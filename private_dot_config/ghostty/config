@@ -1,0 +1,34 @@
+font-family = "Monaspace Neon Frozen"
+font-family-bold = "Monaspace Krypton Frozen"
+font-family-italic = "Monaspace Radon Frozen"
+font-family-bold-italic = "Monaspace Radon Frozen"
+font-style = "Light"
+font-style-bold = "Bold"
+font-style-italic= "Light"
+font-style-bold-italic = "Bold"
+adjust-cell-height = 20%
+font-size = "13.0"
+
+font-feature = -calt
+font-feature = -liga
+font-feature = -dlig
+font-feature = -ss05
+
+theme = "catppuccin-mocha"
+bold-is-bright = true
+cursor-style = block
+shell-integration-features = no-cursor
+# custom-shader = shaders/bloom.gsl
+
+window-theme = system
+gtk-titlebar = true
+gtk-wide-tabs = false
+gtk-adwaita = false
+
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = true
+
+copy-on-select = true
+
+keybind = ctrl+enter=unbind

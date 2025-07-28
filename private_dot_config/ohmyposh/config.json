@@ -1,0 +1,303 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "palette": {
+    "base": "#1e1e2e",
+    "blue": "#89b4fa",
+    "crust": "#11111b",
+    "flamingo": "#f2cdcd",
+    "green": "#a6e3a1",
+    "lavender": "#b4befe",
+    "mantle": "#181825",
+    "maroon": "#eba0ac",
+    "mauve": "#cba6f7",
+    "overlay0": "#6c7086",
+    "overlay1": "#7f849c",
+    "overlay2": "#9399b2",
+    "peach": "#fab387",
+    "pink": "#f5c2e7",
+    "red": "#f38ba8",
+    "rosewater": "#f5e0dc",
+    "sapphire": "#74c7ec",
+    "sky": "#89dceb",
+    "subtext0": "#a6adc8",
+    "subtext1": "#bac2de",
+    "surface0": "#313244",
+    "surface1": "#45475a",
+    "surface2": "#585b70",
+    "teal": "#94e2d5",
+    "text": "#cdd6f4",
+    "yellow": "#f9e2af"
+  },
+  "transient_prompt": {
+    "template": "{{ .PWD }}<p:mauve> ➜ </>",
+    "foreground": "p:lavender",
+    "background": "transparent",
+    "newline": true
+  },
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\u250f",
+          "foreground": "p:mauve",
+          "background": "transparent",
+          "type": "text",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if ne .Code 0 }}p:red{{end}}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " \uf313 ",
+          "foreground": "p:crust",
+          "powerline_symbol": "\ue0b4",
+          "background": "p:mauve",
+          "type": "text",
+          "style": "powerline",
+          "background_templates": [
+            "{{ if ne .Code 0 }}p:red{{end}}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\uea87 {{ .Code }}",
+          "foreground": "p:crust",
+          "powerline_symbol": "\ue0b4",
+          "background": "p:blue",
+          "type": "status",
+          "style": "accordion",
+          "background_templates": [
+            "{{ if ne .Code 0 }}p:red{{end}}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "{{if gt .SHLVL 2}} \uf149 {{ .SHLVL }}{{end}}",
+          "foreground": "p:crust",
+          "powerline_symbol": "\ue0b4",
+          "background": "p:yellow",
+          "type": "text",
+          "style": "accordion",
+          "background_templates": [
+            "{{ if gt .SHLVL 2 }}p:yellow{{end}}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " \udb83\udfc6 ",
+          "foreground": "p:red",
+          "background": "transparent",
+          "type": "root",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "{{ if .SSHSession }}\ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
+          "foreground": "p:surface2",
+          "background": "transparent",
+          "type": "session",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "always_enabled": false,
+            "cache_duration": "none",
+            "style": "round",
+            "threshold": 5000
+          },
+          "template": " <p:text><i>took</i></> \udb81\udd1b {{ .FormattedMs }}",
+          "foreground": "p:yellow",
+          "type": "executiontime",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}p:red{{ end }}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>in</i></> \uf313 nix-{{ .Type }}",
+          "foreground": "p:blue",
+          "type": "nix-shell",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \udb80\udf99 {{ .Full }}",
+          "foreground": "p:green",
+          "type": "node",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }}",
+          "foreground": "p:yellow",
+          "type": "python",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue624 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:mauve",
+          "type": "julia",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue627 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:sky",
+          "type": "go",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue620 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:blue",
+          "type": "lua",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue777 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:mauve",
+          "type": "haskell",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \ue68a {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:blue",
+          "type": "r",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>via</i></> \udb85\ude17 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:peach",
+          "type": "rust",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": " <p:text><i>is</i></> {{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }}{{ end }}",
+          "foreground": "p:teal",
+          "type": "project",
+          "style": "plain"
+        }
+      ],
+      "newline": true
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\u2523",
+          "foreground": "p:mauve",
+          "background": "transparent",
+          "type": "text",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if ne .Code 0 }}p:red{{end}}"
+          ]
+        },
+        {
+          "properties": {
+            "cache_duration": "none",
+            "style": "agnoster_full"
+          },
+          "template": "{{ $segment := .Segments.Git }}{{ $icon := \"\uf07b \" }}{{ if $segment.Dir }}{{ $dirL := splitList \"/\" $segment.Dir }} {{ $icon }}\uf141/{{ if $segment.IsWorkTree}}<b>{{ last $dirL }}</b>{{ else }}<b>{{ $segment.RepoName }}</b>{{ end }}{{if ne $segment.RepoName .Path}}{{ trimPrefix $segment.Dir .PWD }}{{ end }}{{ else }} \uf07b {{ path .Path .Location }}{{ end }}{{ if not .Writable }} \uf023{{ end }} ",
+          "foreground": "p:blue",
+          "type": "path",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "branch_ahead_icon": "\uf148",
+            "branch_behind_icon": "\uf149",
+            "branch_gone_icon": "\ueb9f ",
+            "branch_icon": "\ue0a0",
+            "branch_identical_icon": "\uea77 ",
+            "branch_max_length": 25,
+            "cache_duration": "none",
+            "fetch_bare_info": true,
+            "fetch_stash_count": true,
+            "fetch_status": true,
+            "fetch_upstream_icon": true,
+            "github_icon": "\ueb00 "
+          },
+          "template": "<p:text><i>at</i></> {{ .UpstreamIcon }}{{if .BranchStatus }}<p:teal>{{ .BranchStatus }}</>{{ end }} <p:text><i>on</i></> {{ .HEAD }}{{if .IsWorkTree}}\uf1bb{{end}}{{ if .Working.Changed }} <p:pink>\uf044 {{ .Working.String }}</>{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} <p:pink>\uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
+          "foreground": "p:green",
+          "type": "git",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:peach{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:red{{ end }}",
+            "{{ if gt .Ahead 0 }}p:teal{{ end }}",
+            "{{ if gt .Behind 0 }}p:maroon{{ end }}"
+          ]
+        }
+      ],
+      "newline": true
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\u2517\udb85\udddc ",
+          "foreground": "p:mauve",
+          "background": "transparent",
+          "type": "text",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if ne .Code 0 }}p:red{{end}}"
+          ]
+        }
+      ],
+      "newline": true
+    }
+  ],
+  "version": 3
+}
