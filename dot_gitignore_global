@@ -1,0 +1,5 @@
+# Ignore patterns from Nix config
+.direnv/
+.devenv/
+.venv/
+.env
