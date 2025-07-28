@@ -1,0 +1,92 @@
+PATH=$PATH:~/.local/bin
+
+### Added by Zinit's installer
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
+
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+# Load a few important annexes, without Turbo
+# (this is currently required for annexes)
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
+
+# Plugins
+zinit wait lucid for \
+    OMZL::git.zsh \
+    OMZP::git \
+    OMZP::git-extras
+
+# important libraries
+zinit lucid for \
+    OMZL::clipboard.zsh \
+    OMZL::compfix.zsh \
+    OMZL::history.zsh \
+    OMZL::spectrum.zsh
+
+# important plugins
+zinit ice depth=1
+zinit light jeffreytse/zsh-vi-mode
+zinit light djui/alias-tips
+zinit light wfxr/forgit
+
+zinit wait lucid for \
+    OMZP::asdf \
+    OMZP::aliases \
+    OMZP::copypath \
+    OMZP::colored-man-pages \
+    OMZP::direnv \
+    OMZP::extract \
+    OMZP::magic-enter \
+    OMZP::npm \
+    OMZP::python \
+    OMZP::tmux \
+    OMZP::web-search
+
+zinit wait lucid for \
+ atinit"ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay" \
+    zdharma-continuum/fast-syntax-highlighting \
+ atload"_zsh_autosuggest_start; bindkey '^ ' autosuggest-accept" \
+    zsh-users/zsh-autosuggestions \
+ blockf atpull'zinit creinstall -q .' \
+    zsh-users/zsh-completions
+
+zinit ice as"command" from"gh-r" bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin" \
+    atclone"./atuin init zsh > init.zsh; ./atuin gen-completions --shell zsh > _atuin" \
+    atpull"%atclone" src"init.zsh"
+zinit light atuinsh/atuin
+
+### End of Zinit's installer chunk
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$(zoxide init --cmd cd zsh)"
+eval "$(atuin init zsh)"
+eval "$(tv init zsh)"
+
+# carapace
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+source <(carapace _carapace)
+zstyle ':completion:*:git:*' group-order 'main commands' 'alias commands' 'external commands'
+
+# aliases
+alias y="yazi"
+alias ls="eza --icons"
+alias lg="lazygit"
+alias gst="git status --short"
+alias du="dua i"
+alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
+alias grep="grep --color=auto"
+
+# prompt
+eval "$(starship init zsh)"
