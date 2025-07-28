@@ -1,0 +1,33 @@
+[user]
+    name = Dileep Kishore
+    email = k.dileep1994@gmail.com
+    signingkey = ~/.ssh/github
+
+[core]
+    editor = nvim
+    excludesFile = ~/.gitignore_global
+
+[init]
+    defaultBranch = main
+
+[gpg]
+    format = ssh
+
+[commit]
+    gpgSign = true
+
+[merge]
+    conflictStyle = zdiff3
+
+[branch]
+    sort = committerdate
+
+[push]
+    autoSetupRemote = true
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
