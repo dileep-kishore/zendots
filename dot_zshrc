@@ -1,19 +1,26 @@
 # vim:ft=zsh
 
-setopt INC_APPEND_HISTORY SHARE_HISTORY
-setopt APPEND_HISTORY
-# unsetopt BG_NICE
-setopt CORRECT
-setopt EXTENDED_HISTORY
-# setopt MENU_COMPLETE
-# setopt ALL_EXPORT
-setopt RM_STAR_WAIT
+# History options should be set in .zshrc and after oh-my-zsh sourcing.
+# See https://github.com/nix-community/home-manager/issues/177.
+HISTSIZE="10000"
+SAVEHIST="10000"
 
-setopt   notify globdots correct pushdtohome cdablevars autolist
-setopt   correctall autocd recexact longlistjobs interactivecomments
-setopt   autoresume histignoredups pushdsilent
-setopt   autopushd pushdminus extendedglob rcquotes mailwarning
-unsetopt bgnice autoparamslash
+HISTFILE="$HOME/.zsh_history"
+mkdir -p "$(dirname "$HISTFILE")"
+
+# History-related options
+setopt HIST_FCNTL_LOCK HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY EXTENDED_HISTORY INC_APPEND_HISTORY APPEND_HISTORY
+unsetopt HIST_IGNORE_ALL_DUPS HIST_SAVE_NO_DUPS HIST_FIND_NO_DUPS HIST_EXPIRE_DUPS_FIRST
+
+# Completion and correction options
+setopt CORRECT CORRECT_ALL MENU_COMPLETE
+
+# Pushd/cd-related options
+setopt AUTOCD PUSHDTOHOME CDABLEVARS AUTOPUSHD PUSHD_SILENT PUSHD_MINUS
+
+# Miscellaneous options
+setopt NOTIFY GLOBDOTS AUTOLIST REC_EXACT LONG_LIST_JOBS INTERACTIVE_COMMENTS AUTORESUME EXTENDED_GLOB RC_QUOTES MAIL_WARNING RM_STAR_WAIT ALL_EXPORT
+unsetopt BG_NICE AUTO_PARAM_SLASH
 
 autoload -Uz compinit
 compinit
@@ -56,6 +63,11 @@ zinit light-mode for \
     zdharma-continuum/zinit-annex-rust
 
 # Plugins
+zinit wait lucid for \
+  OMZL::git.zsh \
+  OMZP::git-extras \
+  OMZP::git \
+  wfxr/forgit
 
 # important libraries
 zinit lucid for \
@@ -68,7 +80,6 @@ zinit lucid for \
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
 zinit light djui/alias-tips
-zinit load wfxr/forgit
 
 zinit wait lucid for \
     OMZP::asdf \
@@ -115,7 +126,6 @@ source <(carapace _carapace)
 # aliases
 alias bat="bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
 alias y="yazi"
-alias ls="eza --icons"
 alias lg="lazygit"
 alias gst="git status --short"
 alias du="dua i"
@@ -128,6 +138,14 @@ alias rm="rm -i"
 alias cls="clear"
 alias exportforge="export PATH=$HOME/miniforge3/bin:$PATH"
 alias myip="curl http://ipecho.net/plain; echo"
+
+# eza
+alias eza='eza --icons auto --git'
+alias la='eza -a'
+alias ll='eza -l'
+alias lla='eza -la'
+alias ls=eza
+alias lt='eza --tree'
 
 # Tmux
 alias ta="sesh connect"
