@@ -28,10 +28,6 @@ zinit light-mode for \
     zdharma-continuum/zinit-annex-rust
 
 # Plugins
-zinit wait lucid for \
-    OMZL::git.zsh \
-    OMZP::git \
-    OMZP::git-extras
 
 # important libraries
 zinit lucid for \
@@ -44,7 +40,7 @@ zinit lucid for \
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
 zinit light djui/alias-tips
-zinit light wfxr/forgit
+zinit load wfxr/forgit
 
 zinit wait lucid for \
     OMZP::asdf \
@@ -80,10 +76,13 @@ eval "$(atuin init zsh)"
 eval "$(tv init zsh)"
 
 # carapace
+setopt menucomplete
+export LS_COLORS=$(vivid generate catppuccin-mocha)
+zstyle ':completion:*' menu select
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+zstyle ':completion:*' list-colors $LS_COLORS
 source <(carapace _carapace)
-zstyle ':completion:*:git:*' group-order 'main commands' 'alias commands' 'external commands'
 
 # aliases
 alias bat="bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
@@ -95,16 +94,21 @@ alias du="dua i"
 alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
 alias grep="grep --color=auto"
 
-# Tmux aliases
+# Tmux
 alias ta="sesh connect"
 alias tdetach="tmux detach"
 alias tkill="tmux kill-session -t"
 alias tlist="sesh list -tT --icons"
-
 tnew() {
     bash ~/.config/tmux/scripts/templater.sh "$@"
     tmuxinator start "$1"
 }
+
+# AI secrets
+export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
+export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
+export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
+export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
 
 # prompt
 eval "$(starship init zsh)"
