@@ -86,6 +86,7 @@ source <(carapace _carapace)
 zstyle ':completion:*:git:*' group-order 'main commands' 'alias commands' 'external commands'
 
 # aliases
+alias bat="bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
 alias y="yazi"
 alias ls="eza --icons"
 alias lg="lazygit"

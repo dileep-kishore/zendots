@@ -1,6 +1,7 @@
 tap "jandedobbeleer/oh-my-posh"
 tap "sst/tap"
 brew "bat"
+brew "bat-extras"
 brew "carapace"
 brew "chezmoi"
 brew "eza"
