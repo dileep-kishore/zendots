@@ -1,0 +1,9 @@
+[[mgr.prepend_keymap]]
+desc = "Jump to char"
+on = "s"
+run = "plugin jump-to-char"
+
+[[mgr.prepend_keymap]]
+desc = "Compress with ouch"
+on = "C"
+run = "plugin ouch"
