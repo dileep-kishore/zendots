@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+channel_priority: strict
+changeps1: false
+auto_activate_base: false
