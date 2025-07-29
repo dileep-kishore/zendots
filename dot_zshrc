@@ -1,3 +1,5 @@
+# vim:ft=zsh
+
 autoload -Uz compinit
 compinit
 export EDITOR=nvim
@@ -91,6 +93,17 @@ alias gst="git status --short"
 alias du="dua i"
 alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
 alias grep="grep --color=auto"
+
+# Tmux aliases
+alias ta="sesh connect"
+alias tdetach="tmux detach"
+alias tkill="tmux kill-session -t"
+alias tlist="sesh list -tT --icons"
+
+tnew() {
+    bash ~/.config/tmux/scripts/templater.sh "$@"
+    tmuxinator start "$1"
+}
 
 # prompt
 eval "$(starship init zsh)"
