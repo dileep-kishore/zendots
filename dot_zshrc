@@ -1,5 +1,6 @@
 autoload -Uz compinit
 compinit
+export EDITOR=nvim
 
 PATH=$PATH:~/.local/bin
 
