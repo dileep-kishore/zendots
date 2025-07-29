@@ -1,0 +1,13 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"theme": "catppuccin",
+	"model": "github-copilot/gpt-4.1",
+	"autoshare": false,
+	"autoupdate": false,
+	"mcp": {
+		"context7": {
+			"type": "local",
+			"command": ["npx", "-y", "@upstash/context7-mcp"]
+		}
+	}
+}
