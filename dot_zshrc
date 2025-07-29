@@ -1,10 +1,38 @@
 # vim:ft=zsh
 
+setopt INC_APPEND_HISTORY SHARE_HISTORY
+setopt APPEND_HISTORY
+# unsetopt BG_NICE
+setopt CORRECT
+setopt EXTENDED_HISTORY
+# setopt MENU_COMPLETE
+# setopt ALL_EXPORT
+setopt RM_STAR_WAIT
+
+setopt   notify globdots correct pushdtohome cdablevars autolist
+setopt   correctall autocd recexact longlistjobs interactivecomments
+setopt   autoresume histignoredups pushdsilent
+setopt   autopushd pushdminus extendedglob rcquotes mailwarning
+unsetopt bgnice autoparamslash
+
 autoload -Uz compinit
 compinit
-export EDITOR=nvim
 
-PATH=$PATH:~/.local/bin
+# Variables
+export EDITOR=nvim
+export USE_EDITOR=$EDITOR
+export VISUAL=$EDITOR
+export BROWSER=brave-browser
+export GIT_PAGER="delta"
+export FZF_DEFAULT_OPTS="\
+    --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :500 {}'\
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
+export PATH=$PATH:~/.local/bin
+export PATH="$PATH:/var/lib/flatpak/exports/bin"
+export PATH="$PATH:~/npm-global/bin"
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
@@ -93,6 +121,13 @@ alias gst="git status --short"
 alias du="dua i"
 alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
 alias grep="grep --color=auto"
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias df="df -ahiT --total"
+alias clear="clear -x"
+alias rm="rm -i"
+alias cls="clear"
+alias exportforge="export PATH=$HOME/miniforge3/bin:$PATH"
+alias myip="curl http://ipecho.net/plain; echo"
 
 # Tmux
 alias ta="sesh connect"
