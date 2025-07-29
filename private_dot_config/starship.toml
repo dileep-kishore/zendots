@@ -2,6 +2,11 @@
 
 palette = "catppuccin_mocha"
 
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](sky)" # For use with zsh-vi-mode
+
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
@@ -61,6 +66,7 @@ symbol = " "
 symbol = " "
 
 [directory]
+style = "bold lavender"
 read_only = " 󰌾"
 
 [docker_context]
@@ -82,6 +88,7 @@ symbol = " "
 symbol = "  "
 
 [git_branch]
+style = "bold mauve"
 symbol = " "
 
 [git_commit]
