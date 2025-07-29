@@ -1,11 +1,19 @@
+# vim:ft=gitconfig
+[include]
+	path = ~/.config/delta/themes/catppuccin.gitconfig
+
 [user]
     name = Dileep Kishore
     email = k.dileep1994@gmail.com
     signingkey = ~/.ssh/github
 
+[github]
+    user = dileep-kishore
+
 [core]
     editor = nvim
     excludesFile = ~/.gitignore_global
+    pager = delta
 
 [init]
     defaultBranch = main
@@ -16,8 +24,15 @@
 [commit]
     gpgSign = true
 
+[credential]
+    helper = cache --timeout 18000
+
 [merge]
     conflictStyle = zdiff3
+    tool = nvimdiff
+
+[mergetool "nvimdiff"]
+    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
 
 [branch]
     sort = committerdate
@@ -31,3 +46,5 @@
     process = git-lfs filter-process
     required = true
 
+[delta]
+    features = line-numbers decorations catppuccin-mocha
