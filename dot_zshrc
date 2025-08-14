@@ -165,4 +165,4 @@ export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
 
 # prompt
 eval "$(starship init zsh)"
-export PATH="/home/dileep/.pixi/bin:$PATH"
+export PATH="$HOME/.pixi/bin:$PATH"
