@@ -199,3 +199,18 @@ exposed = { zoxide = "zoxide" }
 channels = ["conda-forge"]
 dependencies = { tmux = "*" }
 exposed = { tmux = "tmux" }
+
+[envs.atuin]
+channels = ["conda-forge"]
+dependencies = { atuin = "*" }
+exposed = { atuin = "atuin" }
+
+[envs.direnv]
+channels = ["conda-forge"]
+dependencies = { direnv = "*" }
+exposed = { direnv = "direnv" }
+
+[envs.yazi]
+channels = ["conda-forge"]
+dependencies = { yazi = "*" }
+exposed = { ya = "ya", yazi = "yazi" }
