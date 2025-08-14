@@ -1,0 +1,201 @@
+version = 1
+
+[envs.nvim]
+channels = ["conda-forge"]
+dependencies = { nvim = "*" }
+exposed = { nvim = "nvim" }
+
+[envs.chezmoi]
+channels = ["conda-forge"]
+dependencies = { chezmoi = "*" }
+exposed = { chezmoi = "chezmoi" }
+
+[envs.aria2]
+channels = ["conda-forge"]
+dependencies = { aria2 = "*" }
+exposed = { aria2c = "aria2c" }
+
+[envs.bat]
+channels = ["conda-forge"]
+dependencies = { bat = "*" }
+exposed = { bat = "bat" }
+
+[envs.bat-extras]
+channels = ["conda-forge"]
+dependencies = { bat-extras = "*" }
+exposed = { bat-modules = "bat-modules", batdiff = "batdiff", batgrep = "batgrep", batman = "batman", batpipe = "batpipe", batwatch = "batwatch", prettybat = "prettybat" }
+
+[envs.bc]
+channels = ["conda-forge"]
+dependencies = { bc = "*" }
+exposed = { bc = "bc", dc = "dc" }
+
+[envs.biome]
+channels = ["conda-forge"]
+dependencies = { biome = "*" }
+exposed = { biome = "biome" }
+
+[envs.btop]
+channels = ["conda-forge"]
+dependencies = { btop = "*" }
+exposed = { btop = "btop" }
+
+[envs.carapace]
+channels = ["conda-forge"]
+dependencies = { carapace = "*" }
+exposed = { carapace = "carapace" }
+
+[envs.dua-cli]
+channels = ["conda-forge"]
+dependencies = { dua-cli = "*" }
+exposed = { dua = "dua" }
+
+[envs.entr]
+channels = ["conda-forge"]
+dependencies = { entr = "*" }
+exposed = { entr = "entr" }
+
+[envs.eza]
+channels = ["conda-forge"]
+dependencies = { eza = "*" }
+exposed = { eza = "eza" }
+
+[envs.fastfetch]
+channels = ["conda-forge"]
+dependencies = { fastfetch = "*" }
+exposed = { fastfetch = "fastfetch", flashfetch = "flashfetch" }
+
+[envs.fzf]
+channels = ["conda-forge"]
+dependencies = { fzf = "*" }
+exposed = { fzf = "fzf" }
+
+[envs.gh]
+channels = ["conda-forge"]
+dependencies = { gh = "*" }
+exposed = { gh = "gh" }
+
+[envs.git-cliff]
+channels = ["conda-forge"]
+dependencies = { git-cliff = "*" }
+exposed = { git-cliff = "git-cliff", git-cliff-completions = "git-cliff-completions", git-cliff-mangen = "git-cliff-mangen" }
+
+[envs.git-delta]
+channels = ["conda-forge"]
+dependencies = { git-delta = "*" }
+exposed = { delta = "delta" }
+
+[envs.fd-find]
+channels = ["conda-forge"]
+dependencies = { fd-find = "*" }
+exposed = { fd = "fd" }
+
+[envs.glow-md]
+channels = ["conda-forge"]
+dependencies = { glow-md = "*" }
+exposed = { glow = "glow" }
+
+[envs.unzip]
+channels = ["conda-forge"]
+dependencies = { unzip = "*" }
+exposed = { funzip = "funzip", unzip = "unzip", unzipsfx = "unzipsfx", zipgrep = "zipgrep", zipinfo = "zipinfo" }
+
+[envs.jc]
+channels = ["conda-forge"]
+dependencies = { jc = "*" }
+exposed = { jc = "jc" }
+
+[envs.jq]
+channels = ["conda-forge"]
+dependencies = { jq = "*" }
+exposed = { jq = "jq" }
+
+[envs.just]
+channels = ["conda-forge"]
+dependencies = { just = "*" }
+exposed = { just = "just" }
+
+[envs.lazydocker]
+channels = ["conda-forge"]
+dependencies = { lazydocker = "*" }
+exposed = { lazydocker = "lazydocker" }
+
+[envs.lazygit]
+channels = ["conda-forge"]
+dependencies = { lazygit = "*" }
+exposed = { lazygit = "lazygit" }
+
+[envs.ouch]
+channels = ["conda-forge"]
+dependencies = { ouch = "*" }
+exposed = { ouch = "ouch" }
+
+[envs.p7zip]
+channels = ["conda-forge"]
+dependencies = { p7zip = "*" }
+exposed = { 7z = "7z", 7za = "7za", 7zr = "7zr" }
+
+[envs.pipx]
+channels = ["conda-forge"]
+dependencies = { pipx = "*" }
+exposed = { pipx = "pipx" }
+
+[envs.rich-cli]
+channels = ["conda-forge"]
+dependencies = { rich-cli = "*" }
+exposed = { rich = "rich" }
+
+[envs.ripgrep]
+channels = ["conda-forge"]
+dependencies = { ripgrep = "*" }
+exposed = { rg = "rg" }
+
+[envs.sesh]
+channels = ["conda-forge"]
+dependencies = { sesh = "*" }
+exposed = { sesh = "sesh" }
+
+[envs.starship]
+channels = ["conda-forge"]
+dependencies = { starship = "*" }
+exposed = { starship = "starship" }
+
+[envs.tealdeer]
+channels = ["conda-forge"]
+dependencies = { tealdeer = "*" }
+exposed = { tldr = "tldr" }
+
+[envs.television]
+channels = ["conda-forge"]
+dependencies = { television = "*" }
+exposed = { tv = "tv" }
+
+[envs.ruby]
+channels = ["conda-forge"]
+dependencies = { ruby = "*" }
+exposed = { bundle = "bundle", bundler = "bundler", erb = "erb", gem = "gem", irb = "irb", racc = "racc", rake = "rake", rbs = "rbs", rdbg = "rdbg", rdoc = "rdoc", ri = "ri", ruby = "ruby", syntax_suggest = "syntax_suggest", typeprof = "typeprof" }
+
+[envs.vivid]
+channels = ["conda-forge"]
+dependencies = { vivid = "*" }
+exposed = { vivid = "vivid" }
+
+[envs.yq]
+channels = ["conda-forge"]
+dependencies = { yq = "*" }
+exposed = { tomlq = "tomlq", yq = "yq", xq = "xq" }
+
+[envs.zip]
+channels = ["conda-forge"]
+dependencies = { zip = "*" }
+exposed = { zip = "zip", zipcloak = "zipcloak", zipnote = "zipnote", zipsplit = "zipsplit" }
+
+[envs.zoxide]
+channels = ["conda-forge"]
+dependencies = { zoxide = "*" }
+exposed = { zoxide = "zoxide" }
+
+[envs.tmux]
+channels = ["conda-forge"]
+dependencies = { tmux = "*" }
+exposed = { tmux = "tmux" }
