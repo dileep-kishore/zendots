@@ -121,12 +121,7 @@ if [[ -f /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator
 fi
 
 eval "$(zoxide init --cmd cd zsh)"
-# If atuin is installed using pixi, then use that
-if [[ -f /global/homes/d/dkishore/.pixi/envs/atuin/bin/atuin ]]; then
-    eval "$(/global/homes/d/dkishore/.pixi/envs/atuin/bin/atuin init zsh)"
-else
-    eval "$(atuin init zsh)"
-fi
+eval "$(atuin init zsh)"
 
 eval "$(tv init zsh)"
 
