@@ -25,6 +25,11 @@ unsetopt BG_NICE AUTO_PARAM_SLASH
 autoload -Uz compinit
 compinit
 
+# If I am on nersc, then export TERM=xterm-256color
+if [[ $HOME == "/global/homes/d/dkishore" ]]; then
+    export TERM=xterm-256color
+fi
+
 # Variables
 export EDITOR=nvim
 export USE_EDITOR=$EDITOR
