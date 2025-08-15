@@ -115,8 +115,19 @@ if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# If ruby is installed using pixi, then add this to PATH /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin/
+if [[ -f /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin/tmuxinator ]]; then
+    export PATH="$PATH:/global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin"
+fi
+
 eval "$(zoxide init --cmd cd zsh)"
-eval "$(atuin init zsh)"
+# If atuin is installed using pixi, then use that
+if [[ -f /global/homes/d/dkishore/.pixi/envs/atuin/bin/atuin ]]; then
+    eval "$(/global/homes/d/dkishore/.pixi/envs/atuin/bin/atuin init zsh)"
+else
+    eval "$(atuin init zsh)"
+fi
+
 eval "$(tv init zsh)"
 
 # carapace
