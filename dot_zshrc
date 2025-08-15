@@ -40,6 +40,7 @@ export FZF_DEFAULT_OPTS="\
 export PATH=$PATH:~/.local/bin
 export PATH="$PATH:/var/lib/flatpak/exports/bin"
 export PATH="$PATH:~/npm-global/bin"
+export PATH="$HOME/.pixi/bin:$PATH"
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
@@ -165,4 +166,3 @@ export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
 
 # prompt
 eval "$(starship init zsh)"
-export PATH="$HOME/.pixi/bin:$PATH"
