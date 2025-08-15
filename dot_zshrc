@@ -110,7 +110,11 @@ zinit light atuinsh/atuin
 
 ### End of Zinit's installer chunk
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Only run these if the file exists
+if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
 eval "$(tv init zsh)"
