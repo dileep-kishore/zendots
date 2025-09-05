@@ -14,6 +14,10 @@ Zen dotfiles
 2. For `tmux` make sure to install plugins using `prefix + I`
 3. For `yazi` run the `pkgs/download_yazi_plugins.sh`
 
+### Misc instructions
+
+1. Run `pkgs/misc_setup.sh` to run a set of commands manually to finish setup
+
 ### Font setup (manual)
 
 1. Monaspace
