@@ -120,11 +120,6 @@ if [[ -f /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator
     export PATH="$PATH:/global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin"
 fi
 
-eval "$(zoxide init --cmd cd zsh)"
-eval "$(atuin init zsh)"
-
-eval "$(tv init zsh)"
-
 # carapace
 setopt menucomplete
 export LS_COLORS=$(vivid generate catppuccin-mocha)
@@ -174,5 +169,12 @@ export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
 export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
 export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
 
-# prompt
+
+eval "$(zoxide init --cmd cd zsh)"
+eval "$(atuin init zsh)"
+eval "$(tv init zsh)"
 eval "$(starship init zsh)"
+
+# bindings
+zvm_after_init_commands+=("bindkey '^r' atuin-search")
+# bindkey '^r' atuin-search
