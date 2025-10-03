@@ -14,7 +14,7 @@ font-feature = -liga
 font-feature = -dlig
 font-feature = -ss05
 
-theme = "catppuccin-mocha"
+theme = "Catppuccin Mocha"
 bold-is-bright = true
 cursor-style = block
 shell-integration-features = no-cursor
@@ -23,7 +23,8 @@ shell-integration-features = no-cursor
 window-theme = system
 gtk-titlebar = true
 gtk-wide-tabs = false
-gtk-adwaita = false
+gtk-toolbar-style = flat
+gtk-titlebar-style = tabs
 
 window-padding-x = 0
 window-padding-y = 0
