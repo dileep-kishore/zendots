@@ -11,3 +11,4 @@ application/xhtml+xml=brave-browser.desktop
 application/x-extension-xhtml=brave-browser.desktop
 application/x-extension-xht=brave-browser.desktop
 x-scheme-handler/chrome=brave-browser.desktop
+x-scheme-handler/tana=tana.desktop
