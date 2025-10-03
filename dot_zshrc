@@ -173,7 +173,8 @@ export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
 eval "$(tv init zsh)"
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
+eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 
 # bindings
 zvm_after_init_commands+=("bindkey '^r' atuin-search")
