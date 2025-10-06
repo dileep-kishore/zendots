@@ -224,3 +224,8 @@ exposed = { xclip = "xclip", xclip-copyfile = "xclip-copyfile", xclip-cutfile = 
 channels = ["conda-forge"]
 dependencies = { xsel = "*" }
 exposed = { xsel = "xsel" }
+
+[envs.oh-my-posh]
+channels = ["conda-forge"]
+dependencies = { oh-my-posh = "*" }
+exposed = { oh-my-posh = "oh-my-posh" }
