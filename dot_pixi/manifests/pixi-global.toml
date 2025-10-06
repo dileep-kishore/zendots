@@ -214,3 +214,13 @@ exposed = { direnv = "direnv" }
 channels = ["conda-forge"]
 dependencies = { yazi = "*" }
 exposed = { ya = "ya", yazi = "yazi" }
+
+[envs.xclip]
+channels = ["conda-forge"]
+dependencies = { xclip = "*" }
+exposed = { xclip = "xclip", xclip-copyfile = "xclip-copyfile", xclip-cutfile = "xclip-cutfile", xclip-pastefile = "xclip-pastefile" }
+
+[envs.xsel]
+channels = ["conda-forge"]
+dependencies = { xsel = "*" }
+exposed = { xsel = "xsel" }
