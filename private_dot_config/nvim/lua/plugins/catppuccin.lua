@@ -12,10 +12,4 @@ return {
       })
     end,
   },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin", -- Load Catppuccin as the default
-    },
-  },
 }
