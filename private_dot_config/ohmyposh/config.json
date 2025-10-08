@@ -28,12 +28,6 @@
     "text": "#cdd6f4",
     "yellow": "#f9e2af"
   },
-  "transient_prompt": {
-    "template": "{{ .PWD }}<p:mauve> ➜ </>",
-    "foreground": "p:lavender",
-    "background": "transparent",
-    "newline": true
-  },
   "blocks": [
     {
       "type": "prompt",
@@ -56,7 +50,7 @@
           "properties": {
             "cache_duration": "none"
           },
-          "template": " \uf313 ",
+          "template": " 󰊠 ",
           "foreground": "p:crust",
           "powerline_symbol": "\ue0b4",
           "background": "p:mauve",
@@ -108,7 +102,7 @@
           "properties": {
             "cache_duration": "none"
           },
-          "template": "{{ if .SSHSession }}\ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
+          "template": " <p:text><i>at</i></> {{ if .SSHSession }}\ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
           "foreground": "p:surface2",
           "background": "transparent",
           "type": "session",
