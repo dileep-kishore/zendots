@@ -26,6 +26,7 @@ require("lazy").setup({
     { import = "plugins" },
     { import = "plugins.themes" },
     { import = "plugins.bars" },
+    { import = "plugins.ui" },
   },
   install = {
       missing = true,
