@@ -102,8 +102,8 @@
           "properties": {
             "cache_duration": "none"
           },
-          "template": " <p:text><i>at</i></> {{ if .SSHSession }}\ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
-          "foreground": "p:surface2",
+          "template": "{{ if .SSHSession }} <p:text><i>at</i></> \ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
+          "foreground": "p:overlay2",
           "background": "transparent",
           "type": "session",
           "style": "plain"
