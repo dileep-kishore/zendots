@@ -44,7 +44,7 @@ return {
           "alejandra",
           "shfmt",
           "gofumpt",
-          "rustfmt",
+          -- "rustfmt", -- NOTE: Recommended to install via rustup
           "ruff",
           "prettierd",
           "yamlfix",

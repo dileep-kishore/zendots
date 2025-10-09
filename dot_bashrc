@@ -118,3 +118,4 @@ fi
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 export PATH="$HOME/.pixi/bin:$PATH"
+. "$HOME/.cargo/env"
