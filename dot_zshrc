@@ -177,6 +177,19 @@ eval "$(tv init zsh)"
 # eval "$(starship init zsh)"
 eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 
-# bindings
+# forced bindings
 zvm_after_init_commands+=("bindkey '^r' atuin-search")
 # bindkey '^r' atuin-search
+
+# ai chat
+_aichat_zsh() {
+    if [[ -n "$BUFFER" ]]; then
+        local _old=$BUFFER
+        BUFFER+="⌛"
+        zle -I && zle redisplay
+        BUFFER=$(aichat -e "$_old")
+        zle end-of-line
+    fi
+}
+zle -N _aichat_zsh
+bindkey '\ee' _aichat_zsh
