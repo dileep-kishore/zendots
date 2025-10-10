@@ -7,9 +7,14 @@
 __pycache__
 
 # Repository specific files
+chezmoi.toml
 README.md
 LICENSE
 assets/
+justfile
+temp.py
+.env
+CLAUDE.md
 
 # Editconfig
 .editorconfig
