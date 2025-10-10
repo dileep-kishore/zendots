@@ -13,6 +13,9 @@ return {
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup({
+        automatic_enable = {
+          "copilot_ls",
+        },
         ensure_installed = {
           -- lsp
           "lua_ls",
@@ -38,6 +41,7 @@ return {
       })
       require("mason-tool-installer").setup({
         ensure_installed = {
+          "copilot-language-server",
           "ltex-ls-plus",
           -- formatters
           "stylua",

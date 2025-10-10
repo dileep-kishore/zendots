@@ -1,9 +1,6 @@
 return {
   {
     "zbirenbaum/copilot.lua",
-    dependencies = {
-      "copilotlsp-nvim/copilot-lsp",
-    },
     event = "InsertEnter",
     cmd = "Copilot",
     init = function()
@@ -12,7 +9,9 @@ return {
     config = function()
       require("copilot").setup({
         panel = { enabled = false },
-        copilot_model = "gpt-4o-copilot",
+        nes = {
+          enabled = false,
+        },
         suggestion = {
           enabled = true,
           auto_trigger = true,

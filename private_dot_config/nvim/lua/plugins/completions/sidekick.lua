@@ -2,11 +2,16 @@ return {
   {
     "folke/sidekick.nvim",
     opts = {
-      -- add any options here
+      nes = {
+        enabled = true,
+        debounce = 100,
+      },
       cli = {
-        mux = {
-          backend = "tmux",
-          enabled = true,
+        mux = { backend = "tmux", enabled = true },
+        tools = {
+          opencode = {
+            env = { OPENCODE_THEME = "catppuccin" },
+          },
         },
       },
     },
@@ -14,40 +19,38 @@ return {
       {
         "<tab>",
         function()
-          -- if there is a next edit, jump to it, otherwise apply it if any
           if not require("sidekick").nes_jump_or_apply() then
-            return "<Tab>" -- fallback to normal tab
+            return "<Tab>"
           end
         end,
+        mode = { "i", "n" },
         expr = true,
         desc = "Goto/Apply Next Edit Suggestion",
       },
       {
-        "<c-.>",
+        "<Esc>",
         function()
-          require("sidekick.cli").toggle()
+          require("sidekick").clear()
         end,
-        desc = "Sidekick Toggle",
-        mode = { "n", "t", "i", "x" },
+        desc = "Clear NES",
+        mode = { "n" },
       },
       {
-        "<leader>aa",
+        "<leader>ka",
         function()
           require("sidekick.cli").toggle()
         end,
         desc = "Sidekick Toggle CLI",
       },
       {
-        "<leader>as",
+        "<leader>ks",
         function()
-          require("sidekick.cli").select()
+          require("sidekick.cli").select({ filter = { installed = true } })
         end,
-        -- Or to select only installed tools:
-        -- require("sidekick.cli").select({ filter = { installed = true } })
         desc = "Select CLI",
       },
       {
-        "<leader>at",
+        "<leader>kt",
         function()
           require("sidekick.cli").send({ msg = "{this}" })
         end,
@@ -55,14 +58,14 @@ return {
         desc = "Send This",
       },
       {
-        "<leader>af",
+        "<leader>kf",
         function()
           require("sidekick.cli").send({ msg = "{file}" })
         end,
         desc = "Send File",
       },
       {
-        "<leader>av",
+        "<leader>kv",
         function()
           require("sidekick.cli").send({ msg = "{selection}" })
         end,
@@ -70,16 +73,15 @@ return {
         desc = "Send Visual Selection",
       },
       {
-        "<leader>ap",
+        "<leader>kp",
         function()
           require("sidekick.cli").prompt()
         end,
         mode = { "n", "x" },
         desc = "Sidekick Select Prompt",
       },
-      -- Example of a keybinding to open Claude directly
       {
-        "<leader>ac",
+        "<leader>kc",
         function()
           require("sidekick.cli").toggle({ name = "claude", focus = true })
         end,
