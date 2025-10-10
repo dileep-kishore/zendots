@@ -1,15 +1,15 @@
 local servers = {}
 
 servers.lua_ls = {
-  filetypes = { 'lua' },
+  filetypes = { "lua" },
   settings = {
     Lua = {
-      runtime = { version = 'LuaJIT' },
+      runtime = { version = "LuaJIT" },
       formatters = { ignoreComments = true },
       signatureHelp = { enabled = true },
       diagnostics = {
-        globals = { 'vim' },
-        disable = { 'missing-fields' },
+        globals = { "vim" },
+        disable = { "missing-fields" },
       },
       telemetry = { enabled = false },
     },
@@ -19,16 +19,16 @@ servers.lua_ls = {
 servers.basedpyright = {
   settings = {
     basedpyright = {
-      analysis = { typeCheckingMode = 'standard' },
+      analysis = { typeCheckingMode = "standard" },
     },
   },
 }
 
 servers.nixd = {
-  filetypes = { 'nix' },
+  filetypes = { "nix" },
   settings = {
     nixd = {
-      nixpkgs = { expr = 'import <nixpkgs> {}' },
+      nixpkgs = { expr = "import <nixpkgs> {}" },
       options = {
         nixos = {
           expr = '(builtins.getFlake "github:dileep-kishore/nixos-hyprland").nixosConfigurations.tsuki.options',
@@ -54,24 +54,24 @@ servers.biome = {}
 servers.jsonls = {}
 
 servers.harper_ls = {
-  filetypes = { 'markdown', 'gitcommit', 'typst', 'html', 'text' },
+  filetypes = { "markdown", "gitcommit", "typst", "html", "text" },
 }
 
 servers.ltex_plus = {
   filetypes = {
-    'bib',
-    'org',
-    'plaintex',
-    'rst',
-    'rnoweb',
-    'tex',
-    'pandoc',
-    'quarto',
-    'rmd',
-    'context',
+    "bib",
+    "org",
+    "plaintex",
+    "rst",
+    "rnoweb",
+    "tex",
+    "pandoc",
+    "quarto",
+    "rmd",
+    "context",
   },
   settings = {
-    check_frequency = 'save',
+    check_frequency = "save",
   },
 }
 
@@ -97,5 +97,8 @@ servers.tinymist = {}
 servers.cssls = {}
 
 servers.html = {}
+
+servers.copilot_ls = {}
+servers.copilot = {}
 
 return servers
