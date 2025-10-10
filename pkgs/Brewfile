@@ -1,5 +1,6 @@
 tap "jandedobbeleer/oh-my-posh"
 tap "sst/tap"
+brew "aichat"
 brew "aria2"
 brew "atuin"
 brew "bat"
