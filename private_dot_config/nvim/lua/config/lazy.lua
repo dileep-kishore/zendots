@@ -28,6 +28,7 @@ require("lazy").setup({
     { import = "plugins.ui" },
     { import = "plugins.lsp" },
     { import = "plugins.git" },
+    { import = "plugins.completions" },
   },
   install = {
     missing = true,
