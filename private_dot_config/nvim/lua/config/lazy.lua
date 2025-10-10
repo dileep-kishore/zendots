@@ -18,7 +18,6 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
@@ -28,10 +27,11 @@ require("lazy").setup({
     { import = "plugins.bars" },
     { import = "plugins.ui" },
     { import = "plugins.lsp" },
+    { import = "plugins.git" },
   },
   install = {
-      missing = true,
-      colorscheme = { "catppuccin" },
+    missing = true,
+    colorscheme = { "catppuccin" },
   },
   -- automatically check for plugin updates
   checker = { enabled = false },
