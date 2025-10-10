@@ -16,7 +16,7 @@ return {
       wk.setup({ preset = "helix" })
       wk.add({
         { "<Leader>a", group = "+Avante" },
-        { "<leader>c", group = "+ChatGPT" },
+        { "<leader>c", group = "+Chat AI" },
         { "<leader>d", group = "+DAP" },
         { "<leader>f", group = "+File search" },
         { "<leader>g", group = "+Git" },

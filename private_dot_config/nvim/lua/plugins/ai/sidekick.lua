@@ -36,21 +36,29 @@ return {
         mode = { "n" },
       },
       {
-        "<leader>ka",
+        "<c-.>",
+        function()
+          require("sidekick.cli").toggle()
+        end,
+        desc = "Sidekick Toggle",
+        mode = { "n", "t", "i", "x" },
+      },
+      {
+        "<leader>ca",
         function()
           require("sidekick.cli").toggle()
         end,
         desc = "Sidekick Toggle CLI",
       },
       {
-        "<leader>ks",
+        "<leader>cs",
         function()
           require("sidekick.cli").select({ filter = { installed = true } })
         end,
         desc = "Select CLI",
       },
       {
-        "<leader>kt",
+        "<leader>ct",
         function()
           require("sidekick.cli").send({ msg = "{this}" })
         end,
@@ -58,14 +66,14 @@ return {
         desc = "Send This",
       },
       {
-        "<leader>kf",
+        "<leader>cf",
         function()
           require("sidekick.cli").send({ msg = "{file}" })
         end,
         desc = "Send File",
       },
       {
-        "<leader>kv",
+        "<leader>cv",
         function()
           require("sidekick.cli").send({ msg = "{selection}" })
         end,
@@ -73,7 +81,7 @@ return {
         desc = "Send Visual Selection",
       },
       {
-        "<leader>kp",
+        "<leader>cp",
         function()
           require("sidekick.cli").prompt()
         end,
@@ -81,7 +89,7 @@ return {
         desc = "Sidekick Select Prompt",
       },
       {
-        "<leader>kc",
+        "<leader>cc",
         function()
           require("sidekick.cli").toggle({ name = "claude", focus = true })
         end,
