@@ -98,7 +98,8 @@ servers.cssls = {}
 
 servers.html = {}
 
-servers.copilot_ls = {}
 servers.copilot = {}
+
+servers.copilot_ls = {}
 
 return servers
