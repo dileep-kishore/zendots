@@ -29,6 +29,7 @@ require("lazy").setup({
     { import = "plugins.lsp" },
     { import = "plugins.git" },
     { import = "plugins.completions" },
+    { import = "plugins.ai" },
   },
   install = {
     missing = true,
