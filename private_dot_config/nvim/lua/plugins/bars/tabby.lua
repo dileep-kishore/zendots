@@ -69,7 +69,17 @@ return {
         if session_name == nil or session_name == "" then
           return " 󱙃 "
         else
-          return " 󰆓 " .. session_name
+          local base_name = vim.fn.fnamemodify(session_name, ":t")
+          -- Parse format: "<project_name> (branch: <branch_name>)"
+          local project, branch = string.match(base_name, "^(.-) %(%s*branch:%s*([^)]+)%)$")
+          local formatted
+          if project and branch and #branch > 0 then
+            local short_branch = string.sub(branch, 1, 1)
+            formatted = project .. "~" .. branch
+          else
+            formatted = base_name
+          end
+          return " 󰆓 " .. formatted
         end
       end
 
