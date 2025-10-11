@@ -1,106 +1,108 @@
 return {
-{
-  'nvim-treesitter/nvim-treesitter',
-  event = 'VeryLazy',
-  dependencies = {
-    'nvim-treesitter/nvim-treesitter-textobjects',
-    'nvim-treesitter/nvim-treesitter-context',
-    'windwp/nvim-ts-autotag',
-  },
-  config = function()
-    require('nvim-treesitter.configs').setup {
-      highlight = { enable = true },
-      indent = { enable = false },
-      matchup = { enable = true },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = '<CR>',
-          node_incremental = '<CR>',
-          scope_incremental = false,
-          node_decremental = '<BS>',
-        },
-      },
-      textobjects = {
-        select = {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    event = "VeryLazy",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
+      "nvim-treesitter/nvim-treesitter-context",
+      "windwp/nvim-ts-autotag",
+    },
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        highlight = { enable = true },
+        ensure_installed = "all",
+        ignore_install = { "ipkg" },
+        indent = { enable = false },
+        matchup = { enable = true },
+        incremental_selection = {
           enable = true,
-          lookahead = true,
           keymaps = {
-            ['af'] = '@function.outer', -- function
-            ['if'] = '@function.inner',
-            ['ac'] = '@class.outer', -- class
-            ['ic'] = '@class.inner',
-            ['al'] = '@loop.outer', -- loop
-            ['il'] = '@loop.inner',
-            ['as'] = '@conditional.outer', -- conditionals
-            ['is'] = '@conditional.inner',
-            -- neopyter
-            ['aj'] = { query = '@cell', desc = 'Select cell' },
-            ['ij'] = { query = '@cellcontent', desc = 'Select cell content' },
+            init_selection = "<CR>",
+            node_incremental = "<CR>",
+            scope_incremental = false,
+            node_decremental = "<BS>",
           },
         },
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = {
-            [']f'] = '@function.outer',
-            [']c'] = '@class.outer',
-            [']l'] = '@loop.outer',
-            [']s'] = '@conditional.outer',
-            [']p'] = '@parameter.outer',
-            [']j'] = '@cellseparator',
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true,
+            keymaps = {
+              ["af"] = "@function.outer", -- function
+              ["if"] = "@function.inner",
+              ["ac"] = "@class.outer", -- class
+              ["ic"] = "@class.inner",
+              ["al"] = "@loop.outer", -- loop
+              ["il"] = "@loop.inner",
+              ["as"] = "@conditional.outer", -- conditionals
+              ["is"] = "@conditional.inner",
+              -- neopyter
+              ["aj"] = { query = "@cell", desc = "Select cell" },
+              ["ij"] = { query = "@cellcontent", desc = "Select cell content" },
+            },
           },
-          goto_next_end = {
-            [']F'] = '@function.outer',
-            [']C'] = '@class.outer',
-            [']L'] = '@loop.outer',
-            [']S'] = '@conditional.outer',
-            [']P'] = '@parameter.outer',
+          move = {
+            enable = true,
+            set_jumps = true,
+            goto_next_start = {
+              ["]f"] = "@function.outer",
+              ["]c"] = "@class.outer",
+              ["]l"] = "@loop.outer",
+              ["]s"] = "@conditional.outer",
+              ["]p"] = "@parameter.outer",
+              ["]j"] = "@cellseparator",
+            },
+            goto_next_end = {
+              ["]F"] = "@function.outer",
+              ["]C"] = "@class.outer",
+              ["]L"] = "@loop.outer",
+              ["]S"] = "@conditional.outer",
+              ["]P"] = "@parameter.outer",
+            },
+            goto_previous_start = {
+              ["[f"] = "@function.outer",
+              ["[c"] = "@class.outer",
+              ["[l"] = "@loop.outer",
+              ["[s"] = "@conditional.outer",
+              ["[p"] = "@parameter.outer",
+              ["[j"] = "@cellseparator",
+            },
+            goto_previous_end = {
+              ["[F"] = "@function.outer",
+              ["[C"] = "@class.outer",
+              ["[L"] = "@loop.outer",
+              ["[S"] = "@conditional.outer",
+              ["[P"] = "@parameter.outer",
+            },
           },
-          goto_previous_start = {
-            ['[f'] = '@function.outer',
-            ['[c'] = '@class.outer',
-            ['[l'] = '@loop.outer',
-            ['[s'] = '@conditional.outer',
-            ['[p'] = '@parameter.outer',
-            ['[j'] = '@cellseparator',
-          },
-          goto_previous_end = {
-            ['[F'] = '@function.outer',
-            ['[C'] = '@class.outer',
-            ['[L'] = '@loop.outer',
-            ['[S'] = '@conditional.outer',
-            ['[P'] = '@parameter.outer',
+          swap = {
+            enable = true,
+            swap_next = {
+              ["gpl"] = "@parameter.inner",
+              desc = "Swap next parameter",
+            },
+            swap_previous = {
+              ["gph"] = "@parameter.inner",
+              desc = "Swap previous parameter",
+            },
           },
         },
-        swap = {
-          enable = true,
-          swap_next = {
-            ['gpl'] = '@parameter.inner',
-            desc = 'Swap next parameter',
-          },
-          swap_previous = {
-            ['gph'] = '@parameter.inner',
-            desc = 'Swap previous parameter',
-          },
+      })
+      require("treesitter-context").setup({
+        enable = true,
+        max_lines = 0,
+        mode = "topline",
+        separator = "-",
+      })
+      require("nvim-ts-autotag").setup({
+        opts = {
+          enable_close = true,
+          enable_rename = true,
+          enable_close_on_slash = true,
         },
-      },
-    }
-    require('treesitter-context').setup {
-      enable = true,
-      max_lines = 0,
-      mode = 'topline',
-      separator = '-',
-    }
-    require('nvim-ts-autotag').setup {
-      opts = {
-        enable_close = true,
-        enable_rename = true,
-        enable_close_on_slash = true,
-      },
-    }
-  end,
-},
+      })
+    end,
+  },
 }
 
 -- NOTE: This makes textobject moves repeatable
