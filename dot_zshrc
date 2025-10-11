@@ -180,15 +180,32 @@ eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 # HACK: custom transient prompt (since oh-my-posh transient prompt is broken with atuin use this)
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd transient-prompt-precmd
-TRANSIENT_PROMPT="${PROMPT// prompt / prompt --profile transient }"
-TRANSIENT_RPROMPT=""
+
+# Catppuccin Mocha colors
+local lavender='%F{#b4befe}'
+local mauve='%F{#cba6f7}'
+local red='%F{#f38ba8}'
+local reset='%f'
+
 function transient-prompt-precmd {
     # Fix ctrl+c behavior
     TRAPINT() { transient-prompt; return $(( 128 + $1 )) }
-    # Save transient prompt
-    SAVED_PROMPT=$'\n'"$(eval "printf '%s' \"${TRANSIENT_PROMPT}\"")"
+
+    # Build transient prompt with color based on exit code
+    local prompt_color="${lavender}"
+    local arrow_color="${mauve}"
+
+    # Check last exit code and use red if it failed
+    if [[ $? -ne 0 ]]; then
+        prompt_color="${red}"
+        arrow_color="${red}"
+    fi
+
+    # Save transient prompt: newline + PWD in lavender/red + arrow in mauve/red
+    SAVED_PROMPT=$'\n'"${prompt_color}%~${arrow_color} ➜ ${reset}"
     SAVED_RPROMPT=""
 }
+
 autoload -Uz add-zle-hook-widget
 add-zle-hook-widget zle-line-finish transient-prompt
 function transient-prompt() {
