@@ -30,6 +30,7 @@ require("lazy").setup({
     { import = "plugins.git" },
     { import = "plugins.completions" },
     { import = "plugins.ai" },
+    { import = "plugins.literate" },
   },
   install = {
     missing = true,
