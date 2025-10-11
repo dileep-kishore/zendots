@@ -6,7 +6,7 @@ return {
       "nvim-tree/nvim-web-devicons",
       "nvim-lua/plenary.nvim",
       "nvimdev/lspsaga.nvim",
-      "jedrzejboczar/possession.nvim",
+      "rmagatti/auto-session",
       "cbochs/grapple.nvim",
     },
     config = function()
@@ -65,8 +65,8 @@ return {
       }
 
       local function get_session_name()
-        local session_name = require("possession.session").get_session_name()
-        if session_name == nil then
+        local session_name = require("auto-session.lib").current_session_name(true)
+        if session_name == nil or session_name == "" then
           return " 󱙃 "
         else
           return " 󰆓 " .. session_name
