@@ -1,13 +1,15 @@
+---
 # cSpell:disable
 config:
-  fallback-icon: "?"
+  fallback-icon: 
   show-name: false
   multi-pane-icon: ""
   icon-position: left # show t
 icons:
-  opencode: 󰚩
+  opencode: 󱙺
+  claude: 󱙺
   apt: 
-  bash: 
+  bash: 
   caffeinate: 
   cargo: 
   beam.smp: 
@@ -20,9 +22,9 @@ icons:
   dpkg: 
   emacs: 
   fdisk: 
-  fish: 
-  git: 
-  gitui: 
+  fish: 
+  git: 
+  gitui: 
   gh: 
   ghostty: 
   go: 
@@ -34,15 +36,15 @@ icons:
   k9s: 󱃾
   kubectl: 󱃾
   lazydocker: 
-  lazygit: 
+  lazygit: 
   lf: 
   lfcd: 
-  lvim: 
+  lvim: 
   mactop: 
   nala: 
   node: 
   nu: 
-  nvim: 
+  nvim: 
   pacman: 
   parted: 
   paru: 
@@ -53,16 +55,16 @@ icons:
   rustc: 
   rustup: 
   ssh: 󰣀
-  tcsh: 
+  tcsh: 
   tig: 
   tmux: 
   top: 
   topgrade: 󰚰
-  vim: 
+  vim: 
   yay: 
   yazi: 
   yum: 
-  zsh: 
+  zsh: 
   gcc: 
   clang: 
   make: 
@@ -139,7 +141,7 @@ icons:
   wordpress: 
   jenkins: 
   travis: 
-  gitlab: 
+  gitlab: 
   bitbucket: 
   react: 
   ng: 
