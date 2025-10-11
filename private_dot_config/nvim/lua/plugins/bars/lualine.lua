@@ -236,7 +236,7 @@ return {
             center_comp,
             icononly_filetype,
             filename,
-            grapple,
+            -- grapple,
           },
           lualine_x = {},
           lualine_y = {

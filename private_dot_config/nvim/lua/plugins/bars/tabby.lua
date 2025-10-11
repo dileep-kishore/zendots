@@ -7,6 +7,7 @@ return {
       "nvim-lua/plenary.nvim",
       "nvimdev/lspsaga.nvim",
       "jedrzejboczar/possession.nvim",
+      "cbochs/grapple.nvim",
     },
     config = function()
       local change_mark = function(tab)
@@ -37,12 +38,22 @@ return {
         return vim.bo[buf].modified and "" or ""
       end
 
+      local get_grapple_status = function()
+        local grapple_status = require("grapple").statusline({
+          active = "[%s] ",
+          inactive = "%s ",
+          include_icon = true,
+        })
+        return grapple_status
+      end
+
       local colors = require("catppuccin.palettes").get_palette("mocha")
 
       local theme = {
         base = { fg = colors.base, bg = colors.base },
         fill = { fg = colors.mauve, bg = colors.base },
         head = { bg = colors.base, fg = colors.mauve, style = "bold" },
+        grapple = { bg = colors.base, fg = colors.yellow, style = "bold" },
         current_tab = {
           bg = colors.base,
           fg = colors.blue,
@@ -147,6 +158,11 @@ return {
               margin = " ",
             }
           end),
+          line.sep(" ", theme.fill, theme.tail),
+          {
+            get_grapple_status(),
+            hl = theme.grapple,
+          },
           line.spacer(),
           hl = theme.base,
         }
