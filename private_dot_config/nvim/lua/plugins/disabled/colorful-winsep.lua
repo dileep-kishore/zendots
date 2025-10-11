@@ -5,6 +5,12 @@ return {
     config = function()
       require("colorful-winsep").setup({
         symbols = { "─", "│", "┌", "┐", "└", "┘" },
+        animate = {
+          enabled = "shift",
+          shift = {
+            delay = 1,
+          },
+        },
       })
     end,
   },
