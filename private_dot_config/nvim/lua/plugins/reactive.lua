@@ -1,9 +1,6 @@
 return {
   {
     "rasulomaroff/reactive.nvim",
-    dependencies = {
-      "sphamba/smear-cursor.nvim",
-    },
     event = "VeryLazy",
     config = function()
       local palette = require("catppuccin.palettes").get_palette("mocha")
@@ -35,7 +32,7 @@ return {
               i = { hl = { ReactiveCursor = { bg = palette.blue } } },
               n = {
                 hl = {
-                  ReactiveCursor = { bg = darken(palette.yellow, 0.7) },
+                  ReactiveCursor = { bg = palette.text },
                 },
               },
             },
