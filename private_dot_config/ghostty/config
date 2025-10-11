@@ -18,7 +18,7 @@ theme = "Catppuccin Mocha"
 bold-is-bright = true
 cursor-style = block
 shell-integration-features = no-cursor
-# custom-shader = shaders/bloom.gsl
+custom-shader = cursor.glsl
 
 window-theme = system
 gtk-titlebar = true
