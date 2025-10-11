@@ -41,7 +41,8 @@ return {
       })
       require("mason-tool-installer").setup({
         ensure_installed = {
-          "copilot-language-server",
+          -- FIXME: https://github.com/zbirenbaum/copilot.lua/issues/576
+          -- "copilot-language-server",
           "ltex-ls-plus",
           -- formatters
           "stylua",
