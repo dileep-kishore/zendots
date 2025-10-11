@@ -1,18 +1,19 @@
 return {
-  {
-    "jedrzejboczar/possession.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+  "rmagatti/auto-session",
+  lazy = false,
+  opts = {
+    auto_save = true,
+    auto_restore = false,
+    auto_create = false,
+    auto_restore_last_session = false,
+    cwd_change_handling = false,
+    single_session_mode = false,
+    bypass_save_filetypes = { "alpha", "dashboard", "snacks_dashboard" },
+    close_unsupported_windows = true,
+    git_use_branch_name = true,
+    auto_delete_empty_sessions = true,
+    session_lens = {
+      picker = "snacks",
     },
-    config = function()
-      require("possession").setup({
-        autosave = { current = true },
-        autoload = false,
-        plugins = {
-          delete_hidden_buffers = false,
-        },
-      })
-    end,
   },
 }
