@@ -3,4 +3,5 @@ require("options")
 require("autocmds")
 require("config.lazy")
 require("keymaps")
-vim.cmd.colorscheme "catppuccin"
+require("ipynb")
+vim.cmd.colorscheme("catppuccin")
