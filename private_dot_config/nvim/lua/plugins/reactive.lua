@@ -1,25 +1,25 @@
 return {
   {
-    'rasulomaroff/reactive.nvim',
+    "rasulomaroff/reactive.nvim",
     dependencies = {
-      'sphamba/smear-cursor.nvim',
+      "sphamba/smear-cursor.nvim",
     },
-    event = 'VeryLazy',
+    event = "VeryLazy",
     config = function()
-      local palette = require('catppuccin.palettes').get_palette 'mocha'
-      local darken = require('catppuccin.utils.colors').darken
-      require('reactive').setup {
+      local palette = require("catppuccin.palettes").get_palette("mocha")
+      local darken = require("catppuccin.utils.colors").darken
+      require("reactive").setup({
         load = {
-          'catppuccin-mocha-cursor',
-          'catppuccin-mocha-cursorline',
+          "catppuccin-mocha-cursor",
+          "catppuccin-mocha-cursorline",
         },
         configs = {
-          ['catppuccin-mocha-cursorline'] = {
+          ["catppuccin-mocha-cursorline"] = {
             modes = {
               n = {
                 winhl = {
-                  CursorLine = { bg = 'None' },
-                  CursorLineNr = { bg = 'None' },
+                  CursorLine = { bg = "None" },
+                  CursorLineNr = { bg = "None" },
                 },
               },
               i = {
@@ -30,7 +30,7 @@ return {
               },
             },
           },
-          ['catppuccin-mocha-cursor'] = {
+          ["catppuccin-mocha-cursor"] = {
             modes = {
               i = { hl = { ReactiveCursor = { bg = palette.blue } } },
               n = {
@@ -41,7 +41,7 @@ return {
             },
           },
         },
-      }
+      })
     end,
   },
 }

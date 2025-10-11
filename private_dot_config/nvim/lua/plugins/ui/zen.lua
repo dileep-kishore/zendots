@@ -1,29 +1,29 @@
 return {
   {
-    'folke/zen-mode.nvim',
+    "folke/zen-mode.nvim",
     keys = {
       {
-        '<leader>zz',
-        '<cmd>ZenMode<cr>',
-        desc = 'Zen mode',
+        "<leader>zz",
+        "<cmd>ZenMode<cr>",
+        desc = "Zen mode",
       },
       {
-        '<leader>zt',
-        '<cmd>Twilight<cr>',
-        desc = 'Zen mode twilight',
+        "<leader>zt",
+        "<cmd>Twilight<cr>",
+        desc = "Zen mode twilight",
       },
     },
-    event = 'VeryLazy',
+    event = "VeryLazy",
     dependencies = {
-      'folke/twilight.nvim',
+      "folke/twilight.nvim",
     },
     config = function()
-      require('zen-mode').setup {
+      require("zen-mode").setup({
         plugins = {
           twilight = { enabled = false },
         },
         window = { backdrop = 1 },
-      }
+      })
     end,
   },
 }
