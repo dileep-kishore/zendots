@@ -12,6 +12,14 @@ return {
         },
         configs = {
           ["catppuccin-mocha-cursorline"] = {
+            static = {
+              winhl = {
+                inactive = {
+                  CursorLine = { bg = "None" },
+                  CursorLineNr = { bg = "None" },
+                },
+              },
+            },
             modes = {
               n = {
                 winhl = {
