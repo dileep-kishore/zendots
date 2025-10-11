@@ -60,6 +60,8 @@ return {
           "stylelint",
           "hadolint",
           "eslint_d",
+          -- debuggers
+          "debugpy",
         },
       })
     end,
