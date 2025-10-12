@@ -27,7 +27,7 @@ sudo dnf install \
 # Misc tools: bar, wallpaper, clipboard, screenshot
 sudo dnf install waybar-git swww wl-clipboard cliphist nwg-clipman
 sudo dnf install grim slurp
-sudo dnf install network-manager-applet wlogout
+sudo dnf install network-manager-applet wlogout blueman
 sudo dnf install libinput
 # Others: copq wl-clip-persist
 
