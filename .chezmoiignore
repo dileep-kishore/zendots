@@ -15,6 +15,7 @@ justfile
 temp.py
 .env
 CLAUDE.md
+pkgs/
 
 # Editconfig
 .editorconfig
