@@ -39,7 +39,8 @@ sudo dnf install SwayNotificationCenter
 sudo dnf copr enable -y errornointernet/walker
 sudo dnf install wofi walker
 
-# Cursors
+# Cursors and icons
+sudo dnf install papirus-icon-theme papirus-icon-theme-dark
 sudo dnf copr enable peterwu/rendezvous
 sudo dnf install bibata-cursor-themes
 
