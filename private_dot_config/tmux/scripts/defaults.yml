@@ -9,7 +9,7 @@ icons:
   opencode: 󱙺
   claude: 󱙺
   apt: 
-  bash: 
+  bash: 
   caffeinate: 
   cargo: 
   beam.smp: 
@@ -22,7 +22,7 @@ icons:
   dpkg: 
   emacs: 
   fdisk: 
-  fish: 
+  fish: 
   git: 
   gitui: 
   gh: 
@@ -50,21 +50,21 @@ icons:
   paru: 
   Python: 
   python: 
-  ranger: 
+  ranger: 
   ruby: 
   rustc: 
   rustup: 
   ssh: 󰣀
-  tcsh: 
+  tcsh: 
   tig: 
   tmux: 
   top: 
   topgrade: 󰚰
   vim: 
   yay: 
-  yazi: 
+  yazi: 
   yum: 
-  zsh: 
+  zsh: 
   gcc: 
   clang: 
   make: 
@@ -100,7 +100,7 @@ icons:
   sqlite: 
   redis: 
   mongo: 
-  powershell: 
+  powershell: 
   perl: 
   swift: 
   ghc: 
