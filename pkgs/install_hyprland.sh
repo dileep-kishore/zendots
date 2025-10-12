@@ -38,3 +38,11 @@ sudo dnf install SwayNotificationCenter
 # Launcher: wofi and walker
 sudo dnf copr enable -y errornointernet/walker
 sudo dnf install wofi walker
+
+# Cursors
+sudo dnf copr enable peterwu/rendezvous
+sudo dnf install bibata-cursor-themes
+
+# Syncthingtray
+sudo dnf config-manager addrepo --from-repofile=https://download.opensuse.org/repositories/home:mkittler/Fedora_42/home:mkittler.repo
+sudo dnf install syncthingtray
