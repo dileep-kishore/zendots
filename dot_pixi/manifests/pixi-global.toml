@@ -249,3 +249,31 @@ exposed = { luarocks = "luarocks", luarocks-admin = "luarocks-admin" }
 channels = ["conda-forge"]
 dependencies = { ast-grep = "*" }
 exposed = { ast-grep = "ast-grep", sg = "sg" }
+
+[envs.nodejs]
+channels = ["conda-forge"]
+dependencies = { nodejs = "*" }
+exposed = { corepack = "corepack", node = "node", npm = "npm", npx = "npx" }
+
+[envs.go]
+channels = ["conda-forge"]
+dependencies = { go = "*" }
+exposed = { go = "go", gofmt = "gofmt" }
+
+[envs.gcc]
+channels = ["conda-forge"]
+dependencies = { gcc = "*" }
+exposed = { cc = "cc", cpp = "cpp", gcc = "gcc", gcc-ar = "gcc-ar", gcc-nm = "gcc-nm", gcc-ranlib = "gcc-ranlib", gcov = "gcov", gcov-dump = "gcov-dump", gcov-tool = "gcov-tool" }
+
+[envs.gcc_linux-64]
+channels = ["conda-forge"]
+dependencies = { gcc_linux-64 = "*" }
+
+[envs.c-compiler]
+channels = ["conda-forge"]
+dependencies = { c-compiler = "*" }
+
+[envs.gopls]
+channels = ["conda-forge"]
+dependencies = { gopls = "*" }
+exposed = { gopls = "gopls" }
