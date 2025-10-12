@@ -28,7 +28,7 @@ sudo dnf install \
 sudo dnf install waybar-git swww wl-clipboard cliphist nwg-clipman
 sudo dnf install grim slurp
 sudo dnf install network-manager-applet wlogout blueman
-sudo dnf install libinput
+sudo dnf install libinput libqalculate
 # Others: copq wl-clip-persist
 
 # Notification: SwayNotificationCenter
