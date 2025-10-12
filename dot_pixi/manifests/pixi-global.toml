@@ -229,3 +229,23 @@ exposed = { xsel = "xsel" }
 channels = ["conda-forge"]
 dependencies = { oh-my-posh = "*" }
 exposed = { oh-my-posh = "oh-my-posh" }
+
+[envs.rust]
+channels = ["conda-forge"]
+dependencies = { rust = "*" }
+exposed = { cargo = "cargo", cargo-clippy = "cargo-clippy", cargo-fmt = "cargo-fmt", clippy-driver = "clippy-driver", rust-analyzer = "rust-analyzer", rust-gdb = "rust-gdb", rust-gdbgui = "rust-gdbgui", rust-lldb = "rust-lldb", rustc = "rustc", rustdoc = "rustdoc", rustfmt = "rustfmt" }
+
+[envs.aichat]
+channels = ["conda-forge"]
+dependencies = { aichat = "*" }
+exposed = { aichat = "aichat" }
+
+[envs.luarocks]
+channels = ["conda-forge"]
+dependencies = { luarocks = "*" }
+exposed = { luarocks = "luarocks", luarocks-admin = "luarocks-admin" }
+
+[envs.ast-grep]
+channels = ["conda-forge"]
+dependencies = { ast-grep = "*" }
+exposed = { ast-grep = "ast-grep", sg = "sg" }
