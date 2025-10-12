@@ -20,7 +20,7 @@ return {
           -- lsp
           "lua_ls",
           "basedpyright",
-          "gopls",
+          -- "gopls", -- NOTE: Not working on NERSC
           "astro",
           "bashls",
           "dockerls",
