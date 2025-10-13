@@ -37,7 +37,7 @@ sudo dnf install SwayNotificationCenter
 
 # Launcher: wofi and walker
 sudo dnf copr enable -y errornointernet/walker
-sudo dnf install wofi walker
+sudo dnf install wofi walker ulauncher
 
 # Cursors and icons
 sudo dnf install papirus-icon-theme papirus-icon-theme-dark
