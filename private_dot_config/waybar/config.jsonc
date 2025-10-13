@@ -9,7 +9,7 @@
   "reload_style_on_change": true,
   "spacing": 0,
   "modules-left": [
-    "image",
+    "custom/spacer",
     "wlr/taskbar",
     "hyprland/window",
     "custom/window-icon",
@@ -34,7 +34,7 @@
     "tray"
   ],
   "custom/spacer": {
-    "format": "   ",
+    "format": "  ",
     "on-click": "hyprctl dispatch overview:toggle"
   },
   "image": {
