@@ -21,10 +21,10 @@ shell-integration-features = no-cursor
 custom-shader = cursor.glsl
 
 window-theme = system
-gtk-titlebar = true
+gtk-titlebar = false
 gtk-wide-tabs = false
-gtk-toolbar-style = flat
-gtk-titlebar-style = tabs
+# gtk-toolbar-style = flat
+# gtk-titlebar-style = tabs
 
 window-padding-x = 0
 window-padding-y = 0
