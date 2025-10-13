@@ -7,11 +7,11 @@ from itertools import cycle
 
 WALLPAPERS_DIR = os.path.expanduser("~/Pictures/wallpapers/")
 WALLPAPER_NAMES = [
-    "bluewave.png",
+    "sushi-dark.png",
     "nixppuccin.png",
     "black-hole.png",
     "galaxy.png",
-    "sushi-dark.png",
+    "bluewave.png",
 ]
 
 
