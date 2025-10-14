@@ -94,7 +94,7 @@
   "hyprland/window": {
     "max-length": 50,
     "format": "{class}",
-    "on-click": "walker --modules windows",
+    "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
     "separate-outputs": true,
     "icon": false,
     "icon-size": 13,
@@ -127,7 +127,7 @@
     "max-length": 50,
     "format": "{app_id}",
     "separate-outputs": true,
-    "on-click": "walker --modules windows",
+    "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
     "rewrite": {
       "": "<span foreground='#89b4fa'> Niri</span>",
       " ": "<span foreground='#89b4fa'> Niri</span>",
@@ -310,7 +310,7 @@
   },
   "custom/window-icon": {
     "format": " ",
-    "on-click": "walker --modules windows",
+    "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
     "tooltip": "Window list"
   }
 }
