@@ -30,7 +30,7 @@ return {
       {
         "<Esc>",
         function()
-          require("sidekick").clear()
+          require("sidekick.nes").clear()
         end,
         desc = "Clear NES",
         mode = { "n" },
