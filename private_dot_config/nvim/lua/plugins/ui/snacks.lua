@@ -9,6 +9,8 @@ return {
       local snacks_dashboard = require("ui.snacks-dashboard")
       require("ui.snacks-rename")
 
+      vim.g.snacks_animate = false
+
       snacks.setup({
         styles = {
           float = { wo = { winblend = 0 } },

@@ -175,4 +175,8 @@ return {
   {
     "HiPhish/rainbow-delimiters.nvim",
   },
+  {
+    "karb94/neoscroll.nvim",
+    opts = {},
+  },
 }
