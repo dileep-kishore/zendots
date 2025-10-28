@@ -1,0 +1,31 @@
+#!/usr/bin/env lua
+
+-- Load the sketchybar-package and prepare the helper binaries
+require "helpers"
+require "init"
+
+sbar.add("event", "aerospace_workspace_change")
+
+-- Get all workspace IDs from aerospace
+local workspace_ids = {}
+for sid in io.popen("aerospace list-workspaces --all"):lines() do
+    table.insert(workspace_ids, sid)
+end
+
+-- Create a space item for each workspace
+for _, sid in ipairs(workspace_ids) do
+    sbar.add("item", "space." .. sid, {
+        position = "left",
+        background = {
+            color = "0x44ffffff",
+            corner_radius = 5,
+            height = 20,
+            drawing = "off",
+        },
+        label = sid,
+        click_script = "aerospace workspace " .. sid,
+        script = os.getenv "CONFIG_DIR" .. "/plugins/aerospace.sh " .. sid,
+    })
+
+    sbar.subscribe("space." .. sid, "aerospace_workspace_change")
+end
