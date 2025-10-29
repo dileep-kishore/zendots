@@ -1,36 +1,49 @@
-local colors = require("colors")
-local icons = require("icons")
-local settings = require("settings")
-
--- Padding item required because of bracket
-sbar.add("item", { width = 5 })
+local colors = require "colors"
+local icons = require "icons"
+local settings = require "settings"
 
 local apple = sbar.add("item", {
-  icon = {
-    font = { size = 16.0 },
-    string = icons.apple,
-    padding_right = 8,
-    padding_left = 8,
-  },
-  label = { drawing = false },
-  background = {
-    color = colors.bg2,
-    border_color = colors.black,
-    border_width = 1
-  },
-  padding_left = 1,
-  padding_right = 1,
-  click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s 0"
+    icon = {
+        font = {
+            size = 22.0,
+        },
+        string = icons.apple,
+        padding_right = 8,
+        padding_left = 8,
+        highlight_color = settings.modes.service.color,
+    },
+    label = {
+        drawing = false,
+    },
+
+    padding_left = 1,
+    padding_right = 1,
+    click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s 0",
 })
 
--- Double border for apple using a single item bracket
-sbar.add("bracket", { apple.name }, {
-  background = {
-    color = colors.transparent,
-    height = 30,
-    border_color = colors.grey,
-  }
-})
+apple:subscribe("aerospace_enter_service_mode", function(_)
+    sbar.animate("tanh", 10, function()
+        apple:set {
+            icon = {
+                highlight = true,
+                string = settings.modes.service.icon,
+            },
+        }
+    end)
+end)
 
--- Padding item required because of bracket
-sbar.add("item", { width = 7 })
+apple:subscribe("aerospace_leave_service_mode", function(_)
+    sbar.animate("tanh", 10, function()
+        apple:set {
+            icon = {
+                highlight = false,
+                string = settings.modes.main.icon,
+            },
+        }
+    end)
+end)
+
+-- Padding to the right of the main button
+sbar.add("item", {
+    width = 7,
+})
