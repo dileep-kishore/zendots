@@ -18,7 +18,7 @@ display="$(echo "$mapping" |
     }' | sort)"
 
 # Show in wofi
-selection="$(echo "$display" | wofi --dmenu --prompt "Switch Window")"
+selection="$(echo "$display" | vicinae dmenu)"
 
 # Exit if already focused
 if [[ "$selection" =~ \[FOCUSED\] ]]; then
