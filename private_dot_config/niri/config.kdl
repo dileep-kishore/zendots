@@ -308,10 +308,12 @@ binds {
         spawn "vicinae" "toggle"
     }
     Mod+D {
-        spawn "~/.config/niri/scripts/wofi_windows.sh"
+        // spawn "~/.config/niri/scripts/switch_windows.sh"
+        spawn "bash" "-c" "vicinae 'vicinae://extensions/vicinae/wm/switch-windows'"
     }
     Mod+Ctrl+V {
-        spawn "bash" "-c" "cliphist list | wofi -dmenu -i -p 'Clipboard History' | cliphist decode | wl-copy"
+        // spawn "bash" "-c" "cliphist list | wofi -dmenu -i -p 'Clipboard History' | cliphist decode | wl-copy"
+        spawn "bash" "-c" "vicinae 'vicinae://extensions/vicinae/clipboard/history'"
     }
     Mod+Ctrl+C {
         spawn "bash" "-c" "hyprpicker | wl-copy"
