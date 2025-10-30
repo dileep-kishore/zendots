@@ -75,6 +75,10 @@ PACMAN_PACKAGES=(
 
 AUR_PACKAGES=(
     bibata-cursor-theme
+    rose-pine-gtk-theme-full
+    ant-dracula-theme-git
+    ant-dracula-kvantum-theme-git
+    ant-dracula-kde-theme-git
     wlogout
     wlr-which-key
     ulauncher
