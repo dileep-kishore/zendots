@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 # Arch Linux Package Installation Script
-# Converted from Homebrew Brewfile
-# Uses pacman for official repos and paru for AUR
 
 set -e
 
@@ -121,6 +119,8 @@ PACMAN_PACKAGES=(
     television
     vivid
     pipx
+    brave-bin
+    vivaldi
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
