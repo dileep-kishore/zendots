@@ -121,6 +121,7 @@ PACMAN_PACKAGES=(
     pipx
     brave-bin
     vivaldi
+    procs
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do

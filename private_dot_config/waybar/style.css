@@ -120,23 +120,6 @@ window.HDMI-A-1 #pulseaudio {
   opacity: 0.8;
 }
 
-#workspaces button.empty {
-  color: @overlay2;
-  opacity: 0.4;
-}
-
-#workspaces button.visible {
-  color: @blue;
-  transition: all 0.3s ease-in-out;
-}
-
-#workspaces button:hover {
-  color: @crust;
-  background: @mauve;
-  border-radius: 3px 3px 3px 3px;
-  opacity: 0.7;
-}
-
 #workspaces button.active {
   color: @crust;
   background: @blue;
@@ -146,6 +129,23 @@ window.HDMI-A-1 #pulseaudio {
   min-width: 30px;
   transition: all 0.3s ease-in-out;
   opacity: 1;
+}
+
+#workspaces button:hover {
+  color: @crust;
+  background: @mauve;
+  border-radius: 3px 3px 3px 3px;
+  opacity: 0.7;
+}
+
+#workspaces button.empty {
+  color: @overlay2;
+  opacity: 0.4;
+}
+
+#workspaces button.visible {
+  color: @blue;
+  transition: all 0.3s ease-in-out;
 }
 
 #workspaces button.focused {
