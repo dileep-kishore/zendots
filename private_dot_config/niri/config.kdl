@@ -40,6 +40,7 @@ output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487" {
     scale 1
     transform "normal"
     position x=1080 y=0
+    focus-at-startup
 }
 // work laptop
 output "InfoVision Optoelectronics (Kunshan) Co.,Ltd China 0x3E94 0x00000004" {
@@ -76,6 +77,8 @@ environment {
 layout {
     gaps 5
     center-focused-column "on-overflow"
+    always-center-single-column
+    // default-column-display "tabbed"
     preset-column-widths {
         proportion 0.5
         proportion 1.0
@@ -85,7 +88,7 @@ layout {
         proportion 1.0
     }
     default-column-width {
-
+        proportion 0.5
     }
     focus-ring {
         off
@@ -106,6 +109,22 @@ layout {
         offset x=0 y=5
         color "#00000070"
     }
+    tab-indicator {
+        hide-when-single-tab
+        place-within-column
+        gap 5
+        width 4
+        length total-proportion=1.0
+        position "right"
+        gaps-between-tabs 2
+        corner-radius 8
+        active-color "#cba6f7"
+        inactive-color "gray"
+        urgent-color "red"
+    }
+    insert-hint {
+        color "#ffc87f80"
+    }
     struts {
 
     }
@@ -113,31 +132,79 @@ layout {
 spawn-at-startup "hypridle"
 spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
-spawn-at-startup "bash" "-c" "syncthing --no-browser"
-spawn-at-startup "bash" "-c" "sleep 5 && morgen"
-spawn-at-startup "bash" "-c" "sleep 5 && sunsama"
-spawn-at-startup "bash" "-c" "sleep 10 && syncthingtray"
-spawn-at-startup "bash" "-c" "sleep 2 && swww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
+spawn-sh-at-startup "sleep 5 && morgen"
+spawn-sh-at-startup "sleep 5 && sunsama"
+spawn-sh-at-startup "sleep 5 && syncthing --no-browser"
+spawn-sh-at-startup "sleep 10 && syncthingtray"
+spawn-sh-at-startup "sleep 2 && swww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
 // NOTE: This is disabled because it causes issues where the last copied text is not pasted
-// spawn-at-startup "bash" "-c" "sleep 10 && wl-clip-persist --clipboard regular"
-spawn-at-startup "bash" "-c" "sleep 15 && wl-paste --watch cliphist store"
-spawn-at-startup "bash" "-c" "python ~/.config/niri/scripts/blur-wallpaper.py"
-spawn-at-startup "bash" "-c" "python ~/.config/niri/scripts/change-wallpaper.py"
+// spawn-sh-at-startup "sleep 10 && wl-clip-persist --clipboard regular"
+spawn-sh-at-startup "sleep 15 && wl-paste --watch cliphist store"
+spawn-sh-at-startup "python ~/.config/niri/scripts/blur-wallpaper.py"
+spawn-sh-at-startup "python ~/.config/niri/scripts/change-wallpaper.py"
 spawn-at-startup "nm-applet"
-spawn-at-startup "bash" "-c" "sleep 10 && protonvpn-app"
+spawn-sh-at-startup "sleep 10 && protonvpn-app"
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+    xcursor-size 24
+    hide-when-typing
+    hide-after-inactive-ms 1000
+}
+hotkey-overlay {
+    skip-at-startup
+    hide-not-bound
+}
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
 // Animation settings.
 animations {
-    // Slow down all animations by this factor. Values below 1 speed them up instead.
-    // slowdown 3.0
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
     window-open {
-        duration-ms 100
+        duration-ms 150
         curve "ease-out-expo"
     }
     window-close {
-        duration-ms 100
+        duration-ms 150
         curve "ease-out-quad"
+    }
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    window-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    window-resize {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    config-notification-open-close {
+        spring damping-ratio=0.6 stiffness=1000 epsilon=0.001
+    }
+    exit-confirmation-open-close {
+        spring damping-ratio=0.6 stiffness=500 epsilon=0.01
+    }
+    screenshot-ui-open {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+}
+// Layer rule for ulauncher
+layer-rule {
+    match namespace="^(ulauncher)$"
+    shadow {
+        off
+    }
+    baba-is-float true
+    geometry-corner-radius 10
+}
+window-rule {
+    match app-id="^(ulauncher)$"
+    border {
+        width 0
     }
 }
 // Work around WezTerm's initial configure bug by setting an empty default-column-width.
@@ -221,7 +288,7 @@ binds {
         spawn "kitty" "--class" "scratchpad"
     }
     Mod+R {
-        spawn "ulauncher"
+        spawn "~/.config/niri/scripts/walker.sh"
     }
     Mod+D {
         spawn "~/.config/rofi/scripts/wofi_app_launcher.sh"
@@ -232,7 +299,10 @@ binds {
     Mod+Ctrl+C {
         spawn "bash" "-c" "hyprpicker | wl-copy"
     }
-    Super+Alt+L {
+    Mod+Alt+W {
+        spawn "bash" "-c" "pkill waybar && waybar"
+    }
+    Mod+Alt+L {
         spawn "bash" "-c" "sleep 3 && niri msg action power-off-monitors && hyprlock"
     }
     XF86AudioRaiseVolume allow-when-locked=true {

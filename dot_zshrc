@@ -46,7 +46,6 @@ export PATH=$PATH:$HOME/.local/bin
 export PATH="$PATH:/var/lib/flatpak/exports/bin"
 export PATH="$PATH:$HOME/npm-global/bin"
 export PATH="$HOME/.pixi/bin:$PATH"
-. "$HOME/.cargo/env"
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then

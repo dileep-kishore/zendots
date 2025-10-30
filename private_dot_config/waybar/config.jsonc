@@ -95,7 +95,6 @@
     "max-length": 50,
     "format": "{class}",
     "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
-    // "on-click": "walker --modules windows",
     "separate-outputs": true,
     "icon": false,
     "icon-size": 13,
@@ -128,7 +127,8 @@
     "max-length": 50,
     "format": "{app_id}",
     "separate-outputs": true,
-    "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
+    // "on-click": "~/.config/waybar/scripts/wofi_windows.sh",
+    "on-click": "walker -m windows",
     "rewrite": {
       "": "<span foreground='#89b4fa'> Niri</span>",
       " ": "<span foreground='#89b4fa'> Niri</span>",
