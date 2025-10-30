@@ -231,6 +231,9 @@ window-rule {
     match app-id="Zotero"
     match app-id="spotify"
     open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
+    default-column-width {
+        proportion 1.0
+    }
 }
 // floating terminal
 window-rule {
@@ -250,6 +253,12 @@ window-rule {
     default-column-width {
         proportion 0.333
     }
+}
+window-rule {
+    match app-id="ghostty"
+    match app-id="kitty"
+    match is-active=true
+    opacity 0.97
 }
 // floating
 window-rule {
