@@ -12,3 +12,7 @@ application/x-extension-xhtml=brave-browser.desktop
 application/x-extension-xht=brave-browser.desktop
 x-scheme-handler/chrome=brave-browser.desktop
 x-scheme-handler/tana=tana.desktop
+x-scheme-handler/claude=claude-desktop-native.desktop
+x-scheme-handler/morgen=morgen.desktop
+x-scheme-handler/notion=notion.desktop
+x-scheme-handler/mailto=brave-browser.desktop
