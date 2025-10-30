@@ -293,7 +293,7 @@ binds {
         spawn "walker"
     }
     Mod+D {
-        spawn "walker" "-m" "windows"
+        spawn "~/.config/niri/scripts/wofi_windows.sh"
     }
     Mod+Ctrl+V {
         spawn "bash" "-c" "cliphist list | wofi -dmenu -i -p 'Clipboard History' | cliphist decode | wl-copy"
