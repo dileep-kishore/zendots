@@ -132,7 +132,7 @@ layout {
 spawn-at-startup "hypridle"
 spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
-spawn-sh-at-startup "walker --gapplication-service"
+spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && sunsama"
 spawn-sh-at-startup "sleep 5 && pidof syncthing || syncthing --no-browser"
@@ -201,6 +201,13 @@ layer-rule {
         off
     }
     baba-is-float true
+    geometry-corner-radius 10
+}
+layer-rule {
+    match namespace="^(vicinae)$"
+    shadow {
+        on
+    }
     geometry-corner-radius 10
 }
 window-rule {
@@ -290,7 +297,7 @@ binds {
         spawn "kitty" "--class" "scratchpad"
     }
     Mod+R {
-        spawn "walker"
+        spawn "vicinae" "toggle"
     }
     Mod+D {
         spawn "~/.config/niri/scripts/wofi_windows.sh"
