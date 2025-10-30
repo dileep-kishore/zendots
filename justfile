@@ -19,3 +19,7 @@ dump:
 
 install:
   cd pkgs && brew bundle install
+
+sync-gtk:
+  chezmoi add ~/.config/gtk-3.0/settings.ini
+  chezmoi add ~/.config/gtk-4.0/settings.ini
