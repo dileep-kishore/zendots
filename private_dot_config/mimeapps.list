@@ -16,3 +16,4 @@ x-scheme-handler/claude=claude-desktop-native.desktop
 x-scheme-handler/morgen=morgen.desktop
 x-scheme-handler/notion=notion.desktop
 x-scheme-handler/mailto=brave-browser.desktop
+x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
