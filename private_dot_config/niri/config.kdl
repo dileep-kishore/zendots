@@ -132,10 +132,12 @@ layout {
 spawn-at-startup "hypridle"
 spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
+spawn-sh-at-startup "walker --gapplication-service"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && sunsama"
-spawn-sh-at-startup "sleep 5 && syncthing --no-browser"
-spawn-sh-at-startup "sleep 10 && syncthingtray"
+spawn-sh-at-startup "sleep 5 && pidof syncthing || syncthing --no-browser"
+// TODO: Fix this syncthing issue
+// spawn-sh-at-startup "sleep 10 && syncthingtray"
 spawn-sh-at-startup "sleep 2 && swww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
 // NOTE: This is disabled because it causes issues where the last copied text is not pasted
 // spawn-sh-at-startup "sleep 10 && wl-clip-persist --clipboard regular"
@@ -288,10 +290,10 @@ binds {
         spawn "kitty" "--class" "scratchpad"
     }
     Mod+R {
-        spawn "~/.config/niri/scripts/walker.sh"
+        spawn "walker"
     }
     Mod+D {
-        spawn "~/.config/rofi/scripts/wofi_app_launcher.sh"
+        spawn "walker" "-m" "windows"
     }
     Mod+Ctrl+V {
         spawn "bash" "-c" "cliphist list | wofi -dmenu -i -p 'Clipboard History' | cliphist decode | wl-copy"
