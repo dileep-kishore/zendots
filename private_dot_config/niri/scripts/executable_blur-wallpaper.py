@@ -17,22 +17,25 @@ def get_niri_msg_output(msg):
 def get_current_wallpaper(monitor):
     with open(os.path.join(wallpapers_cache_path, monitor)) as f:
         wallpaper_string = str(f.readlines()[-1].strip())
-        wallpaper = "/home/dileep" + wallpaper_string.split("/home/dileep")[-1]
+        wallpaper = (
+            "/home/dileep"
+            + wallpaper_string.split("/home/dileep")[-1].split(".png")[0]
+            + ".png"
+        )
         return wallpaper
 
 
 def set_wallpaper(monitor, wallpaper):
-    subprocess.run(
-        [
-            "swww",
-            "img",
-            "--transition-type",
-            "grow",
-            "-o",
-            monitor,
-            wallpaper,
-        ]
-    )
+    cmd = [
+        "swww",
+        "img",
+        "--transition-type",
+        "grow",
+        "-o",
+        monitor,
+        wallpaper,
+    ]
+    subprocess.run(cmd)
 
 
 def change_wallpaper_on_event():
@@ -45,7 +48,7 @@ def change_wallpaper_on_event():
         active_workspace_monitor = active_workspace["output"]
         current_wallpaper = get_current_wallpaper(active_workspace_monitor)
         unblurred_wallpaper = current_wallpaper.replace("-blurred", "")
-        blurred_wallpaper = unblurred_wallpaper.split(".png")[0] + "-blurred.png"
+        blurred_wallpaper = unblurred_wallpaper.removesuffix(".png") + "-blurred.png"
         if active_workspace_is_empty:
             wallpaper = unblurred_wallpaper
         else:
