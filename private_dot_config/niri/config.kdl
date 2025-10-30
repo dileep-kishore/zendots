@@ -221,10 +221,13 @@ binds {
         spawn "kitty" "--class" "scratchpad"
     }
     Mod+R {
-        spawn "~/.config/niri/scripts/walker.sh"
+        spawn "ulauncher"
     }
     Mod+D {
-        spawn "walker" "--modules" "windows"
+        spawn "~/.config/rofi/scripts/wofi_app_launcher.sh"
+    }
+    Mod+Ctrl+V {
+        spawn "bash" "-c" "cliphist list | wofi -dmenu -i -p 'Clipboard History' | cliphist decode | wl-copy"
     }
     Mod+Ctrl+C {
         spawn "bash" "-c" "hyprpicker | wl-copy"
