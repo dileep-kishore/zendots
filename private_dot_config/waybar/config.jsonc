@@ -127,7 +127,7 @@
     "max-length": 50,
     "format": "{app_id}",
     "separate-outputs": true,
-    "on-click": "~/.config/niri/scripts/wofi_windows.sh",
+    "on-click": "vicinae 'vicinae://extensions/vicinae/wm/switch-windows'",
     "rewrite": {
       "": "<span foreground='#89b4fa'> Niri</span>",
       " ": "<span foreground='#89b4fa'> Niri</span>",
@@ -310,7 +310,7 @@
   },
   "custom/window-icon": {
     "format": " ",
-    "on-click": "~/.config/niri/scripts/wofi_windows.sh",
+    "on-click": "vicinae 'vicinae://extensions/vicinae/wm/switch-windows'",
     "tooltip": "Window list"
   }
 }
