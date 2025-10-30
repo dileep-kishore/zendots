@@ -212,8 +212,3 @@ _aichat_zsh() {
 }
 zle -N _aichat_zsh
 bindkey '\ee' _aichat_zsh
-
-# SSH agent using gnome-keyring
-if [ -z "$SSH_AUTH_SOCK" ]; then
-    eval $(gnome-keyring-daemon --start --components=secrets,ssh)
-fi
