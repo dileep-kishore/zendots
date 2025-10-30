@@ -255,9 +255,8 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="ghostty"
-    match app-id="kitty"
-    match is-active=true
+    match app-id="^com\\.mitchellh\\.ghostty$" is-active=true
+    match app-id="^kitty$" is-active=true
     opacity 0.97
 }
 // floating
