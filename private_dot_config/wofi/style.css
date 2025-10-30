@@ -1,94 +1,75 @@
-/* Mocha Mauve */
-@define-color accent #cba6f7;
-@define-color txt #cad3f5;
-@define-color bg #24273a;
-@define-color bg2 #494d64;
-
+/* Catppuccin Mocha Color Palette */
 * {
-  font-family: "Maple Mono NF", monospace;
-  font-size: 14px;
+  font-family: Maple Mono;
+  background: transparent;
+  color: #cdd6f4; /* Text */
 }
 
-/* Window */
-window {
-  margin: 0px;
-  padding: 10px;
-  border: 3px solid @accent;
-  border-radius: 7px;
-  background-color: @bg;
-  animation: slideIn 0.5s ease-in-out both;
+#window {
+  color: #cdd6f4; /* Text */
+  border-color: #cba6f7; /* Mauve */
+  border-style: solid;
+  border-width: 2px;
+
+  /*Linear gradient background instead of standard background, because it makes cleaner border-radius cuts, issa bug :p*/
+  background-image: linear-gradient(to bottom, #1e1e2e 100%); /* Base */
+  border-radius: 14px;
+
+  height: 60%;
 }
-
-/* Slide In */
-@keyframes slideIn {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Inner Box */
-#inner-box {
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  background-color: @bg;
-  animation: fadeIn 0.5s ease-in-out both;
-}
-
-/* Fade In */
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Outer Box */
-#outer-box {
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  background-color: @bg;
-}
-
-/* Scroll */
 #scroll {
-  margin: 0px;
-  padding: 10px;
-  border: none;
+  border-top-style: solid;
+  border-width: 1px;
+  border-color: #45475a; /* Surface1 */
+}
+#inner-box {
+  padding-top: 12px;
+}
+#entry {
+  border-style: none;
+  border-color: #45475a; /* Surface1 */
+  color: #cdd6f4; /* Text */
+  padding: 6px;
+  margin-bottom: 8px;
+  margin-left: 12px;
+  margin-right: 12;
+
+  border-radius: 12px;
 }
 
-/* Input */
-#input {
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  color: @accent;
-  background-color: @bg2;
-  animation: fadeIn 0.5s ease-in-out both;
-}
-
-/* Text */
-#text {
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  color: @txt;
-  animation: fadeIn 0.5s ease-in-out both;
-}
-
-/* Selected Entry */
 #entry:selected {
-  background-color: @accent;
+  background: #313244; /* Surface0 */
+  color: #cba6f7; /* Mauve */
+  font-weight: bold;
+  outline: none;
 }
 
-#entry:selected #text {
-  color: @bg2;
+#input {
+  background-color: #1e1e2e; /* Base */
+  color: #cdd6f4; /* Text */
+  border-color: #45475a; /* Surface1 */
+
+  border-style: none;
+  border-bottom-style: solid;
+  border-width: 1px;
+
+  font-style: normal;
+
+  border-radius: 8;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+
+  padding: 12px;
+  margin: 8px;
+}
+#input:focus {
+  background: #313244; /* Surface0 */
+  background-color: #313244; /* Surface0 */
+  border-color: #cba6f7; /* Mauve */
+  font-style: italic;
+}
+
+#img {
+  padding: 4px;
+  margin-right: 6px;
 }
