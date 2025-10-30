@@ -78,11 +78,7 @@ AUR_PACKAGES=(
     wlogout
     wlr-which-key
     ulauncher
-    walker
-    elephant-calc
-    elephant-clipboard
-    elephant-files
-    elephant-windows
+    vicinae-bin
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
