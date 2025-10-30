@@ -46,11 +46,12 @@ install_paru() {
 
 PACMAN_PACKAGES=(
     niri
+    wofi
     fuzzel
     swaync
     waybar
     xdg-desktop-portal-gtk
-    xdg-desktop-portal-gnome:
+    xdg-desktop-portal-gnome
     swww
     hypridle
     hyprlock
@@ -69,13 +70,14 @@ PACMAN_PACKAGES=(
     swayosd
     proton-vpn-gtk-app
     papirus-icon-theme
+    nwg-look
 )
 
 AUR_PACKAGES=(
     bibata-cursor-theme
     wlogout
     wlr-which-key
-    walker
+    ulauncher
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
