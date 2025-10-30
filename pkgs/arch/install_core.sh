@@ -85,6 +85,7 @@ PACMAN_PACKAGES=(
     nvm
     p7zip
     python-pipx # pipx
+    uv
     ripgrep
     rustup
     python
