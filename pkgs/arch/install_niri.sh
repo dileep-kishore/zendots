@@ -80,7 +80,7 @@ AUR_PACKAGES=(
     ant-dracula-kvantum-theme-git
     ant-dracula-kde-theme-git
     wlogout
-    wlr-which-key
+    wlr-which-key-git
     ulauncher
     vicinae-bin
 )
