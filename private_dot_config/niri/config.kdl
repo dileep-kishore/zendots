@@ -132,12 +132,17 @@ layout {
 spawn-at-startup "hypridle"
 spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
-spawn-sh-at-startup "vicinae server"
+spawn-at-startup "brave"
+spawn-at-startup "ghostty"
+spawn-at-startup "tana"
+spawn-at-startup "swww-daemon"
+spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
+spawn-at-startup "bash" "-c" "brave -app='https://linear.app/dkishore-lifecycles/inbox'"
+spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && sunsama"
-spawn-sh-at-startup "sleep 5 && pidof syncthing || syncthing --no-browser"
-// TODO: Fix this syncthing issue
-// spawn-sh-at-startup "sleep 10 && syncthingtray"
+spawn-sh-at-startup "sleep 5 && (pidof syncthing || syncthing --no-browser)"
+spawn-sh-at-startup "sleep 10 && syncthingtray"
 spawn-sh-at-startup "sleep 2 && swww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
 // NOTE: This is disabled because it causes issues where the last copied text is not pasted
 // spawn-sh-at-startup "sleep 10 && wl-clip-persist --clipboard regular"
@@ -216,6 +221,93 @@ window-rule {
         width 0
     }
 }
+// Named workspaces
+// Top
+workspace "browser" {
+    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
+}
+workspace "notes" {
+    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
+}
+workspace "tasks" {
+    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
+}
+window-rule {
+    match at-startup=true app-id="brave-browser$"
+    open-on-workspace "browser"
+    default-column-width {
+        proportion 1.0
+    }
+}
+window-rule {
+    match at-startup=true app-id="^tana$"
+    match at-startup=true app-id="^obsidian$"
+    open-on-workspace "notes"
+    default-column-width {
+        proportion 1.0
+    }
+}
+window-rule {
+    match at-startup=true app-id="^brave-app\\.todoist\\.com"
+    match at-startup=true app-id="^brave-linear\\.app"
+    open-on-workspace "tasks"
+    default-column-width {
+        proportion 0.5
+    }
+}
+// Bottom
+workspace "terminal" {
+    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495"
+}
+window-rule {
+    match at-startup=true app-id="^com\\.mitchellh\\.ghostty$"
+    open-on-workspace "terminal"
+    default-column-width {
+        proportion 1.0
+    }
+}
+// Left
+workspace "calendar" {
+    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
+}
+workspace "communication" {
+    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
+}
+workspace "music" {
+    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
+}
+workspace "literature" {
+    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
+}
+window-rule {
+    match app-id="^Morgen$"
+    match app-id="^Sunsama$"
+    open-on-workspace "calendar"
+    default-column-width {
+        proportion 1.0
+    }
+}
+window-rule {
+    match app-id="^Slack$"
+    open-on-workspace "communication"
+    default-column-width {
+        proportion 1.0
+    }
+}
+window-rule {
+    match app-id="^spotify$"
+    open-on-workspace "music"
+    default-column-width {
+        proportion 1.0
+    }
+}
+window-rule {
+    match app-id="^Zotero$"
+    open-on-workspace "literature"
+    default-column-width {
+        proportion 1.0
+    }
+}
 // Work around WezTerm's initial configure bug by setting an empty default-column-width.
 window-rule {
     match app-id="^org\\.wezfurlong\\.wezterm$"
@@ -225,9 +317,6 @@ window-rule {
 }
 // Side monitor apps
 window-rule {
-    match app-id="Morgen"
-    match app-id="Sunsama"
-    match app-id="Slack"
     match app-id="Zotero"
     match app-id="spotify"
     open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
