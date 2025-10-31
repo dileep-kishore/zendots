@@ -38,8 +38,8 @@ menu:
       - key: c
         desc: Calendar
         cmd: morgen
-  - key: w
-    desc: Web apps
+  - key: b
+    desc: Browser apps
     submenu:
       - key: h
         desc: GitHub Home
@@ -50,6 +50,42 @@ menu:
       - key: g
         desc: Gemini
         cmd: brave -app="https://gemini.google.com"
+      - key: t
+        desc: Todoist
+        cmd: brave -app="https://app.todoist.com/app/today"
+      - key: l
+        desc: Linear
+        cmd: brave -app="https://linear.app/dkishore-lifecycles/inbox"
+      - key: e
+        desc: Excalidraw
+        cmd: brave -app="https://app.excalidraw.com/dashboard"
+  - key: w
+    desc: Workspaces
+    submenu:
+      - key: b
+        desc: Browser workspace
+        cmd: niri msg action focus-workspace "browser"
+      - key: n
+        desc: Notes workspace
+        cmd: niri msg action focus-workspace "notes"
+      - key: c
+        desc: Calendar workspace
+        cmd: niri msg action focus-workspace "calendar"
+      - key: s
+        desc: Slack workspace
+        cmd: niri msg action focus-workspace "communication"
+      - key: c
+        desc: Code workspace
+        cmd: niri msg action focus-workspace "terminal"
+      - key: m
+        desc: Music workspace
+        cmd: niri msg action focus-workspace "music"
+      - key: l
+        desc: Literature workspace
+        cmd: niri msg action focus-workspace "literature"
+      - key: t
+        desc: Tasks workspace
+        cmd: niri msg action focus-workspace "tasks"
   - key: s
     desc: Switch apps
     submenu:
