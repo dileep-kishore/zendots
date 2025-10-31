@@ -215,6 +215,14 @@ layer-rule {
     }
     geometry-corner-radius 10
 }
+layer-rule {
+    match namespace="^(wlr_which_key)$"
+    shadow {
+        on
+    }
+    geometry-corner-radius 10
+    baba-is-float true
+}
 window-rule {
     match app-id="^(ulauncher)$"
     border {
