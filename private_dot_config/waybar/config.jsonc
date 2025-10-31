@@ -34,7 +34,9 @@
     "tray"
   ],
   "custom/spacer": {
-    "format": "  ",
+    // "format": "  ",
+    "format": " {}",
+    "exec": "polycat",
     "on-click": "niri msg action toggle-overview"
   },
   "image": {

@@ -83,6 +83,7 @@ AUR_PACKAGES=(
     wlr-which-key-git
     ulauncher
     vicinae-bin
+    polycat
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
