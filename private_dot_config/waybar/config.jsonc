@@ -22,13 +22,14 @@
   "modules-right": [
     "custom/clock-icon",
     "clock",
-    "custom/tray-icon",
+    "custom/specs-icon",
     "memory",
     "cpu",
+    "network",
+    "custom/tray-icon",
     "backlight",
     "battery",
     "battery#bat2",
-    "network",
     "idle_inhibitor",
     "pulseaudio",
     "tray"
@@ -198,8 +199,8 @@
   },
   "memory": {
     "interval": 1,
-    "rotate": 270,
-    "format": "{icon}",
+    // "rotate": 270,
+    "format": "{icon} M",
     "format-icons": [
       "<span color='#b4befe'>󰝦</span>",
       "<span color='#b4befe'>󰪞</span>",
@@ -215,8 +216,8 @@
   },
   "cpu": {
     "interval": 1,
-    "format": "{icon}",
-    "rotate": 270,
+    "format": "{icon} C",
+    // "rotate": 270,
     "format-icons": [
       "<span color='#b4befe'>󰝦</span>",
       "<span color='#b4befe'>󰪞</span>",
@@ -294,6 +295,9 @@
   },
   "custom/audio-icon": {
     "format": ""
+  },
+  "custom/specs-icon": {
+    "format": ""
   },
   "custom/network-icon": {
     "format": "󰖩"
