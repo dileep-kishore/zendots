@@ -75,8 +75,8 @@ menu:
       - key: s
         desc: Slack workspace
         cmd: niri msg action focus-workspace "communication"
-      - key: c
-        desc: Code workspace
+      - key: w
+        desc: Main workspace
         cmd: niri msg action focus-workspace "terminal"
       - key: m
         desc: Music workspace
