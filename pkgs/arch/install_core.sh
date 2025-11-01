@@ -86,6 +86,7 @@ PACMAN_PACKAGES=(
     p7zip
     python-pipx # pipx
     uv
+    pixi
     ripgrep
     rustup
     python
