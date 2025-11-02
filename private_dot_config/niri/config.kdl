@@ -234,9 +234,6 @@ window-rule {
 workspace "browser" {
     open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
 }
-workspace "notes" {
-    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
-}
 workspace "tasks" {
     open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
 }
@@ -265,6 +262,9 @@ window-rule {
 }
 // Bottom
 workspace "terminal" {
+    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495"
+}
+workspace "notes" {
     open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495"
 }
 window-rule {
