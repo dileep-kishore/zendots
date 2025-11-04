@@ -266,8 +266,8 @@
   },
   "mpris": {
     "interval": 2,
-    "format": "{player_icon}{dynamic}{status_icon}",
-    "format-paused": "{player_icon}{dynamic}{status_icon}",
+    "format": "{player_icon}{status_icon}",
+    "format-paused": "{player_icon}{status_icon}",
     "tooltip": true,
     "tooltip-format": "{dynamic}",
     "on-click": "playerctl play-pause",
@@ -288,9 +288,9 @@
       "vlc": "󰕼 "
     },
     "status-icons": {
-      "playing": "",
-      "paused": "",
-      "stopped": ""
+      "playing": "Playing ",
+      "paused": "Paused ",
+      "stopped": "Stopped "
     }
   },
   "custom/audio-icon": {
