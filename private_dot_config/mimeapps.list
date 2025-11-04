@@ -18,3 +18,4 @@ x-scheme-handler/notion=notion.desktop
 x-scheme-handler/mailto=brave-browser.desktop
 x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
 inode/directory=org.gnome.Nautilus.desktop;
+x-scheme-handler/discord=vesktop.desktop
