@@ -211,3 +211,15 @@ _aichat_zsh() {
 }
 zle -N _aichat_zsh
 bindkey '\ee' _aichat_zsh
+
+# Export certificates for claude code and other node applications
+if [[ $(hostname) == "mac148593" ]]; then
+  CERT_FILE="$HOME/corporate-certs.pem"
+
+  if [ ! -f "$CERT_FILE" ]; then
+    echo "Creating certificate bundle..."
+    security find-certificate -a -p /Library/Keychains/System.keychain > "$CERT_FILE"
+  fi
+
+  export NODE_EXTRA_CA_CERTS="$CERT_FILE"
+fi
