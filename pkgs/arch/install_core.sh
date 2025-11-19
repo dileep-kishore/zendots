@@ -125,6 +125,9 @@ PACMAN_PACKAGES=(
     brave-bin
     vivaldi
     procs
+    okluar
+    zathura
+    zathura-pdf-mupdf
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
