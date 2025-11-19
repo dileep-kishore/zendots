@@ -43,7 +43,6 @@ print_info "Using package manager: $PM"
 
 # Core LaTeX packages
 CORE_PACKAGES=(
-    tectonic
     texlive-basic            # Basic LaTeX distribution
     texlive-bin              # Contains latexmk, xelatex, lualatex, pdflatex
     texlive-binextra         # Contains latexmk, xelatex, lualatex, pdflatex
