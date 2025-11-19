@@ -75,7 +75,28 @@ servers.ltex_plus = {
   },
 }
 
-servers.texlab = {}
+servers.texlab = {
+  -- keys = {
+  --   { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },
+  -- },
+  settings = {
+    texlab = {
+      build = {
+        executable = "latexmk",
+        args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
+        onSave = true,
+      },
+      forwardSearch = {
+        executable = "zathura", -- or your PDF viewer
+        args = { "--synctex-forward", "%l:1:%f", "%p" },
+      },
+      chktex = {
+        onEdit = false,
+        onOpenAndSave = true,
+      },
+    },
+  },
+}
 
 servers.marksman = {}
 
