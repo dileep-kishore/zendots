@@ -134,7 +134,7 @@ spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "brave"
 spawn-at-startup "ghostty"
-spawn-at-startup "tana"
+spawn-at-startup "notion-app"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
 spawn-at-startup "bash" "-c" "brave -app='https://linear.app/dkishore-lifecycles/inbox'"
@@ -246,6 +246,7 @@ window-rule {
 }
 window-rule {
     match at-startup=true app-id="^tana$"
+    match at-startup=true app-id="^Notion$"
     match at-startup=true app-id="^obsidian$"
     open-on-workspace "notes"
     default-column-width {
