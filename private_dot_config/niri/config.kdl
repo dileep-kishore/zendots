@@ -347,6 +347,10 @@ window-rule {
     }
 }
 window-rule {
+    match app-id="Notion" title="^Notion - Command Search$"
+    open-floating true
+}
+window-rule {
     match app-id="kitty"
     default-column-width {
         proportion 0.333
