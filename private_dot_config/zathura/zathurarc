@@ -1,0 +1,4 @@
+set selection-clipboard clipboard
+set recolor "true"       # For dark mode toggling (toggle with C-r)
+map u scroll half-up
+map d scroll half-down
