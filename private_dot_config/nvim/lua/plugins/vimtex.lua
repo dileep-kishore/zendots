@@ -8,6 +8,22 @@ return {
     },
     init = function()
       vim.g.vimtex_view_method = "zathura"
+
+      -- Compiler settings for custom output directory
+      vim.g.vimtex_compiler_latexmk = {
+        out_dir = "build",
+        callback = 1,
+        continuous = 1,
+        executable = "latexmk",
+        options = {
+          "-verbose",
+          "-file-line-error",
+          "-synctex=1",
+          "-interaction=nonstopmode",
+          "-f",
+        },
+      }
+
       -- Quickfix settings
       vim.g.vimtex_quickfix_open_on_warning = 0
       vim.g.vimtex_quickfix_ignore_filters = {
