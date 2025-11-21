@@ -49,6 +49,7 @@ CORE_PACKAGES=(
     texlive-latex            # LaTeX base packages
     texlive-latexrecommended # Recommended LaTeX packages
     texlive-latexextra       # Extra LaTeX packages (beamer, etc.)
+    texlive-plaingeneric
 )
 
 # Additional useful packages
