@@ -6,6 +6,16 @@ sort_dir_first = true
 sort_reverse = false
 sort_sensitive = false
 
+[opener]
+edit = [
+  { run = 'nvim "$@"', block = true, desc = "Edit in nvim", for = "unix" },
+]
+
+[open]
+prepend_rules = [
+  { name = "*.tex", use = "edit" },
+]
+
 [[plugin.prepend_fetchers]]
 id = "git"
 name = "*"
