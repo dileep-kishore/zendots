@@ -20,3 +20,4 @@ x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
 inode/directory=org.gnome.Nautilus.desktop;
 x-scheme-handler/discord=vesktop.desktop
 application/pdf=org.pwmt.zathura.desktop
+text/plain=nvim.desktop
