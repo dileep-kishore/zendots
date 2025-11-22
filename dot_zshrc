@@ -47,6 +47,11 @@ export PATH="$PATH:/var/lib/flatpak/exports/bin"
 export PATH="$PATH:$HOME/npm-global/bin"
 export PATH="$HOME/.pixi/bin:$PATH"
 
+# HACK: Run non-interactive config when using claude code
+if [[ "$CLAUDECODE" == "1" ]]; then
+    return
+fi
+
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -162,6 +167,9 @@ tnew() {
     bash ~/.config/tmux/scripts/templater.sh "$@"
     tmuxinator start "$1"
 }
+
+# Claude
+alias claude='SHELL=/bin/bash claude'
 
 # AI secrets
 export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
