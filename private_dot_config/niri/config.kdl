@@ -273,35 +273,35 @@ window-rule {
     match at-startup=true app-id="^com\\.mitchellh\\.ghostty$"
     open-on-workspace "terminal"
     default-column-width {
-        proportion 1.0
+        proportion 0.75
     }
 }
 window-rule {
     match app-id="^Morgen$"
     open-on-workspace "calendar"
     default-column-width {
-        proportion 1.0
+        proportion 0.5
     }
 }
 window-rule {
     match app-id="^Slack$"
     open-on-workspace "communication"
     default-column-width {
-        proportion 1.0
+        proportion 0.5
     }
 }
 window-rule {
     match app-id="^spotify$"
     open-on-workspace "music"
     default-column-width {
-        proportion 1.0
+        proportion 0.5
     }
 }
 window-rule {
     match app-id="^Zotero$"
     open-on-workspace "literature"
     default-column-width {
-        proportion 1.0
+        proportion 0.75
     }
 }
 // Work around WezTerm's initial configure bug by setting an empty default-column-width.
@@ -311,15 +311,6 @@ window-rule {
 
     }
 }
-// Side monitor apps
-window-rule {
-    match app-id="Zotero"
-    match app-id="spotify"
-    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
-    default-column-width {
-        proportion 1.0
-    }
-}
 // floating terminal
 window-rule {
     match app-id="scratchpad"
@@ -327,7 +318,7 @@ window-rule {
     default-floating-position x=0 y=50 relative-to="bottom"
     opacity 0.9
     default-column-width {
-        proportion 0.7
+        proportion 0.5
     }
     default-window-height {
         proportion 0.5
