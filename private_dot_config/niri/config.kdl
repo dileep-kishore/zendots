@@ -124,7 +124,6 @@ spawn-at-startup "ghostty"
 spawn-at-startup "notion-app"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
-spawn-at-startup "bash" "-c" "brave -app='https://linear.app/dkishore-lifecycles/inbox'"
 spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 7 && sunsama"
@@ -220,10 +219,28 @@ window-rule {
 // Named workspaces
 // Top
 workspace "browser" {
-    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
+
+}
+workspace "terminal" {
+
+}
+workspace "notes" {
+
 }
 workspace "tasks" {
-    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487"
+
+}
+workspace "calendar" {
+
+}
+workspace "communication" {
+
+}
+workspace "music" {
+
+}
+workspace "literature" {
+
 }
 window-rule {
     match at-startup=true app-id="brave-browser$"
@@ -244,17 +261,11 @@ window-rule {
 window-rule {
     match at-startup=true app-id="^brave-app\\.todoist\\.com"
     match at-startup=true app-id="^brave-linear\\.app"
+    match app-id="^Sunsama$"
     open-on-workspace "tasks"
     default-column-width {
         proportion 0.5
     }
-}
-// Bottom
-workspace "terminal" {
-    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495"
-}
-workspace "notes" {
-    open-on-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495"
 }
 window-rule {
     match at-startup=true app-id="^com\\.mitchellh\\.ghostty$"
@@ -263,22 +274,8 @@ window-rule {
         proportion 1.0
     }
 }
-// Left
-workspace "calendar" {
-    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
-}
-workspace "communication" {
-    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
-}
-workspace "music" {
-    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
-}
-workspace "literature" {
-    open-on-output "Ancor Communications Inc VC279 G8LMRS004210"
-}
 window-rule {
     match app-id="^Morgen$"
-    match app-id="^Sunsama$"
     open-on-workspace "calendar"
     default-column-width {
         proportion 1.0
