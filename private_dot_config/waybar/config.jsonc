@@ -2,6 +2,7 @@
   "layer": "top",
   "position": "top",
   "mod": "dock",
+  "start_hidden": true,
   "margin-left": 15,
   "margin-right": 15,
   "margin-top": 4,
