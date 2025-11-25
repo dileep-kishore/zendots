@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 
-import os
 import subprocess
 import time
 from itertools import cycle
+from pathlib import Path
 
-WALLPAPERS_DIR = os.path.expanduser("~/Pictures/wallpapers/")
-WALLPAPER_NAMES = [
-    "sushi-dark.png",
-    "nixppuccin.png",
-    "black-hole.png",
-    "galaxy.png",
-    "bluewave.png",
-]
+WALLPAPERS_DIR = Path("~/Pictures/swww/").expanduser()
+WALLPAPERS = []
+for file in WALLPAPERS_DIR.iterdir():
+    if file.suffix.lower() in [".jpg", ".jpeg", ".png"]:
+        if "-blurred" not in file.stem:
+            WALLPAPERS.append(file)
 
 
 def set_wallpaper(wallpaper):
@@ -28,8 +26,7 @@ def set_wallpaper(wallpaper):
 
 
 def main():
-    wallpapers = [os.path.join(WALLPAPERS_DIR, name) for name in WALLPAPER_NAMES]
-    wallpaper_cycle = cycle(wallpapers)
+    wallpaper_cycle = cycle(WALLPAPERS)
     for wallpaper in wallpaper_cycle:
         print(f"Setting wallpaper to {wallpaper}")
         set_wallpaper(wallpaper)

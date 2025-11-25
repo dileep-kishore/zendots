@@ -17,10 +17,16 @@ def get_niri_msg_output(msg):
 def get_current_wallpaper(monitor):
     with open(os.path.join(wallpapers_cache_path, monitor)) as f:
         wallpaper_string = str(f.readlines()[-1].strip())
+        if ".png" in wallpaper_string:
+            suffix = ".png"
+        elif ".jpg" in wallpaper_string:
+            suffix = ".jpg"
+        else:
+            raise ValueError("Unsupported wallpaper format")
         wallpaper = (
             "/home/dileep"
-            + wallpaper_string.split("/home/dileep")[-1].split(".png")[0]
-            + ".png"
+            + wallpaper_string.split("/home/dileep")[-1].split(suffix)[0]
+            + suffix
         )
         return wallpaper
 
@@ -48,7 +54,15 @@ def change_wallpaper_on_event():
         active_workspace_monitor = active_workspace["output"]
         current_wallpaper = get_current_wallpaper(active_workspace_monitor)
         unblurred_wallpaper = current_wallpaper.replace("-blurred", "")
-        blurred_wallpaper = unblurred_wallpaper.removesuffix(".png") + "-blurred.png"
+        if ".png" in unblurred_wallpaper:
+            suffix = ".png"
+        elif ".jpg" in unblurred_wallpaper:
+            suffix = ".jpg"
+        else:
+            raise ValueError("Unsupported wallpaper format")
+        blurred_wallpaper = (
+            unblurred_wallpaper.removesuffix(suffix) + f"-blurred{suffix}"
+        )
         if active_workspace_is_empty:
             wallpaper = unblurred_wallpaper
         else:
