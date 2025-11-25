@@ -408,7 +408,7 @@ binds {
         spawn "bash" "-c" "hyprpicker | wl-copy"
     }
     Mod+Alt+W {
-        spawn "bash" "-c" "pkill waybar && waybar"
+        spawn-sh "pkill -SIGUSR1 waybar"
     }
     Mod+Alt+L {
         spawn "bash" "-c" "sleep 3 && niri msg action power-off-monitors && hyprlock"
