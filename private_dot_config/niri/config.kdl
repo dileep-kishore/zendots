@@ -22,24 +22,11 @@ input {
     mod-key "Super"
 }
 // tsuki
-output "Ancor Communications Inc VC279 G8LMRS004210" {
-    mode "1920x1080@60.000"
+output "Microstep MPG491CX OLED Unknown" {
+    mode "5120x1440@240.000"
     scale 1
-    transform "90"
+    transform "normal"
     position x=0 y=0
-}
-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003495" {
-    mode "3440x1440@144.000"
-    scale 1
-    transform "normal"
-    position x=1080 y=1440
-    focus-at-startup
-}
-output "GIGA-BYTE TECHNOLOGY CO., LTD. G34WQC A 23022B003487" {
-    mode "3440x1440@144.000"
-    scale 1
-    transform "normal"
-    position x=1080 y=0
     focus-at-startup
 }
 // work laptop
