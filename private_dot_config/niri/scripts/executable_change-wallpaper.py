@@ -33,7 +33,7 @@ def main():
     for wallpaper in wallpaper_cycle:
         print(f"Setting wallpaper to {wallpaper}")
         set_wallpaper(wallpaper)
-        time.sleep(3600)
+        time.sleep(900)
 
 
 if __name__ == "__main__":
