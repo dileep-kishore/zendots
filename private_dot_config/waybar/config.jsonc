@@ -84,13 +84,10 @@
       "8": "8",
       "9": "9",
       "browser": "",
+      "terminal": "",
       "notes": "󰠮",
       "calendar": "",
-      "communication": "",
-      "terminal": "",
-      "music": "",
-      "literature": "",
-      "tasks": "",
+      "reference": ""
     }
   },
   "wlr/taskbar": {
