@@ -123,12 +123,12 @@ spawn-at-startup "waybar"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "brave"
 spawn-at-startup "ghostty"
-spawn-at-startup "notion-app"
-spawn-at-startup "swww-daemon"
 spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
+spawn-sh-at-startup "sleep 2 && sunsama"
+spawn-at-startup "sleep 4 && notion-app"
+spawn-at-startup "swww-daemon"
 spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
-spawn-sh-at-startup "sleep 7 && sunsama"
 spawn-sh-at-startup "sleep 5 && zotero"
 spawn-sh-at-startup "sleep 5 && (pidof syncthing || syncthing --no-browser)"
 spawn-sh-at-startup "sleep 10 && syncthingtray"
@@ -229,19 +229,10 @@ workspace "terminal" {
 workspace "notes" {
 
 }
-workspace "tasks" {
-
-}
 workspace "calendar" {
 
 }
-workspace "communication" {
-
-}
-workspace "music" {
-
-}
-workspace "literature" {
+workspace "reference" {
 
 }
 window-rule {
@@ -257,16 +248,16 @@ window-rule {
     match at-startup=true app-id="^obsidian$"
     open-on-workspace "notes"
     default-column-width {
-        proportion 1.0
+        proportion 0.6
     }
 }
 window-rule {
     match at-startup=true app-id="^brave-app\\.todoist\\.com"
     match at-startup=true app-id="^brave-linear\\.app"
     match app-id="^Sunsama$"
-    open-on-workspace "tasks"
+    open-on-workspace "notes"
     default-column-width {
-        proportion 0.5
+        proportion 0.2
     }
 }
 window-rule {
@@ -285,23 +276,23 @@ window-rule {
 }
 window-rule {
     match app-id="^Slack$"
-    open-on-workspace "communication"
+    open-on-workspace "reference"
     default-column-width {
         proportion 0.5
     }
 }
 window-rule {
     match app-id="^spotify$"
-    open-on-workspace "music"
+    open-on-workspace "reference"
     default-column-width {
         proportion 0.5
     }
 }
 window-rule {
     match app-id="^Zotero$"
-    open-on-workspace "literature"
+    open-on-workspace "reference"
     default-column-width {
-        proportion 0.75
+        proportion 0.5
     }
 }
 // Work around WezTerm's initial configure bug by setting an empty default-column-width.
