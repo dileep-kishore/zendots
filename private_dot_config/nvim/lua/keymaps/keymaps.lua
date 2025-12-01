@@ -70,3 +70,7 @@ map("v", ">", ">gv", { desc = "Indent right" })
 -- Macros
 map("n", "Q", "@qj", { desc = "Run q macro" })
 map("x", "Q", ":norm @q<CR>", { desc = "Run q macro" })
+
+-- Load macro functions
+local macros = require("keymaps.macros")
+map("n", "<Leader>ux", macros.split_sentences, { desc = "Split sentences to new lines" })
