@@ -1,7 +1,6 @@
 {
 	"$schema": "https://opencode.ai/config.json",
 	"theme": "catppuccin",
-	"model": "github-copilot/gpt-5",
 	"autoshare": false,
 	"autoupdate": false,
 	"mcp": {
@@ -9,5 +8,72 @@
 			"type": "local",
 			"command": ["npx", "-y", "@upstash/context7-mcp"]
 		}
-	}
+	},
+	"provider": {
+		"cborg": {
+			"npm": "@ai-sdk/openai-compatible",
+			"name": "CBorg API",
+			"options": {
+				"baseURL": "https://api.cborg.lbl.gov",
+				"apiKey": "{env:CBORG_API_KEY}"
+			},
+			"models": {
+				"lbl/cborg-coder": {
+					"id": "lbl/cborg-coder",
+					"name": "CBorg Coder",
+					"reasoning": true,
+					"tool_call": true,
+					"limit": {
+						"context": 131072,
+						"output": 131072
+					}
+				},
+				"lbl/claude-sonnet-4-5": {
+					"id": "claude-sonnet-4-5",
+					"name": "Claude Sonnet 4.5",
+					"reasoning": true,
+					"tool_call": true,
+					"options": {
+						"reasoningEffort": "high",
+						"textVerbosity": "low",
+						"reasoningSummary": "auto"
+					}
+				},
+				"lbl/claude-opus-4-5": {
+					"id": "claude-opus-4-5",
+					"name": "Claude Opus 4.5",
+					"reasoning": true,
+					"tool_call": true,
+					"options": {
+						"reasoningEffort": "high",
+						"textVerbosity": "low",
+						"reasoningSummary": "auto"
+					}
+				},
+				"lbl/gpt-5.1": {
+					"id": "gpt-5.1",
+					"name": "GPT 5.1",
+					"reasoning": true,
+					"tool_call": true,
+					"options": {
+						"reasoningEffort": "high",
+						"textVerbosity": "low",
+						"reasoningSummary": "auto"
+					}
+				},
+				"lbl/gemini-3-pro": {
+					"id": "gemini-3-pro",
+					"name": "Gemini 3 Pro",
+					"reasoning": true,
+					"tool_call": true,
+					"options": {
+						"reasoningEffort": "high",
+						"textVerbosity": "low",
+						"reasoningSummary": "auto"
+					}
+				}
+			}
+		}
+	},
+	"model": "lbl/claude-sonnet-4-5"
 }

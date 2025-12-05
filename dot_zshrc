@@ -169,15 +169,22 @@ tnew() {
     tmuxinator start "$1"
 }
 
-# Claude
-alias claude='SHELL=/bin/bash claude'
-
 # AI secrets
 export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
 export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
 export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
 export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
+export CBORG_API_KEY="$(cat ~/.secrets/cborg.txt)"
 
+# Claude
+alias claude='SHELL=/bin/bash claude'
+export ANTHROPIC_AUTH_TOKEN=$CBORG_API_KEY
+export ANTHROPIC_BASE_URL=https://api.cborg.lbl.gov
+export ANTHROPIC_SMALL_FAST_MODEL=claude-haiku-4-5
+export ANTHROPIC_MODEL=claude-sonnet-4-5
+export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
+export DISABLE_TELEMETRY=1
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192
 
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
