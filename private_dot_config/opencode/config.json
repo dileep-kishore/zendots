@@ -3,6 +3,18 @@
 	"theme": "catppuccin",
 	"autoshare": false,
 	"autoupdate": false,
+	"model": "lbl/claude-sonnet-4-5",
+	"permission": {
+		"edit": "allow",
+		"bash": "allow",
+		"webfetch": "allow",
+		"external_directory": "ask"
+	},
+	"instructions": ["~/.config/opencode/AGENTS.md"],
+	"tools": {
+		"bash": true,
+		"edit": true
+	},
 	"mcp": {
 		"context7": {
 			"type": "local",
@@ -32,12 +44,7 @@
 					"id": "claude-sonnet-4-5",
 					"name": "Claude Sonnet 4.5",
 					"reasoning": true,
-					"tool_call": true,
-					"options": {
-						"reasoningEffort": "high",
-						"textVerbosity": "low",
-						"reasoningSummary": "auto"
-					}
+					"tool_call": true
 				},
 				"lbl/claude-opus-4-5": {
 					"id": "claude-opus-4-5",
@@ -54,12 +61,7 @@
 					"id": "gpt-5.1",
 					"name": "GPT 5.1",
 					"reasoning": true,
-					"tool_call": true,
-					"options": {
-						"reasoningEffort": "high",
-						"textVerbosity": "low",
-						"reasoningSummary": "auto"
-					}
+					"tool_call": true
 				},
 				"lbl/gemini-3-pro": {
 					"id": "gemini-3-pro",
@@ -74,6 +76,5 @@
 				}
 			}
 		}
-	},
-	"model": "lbl/claude-sonnet-4-5"
+	}
 }
