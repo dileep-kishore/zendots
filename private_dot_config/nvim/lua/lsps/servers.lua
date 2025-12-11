@@ -71,7 +71,7 @@ servers.ltex_plus = {
     "context",
   },
   settings = {
-    check_frequency = "save",
+    checkFrequency = "save",
   },
 }
 
