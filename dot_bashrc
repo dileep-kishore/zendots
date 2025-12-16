@@ -1,3 +1,5 @@
+# vim:ft=bash
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -116,6 +118,23 @@ if ! shopt -oq posix; then
   fi
 fi
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+export EDITOR=nvim
+export USE_EDITOR=$EDITOR
+export VISUAL=$EDITOR
+# export BROWSER=brave-browser
+export GIT_PAGER="delta"
+export FZF_DEFAULT_OPTS="\
+    --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :100 {}'\
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
+export PATH=$PATH:$HOME/.local/bin
+export PATH="$PATH:/var/lib/flatpak/exports/bin"
+export PATH="$PATH:$HOME/npm-global/bin"
 export PATH="$HOME/.pixi/bin:$PATH"
-. "$HOME/.cargo/env"
+
+# Only init linuxbrew if it exists
+if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
