@@ -20,3 +20,38 @@ Write two kinds of tests:
 **Skip:** Hypothetical edge cases and exhaustive coverage that bloat context windows.
 
 Tests are living documentation of what should work and what broke before, not comprehensive safety nets for every possibility.
+
+## Python Docstrings
+
+Always use NumPy-style docstrings for Python code:
+
+```python
+def function_name(param1, param2):
+    """
+    Brief description of function.
+
+    Parameters
+    ----------
+    param1 : type
+        Description of param1.
+    param2 : type
+        Description of param2.
+
+    Returns
+    -------
+    type
+        Description of return value.
+
+    Raises
+    ------
+    ExceptionType
+        When and why this exception is raised.
+
+    Examples
+    --------
+    >>> function_name(1, 2)
+    3
+    """
+```
+
+You don't need to include all sections if they aren't relevant.
