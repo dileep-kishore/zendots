@@ -119,7 +119,7 @@ layout {
     }
 }
 spawn-at-startup "hypridle"
-spawn-at-startup "waybar"
+spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "brave"
 spawn-at-startup "ghostty"
@@ -390,7 +390,7 @@ binds {
         spawn "bash" "-c" "hyprpicker | wl-copy"
     }
     Mod+Alt+W {
-        spawn-sh "pkill -SIGUSR1 waybar"
+        spawn-sh "qs -c noctalia-shell ipc call bar toggle"
     }
     Mod+Alt+L {
         spawn "bash" "-c" "sleep 3 && niri msg action power-off-monitors && hyprlock"
