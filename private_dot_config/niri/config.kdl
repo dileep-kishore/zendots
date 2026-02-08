@@ -87,8 +87,8 @@ layout {
     }
     border {
         width 4
-        active-gradient from="#cba6f7" to="#89b4fa"
-        inactive-gradient from="#585b70" to="#585b70"
+        active-gradient from="#cba6f7" to="#89b4fa" relative-to="workspace-view"
+        inactive-gradient from="#585b70" to="#585b70" relative-to="workspace-view"
     }
     shadow {
         on
