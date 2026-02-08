@@ -1,0 +1,239 @@
+# Espanso match file
+# Reference: https://espanso.org/docs/matches/basics/
+#
+# Matches are substitution rules: when you type the "trigger" string
+# it gets replaced by the "replace" string.
+#
+# You can add more match files in this directory and they will be loaded automatically.
+# Files starting with underscore (_) are not loaded automatically (useful for app-specific configs).
+
+matches:
+  # ============================================
+  # Common text expansions
+  # ============================================
+  
+  - trigger: ":espanso"
+    replace: "Hi there!"
+    label: "Espanso test"
+
+  - trigger: ":br"
+    replace: "Best Regards,\nDileep"
+    label: "Best regards signature"
+
+  - trigger: ":thx"
+    replace: "Thank you!"
+    label: "Thank you"
+
+  - trigger: ":ty"
+    replace: "Thank you!"
+    label: "Thank you (short)"
+
+  - trigger: ":pls"
+    replace: "Please"
+    label: "Please"
+
+  # ============================================
+  # Date and Time
+  # ============================================
+  
+  - trigger: ":date"
+    replace: "{{mydate}}"
+    label: "Current date (YYYY-MM-DD)"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          format: "%Y-%m-%d"
+
+  - trigger: ":ddate"
+    replace: "{{mydate}}"
+    label: "Current date (Month Day, Year)"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          format: "%B %d, %Y"
+
+  - trigger: ":time"
+    replace: "{{mytime}}"
+    label: "Current time (HH:MM)"
+    vars:
+      - name: mytime
+        type: date
+        params:
+          format: "%H:%M"
+
+  - trigger: ":now"
+    replace: "{{datetime}}"
+    label: "Current date and time"
+    vars:
+      - name: datetime
+        type: date
+        params:
+          format: "%Y-%m-%d %H:%M"
+
+  - trigger: ":week"
+    replace: "{{week}}"
+    label: "Current week number"
+    vars:
+      - name: week
+        type: date
+        params:
+          format: "Week %W"
+
+  # ============================================
+  # Email
+  # ============================================
+  
+  - trigger: ":email"
+    replace: "{{clipboard}}@example.com"
+    label: "Email with clipboard"
+    vars:
+      - name: clipboard
+        type: clipboard
+
+  # ============================================
+  # Markdown shortcuts
+  # ============================================
+  
+  - trigger: ":codeblock"
+    replace: "```$|$\n```"
+    label: "Markdown code block"
+
+  - trigger: ":cb"
+    replace: "```$|$\n```"
+    label: "Markdown code block (short)"
+
+  - trigger: ":link"
+    replace: "[$|$]()"
+    label: "Markdown link"
+
+  - trigger: ":img"
+    replace: "![$|$]()"
+    label: "Markdown image"
+
+  - trigger: ":task"
+    replace: "- [ ] "
+    label: "Markdown task"
+
+  - trigger: ":table"
+    replace: |
+      | Column 1 | Column 2 | Column 3 |
+      |----------|----------|----------|
+      |          |          |          |
+    label: "Markdown table"
+
+  # ============================================
+  # Development shortcuts
+  # ============================================
+  
+  - trigger: ":todo"
+    replace: "TODO: "
+    label: "TODO comment"
+
+  - trigger: ":fixme"
+    replace: "FIXME: "
+    label: "FIXME comment"
+
+  - trigger: ":note"
+    replace: "NOTE: "
+    label: "NOTE comment"
+
+  - trigger: ":hack"
+    replace: "HACK: "
+    label: "HACK comment"
+
+  # ============================================
+  # Shell / CLI
+  # ============================================
+  
+  - trigger: ":shrug"
+    replace: "¯\\_(ツ)_/¯"
+    label: "Shrug emoji"
+
+  - trigger: ":lenny"
+    replace: "( ͡° ͜ʖ ͡°)"
+    label: "Lenny face"
+
+  - trigger: ":flip"
+    replace: "(╯°□°)╯︵ ┻━┻"
+    label: "Table flip"
+
+  - trigger: ":unflip"
+    replace: "┬─┬ノ( º _ ºノ)"
+    label: "Table unflip"
+
+  # ============================================
+  # Arrows and symbols
+  # ============================================
+  
+  - trigger: ":arrow"
+    replace: "→"
+    label: "Right arrow"
+
+  - trigger: ":larrow"
+    replace: "←"
+    label: "Left arrow"
+
+  - trigger: ":uarrow"
+    replace: "↑"
+    label: "Up arrow"
+
+  - trigger: ":darrow"
+    replace: "↓"
+    label: "Down arrow"
+
+  - trigger: ":check"
+    replace: "✓"
+    label: "Checkmark"
+
+  - trigger: ":cross"
+    replace: "✗"
+    label: "Cross mark"
+
+  - trigger: ":star"
+    replace: "★"
+    label: "Star"
+
+  - trigger: ":bullet"
+    replace: "•"
+    label: "Bullet point"
+
+  - trigger: ":deg"
+    replace: "°"
+    label: "Degree symbol"
+
+  # ============================================
+  # Dynamic content with clipboard
+  # ============================================
+  
+  - trigger: ":upper"
+    replace: "{{output}}"
+    label: "Clipboard to uppercase"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "wl-paste | tr '[:lower:]' '[:upper:]'"
+
+  - trigger: ":lower"
+    replace: "{{output}}"
+    label: "Clipboard to lowercase"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "wl-paste | tr '[:upper:]' '[:lower:]'"
+
+  # ============================================
+  # UUID generation
+  # ============================================
+  
+  - trigger: ":uuid"
+    replace: "{{output}}"
+    label: "Generate UUID"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "uuidgen"

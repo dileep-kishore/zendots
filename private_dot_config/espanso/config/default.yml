@@ -1,0 +1,46 @@
+# Espanso configuration for Wayland (niri / hyprland)
+# Reference: https://espanso.org/docs/configuration/options/
+
+# Backend configuration for Wayland
+# Using 'Clipboard' backend for better Wayland compatibility
+backend: Clipboard
+
+# Keyboard layout - explicitly set for Wayland
+# This prevents the "unable to determine keyboard layout automatically" warning
+keyboard_layout:
+  layout: us
+
+# Search bar configuration
+# Note: Alt+Space may conflict with some window managers, customize as needed
+search_shortcut: ALT+SPACE
+search_trigger: ":search"
+
+# Show icon in system tray (if supported)
+show_icon: true
+
+# Toggle key to enable/disable espanso
+toggle_key: ALT
+
+# Injection delay (ms) - increase if expansions are unreliable
+inject_delay: 0
+
+# Key delay (ms) - time between key injections
+key_delay: 0
+
+# Clipboard threshold - use clipboard for text longer than this
+clipboard_threshold: 100
+
+# Preserve clipboard content after expansion
+preserve_clipboard: true
+
+# Paste shortcut for Wayland (uses wl-clipboard)
+paste_shortcut: CTRL+V
+
+# Auto restart on configuration changes
+auto_restart: true
+
+# Backspace limit - max backspaces to undo trigger
+backspace_limit: 5
+
+# Apply patch for ibus (useful on some systems)
+# ibus_engine_patch: true
