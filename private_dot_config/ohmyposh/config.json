@@ -279,11 +279,5 @@
       "newline": true
     }
   ],
-  "transient_prompt": {
-    "background": "transparent",
-    "foreground": "p:lavender",
-    "template": "{{ .PWD }}<p:mauve> ➜ </>",
-    "newline": true
-  },
   "version": 3
 }
