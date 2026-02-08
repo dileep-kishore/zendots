@@ -102,7 +102,6 @@ zinit wait lucid for \
     OMZP::magic-enter \
     OMZP::npm \
     OMZP::python \
-    OMZP::tmux \
     OMZP::web-search
 
 zinit wait lucid for \
