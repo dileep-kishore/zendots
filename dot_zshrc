@@ -191,24 +191,24 @@ eval "$(tv init zsh)"
 # eval "$(starship init zsh)"
 eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 
-# HACK: custom transient prompt (since oh-my-posh transient prompt is broken with atuin use this)
-autoload -Uz add-zsh-hook
-add-zsh-hook precmd transient-prompt-precmd
-TRANSIENT_PROMPT='$(oh-my-posh print primary --config ~/.config/ohmyposh/transient.json)'
-TRANSIENT_RPROMPT=''
-function transient-prompt-precmd {
-    # Fix ctrl+c behavior
-    TRAPINT() { transient-prompt; return $(( 128 + $1 )) }
-    # Save transient prompt
-    SAVED_PROMPT=$'\n'"$(eval "printf '%s' \"${TRANSIENT_PROMPT}\"")"
-    SAVED_RPROMPT=""
-}
-autoload -Uz add-zle-hook-widget
-add-zle-hook-widget zle-line-finish transient-prompt
-function transient-prompt() {
-    # Use saved transient prompt
-    PROMPT="$SAVED_PROMPT" RPROMPT="$SAVED_RPROMPT" zle .reset-prompt
-}
+# # HACK: custom transient prompt (since oh-my-posh transient prompt is broken with atuin use this)
+# autoload -Uz add-zsh-hook
+# add-zsh-hook precmd transient-prompt-precmd
+# TRANSIENT_PROMPT='$(oh-my-posh print primary --config ~/.config/ohmyposh/transient.json)'
+# TRANSIENT_RPROMPT=''
+# function transient-prompt-precmd {
+#     # Fix ctrl+c behavior
+#     TRAPINT() { transient-prompt; return $(( 128 + $1 )) }
+#     # Save transient prompt
+#     SAVED_PROMPT=$'\n'"$(eval "printf '%s' \"${TRANSIENT_PROMPT}\"")"
+#     SAVED_RPROMPT=""
+# }
+# autoload -Uz add-zle-hook-widget
+# add-zle-hook-widget zle-line-finish transient-prompt
+# function transient-prompt() {
+#     # Use saved transient prompt
+#     PROMPT="$SAVED_PROMPT" RPROMPT="$SAVED_RPROMPT" zle .reset-prompt
+# }
 
 # forced bindings
 zvm_after_init_commands+=("bindkey '^r' atuin-search")

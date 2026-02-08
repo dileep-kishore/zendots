@@ -42,9 +42,7 @@
           "background": "transparent",
           "type": "text",
           "style": "plain",
-          "foreground_templates": [
-            "{{ if ne .Code 0 }}p:red{{end}}"
-          ]
+          "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
           "properties": {
@@ -56,9 +54,7 @@
           "background": "p:mauve",
           "type": "text",
           "style": "powerline",
-          "background_templates": [
-            "{{ if ne .Code 0 }}p:red{{end}}"
-          ]
+          "background_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
           "properties": {
@@ -70,9 +66,7 @@
           "background": "p:blue",
           "type": "status",
           "style": "accordion",
-          "background_templates": [
-            "{{ if ne .Code 0 }}p:red{{end}}"
-          ]
+          "background_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
           "properties": {
@@ -84,9 +78,7 @@
           "background": "p:yellow",
           "type": "text",
           "style": "accordion",
-          "background_templates": [
-            "{{ if gt .SHLVL 2 }}p:yellow{{end}}"
-          ]
+          "background_templates": ["{{ if gt .SHLVL 2 }}p:yellow{{end}}"]
         },
         {
           "properties": {
@@ -119,9 +111,7 @@
           "foreground": "p:yellow",
           "type": "executiontime",
           "style": "plain",
-          "foreground_templates": [
-            "{{ if gt .Code 0 }}p:red{{ end }}"
-          ]
+          "foreground_templates": ["{{ if gt .Code 0 }}p:red{{ end }}"]
         },
         {
           "properties": {
@@ -229,9 +219,7 @@
           "background": "transparent",
           "type": "text",
           "style": "plain",
-          "foreground_templates": [
-            "{{ if ne .Code 0 }}p:red{{end}}"
-          ]
+          "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
           "properties": {
@@ -285,13 +273,17 @@
           "background": "transparent",
           "type": "text",
           "style": "plain",
-          "foreground_templates": [
-            "{{ if ne .Code 0 }}p:red{{end}}"
-          ]
+          "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         }
       ],
       "newline": true
     }
   ],
+  "transient_prompt": {
+    "background": "transparent",
+    "foreground": "p:lavender",
+    "template": "{{ .PWD }}<p:mauve> ➜ </>",
+    "newline": true
+  },
   "version": 3
 }
