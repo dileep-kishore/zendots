@@ -123,7 +123,7 @@ spawn-at-startup "espanso" "daemon"
 spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "brave"
-spawn-at-startup "ghostty"
+spawn-at-startup "warp-terminal"
 spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
 spawn-sh-at-startup "sleep 2 && sunsama"
 spawn-at-startup "sleep 4 && notion-app"
@@ -263,6 +263,7 @@ window-rule {
 }
 window-rule {
     match at-startup=true app-id="^com\\.mitchellh\\.ghostty$"
+    match at-startup=true app-id="^dev\\.warp\\.Warp$"
     open-on-workspace "terminal"
     default-column-width {
         proportion 0.75
@@ -322,12 +323,14 @@ window-rule {
 }
 window-rule {
     match app-id="kitty"
+    match app-id="^dev\\.warp\\.Warp$"
     default-column-width {
         proportion 0.333
     }
 }
 window-rule {
     match app-id="^com\\.mitchellh\\.ghostty$" is-active=true
+    match app-id="^dev\\.warp\\.Warp$" is-active=true
     match app-id="^kitty$" is-active=true
     opacity 0.97
 }
@@ -371,7 +374,7 @@ binds {
         spawn "wlr-which-key"
     }
     Mod+Return {
-        spawn "ghostty"
+        spawn "warp-terminal"
     }
     Mod+Shift+Return {
         spawn "kitty" "--class" "scratchpad"
