@@ -138,3 +138,18 @@ export PATH="$HOME/.pixi/bin:$PATH"
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+case ":$PATH:" in
+    *:/home/dileep/.juliaup/bin:*)
+        ;;
+
+    *)
+        export PATH=/home/dileep/.juliaup/bin${PATH:+:${PATH}}
+        ;;
+esac
+
+# <<< juliaup initialize <<<

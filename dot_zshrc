@@ -238,3 +238,12 @@ if [[ $(hostname) == "mac148593" ]]; then
 
   export NODE_EXTRA_CA_CERTS="$CERT_FILE"
 fi
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+path=('/home/dileep/.juliaup/bin' $path)
+export PATH
+
+# <<< juliaup initialize <<<
