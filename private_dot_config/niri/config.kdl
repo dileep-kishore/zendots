@@ -122,9 +122,9 @@ spawn-at-startup "hypridle"
 // spawn-at-startup "espanso" "daemon"  // Autostarts via systemd
 spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "swww-daemon"
-spawn-at-startup "brave"
+spawn-at-startup "helium-browser"
 spawn-at-startup "warp-terminal"
-spawn-at-startup "bash" "-c" "brave -app='https://app.todoist.com/app/today'"
+spawn-at-startup "bash" "-c" "helium-browser --app='https://app.todoist.com/app/today'"
 spawn-sh-at-startup "sleep 2 && sunsama"
 spawn-at-startup "sleep 4 && notion-app"
 spawn-at-startup "swww-daemon"
@@ -237,7 +237,7 @@ workspace "reference" {
 
 }
 window-rule {
-    match at-startup=true app-id="brave-browser$"
+    match at-startup=true app-id="helium$"
     open-on-workspace "browser"
     default-column-width {
         proportion 1.0
@@ -253,7 +253,7 @@ window-rule {
     }
 }
 window-rule {
-    match at-startup=true app-id="^brave-app\\.todoist\\.com"
+    match at-startup=true app-id="^chrome-app\\.todoist\\.com"
     match at-startup=true app-id="^brave-linear\\.app"
     match app-id="^Sunsama$"
     open-on-workspace "notes"
@@ -337,7 +337,7 @@ window-rule {
 // floating
 window-rule {
     match app-id="firefox$" title="^Picture-in-Picture$"
-    match app-id="brave-browser$" title="^Picture-in-Picture$"
+    match app-id="helium$" title="^Picture-in-Picture$"
     match app-id="Vivaldi-stable$" title="^Picture-in-Picture$"
     match app-id="org.kde.polkit-kde-authentication-agent-1"
     match app-id="org.gnome.Nautilus$" title="^Open File$"
