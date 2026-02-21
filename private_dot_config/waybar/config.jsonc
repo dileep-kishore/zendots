@@ -15,11 +15,9 @@
     "niri/window",
     "custom/window-icon",
     "mpris",
-    "custom/mpris-icon"
+    "custom/mpris-icon",
   ],
-  "modules-center": [
-    "niri/workspaces"
-  ],
+  "modules-center": ["niri/workspaces"],
   "modules-right": [
     "custom/clock-icon",
     "clock",
@@ -33,19 +31,19 @@
     "battery#bat2",
     "idle_inhibitor",
     "pulseaudio",
-    "tray"
+    "tray",
   ],
   "custom/spacer": {
     // "format": "  ",
     "format": " {}",
     "exec": "polycat",
-    "on-click": "niri msg action toggle-overview"
+    "on-click": "niri msg action toggle-overview",
   },
   "image": {
     "path": "/usr/share/icons/Papirus-Dark/64x64/apps/distributor-logo-fedora.svg",
     "on-click": "hyprctl dispatch overview:toggle",
     "size": 22,
-    "tooltip": false
+    "tooltip": false,
   },
   "hyprland/workspaces": {
     "disable-scroll": false,
@@ -63,8 +61,8 @@
       "7": "7",
       "8": "8",
       "9": "9",
-      "urgent": " "
-    }
+      "urgent": " ",
+    },
   },
   "niri/workspaces": {
     "all-outputs": false,
@@ -87,8 +85,8 @@
       "terminal": "",
       "notes": "󰠮",
       "calendar": "",
-      "reference": ""
-    }
+      "reference": "",
+    },
   },
   "wlr/taskbar": {
     "all-outputs": false,
@@ -98,7 +96,7 @@
     "tooltip": true,
     "tooltip-format": "{title}",
     "active-first": true,
-    "on-click": "activate"
+    "on-click": "activate",
   },
   "hyprland/window": {
     "max-length": 50,
@@ -118,6 +116,9 @@
       "brave-browser": "<span foreground='#89b4fa'> Brave</span>",
       "brave-linear.app.*": "<span foreground='#89b4fa'> Linear</span>",
       "brave-app.todoist.com.*": "<span foreground='#89b4fa'> Todoist</span>",
+      "helium": "<span foreground='#89b4fa'> Helium</span>",
+      "chrome-linear.app.*": "<span foreground='#89b4fa'> Linear</span>",
+      "chrome-app.todoist.com.*": "<span foreground='#89b4fa'> Todoist</span>",
       "Vivaldi-stable": "<span foreground='#89b4fa'> Vivaldi</span>",
       "firefox": "<span foreground='#89b4fa'> Firefox</span>",
       "zen": "<span foreground='#89b4fa'> Zen</span>",
@@ -131,8 +132,8 @@
       "obsidian": "<span foreground='#89b4fa'>󰠮 Obsdian</span>",
       "Zotero": "<span foreground='#89b4fa'>󰬡 Zotero</span>",
       "org.pulseaudio.pavucontrol": "<span foreground='#89b4fa'> Pavucontrol</span>",
-      "(.*)": "<span foreground='#89b4fa'>$1</span>"
-    }
+      "(.*)": "<span foreground='#89b4fa'>$1</span>",
+    },
   },
   "niri/window": {
     "max-length": 50,
@@ -150,6 +151,9 @@
       "brave-browser": "<span foreground='#89b4fa'> Brave</span>",
       "brave-linear.app.*": "<span foreground='#89b4fa'> Linear</span>",
       "brave-app.todoist.com.*": "<span foreground='#89b4fa'> Todoist</span>",
+      "helium": "<span foreground='#89b4fa'> Helium</span>",
+      "chrome-linear.app.*": "<span foreground='#89b4fa'> Linear</span>",
+      "chrome-app.todoist.com.*": "<span foreground='#89b4fa'> Todoist</span>",
       "Vivaldi-stable": "<span foreground='#89b4fa'> Vivaldi</span>",
       "firefox": "<span foreground='#89b4fa'> Firefox</span>",
       "zen": "<span foreground='#89b4fa'> Zen</span>",
@@ -163,13 +167,13 @@
       "obsidian": "<span foreground='#89b4fa'>󰠮 Obsdian</span>",
       "Zotero": "<span foreground='#89b4fa'>󰬡 Zotero</span>",
       "org.pulseaudio.pavucontrol": "<span foreground='#89b4fa'> Pavucontrol</span>",
-      "(.*)": "<span foreground='#89b4fa'>$1</span>"
-    }
+      "(.*)": "<span foreground='#89b4fa'>$1</span>",
+    },
   },
   "clock": {
     "format": "<b>{:%a %b[%m] %d ▒ %I:%M %p}</b>",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    "format-alt": "{:%H:%M %Y-%m-%d}"
+    "format-alt": "{:%H:%M %Y-%m-%d}",
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -186,10 +190,10 @@
       "phone-muted": "",
       "portable": "",
       "car": "",
-      "default": ["", ""]
+      "default": ["", ""],
     },
     "scroll-step": 1,
-    "on-click": "pavucontrol"
+    "on-click": "pavucontrol",
   },
   "network": {
     "format-wifi": " ",
@@ -197,7 +201,7 @@
     "tooltip-format": "{essid} ({signalStrength}%)",
     "format-linked": "󰛵 ",
     "format-disconnected": "󰅛 ",
-    "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    "format-alt": "{ifname}: {ipaddr}/{cidr}",
   },
   "memory": {
     "interval": 1,
@@ -212,9 +216,9 @@
       "<span color='#fab387'>󰪢</span>",
       "<span color='#eba0ac'>󰪣</span>",
       "<span color='#f38ba8'>󰪤</span>",
-      "<span color='#f38ba8'>󰪥</span>"
+      "<span color='#f38ba8'>󰪥</span>",
     ],
-    "max-length": 10
+    "max-length": 10,
   },
   "cpu": {
     "interval": 1,
@@ -229,17 +233,17 @@
       "<span color='#fab387'>󰪢</span>",
       "<span color='#eba0ac'>󰪣</span>",
       "<span color='#f38ba8'>󰪤</span>",
-      "<span color='#f38ba8'>󰪥</span>"
-    ]
+      "<span color='#f38ba8'>󰪥</span>",
+    ],
   },
   "backlight": {
     "format": "{icon}",
-    "format-icons": ["", "", "", "", "", "", "", "", ""]
+    "format-icons": ["", "", "", "", "", "", "", "", ""],
   },
   "battery": {
     "states": {
       "warning": 30,
-      "critical": 15
+      "critical": 15,
     },
     "format": "{icon}",
     "format-charging": "",
@@ -247,24 +251,24 @@
     "format-alt": "{capacity}% {icon}",
     "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
     "tooltip-format": "{capacity}% {time}",
-    "tooltip": true
+    "tooltip": true,
   },
   "battery#bat2": {
-    "bat": "BAT2"
+    "bat": "BAT2",
   },
   "tray": {
     "icon-size": 18,
-    "spacing": 10
+    "spacing": 10,
   },
   "idle_inhibitor": {
     "format": "<i>{icon}</i>",
     "start-activated": false,
     "format-icons": {
       "activated": " ",
-      "deactivated": " "
+      "deactivated": " ",
     },
     "tooltip-format-activated": "Swayidle inactive",
-    "tooltip-format-deactivated": "Swayidle active"
+    "tooltip-format-deactivated": "Swayidle active",
   },
   "mpris": {
     "interval": 2,
@@ -281,52 +285,53 @@
     "player-icons": {
       "chromium": " ",
       "brave-browser": " ",
+      "helium": " ",
       "default": " ",
       "firefox": " ",
       "kdeconnect": " ",
       "mopidy": " ",
       "mpv": "󰐹 ",
       "spotify": " ",
-      "vlc": "󰕼 "
+      "vlc": "󰕼 ",
     },
     "status-icons": {
       "playing": "",
       "paused": "",
-      "stopped": ""
-    }
+      "stopped": "",
+    },
   },
   "custom/audio-icon": {
-    "format": ""
+    "format": "",
   },
   "custom/specs-icon": {
-    "format": ""
+    "format": "",
   },
   "custom/network-icon": {
-    "format": "󰖩"
+    "format": "󰖩",
   },
   "custom/backlight-icon": {
-    "format": "󰌵"
+    "format": "󰌵",
   },
   "custom/battery-icon": {
-    "format": "󰁹"
+    "format": "󰁹",
   },
   "custom/clock-icon": {
-    "format": ""
+    "format": "",
   },
   "custom/mpris-icon": {
-    "format": " "
+    "format": " ",
   },
   "custom/idle-icon": {
-    "format": " "
+    "format": " ",
   },
   "custom/tray-icon": {
     "format": "󱊖",
     "on-click": "swaync-client -t",
-    "tooltip": "Notification center"
+    "tooltip": "Notification center",
   },
   "custom/window-icon": {
     "format": " ",
     "on-click": "vicinae 'vicinae://extensions/vicinae/wm/switch-windows'",
-    "tooltip": "Window list"
-  }
+    "tooltip": "Window list",
+  },
 }
