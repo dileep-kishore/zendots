@@ -1,4 +1,8 @@
 sourceDir = "~/zendots"
+
 [diff]
   format = "git"
   pager = "delta"
+
+[data]
+  personal = true
