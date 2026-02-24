@@ -25,3 +25,21 @@ Makefile
 
 # bin
 bin/
+
+# Platform-specific: Linux-only configs (ignore on macOS)
+{{- if eq .chezmoi.os "darwin" }}
+.config/niri
+.config/hypr
+.config/waybar
+.config/swaync
+.config/wofi
+.config/walker
+.config/wlr-which-key
+.config/ulauncher
+{{- end }}
+
+# Platform-specific: macOS-only configs (ignore on Linux)
+{{- if eq .chezmoi.os "linux" }}
+.aerospace.toml
+.config/sketchybar
+{{- end }}
