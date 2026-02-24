@@ -34,7 +34,9 @@ fi
 export EDITOR=nvim
 export USE_EDITOR=$EDITOR
 export VISUAL=$EDITOR
-# export BROWSER=helium-browser
+{{- if eq .chezmoi.hostname "tsuki" }}
+export BROWSER=helium-browser
+{{- end }}
 export GIT_PAGER="delta"
 export FZF_DEFAULT_OPTS="\
     --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :100 {}'\
@@ -239,11 +241,13 @@ if [[ $(hostname) == "mac148593" ]]; then
   export NODE_EXTRA_CA_CERTS="$CERT_FILE"
 fi
 
+{{- if eq .chezmoi.hostname "tsuki" }}
 # >>> juliaup initialize >>>
 
 # !! Contents within this block are managed by juliaup !!
 
-path=('/home/dileep/.juliaup/bin' $path)
+path=('{{ .chezmoi.homeDir }}/.juliaup/bin' $path)
 export PATH
 
 # <<< juliaup initialize <<<
+{{- end }}
