@@ -136,6 +136,9 @@ export PATH="$PATH:/var/lib/flatpak/exports/bin"
 export PATH="$PATH:$HOME/npm-global/bin"
 export PATH="$HOME/.pixi/bin:$PATH"
 
+# Claude
+export ENABLE_LSP_TOOL=1
+
 # Only init linuxbrew if it exists
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
