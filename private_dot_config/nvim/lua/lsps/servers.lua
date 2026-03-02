@@ -16,11 +16,9 @@ servers.lua_ls = {
   },
 }
 
-servers.basedpyright = {
+servers.ty = {
   settings = {
-    basedpyright = {
-      analysis = { typeCheckingMode = "standard" },
-    },
+    ty = {},
   },
 }
 

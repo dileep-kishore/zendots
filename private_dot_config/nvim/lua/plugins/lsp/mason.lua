@@ -19,7 +19,7 @@ return {
         ensure_installed = {
           -- lsp
           "lua_ls",
-          "basedpyright",
+          "ty",
           -- "gopls", -- NOTE: Not working on NERSC
           "astro",
           "bashls",
