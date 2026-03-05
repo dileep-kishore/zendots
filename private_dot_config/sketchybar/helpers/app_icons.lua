@@ -199,7 +199,7 @@ return {
     ["Messages"] = ":messages:",
     ["信息"] = ":messages:",
     ["Nachrichten"] = ":messages:",
-    ["Helium"] = ":helium:",
+    ["Brave Browser"] = ":brave:",
     ["Preview"] = ":pdf:",
     ["预览"] = ":pdf:",
     ["Skim"] = ":pdf:",

@@ -122,7 +122,7 @@ PACMAN_PACKAGES=(
     television
     vivid
     pipx
-    helium-browser-bin
+    brave-bin
     vivaldi
     procs
     okluar

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # App ID to switch to
-BROWSER_APP_ID=$1 # eg. "helium"
+BROWSER_APP_ID=$1 # eg. "brave-browser"
 
 # Get the window ID of the application
 WINDOW_ID=$(niri msg -j windows | jq "[.[] | select(.app_id | test(\"$BROWSER_APP_ID\"))] | sort_by(.id) | .[0].id")
