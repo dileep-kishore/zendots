@@ -22,7 +22,7 @@ else BAR_COLOR="$GREEN"; fi
 
 FILLED=$((PCT / 10))
 EMPTY=$((10 - FILLED))
-BAR=$(printf "%${FILLED}s" | tr ' ' '█')$(printf "%${EMPTY}s" | tr ' ' '░')
+BAR=$(printf "%${FILLED}s" '' | sed 's/ /▓/g')$(printf "%${EMPTY}s" '' | sed 's/ /░/g')
 
 MINS=$((DURATION_MS / 60000))
 SECS=$(((DURATION_MS % 60000) / 1000))
