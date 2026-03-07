@@ -167,6 +167,21 @@ zle -N _aichat_zsh
 bindkey '\ee' _aichat_zsh
 
 
+# Zellij aliases
+alias z="zellij"
+alias znew="zellij --session"
+alias zlayout='zellij --layout "$(fd . "$(zellij list-sessions -s)" | sed '\''s|.*/||; s|\.[^.]*$||'\'' | fzf --ansi -i || exit)"'
+alias za="zellij attach"
+alias zai='zellij attach "$(echo "$(zellij list-sessions)" | fzf --ansi -i | awk '\''{print $1}'\'')"'
+alias zk="zellij kill-session"
+alias zki='zellij kill-session "$(echo "$(zellij list-sessions)" | fzf --ansi -i | awk '\''{print $1}'\'')"'
+alias zka="zellij kill-all-sessions"
+alias zd="zellij delete-session"
+alias zdi='zellij delete-session "$(echo "$(zellij list-sessions)" | fzf --ansi -i | awk '\''{print $1}'\'')"'
+alias zda="zellij delete-all-sessions"
+alias zlist="zellij list-sessions"
+alias zls="zellij list-sessions"
+
 {{- if eq .chezmoi.hostname "tsuki" }}
 # >>> juliaup initialize >>>
 
