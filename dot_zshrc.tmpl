@@ -22,37 +22,22 @@ setopt AUTOCD PUSHDTOHOME CDABLEVARS AUTOPUSHD PUSHD_SILENT PUSHD_MINUS
 setopt NOTIFY GLOBDOTS AUTOLIST REC_EXACT LONG_LIST_JOBS INTERACTIVE_COMMENTS AUTORESUME EXTENDED_GLOB RC_QUOTES MAIL_WARNING RM_STAR_WAIT ALL_EXPORT
 unsetopt BG_NICE AUTO_PARAM_SLASH
 
-autoload -Uz compinit
-compinit
-
 # If I am on nersc, then export TERM=xterm-256color
 if [[ $HOME == "/global/homes/d/dkishore" ]]; then
     export TERM=xterm-256color
 fi
+# Shared shell environment
+if [[ -f "$HOME/.shell_exports" ]]; then
+    source "$HOME/.shell_exports"
+fi
 
-# Variables
-export EDITOR=nvim
-export USE_EDITOR=$EDITOR
-export VISUAL=$EDITOR
-{{- if eq .chezmoi.hostname "tsuki" }}
-export BROWSER=helium-browser
-{{- end }}
-export GIT_PAGER="delta"
-export FZF_DEFAULT_OPTS="\
-    --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :100 {}'\
-    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
-    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
-    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
-
-export PATH=$PATH:$HOME/.local/bin
-export PATH="$PATH:/var/lib/flatpak/exports/bin"
-export PATH="$PATH:$HOME/npm-global/bin"
-export PATH="$HOME/.pixi/bin:$PATH"
-
-# HACK: Run non-interactive config when using claude code
-if [[ "$CLAUDECODE" == "1" ]]; then
+# Skip interactive-only config for agent shells
+if [[ -n "${AGENT_SHELL:-}" || "$CLAUDECODE" == "1" || -n "${CURSOR_AGENT:-}" || -n "${GEMINI_CLI:-}" ]]; then
     return
 fi
+
+autoload -Uz compinit
+compinit
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
@@ -135,60 +120,9 @@ zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 zstyle ':completion:*' list-colors $LS_COLORS
 source <(carapace _carapace)
 
-# aliases
-alias bat="bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
-alias y="yazi"
-alias lg="lazygit"
-alias gst="git status --short"
-alias du="dua i"
-alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
-alias grep="grep --color=auto"
-alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-alias df="df -ahiT --total"
-alias clear="clear -x"
-alias rm="rm -i"
-alias cls="clear"
-alias exportforge="export PATH=$HOME/miniforge3/bin:$PATH"
-alias myip="curl http://ipecho.net/plain; echo"
-alias screenoff-niri="niri msg action power-off-monitors"
-
-# eza
-alias eza='eza --icons auto --git'
-alias la='eza -a'
-alias ll='eza -l'
-alias lla='eza -la'
-alias ls=eza
-alias lt='eza --tree'
-
-# Tmux
-alias ta="sesh connect"
-alias tdetach="tmux detach"
-alias tkill="tmux kill-session -t"
-alias tlist="sesh list -tT --icons"
-tnew() {
-    bash ~/.config/tmux/scripts/templater.sh "$@"
-    tmuxinator start "$1"
-}
-
-# AI secrets
-export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
-export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
-export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
-export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
-export CBORG_API_KEY="$(cat ~/.secrets/cborg.txt)"
-
-# Claude
-alias claude='SHELL=/bin/bash claude'
-alias cc='SHELL=/bin/bash claude'
-alias ccy='SHELL=/bin/bash claude --dangerously-skip-permissions'
-# export ANTHROPIC_AUTH_TOKEN=$CBORG_API_KEY
-# export ANTHROPIC_BASE_URL=https://api.cborg.lbl.gov
-# export ANTHROPIC_SMALL_FAST_MODEL=claude-haiku-4-5
-# export ANTHROPIC_MODEL=claude-sonnet-4-5
-export ENABLE_LSP_TOOL=1
-export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
-export DISABLE_TELEMETRY=1
-# export CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192
+if [[ -f "$HOME/.shell_aliases" ]]; then
+    source "$HOME/.shell_aliases"
+fi
 
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
@@ -232,17 +166,6 @@ _aichat_zsh() {
 zle -N _aichat_zsh
 bindkey '\ee' _aichat_zsh
 
-# Export certificates for claude code and other node applications
-if [[ $(hostname) == "mac148593" ]]; then
-  CERT_FILE="$HOME/corporate-certs.pem"
-
-  if [ ! -f "$CERT_FILE" ]; then
-    echo "Creating certificate bundle..."
-    security find-certificate -a -p /Library/Keychains/System.keychain > "$CERT_FILE"
-  fi
-
-  export NODE_EXTRA_CA_CERTS="$CERT_FILE"
-fi
 
 {{- if eq .chezmoi.hostname "tsuki" }}
 # >>> juliaup initialize >>>
