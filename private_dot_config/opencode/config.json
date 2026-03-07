@@ -40,15 +40,15 @@
 						"output": 131072
 					}
 				},
-				"lbl/claude-sonnet-4-5": {
-					"id": "claude-sonnet-4-5",
-					"name": "Claude Sonnet 4.5",
+				"lbl/claude-sonnet-4-6": {
+					"id": "claude-sonnet-4-6",
+					"name": "Claude Sonnet 4.6",
 					"reasoning": true,
 					"tool_call": true
 				},
-				"lbl/claude-opus-4-5": {
-					"id": "claude-opus-4-5",
-					"name": "Claude Opus 4.5",
+				"lbl/claude-opus-4-6": {
+					"id": "claude-opus-4-6",
+					"name": "Claude Opus 4.6",
 					"reasoning": true,
 					"tool_call": true,
 					"options": {
@@ -57,15 +57,15 @@
 						"reasoningSummary": "auto"
 					}
 				},
-				"lbl/gpt-5.1": {
-					"id": "gpt-5.1",
-					"name": "GPT 5.1",
+				"lbl/gpt-5.3-codex": {
+					"id": "gpt-5.3-codex",
+					"name": "GPT 5.3 codex",
 					"reasoning": true,
 					"tool_call": true
 				},
-				"lbl/gemini-3-pro": {
-					"id": "gemini-3-pro",
-					"name": "Gemini 3 Pro",
+				"lbl/gemini-3.1-pro": {
+					"id": "gemini-3.1-pro",
+					"name": "Gemini 3.1 Pro",
 					"reasoning": true,
 					"tool_call": true,
 					"options": {
