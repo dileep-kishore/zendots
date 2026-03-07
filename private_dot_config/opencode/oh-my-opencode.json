@@ -1,22 +1,22 @@
 {
   "agents": {
     "sisyphus": {
-      "model": "anthropic/claude-opus-4-6"
+      "model": "cborg/lbl/claude-opus-4-6"
     },
     "oracle": {
-      "model": "anthropic/claude-opus-4-6"
+      "model": "cborg/lbl/claude-opus-4-6"
     },
     "librarian": {
-      "model": "opencode/big-pickle"
+      "model": "cborg/lbl/claude-opus-4-6"
     },
     "frontend-ui-ux-engineer": {
-      "model": "anthropic/claude-sonnet-4-6"
+      "model": "cborg/lbl/claude-sonnet-4-6"
     },
     "document-writer": {
-      "model": "anthropic/claude-opus-4-6"
+      "model": "cborg/lbl/claude-opus-4-6"
     },
     "multimodal-looker": {
-      "model": "anthropic/claude-opus-4-6"
+      "model": "cborg/lbl/claude-opus-4-6"
     }
   },
   "_migrations": [

@@ -1,9 +1,8 @@
 {
 	"$schema": "https://opencode.ai/config.json",
-	"theme": "catppuccin",
 	"autoshare": false,
 	"autoupdate": false,
-	"model": "lbl/claude-sonnet-4-5",
+	"model": "cborg/lbl/claude-sonnet-4-6",
 	"permission": {
 		"edit": "allow",
 		"bash": "allow",
