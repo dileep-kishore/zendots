@@ -4,6 +4,11 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Shared shell environment
+if [ -f "$HOME/.shell_exports" ]; then
+    . "$HOME/.shell_exports"
+fi
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -102,6 +107,9 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
+if [ -f "$HOME/.shell_aliases" ]; then
+    . "$HOME/.shell_aliases"
+fi
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
@@ -118,26 +126,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export EDITOR=nvim
-export USE_EDITOR=$EDITOR
-export VISUAL=$EDITOR
-{{- if eq .chezmoi.hostname "tsuki" }}
-export BROWSER=helium-browser
-{{- end }}
-export GIT_PAGER="delta"
-export FZF_DEFAULT_OPTS="\
-    --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :100 {}'\
-    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
-    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
-    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
-
-export PATH=$PATH:$HOME/.local/bin
-export PATH="$PATH:/var/lib/flatpak/exports/bin"
-export PATH="$PATH:$HOME/npm-global/bin"
-export PATH="$HOME/.pixi/bin:$PATH"
-
-# Claude
-export ENABLE_LSP_TOOL=1
 
 # Only init linuxbrew if it exists
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then

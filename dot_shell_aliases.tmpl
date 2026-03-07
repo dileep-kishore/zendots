@@ -1,0 +1,46 @@
+# Shared aliases for interactive shells only.
+
+alias bat="bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
+alias y="yazi"
+alias lg="lazygit"
+alias gst="git status --short"
+alias du="dua i"
+alias vimipython="ipython --TerminalInteractiveShell.editing_mode=vi"
+alias grep="grep --color=auto"
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias df="df -ahiT --total"
+alias clear="clear -x"
+alias rm="rm -i"
+alias cls="clear"
+alias exportforge="export PATH=$HOME/miniforge3/bin:$PATH"
+alias myip="curl http://ipecho.net/plain; echo"
+alias screenoff-niri="niri msg action power-off-monitors"
+
+# eza
+alias eza='eza --icons auto --git'
+alias la='eza -a'
+alias ll='eza -l'
+alias lla='eza -la'
+alias ls=eza
+alias lt='eza --tree'
+
+# Tmux
+alias ta="sesh connect"
+alias tdetach="tmux detach"
+alias tkill="tmux kill-session -t"
+alias tlist="sesh list -tT --icons"
+tnew() {
+    bash ~/.config/tmux/scripts/templater.sh "$@"
+    tmuxinator start "$1"
+}
+
+# Claude
+alias claude='AGENT_SHELL=1 claude'
+alias cc='AGENT_SHELL=1 claude'
+alias ccy='AGENT_SHELL=1 claude --dangerously-skip-permissions'
+alias codex='AGENT_SHELL=1 codex'
+alias gemini='AGENT_SHELL=1 gemini'
+# export ANTHROPIC_AUTH_TOKEN=$CBORG_API_KEY
+# export ANTHROPIC_BASE_URL=https://api.cborg.lbl.gov
+# export ANTHROPIC_SMALL_FAST_MODEL=claude-haiku-4-5
+# export ANTHROPIC_MODEL=claude-sonnet-4-5

@@ -1,0 +1,45 @@
+# Shared environment for interactive shells and agent shells.
+
+export EDITOR=nvim
+export USE_EDITOR=$EDITOR
+export VISUAL=$EDITOR
+{{- if eq .chezmoi.hostname "tsuki" }}
+export BROWSER=helium-browser
+{{- end }}
+export GIT_PAGER="delta"
+export FZF_DEFAULT_OPTS="\
+    --height 40% --reverse --preview 'bat --style=numbers --color=always --line-range :100 {}'\
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
+export PATH=$PATH:$HOME/.local/bin
+export PATH="$PATH:/var/lib/flatpak/exports/bin"
+export PATH="$PATH:$HOME/npm-global/bin"
+export PATH="$HOME/.pixi/bin:$PATH"
+
+# AI secrets
+export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
+export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
+export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
+export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
+export CBORG_API_KEY="$(cat ~/.secrets/cborg.txt)"
+
+# Claude and other agent defaults
+export ENABLE_LSP_TOOL=1
+export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
+export DISABLE_TELEMETRY=1
+# export CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192
+
+# Export certificates for Claude Code and other Node applications
+if [[ $(hostname) == "mac148593" ]]; then
+  CERT_FILE="$HOME/corporate-certs.pem"
+
+  if [ ! -f "$CERT_FILE" ]; then
+    security find-certificate -a -p /Library/Keychains/System.keychain > "$CERT_FILE" 2>/dev/null
+  fi
+
+  if [ -f "$CERT_FILE" ]; then
+    export NODE_EXTRA_CA_CERTS="$CERT_FILE"
+  fi
+fi
