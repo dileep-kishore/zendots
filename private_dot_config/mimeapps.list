@@ -21,3 +21,4 @@ inode/directory=org.gnome.Nautilus.desktop;
 x-scheme-handler/discord=vesktop.desktop
 application/pdf=org.pwmt.zathura.desktop
 text/plain=nvim.desktop
+x-scheme-handler/opencode=opencode-desktop-handler.desktop
