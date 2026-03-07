@@ -20,6 +20,9 @@
 			"command": ["npx", "-y", "@upstash/context7-mcp"]
 		}
 	},
+	"plugin": [
+		"oh-my-opencode"
+	],
 	"provider": {
 		"cborg": {
 			"npm": "@ai-sdk/openai-compatible",
