@@ -111,6 +111,10 @@ A comprehensive dotfiles repository managed by [chezmoi](https://www.chezmoi.io/
    # Press: Ctrl-a + Shift-i
    ```
 
+4. **Install Superpowers skills for OpenCode** (manual step — not managed by chezmoi):
+
+   Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
+
 ### Font Setup (Manual)
 
 Install the following fonts manually:
