@@ -1,0 +1,36 @@
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zjstatus"
+        }
+        children
+    }
+    tab_template name="nvim_tab" {
+        pane size=1 borderless=true {
+            plugin location="zjstatus"
+        }
+        pane borderless=true name="Code" command="nvim"
+    }
+    tab name=" main" {
+        pane name="main"
+    }
+    nvim_tab name=" nvim"
+    tab name=" git" {
+        pane name="lazygit" command="lazygit"
+    }
+    tab name=" term" {
+        pane split_direction="vertical" {
+            pane split_direction="horizontal" {
+                pane name="just" size="30%"
+                pane name="term 1"
+            }
+            pane name="term 2" size="50%"
+        }
+    }
+    tab name=" misc" {
+        pane split_direction="vertical" {
+            pane name="misc 1"
+            pane name="misc 2" size="50%"
+        }
+    }
+}
