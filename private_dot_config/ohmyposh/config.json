@@ -32,53 +32,18 @@
     {
       "type": "prompt",
       "alignment": "left",
+      "newline": true,
       "segments": [
         {
           "properties": {
             "cache_duration": "none"
           },
-          "template": "\u250f",
+          "template": "\u256d",
           "foreground": "p:mauve",
           "background": "transparent",
           "type": "text",
           "style": "plain",
           "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " 󰊠 ",
-          "foreground": "p:crust",
-          "powerline_symbol": "\ue0b4",
-          "background": "p:mauve",
-          "type": "text",
-          "style": "powerline",
-          "background_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": "\uea87 {{ .Code }}",
-          "foreground": "p:crust",
-          "powerline_symbol": "\ue0b4",
-          "background": "p:blue",
-          "type": "status",
-          "style": "accordion",
-          "background_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": "{{if gt .SHLVL 2}} \uf149 {{ .SHLVL }}{{end}}",
-          "foreground": "p:crust",
-          "powerline_symbol": "\ue0b4",
-          "background": "p:yellow",
-          "type": "text",
-          "style": "accordion",
-          "background_templates": ["{{ if gt .SHLVL 2 }}p:yellow{{end}}"]
         },
         {
           "properties": {
@@ -99,127 +64,6 @@
           "background": "transparent",
           "type": "session",
           "style": "plain"
-        },
-        {
-          "properties": {
-            "always_enabled": false,
-            "cache_duration": "none",
-            "style": "round",
-            "threshold": 5000
-          },
-          "template": " <p:text><i>took</i></> \udb81\udd1b {{ .FormattedMs }}",
-          "foreground": "p:yellow",
-          "type": "executiontime",
-          "style": "plain",
-          "foreground_templates": ["{{ if gt .Code 0 }}p:red{{ end }}"]
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>in</i></> \uf313 nix-{{ .Type }}",
-          "foreground": "p:blue",
-          "type": "nix-shell",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \udb80\udf99 {{ .Full }}",
-          "foreground": "p:green",
-          "type": "node",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }}",
-          "foreground": "p:yellow",
-          "type": "python",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue624 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:mauve",
-          "type": "julia",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue627 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:sky",
-          "type": "go",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue620 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:blue",
-          "type": "lua",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue777 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:mauve",
-          "type": "haskell",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \ue68a {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:blue",
-          "type": "r",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>via</i></> \udb85\ude17 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
-          "foreground": "p:peach",
-          "type": "rust",
-          "style": "plain"
-        },
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": " <p:text><i>is</i></> {{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }}{{ end }}",
-          "foreground": "p:teal",
-          "type": "project",
-          "style": "plain"
-        }
-      ],
-      "newline": true
-    },
-    {
-      "type": "prompt",
-      "alignment": "left",
-      "segments": [
-        {
-          "properties": {
-            "cache_duration": "none"
-          },
-          "template": "\u2523",
-          "foreground": "p:mauve",
-          "background": "transparent",
-          "type": "text",
-          "style": "plain",
-          "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
           "properties": {
@@ -257,26 +101,148 @@
             "{{ if gt .Behind 0 }}p:maroon{{ end }}"
           ]
         }
-      ],
-      "newline": true
+      ]
     },
     {
       "type": "prompt",
-      "alignment": "left",
+      "alignment": "right",
       "segments": [
         {
           "properties": {
             "cache_duration": "none"
           },
-          "template": "\u2517\udb85\udddc ",
+          "template": "{{if gt .SHLVL 2}}\uf149 {{ .SHLVL }} {{end}}",
+          "foreground": "p:yellow",
+          "type": "text",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "always_enabled": false,
+            "cache_duration": "none",
+            "style": "round",
+            "threshold": 5000
+          },
+          "template": "<p:text><i>took</i></> \udb81\udd1b {{ .FormattedMs }} ",
+          "foreground": "p:yellow",
+          "type": "executiontime",
+          "style": "plain",
+          "foreground_templates": ["{{ if gt .Code 0 }}p:red{{ end }}"]
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "{{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }}{{ end }}",
+          "foreground": "p:teal",
+          "type": "project",
+          "style": "plain"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\u2570\udb85\udddc ",
           "foreground": "p:mauve",
           "background": "transparent",
           "type": "text",
           "style": "plain",
           "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         }
-      ],
-      "newline": true
+      ]
+    },
+    {
+      "type": "rprompt",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\uf313 nix-{{ .Type }} ",
+          "foreground": "p:blue",
+          "type": "nix-shell",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\udb80\udf99 {{ .Full }} ",
+          "foreground": "p:green",
+          "type": "node",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }} ",
+          "foreground": "p:yellow",
+          "type": "python",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue624 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:mauve",
+          "type": "julia",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue627 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:sky",
+          "type": "go",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue620 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:blue",
+          "type": "lua",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue777 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:mauve",
+          "type": "haskell",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\ue68a {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:blue",
+          "type": "r",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "\udb85\ude17 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}",
+          "foreground": "p:peach",
+          "type": "rust",
+          "style": "plain"
+        }
+      ]
     }
   ],
   "version": 3
