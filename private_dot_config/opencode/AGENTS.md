@@ -1,4 +1,4 @@
-# Global OpenCode Rules
+# Global Rules
 
 ## Critical Instructions
 
