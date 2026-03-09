@@ -268,12 +268,5 @@
       ]
     }
   ],
-  "transient_prompt": {
-    "background": "transparent",
-    "foreground": "p:lavender",
-    "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"],
-    "template": "{{ .PWD }}<p:mauve> \u27a4 </>",
-    "newline": true
-  },
   "version": 3
 }
