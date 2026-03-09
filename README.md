@@ -111,9 +111,17 @@ A comprehensive dotfiles repository managed by [chezmoi](https://www.chezmoi.io/
    # Press: Ctrl-a + Shift-i
    ```
 
-4. **Install Superpowers skills for OpenCode** (manual step — not managed by chezmoi):
+4. **Install Superpowers skills for OpenCode**:
 
    Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
+
+   Or, after chezmoi has installed the managed helper scripts:
+
+   ```bash
+   ~/.config/opencode/sync_skill_collections.sh
+   ```
+
+   The helper only installs the Superpowers OpenCode plugin and skills.
 
 ### Font Setup (Manual)
 
