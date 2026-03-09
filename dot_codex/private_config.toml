@@ -1,5 +1,21 @@
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "high"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+bearer_token_env_var = "CONTEXT7_API_KEY"
+
+[mcp_servers.gh_grep]
+url = "https://mcp.grep.app"
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+
+[mcp_servers.serena]
+command = "uvx"
+args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
+
 [projects."/home/dileep/Documents/Work/pmi-datalake"]
 trust_level = "trusted"
