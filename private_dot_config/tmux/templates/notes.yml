@@ -1,7 +1,7 @@
 windows:
   - main:
-      layout: main-vertical
-      panes: [null]
+      layout: e10b,254x62,0,0{165x62,0,0[165x50,0,0,11,165x11,0,51,16],88x62,166,0,17}
+      panes: [null, null, ccy]
   - nvim:
       layout: main-horizontal
       panes: [nvim]
@@ -11,6 +11,6 @@ windows:
   - ai:
       layout: main-horizontal
       panes: [opencode]
-  - term:
-      layout: main-horizontal
-      panes: [null, null, null]
+  - notes:
+      layout: even-vertical
+      panes: [null, null]
