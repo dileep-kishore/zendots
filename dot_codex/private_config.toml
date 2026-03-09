@@ -4,7 +4,7 @@ plan_mode_reasoning_effort = "high"
 
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
-bearer_token_env_var = "CONTEXT7_API_KEY"
+env_http_headers = { CONTEXT7_API_KEY = "CONTEXT7_API_KEY" }
 
 [mcp_servers.gh_grep]
 url = "https://mcp.grep.app"
