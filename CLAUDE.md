@@ -77,12 +77,14 @@ cd pkgs && ./download_yazi_plugins.sh
 ### Tmux Plugin Installation
 
 After applying dotfiles with tmux configuration:
+
 1. Start tmux
 2. Press `prefix + I` (Ctrl-a + Shift-i) to install plugins via TPM
 
 ### Testing Configuration Changes
 
 When modifying configurations:
+
 - **Shell changes**: Source the file or restart shell (`exec zsh`)
 - **Tmux changes**: Reload with `prefix + r` (Ctrl-a + r)
 - **Neovim changes**: Restart Neovim or use `:Lazy sync` for plugins
@@ -99,79 +101,10 @@ This repository is the **source** for dotfiles. The typical workflow is:
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
 
-### Shell Configuration (Zsh)
-
-The shell setup uses **Zinit** as the plugin manager (auto-installs if not present):
-
-- **Core location**: `dot_zshrc` (becomes `~/.zshrc`)
-- **Plugin manager**: Zinit with fast-syntax-highlighting, zsh-autosuggestions, zsh-completions
-- **Oh-My-Zsh plugins**: Loaded selectively (git, git-extras, aliases, direnv, tmux, etc.)
-- **Vi mode**: `zsh-vi-mode` plugin enabled
-- **Prompt**: Oh-My-Posh (configured at `~/.config/ohmyposh/config.json`)
-- **Tools integrated**:
-  - `zoxide` (cd replacement)
-  - `atuin` (shell history, bound to Ctrl-r)
-  - `tv` (television)
-  - `carapace` (completions)
-  - `fzf` with custom Catppuccin theme
-- **AI integration**: `aichat` bound to Alt-e for AI-assisted command generation
-- **API keys**: Loaded from `~/.secrets/` for OpenAI, Anthropic, Gemini, Tavily
-
-### Neovim Configuration
-
-- **Plugin manager**: lazy.nvim
-- **Entry point**: `private_dot_config/nvim/init.lua`
-- **Structure**: Modular Lua configuration split into:
-  - `lua/options.lua` → Core editor options
-  - `lua/keymaps/` → Key bindings
-  - `lua/autocmds.lua` → Auto commands
-  - `lua/config/lazy.lua` → Lazy.nvim setup
-  - `lua/plugins/` → Plugin configurations organized by category:
-    - `lsp/` → LSP setup (Mason, formatters, linters, lspsaga, symbol-usage)
-    - `git/` → Git integration (gitsigns, neogit, diffview, octo)
-    - `completions/` → Completion plugins
-    - `bars/` → Status/tab bars (lualine, tabby, incline)
-    - `themes/` → Color schemes (catppuccin, rosepine)
-    - `ui/` → UI enhancements (snacks.lua)
-
-- **Theme**: Catppuccin Mocha (applied by default)
-- **Special plugins**:
-  - `chezmoi.lua` → Chezmoi integration for editing dotfiles from within Neovim
-  - `sidekick.nvim` → Working with AI assistants
-
-### Tmux Configuration
-
-- **Prefix key**: `Ctrl-a` (instead of default Ctrl-b)
-- **Plugin manager**: TPM (Tmux Plugin Manager)
-- **Session manager**: `sesh` bound to `prefix + o` (Ctrl-a + o)
-- **Theme**: Custom Catppuccin Mocha colors with custom status bar
-- **Custom scripts** in `private_dot_config/tmux/scripts/`:
-  - `custom_number.sh` → Custom window numbering
-  - `window_icon.sh` → Dynamic window icons based on running process
-  - `git_status.sh`, `wb_git_status.sh` → Git status in status bar
-  - `find_git_root.py` → Find git repository root for display
-  - `uptime_fmt.sh` → Format system uptime
-  - `templater.sh` → Tmuxinator template generator
-
-- **Key bindings**:
-  - `prefix + h/v` → Split horizontally/vertically
-  - `Ctrl-Shift-h/l` → Switch windows
-  - `Alt + arrows` → Resize panes
-  - Vi mode in copy mode
-
-### AI Tools Integration
-
-The repository includes configuration for AI-powered development tools:
-
-- **aichat**: CLI AI assistant with shell binding (Alt-e) for command generation
-- **API credentials**: Stored in `~/.secrets/` directory (not in repository)
-  - `openai.txt`, `anthropic.txt`, `gemini.txt`, `tavily.txt`
-- **Neovim AI plugins**: sidekick.nvim configured for AI assistance
-- **claude-code**: Added to Brewfile for this tool
-
 ### Theme Consistency
 
 The entire environment uses **Catppuccin Mocha** color scheme:
+
 - Shell (via Oh-My-Posh config)
 - Neovim (catppuccin theme)
 - Tmux (custom color variables)
