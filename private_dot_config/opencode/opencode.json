@@ -55,8 +55,7 @@
 					"tool_call": true,
 					"options": {
 						"reasoningEffort": "high",
-						"textVerbosity": "low",
-						"reasoningSummary": "auto"
+						"textVerbosity": "low"
 					}
 				},
 				"lbl/gpt-5.3-codex": {
@@ -72,8 +71,7 @@
 					"tool_call": true,
 					"options": {
 						"reasoningEffort": "high",
-						"textVerbosity": "low",
-						"reasoningSummary": "auto"
+						"textVerbosity": "low"
 					}
 				}
 			}
