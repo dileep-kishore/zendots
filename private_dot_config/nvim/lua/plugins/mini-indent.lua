@@ -10,7 +10,7 @@ return {
         },
         symbol = "╎",
       })
-      local disabled_filetypes = { "NvimTree", "alpha", "help", "snacks_dashboard", "", "Outline" }
+      local disabled_filetypes = { "NvimTree", "alpha", "help", "snacks_dashboard", "", "Outline", "sidekick_terminal" }
       vim.api.nvim_create_autocmd("BufWinEnter", {
         group = vim.api.nvim_create_augroup("MiniIndentScopeDisable", { clear = true }),
         callback = function(opts)
