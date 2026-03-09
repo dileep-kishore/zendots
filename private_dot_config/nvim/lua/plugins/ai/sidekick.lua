@@ -9,6 +9,12 @@ return {
       cli = {
         mux = { backend = "tmux", enabled = true },
         tools = {
+          claude = {
+            cmd = { "claude", "--dangerously-skip-permissions" },
+          },
+          codex = {
+            cmd = { "codex", "--yolo" },
+          },
           opencode = {
             env = { OPENCODE_THEME = "catppuccin" },
           },
