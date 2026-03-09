@@ -45,3 +45,5 @@ Tests document what should work and what broke before — not safety nets for ev
 
 - Use conventional commit messages (feat:, fix:, chore:, refactor:, docs:, etc.)
 - Keep commits atomic and focused.
+- In the description, explain the "why" and "what" of the change, not just "how".
+- Try to limit title to 50 characters and wrap description body at 72 characters.
