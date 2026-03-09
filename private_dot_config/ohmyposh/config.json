@@ -112,7 +112,7 @@
           "properties": {
             "cache_duration": "none"
           },
-          "template": "{{if gt .SHLVL 2}}\uf149 {{ .SHLVL }} {{end}}",
+          "template": "{{if gt .SHLVL 2}}{{ .SHLVL }} {{end}}",
           "foreground": "p:yellow",
           "type": "text",
           "style": "plain"
