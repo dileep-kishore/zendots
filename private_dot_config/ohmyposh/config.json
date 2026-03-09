@@ -143,6 +143,15 @@
           "properties": {
             "cache_duration": "none"
           },
+          "template": "{{ if not (or (.Segments.Contains \"Project\") (.Segments.Contains \"Executiontime\")) }} {{ .CurrentDate | date \"Jan 02\" }} {{ end }}",
+          "foreground": "p:overlay1",
+          "type": "time",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
           "template": "\u256e",
           "foreground": "p:mauve",
           "background": "transparent",
@@ -252,6 +261,15 @@
           "template": "<p:text><i>via</i></> \udb85\ude17 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
           "foreground": "p:peach",
           "type": "rust",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "{{ if not (or (.Segments.Contains \"Node\") (.Segments.Contains \"Python\") (.Segments.Contains \"Julia\") (.Segments.Contains \"Go\") (.Segments.Contains \"Lua\") (.Segments.Contains \"Haskell\") (.Segments.Contains \"R\") (.Segments.Contains \"Rust\") (.Segments.Contains \"Nix-shell\")) }} {{ .CurrentDate | date \"15:04\" }} {{ end }}",
+          "foreground": "p:overlay1",
+          "type": "time",
           "style": "plain"
         },
         {
