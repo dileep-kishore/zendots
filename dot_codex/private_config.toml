@@ -17,5 +17,5 @@ args = ["-y", "@playwright/mcp@latest"]
 command = "uvx"
 args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
 
-[projects."/home/dileep/Documents/Work/pmi-datalake"]
-trust_level = "trusted"
+[mcp_servers.linear]
+url = "https://mcp.linear.app/mcp"
