@@ -48,3 +48,4 @@
 
 [delta]
     features = line-numbers decorations catppuccin-mocha
+    side-by-side = true
