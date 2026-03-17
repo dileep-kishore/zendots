@@ -32,11 +32,15 @@ get_usage() {
         fi
     fi
 
-    # Read OAuth token from macOS Keychain
-    local creds
-    creds=$(/usr/bin/security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null) || return
+    # Read OAuth token (macOS Keychain or Linux credentials file)
     local token
-    token=$(echo "$creds" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+    if [ -f /usr/bin/security ]; then
+        local creds
+        creds=$(/usr/bin/security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null) || return
+        token=$(echo "$creds" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+    elif [ -f "$HOME/.claude/.credentials.json" ]; then
+        token=$(jq -r '.claudeAiOauth.accessToken // empty' "$HOME/.claude/.credentials.json" 2>/dev/null)
+    fi
     [ -z "$token" ] && return
 
     # Fetch usage API
@@ -62,8 +66,8 @@ FIVE_HR=""
 SEVEN_DAY=""
 USAGE_JSON=$(get_usage 2>/dev/null)
 if [ -n "$USAGE_JSON" ]; then
-    FIVE_HR=$(echo "$USAGE_JSON" | jq -r '.five_hour.utilization // empty' 2>/dev/null)
-    SEVEN_DAY=$(echo "$USAGE_JSON" | jq -r '.seven_day.utilization // empty' 2>/dev/null)
+    FIVE_HR=$(echo "$USAGE_JSON" | jq -r '.five_hour.utilization // empty' 2>/dev/null | cut -d. -f1)
+    SEVEN_DAY=$(echo "$USAGE_JSON" | jq -r '.seven_day.utilization // empty' 2>/dev/null | cut -d. -f1)
 fi
 
 usage_color() {
