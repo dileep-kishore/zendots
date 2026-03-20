@@ -5,6 +5,7 @@
 - When the user requests code examples, setup or configuration steps, or library/API documentation, use the `context7` MCP or search the web for current docs.
 - When the user asks for real-world implementation examples, API usage patterns, or framework conventions, use `gh_grep` to search GitHub code before guessing.
 - Prefer the built-in file/code tools for small changes. On larger, strongly structured codebases, use `serena` for symbol-aware navigation and edits.
+- Never use `serena` to read skill files outside the active repository (for example under `~/.codex` or `~/.config/opencode`); use a general file reader instead.
 - Do not over-engineer. Only make changes directly requested or clearly necessary. Prefer simple, minimal solutions.
 - Don't add error handling for impossible scenarios. Don't create abstractions for one-time operations.
 
