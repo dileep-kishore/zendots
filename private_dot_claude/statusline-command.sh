@@ -6,6 +6,8 @@ DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
 DURATION_MS=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
+FIVE_HR=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
+SEVEN_DAY=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
 
 CYAN='\033[36m'
 GREEN='\033[32m'
@@ -13,62 +15,6 @@ YELLOW='\033[33m'
 RED='\033[31m'
 DIM='\033[2m'
 RESET='\033[0m'
-
-# --- Usage API (5-hour & weekly) with file-based cache ---
-USAGE_CACHE="$HOME/.claude/.usage-cache.json"
-CACHE_TTL=300 # 5 minutes
-
-get_usage() {
-    local now
-    now=$(date +%s)
-
-    # Check cache freshness
-    if [ -f "$USAGE_CACHE" ]; then
-        local cached_at
-        cached_at=$(jq -r '.timestamp // 0' "$USAGE_CACHE" 2>/dev/null)
-        if [ $((now - cached_at)) -lt $CACHE_TTL ]; then
-            jq -r '.data' "$USAGE_CACHE" 2>/dev/null
-            return
-        fi
-    fi
-
-    # Read OAuth token (macOS Keychain or Linux credentials file)
-    local token
-    if [ -f /usr/bin/security ]; then
-        local creds
-        creds=$(/usr/bin/security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null) || return
-        token=$(echo "$creds" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
-    elif [ -f "$HOME/.claude/.credentials.json" ]; then
-        token=$(jq -r '.claudeAiOauth.accessToken // empty' "$HOME/.claude/.credentials.json" 2>/dev/null)
-    fi
-    [ -z "$token" ] && return
-
-    # Fetch usage API
-    local response
-    response=$(curl -s --max-time 5 \
-        -H "Authorization: Bearer $token" \
-        -H "anthropic-beta: oauth-2025-04-20" \
-        "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
-
-    # Validate response has expected fields
-    if echo "$response" | jq -e '.five_hour' >/dev/null 2>&1; then
-        # Write cache
-        jq -n --argjson data "$response" --arg ts "$now" \
-            '{data: $data, timestamp: ($ts | tonumber)}' > "$USAGE_CACHE" 2>/dev/null
-        echo "$response"
-    elif [ -f "$USAGE_CACHE" ]; then
-        # Fall back to stale cache on API failure
-        jq -r '.data' "$USAGE_CACHE" 2>/dev/null
-    fi
-}
-
-FIVE_HR=""
-SEVEN_DAY=""
-USAGE_JSON=$(get_usage 2>/dev/null)
-if [ -n "$USAGE_JSON" ]; then
-    FIVE_HR=$(echo "$USAGE_JSON" | jq -r '.five_hour.utilization // empty' 2>/dev/null | cut -d. -f1)
-    SEVEN_DAY=$(echo "$USAGE_JSON" | jq -r '.seven_day.utilization // empty' 2>/dev/null | cut -d. -f1)
-fi
 
 usage_color() {
     local val=$1
@@ -97,7 +43,6 @@ git rev-parse --git-dir >/dev/null 2>&1 && BRANCH=" | 🌿 $(git branch --show-c
 echo -e "${CYAN}[$MODEL]${RESET} 📁 ${DIR##*/}$BRANCH"
 COST_FMT=$(printf '$%.2f' "$COST")
 
-# Build usage segment
 USAGE_SEG=""
 if [ -n "$FIVE_HR" ]; then
     USAGE_SEG=" | $(usage_color "$FIVE_HR")5h:${FIVE_HR}%${RESET}"
