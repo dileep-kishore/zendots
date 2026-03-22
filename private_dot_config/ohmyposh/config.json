@@ -203,7 +203,7 @@
           "options": {
             "cache_duration": "none"
           },
-          "template": "<p:text><i>via</i></> \ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }} ",
+          "template": "<p:text><i>via</i></> 󱔎 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }} ",
           "foreground": "p:yellow",
           "type": "python",
           "style": "plain"
