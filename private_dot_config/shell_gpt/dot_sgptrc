@@ -1,0 +1,10 @@
+# Default OpenAI model to use.
+DEFAULT_MODEL=gpt-5.4-nano
+# Default color for shell and code completions.
+DEFAULT_COLOR=magenta
+# When in --shell mode, default to "Y" for no input.
+DEFAULT_EXECUTE_SHELL_CMD=false
+# Disable streaming of responses
+DISABLE_STREAMING=false
+# The pygment theme to view markdown (default/describe role).
+CODE_THEME=default
