@@ -35,7 +35,7 @@
       "newline": true,
       "segments": [
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "\u256d",
@@ -46,7 +46,7 @@
           "foreground_templates": ["{{ if ne .Code 0 }}p:red{{end}}"]
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": " \udb83\udfc6 ",
@@ -56,7 +56,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "{{ if .SSHSession }} <p:text><i>at</i></> \ueba9 {{ .UserName }}@{{ .HostName }}{{ end }}",
@@ -66,7 +66,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none",
             "style": "agnoster_full"
           },
@@ -76,21 +76,22 @@
           "style": "plain"
         },
         {
-          "properties": {
-            "branch_ahead_icon": "\uf148",
-            "branch_behind_icon": "\uf149",
-            "branch_gone_icon": "\ueb9f ",
-            "branch_icon": "\ue0a0",
-            "branch_identical_icon": "\uea77 ",
+          "options": {
+            "branch_icon": "",
+            "branch_identical_icon": " ",
+            "branch_gone_icon": " ",
+            "branch_ahead_icon": "",
+            "branch_behind_icon": "",
+            "github_icon": " ",
             "branch_max_length": 25,
             "cache_duration": "none",
             "fetch_bare_info": true,
             "fetch_stash_count": true,
             "fetch_status": true,
-            "fetch_upstream_icon": true,
-            "github_icon": "\ueb00 "
+            "fetch_upstream_icon": true
           },
-          "template": "<p:text><i>at</i></> {{ .UpstreamIcon }}{{if .BranchStatus }}<p:teal>{{ .BranchStatus }}</>{{ end }} <p:text><i>on</i></> {{ .HEAD }}{{if .IsWorkTree}}\uf1bb{{end}}{{ if .Working.Changed }} <p:pink>\uf044 {{ .Working.String }}</>{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} <p:pink>\uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
+          "template": "<p:text><i>on</i></>  {{ .HEAD }}{{if .IsWorkTree}} {{end}} [{{if .BranchStatus }}<p:teal>{{ .BranchStatus }}</>{{ end }}] {{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
+
           "foreground": "p:green",
           "type": "git",
           "style": "plain",
@@ -109,7 +110,7 @@
       "filler": "<p:surface0>\u00b7</>",
       "segments": [
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "{{if gt .SHLVL 2}}{{ .SHLVL }} {{end}}",
@@ -118,7 +119,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "always_enabled": false,
             "cache_duration": "none",
             "style": "round",
@@ -131,7 +132,7 @@
           "foreground_templates": ["{{ if gt .Code 0 }}p:red{{ end }}"]
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>is</i></> {{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }}{{ end }} ",
@@ -140,7 +141,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "{{ if not (or (.Segments.Contains \"Project\") (.Segments.Contains \"Executiontime\")) }} {{ .CurrentDate | date \"Jan 02\" }} {{ end }}",
@@ -149,7 +150,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "\u256e",
@@ -167,7 +168,7 @@
       "newline": true,
       "segments": [
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "\u2570\udb85\udddc ",
@@ -183,7 +184,7 @@
       "type": "rprompt",
       "segments": [
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>in</i></> \uf313 nix-{{ .Type }} ",
@@ -192,7 +193,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \udb80\udf99 {{ .Full }} ",
@@ -201,7 +202,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }} {{ if .Venv }}[{{ .Venv }}]{{ end }}{{ end }} ",
@@ -210,7 +211,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue624 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -219,7 +220,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue627 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -228,7 +229,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue620 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -237,7 +238,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue777 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -246,7 +247,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \ue68a {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -255,7 +256,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "<p:text><i>via</i></> \udb85\ude17 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
@@ -264,7 +265,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "{{ if not (or (.Segments.Contains \"Node\") (.Segments.Contains \"Python\") (.Segments.Contains \"Julia\") (.Segments.Contains \"Go\") (.Segments.Contains \"Lua\") (.Segments.Contains \"Haskell\") (.Segments.Contains \"R\") (.Segments.Contains \"Rust\") (.Segments.Contains \"Nix-shell\")) }} {{ .CurrentDate | date \"15:04\" }} {{ end }}",
@@ -273,7 +274,7 @@
           "style": "plain"
         },
         {
-          "properties": {
+          "options": {
             "cache_duration": "none"
           },
           "template": "\u256f",
