@@ -245,8 +245,7 @@ keybinds {
         bind "u" {
             HalfPageScrollUp
         }
- // uncomment this and adjust key if using copy_on_select=false
-        // bind "Alt c" { Copy; }
+        bind "y" { Copy; }
     }
     search {
         bind "Ctrl s" {
@@ -412,8 +411,16 @@ keybinds {
             GoToNextTab
             SwitchToMode "Normal"
         }
-        bind "Left" "h" {
+        bind "Left" {
             MoveFocus "Left"
+            SwitchToMode "Normal"
+        }
+        bind "h" {
+            NewPane "Down"
+            SwitchToMode "Normal"
+        }
+        bind "v" {
+            NewPane "Right"
             SwitchToMode "Normal"
         }
         bind "Right" "l" {
@@ -489,6 +496,8 @@ keybinds {
         }
     }
     shared_except "locked" {
+        bind "Ctrl Shift h" { GoToPreviousTab; }
+        bind "Ctrl Shift l" { GoToNextTab; }
         bind "Ctrl g" {
             MessagePlugin "autolock" {
                 payload "disable"
@@ -539,6 +548,10 @@ keybinds {
         bind "Alt ]" {
             NextSwapLayout
         }
+        bind "Alt Up" { Resize "Increase Up"; }
+        bind "Alt Down" { Resize "Increase Down"; }
+        bind "Alt Left" { Resize "Increase Left"; }
+        bind "Alt Right" { Resize "Increase Right"; }
     }
     shared_except "normal" "locked" {
         bind "Enter" "Esc" {
@@ -705,6 +718,7 @@ default_layout "code"
 default_mode "normal"
 mouse_mode true
 copy_on_select true
+copy_command "wl-copy"
 styled_underlines true
 disable_session_metadata false
 support_kitty_keyboard_protocol true
