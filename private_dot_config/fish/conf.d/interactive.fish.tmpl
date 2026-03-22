@@ -1,0 +1,64 @@
+status is-interactive; or return
+
+if set -q AGENT_SHELL
+    return
+end
+
+if set -q CLAUDECODE
+    if test "$CLAUDECODE" = "1"
+        return
+    end
+end
+
+if set -q CURSOR_AGENT
+    return
+end
+
+if set -q GEMINI_CLI
+    return
+end
+
+abbr --add bat "bat --theme='Catppuccin Mocha' --style='numbers,changes,header'"
+abbr --add y "yazi"
+abbr --add lg "lazygit"
+abbr --add gst "git status --short"
+abbr --add du "dua i"
+abbr --add vimipython "ipython --TerminalInteractiveShell.editing_mode=vi"
+abbr --add grep "grep --color=auto"
+abbr --add psgrep "ps aux | grep -v grep | grep -i -e VSZ -e"
+abbr --add df "df -ahiT --total"
+abbr --add clear "clear -x"
+abbr --add cls "clear"
+abbr --add exportforge "fish_add_path -p \$HOME/miniforge3/bin"
+abbr --add myip "curl http://ipecho.net/plain; echo"
+abbr --add screenoff-niri "niri msg action power-off-monitors"
+
+abbr --add eza "eza --icons auto --git"
+abbr --add la "eza --icons auto --git -a"
+abbr --add ll "eza --icons auto --git -l"
+abbr --add lla "eza --icons auto --git -la"
+abbr --add ls "eza --icons auto --git"
+abbr --add lt "eza --icons auto --git --tree"
+
+abbr --add ta "sesh connect"
+abbr --add tdetach "tmux detach"
+abbr --add tkill "tmux kill-session -t"
+abbr --add tlist "sesh list -tT --icons"
+
+abbr --add claude "env AGENT_SHELL=1 claude"
+abbr --add cc "env AGENT_SHELL=1 claude"
+abbr --add ccy "env AGENT_SHELL=1 claude --dangerously-skip-permissions"
+abbr --add codex "env AGENT_SHELL=1 codex"
+abbr --add gpt "env AGENT_SHELL=1 codex --yolo"
+abbr --add oc "env AGENT_SHELL=1 opencode"
+abbr --add gemini "env AGENT_SHELL=1 gemini"
+
+abbr --add z "zellij"
+abbr --add znew "zellij --session"
+abbr --add za "zellij attach"
+abbr --add zk "zellij kill-session"
+abbr --add zka "zellij kill-all-sessions"
+abbr --add zd "zellij delete-session"
+abbr --add zda "zellij delete-all-sessions"
+abbr --add zlist "zellij list-sessions"
+abbr --add zls "zellij list-sessions"
