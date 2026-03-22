@@ -77,12 +77,11 @@
         },
         {
           "options": {
-            "branch_icon": "",
             "branch_identical_icon": " ",
             "branch_gone_icon": " ",
             "branch_ahead_icon": "",
             "branch_behind_icon": "",
-            "github_icon": " ",
+            "github_icon": " ",
             "branch_max_length": 25,
             "cache_duration": "none",
             "fetch_bare_info": true,
@@ -90,8 +89,7 @@
             "fetch_status": true,
             "fetch_upstream_icon": true
           },
-          "template": "<p:text><i>on</i></>  {{ .HEAD }}{{if .IsWorkTree}} {{end}} [{{if .BranchStatus }}<p:teal>{{ .BranchStatus }}</>{{ end }}] {{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
-
+          "template": "<p:text><i>on</i></> {{ .UpstreamIcon }}{{ .HEAD }}{{if .IsWorkTree}} {{end}} {{if .BranchStatus }}<p:teal>{{ .BranchStatus }} </>{{ end }}{{ if .Working.Changed }}<p:pink>\uf044</> {{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }}{{ end }}{{ if .Staging.Changed }}<p:green>\uf046</> {{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
           "foreground": "p:green",
           "type": "git",
           "style": "plain",
