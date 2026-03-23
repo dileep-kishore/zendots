@@ -18,6 +18,18 @@
 		"serena_*": false
 	},
 	"mcp": {
+		"sequential-thinking": {
+			"type": "local",
+			"command": [
+				"npx",
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			],
+			"environment": {
+				"DISABLE_THOUGHT_LOGGING": "true"
+			},
+			"enabled": true
+		},
 		"context7": {
 			"type": "remote",
 			"url": "https://mcp.context7.com/mcp",
