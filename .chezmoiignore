@@ -44,3 +44,6 @@ bin/
 .aerospace.toml
 .config/sketchybar
 {{- end }}
+
+# misc
+tests/
