@@ -49,3 +49,9 @@
 [delta]
     features = line-numbers decorations catppuccin-mocha
     side-by-side = true
+[gitbutler]
+	aiOpenAIKeyOption = bringYourOwn
+	aiOpenAICustomEndpoint = 
+	aiOpenAIModelName = gpt-5-mini
+	aiModelProvider = anthropic
+	aiAnthropicKeyOption = bringYourOwn
