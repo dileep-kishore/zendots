@@ -12,28 +12,7 @@
     "defaultMode": "plan"
   },
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|elicitation_dialog",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      }
-    ],
     "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      },
       {
         "matcher": "*",
         "hooks": [
@@ -44,48 +23,7 @@
         ]
       }
     ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      }
-    ],
     "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      },
       {
         "hooks": [
           {
@@ -96,15 +34,6 @@
       }
     ],
     "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
-          }
-        ]
-      },
       {
         "hooks": [
           {
@@ -158,16 +87,7 @@
     "claude-md-management@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "agent-deck@agent-deck": true
-  },
-  "extraKnownMarketplaces": {
-    "agent-deck": {
-      "source": {
-        "source": "github",
-        "repo": "asheshgoplani/agent-deck"
-      }
-    }
+    "skill-creator@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "voiceEnabled": true,
