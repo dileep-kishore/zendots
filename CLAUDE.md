@@ -88,6 +88,7 @@ When modifying configurations:
 - **Shell changes**: Source the file or restart shell (`exec zsh`)
 - **Tmux changes**: Reload with `prefix + r` (Ctrl-a + r)
 - **Neovim changes**: Restart Neovim or use `:Lazy sync` for plugins
+- **Repo policy**: Do not add automated tests for dotfiles or shell helpers in this repository unless explicitly requested. Prefer targeted verification commands and manual checks instead.
 
 ## Architecture and Configuration System
 
