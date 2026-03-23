@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "sequential-thinking": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+            "env": {
+                "DISABLE_THOUGHT_LOGGING": "true"
+            }
+        }
+    }
+}
