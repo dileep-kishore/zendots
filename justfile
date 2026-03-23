@@ -14,6 +14,9 @@ apply:
 diff:
   chezmoi diff
 
+sync-from-home:
+  ./private_dot_local/bin/executable_chezmoi-sync-from-home.sh
+
 dump:
   cd pkgs && rm Brewfile && brew bundle dump
 

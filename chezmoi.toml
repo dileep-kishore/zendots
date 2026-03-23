@@ -4,5 +4,9 @@ sourceDir = "~/zendots"
   format = "git"
   pager = "delta"
 
+[merge]
+  command = "nvim"
+  args = ["-d", "{{ .Destination }}", "{{ .Source }}", "{{ .Target }}"]
+
 [data]
   personal = true
