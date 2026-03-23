@@ -4,37 +4,12 @@
     "CLAUDE_CODE_SHELL": "/bin/bash",
     "DISABLE_AUTOUPDATER": "1"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
-  "enabledPlugins": {
-    "context7@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "serena@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "productivity@knowledge-work-plugins": true,
-    "bio-research@knowledge-work-plugins": true,
-    "claude-md-management@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "agent-deck@agent-deck": true
-  },
-  "extraKnownMarketplaces": {
-    "agent-deck": {
-      "source": {
-        "source": "github",
-        "repo": "asheshgoplani/agent-deck"
-      }
-    }
+  "permissions": {
+    "defaultMode": "plan"
   },
   "hooks": {
     "Notification": [
@@ -56,6 +31,15 @@
             "type": "command",
             "command": "agent-deck hook-handler",
             "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
           }
         ]
       }
@@ -101,6 +85,14 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -112,17 +104,73 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
+          }
+        ]
       }
     ]
   },
-  "permissions": {
-    "defaultMode": "plan"
+  "statusLine": {
+    "type": "command",
+    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
   },
-  "attribution": {
-    "commit": "",
-    "pr": ""
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "productivity@knowledge-work-plugins": true,
+    "bio-research@knowledge-work-plugins": true,
+    "claude-md-management@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "agent-deck@agent-deck": true
+  },
+  "extraKnownMarketplaces": {
+    "agent-deck": {
+      "source": {
+        "source": "github",
+        "repo": "asheshgoplani/agent-deck"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
+  "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
-  "voiceEnabled": true
+  "model": "opus[1m]"
 }
