@@ -50,19 +50,6 @@ source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-_zendots_init_completion_integrations() {
-    (( ${+_zendots_completion_integrations_loaded} )) && return
-    typeset -g _zendots_completion_integrations_loaded=1
-
-    if (( $+commands[carapace] )); then
-        source <(carapace _carapace)
-    fi
-
-    if (( $+commands[tv] )); then
-        eval "$(tv init zsh)"
-    fi
-}
-
 # Load a few important annexes, without Turbo
 # (this is currently required for annexes)
 zinit light-mode for \
@@ -104,10 +91,17 @@ zinit wait lucid for \
 
 zinit wait lucid for \
  atload"_zsh_autosuggest_start; bindkey '^ ' autosuggest-accept" \
-    zsh-users/zsh-autosuggestions \
- blockf atpull'zinit creinstall -q .' atload"zicompinit; zicdreplay; _zendots_init_completion_integrations" \
-    zsh-users/zsh-completions \
+    zsh-users/zsh-autosuggestions
+
+zinit blockf atpull'zinit creinstall -q .' for \
+    zsh-users/zsh-completions
+
+zinit light \
     zdharma-continuum/fast-syntax-highlighting
+
+ZINIT[COMPINIT_OPTS]=-C
+zicompinit
+zinit cdreplay -q
 
 ### End of Zinit's installer chunk
 
@@ -128,6 +122,7 @@ zstyle ':completion:*' menu select
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 zstyle ':completion:*' list-colors $LS_COLORS
+source <(carapace _carapace)
 
 if [[ -f "$HOME/.shell_aliases" ]]; then
     source "$HOME/.shell_aliases"
@@ -135,6 +130,7 @@ fi
 
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
+eval "$(tv init zsh)"
 # eval "$(starship init zsh)"
 eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 
