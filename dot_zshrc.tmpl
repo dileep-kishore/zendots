@@ -36,21 +36,32 @@ if [[ -n "${AGENT_SHELL:-}" || "$CLAUDECODE" == "1" || -n "${CURSOR_AGENT:-}" ||
     return
 fi
 
-autoload -Uz compinit
-compinit
-
 ### Added by Zinit's installer
-if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -d "$ZINIT_HOME/.git" ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
-    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
-    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+    command mkdir -p "$(dirname "$ZINIT_HOME")" && command chmod g-rwX "$(dirname "$ZINIT_HOME")"
+    command git clone https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" && \
         print -P "%F{33} %F{34}Installation successful.%f%b" || \
         print -P "%F{160} The clone has failed.%f%b"
 fi
 
-source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
+
+_zendots_init_completion_integrations() {
+    (( ${+_zendots_completion_integrations_loaded} )) && return
+    typeset -g _zendots_completion_integrations_loaded=1
+
+    if (( $+commands[carapace] )); then
+        source <(carapace _carapace)
+    fi
+
+    if (( $+commands[tv] )); then
+        eval "$(tv init zsh)"
+    fi
+}
 
 # Load a few important annexes, without Turbo
 # (this is currently required for annexes)
@@ -92,12 +103,11 @@ zinit wait lucid for \
     OMZP::web-search
 
 zinit wait lucid for \
- atinit"ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay" \
-    zdharma-continuum/fast-syntax-highlighting \
  atload"_zsh_autosuggest_start; bindkey '^ ' autosuggest-accept" \
     zsh-users/zsh-autosuggestions \
- blockf atpull'zinit creinstall -q .' \
-    zsh-users/zsh-completions
+ blockf atpull'zinit creinstall -q .' atload"zicompinit; zicdreplay; _zendots_init_completion_integrations" \
+    zsh-users/zsh-completions \
+    zdharma-continuum/fast-syntax-highlighting
 
 ### End of Zinit's installer chunk
 
@@ -118,7 +128,6 @@ zstyle ':completion:*' menu select
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 zstyle ':completion:*' list-colors $LS_COLORS
-source <(carapace _carapace)
 
 if [[ -f "$HOME/.shell_aliases" ]]; then
     source "$HOME/.shell_aliases"
@@ -126,7 +135,6 @@ fi
 
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(atuin init zsh)"
-eval "$(tv init zsh)"
 # eval "$(starship init zsh)"
 eval "$(oh-my-posh init zsh --config '~/.config/ohmyposh/config.json')"
 
