@@ -27,7 +27,7 @@ print_list() {
 
     case "$mode" in
     all)
-        filter='select(.Src == "tmux" or .Src == "config")'
+        filter='select(.Src == "tmux")'
         ;;
     tmux)
         filter='select(.Src == "tmux")'
@@ -177,7 +177,7 @@ pick_entry() {
             --ansi \
             --border-label '  TMUX Session Manager (sesh) ' \
             --prompt '  ' \
-            --header '  ^a tmux+config ^s tmux ^g config ^x zoxide ^f find ^d tmux kill' \
+            --header '  ^a tmux ^s tmux ^g config ^x zoxide ^f find ^d tmux kill' \
             --bind "tab:down,btab:up" \
             --bind "ctrl-a:change-prompt(  )+reload($SELF list all)" \
             --bind "ctrl-s:change-prompt(  )+reload($SELF list tmux)" \
