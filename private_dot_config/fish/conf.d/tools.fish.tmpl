@@ -22,10 +22,6 @@ if test -x /home/linuxbrew/.linuxbrew/bin/brew
     /home/linuxbrew/.linuxbrew/bin/brew shellenv | source
 end
 
-if test -f /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin/tmuxinator
-    fish_add_path -a /global/homes/d/dkishore/.pixi/envs/ruby/share/rubygems/gems/tmuxinator-3.3.5/bin
-end
-
 if command -q vivid
     set -gx LS_COLORS (vivid generate catppuccin-mocha)
 end
