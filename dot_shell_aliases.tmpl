@@ -29,9 +29,16 @@ alias lt='eza --tree'
 alias ta="$HOME/.config/tmux/scripts/sesh-session-picker.sh connect"
 alias tdetach="tmux detach"
 alias tkill="tmux kill-session -t"
-alias tlist="sesh list -ctz --icons"
+alias tlist="sesh list -ct --icons"
 tnew() {
-    ~/.config/tmux/scripts/start-standard-session.sh "${1:-$PWD}"
+    if [ -z "$1" ]; then
+        echo "Usage: tnew <session-name> [directory]" >&2
+        return 1
+    fi
+
+    local target_dir="${2:-$PWD}"
+    ~/.config/tmux/scripts/register-sesh-session.sh "$1" "$target_dir" &&
+        ~/.config/tmux/scripts/start-standard-session.sh "$target_dir" "$1"
 }
 
 # Claude
