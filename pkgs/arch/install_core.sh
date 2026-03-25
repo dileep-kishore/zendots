@@ -95,6 +95,7 @@ PACMAN_PACKAGES=(
     starship
     tealdeer
     tmux
+    tmuxp
     unzip
     yazi
     yq
@@ -147,7 +148,6 @@ AUR_PACKAGES=(
     oh-my-posh-bin
     rich-cli
     sesh-bin
-    tmuxinator
     visual-studio-code-bin
     cursor-bin
     warp-terminal-bin
