@@ -4,7 +4,7 @@ import json
 import os
 import subprocess
 
-wallpapers_cache_path = os.path.expanduser("~/.cache/swww/")
+wallpapers_cache_path = os.path.expanduser("~/.cache/awww/")
 events_of_interest = ["Workspace focused", "Window opened", "Window closed"]
 
 
@@ -33,7 +33,7 @@ def get_current_wallpaper(monitor):
 
 def set_wallpaper(monitor, wallpaper):
     cmd = [
-        "swww",
+        "awww",
         "img",
         "--transition-type",
         "grow",

@@ -16,7 +16,7 @@ for file in WALLPAPERS_DIR.iterdir():
 def set_wallpaper(wallpaper):
     subprocess.run(
         [
-            "swww",
+            "awww",
             "img",
             wallpaper,
             "--transition-type",

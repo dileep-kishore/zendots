@@ -2,3 +2,4 @@
 .serena/
 .claude/settings.local.json
 docs/plans/
+*.pyc

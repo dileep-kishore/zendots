@@ -52,7 +52,7 @@ PACMAN_PACKAGES=(
     waybar
     xdg-desktop-portal-gtk
     xdg-desktop-portal-gnome
-    swww
+    awww
     hypridle
     hyprlock
     swayidle

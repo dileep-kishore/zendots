@@ -18,7 +18,7 @@ WALLPAPER_NAMES = [
 def set_wallpaper(wallpaper):
     subprocess.run(
         [
-            "swww",
+            "awww",
             "img",
             wallpaper,
             "--transition-type",
