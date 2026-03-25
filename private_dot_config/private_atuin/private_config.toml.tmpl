@@ -38,7 +38,11 @@ sync_frequency = "10m"
 
 ## which search mode to use
 ## possible values: prefix, fulltext, fuzzy, skim
+{{- if eq .chezmoi.homeDir "/global/homes/d/dkishore" }}
+search_mode = "fuzzy"
+{{- else }}
 search_mode = "daemon-fuzzy"
+{{- end }}
 
 ## which filter mode to use by default
 ## possible values: "global", "host", "session", "directory", "workspace"
@@ -72,7 +76,7 @@ style = "compact"
 inline_height = 20
 
 ## Invert the UI - put the search bar at the top , Default to `false`
-invert = true
+invert = false
 
 ## enable or disable showing a preview of the selected command
 ## useful when the command is longer than the terminal width and is cut off
@@ -231,8 +235,13 @@ records = true
 
 [daemon]
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
+{{- if eq .chezmoi.homeDir "/global/homes/d/dkishore" }}
+enabled = false
+autostart = false
+{{- else }}
 enabled = true
 autostart = true
+{{- end }}
 
 ## How often the daemon should sync in seconds
 # sync_frequency = 300
