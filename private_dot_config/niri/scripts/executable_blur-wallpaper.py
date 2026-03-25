@@ -4,7 +4,10 @@ import json
 import os
 import subprocess
 
-wallpapers_cache_path = os.path.expanduser("~/.cache/awww/")
+awww_version = (
+    subprocess.check_output(["awww", "--version"]).decode().strip().split()[-1]
+)
+wallpapers_cache_path = os.path.expanduser(f"~/.cache/awww/{awww_version}/")
 events_of_interest = ["Workspace focused", "Window opened", "Window closed"]
 
 
