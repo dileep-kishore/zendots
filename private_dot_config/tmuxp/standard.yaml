@@ -1,0 +1,26 @@
+session_name: template
+start_directory: ${PROJECT_ROOT}
+windows:
+  - window_name: main
+    layout: e10b,254x62,0,0{165x62,0,0[165x50,0,0,11,165x11,0,51,16],88x62,166,0,17}
+    panes:
+      -
+      -
+      - ccy
+  - window_name: nvim
+    layout: main-horizontal
+    panes:
+      - nvim
+  - window_name: git
+    layout: main-horizontal
+    panes:
+      - lazygit
+  - window_name: ai
+    layout: main-horizontal
+    panes:
+      - opencode
+  - window_name: term
+    layout: even-vertical
+    panes:
+      -
+      -
