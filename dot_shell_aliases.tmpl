@@ -26,13 +26,12 @@ alias ls=eza
 alias lt='eza --tree'
 
 # Tmux
-alias ta="sesh connect"
+alias ta="$HOME/.config/tmux/scripts/sesh-session-picker.sh connect"
 alias tdetach="tmux detach"
 alias tkill="tmux kill-session -t"
-alias tlist="sesh list -tT --icons"
+alias tlist="sesh list -ctz --icons"
 tnew() {
-    bash ~/.config/tmux/scripts/templater.sh "$@"
-    tmuxinator start "$1"
+    ~/.config/tmux/scripts/start-standard-session.sh "${1:-$PWD}"
 }
 
 # Claude
