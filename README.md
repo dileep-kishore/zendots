@@ -41,7 +41,7 @@ A comprehensive dotfiles repository managed by [chezmoi](https://www.chezmoi.io/
 
 - **Shell enhancements**: `zoxide` (smart cd), `atuin` (shell history), `fzf` (fuzzy finder), `eza` (modern ls)
 - **AI integration**: Command generation with `aichat` (Alt-e), AI-assisted editing in Neovim
-- **Session management**: Tmux with `sesh` for quick session switching (Ctrl-a + o)
+- **Session management**: Tmux with `sesh` for quick session switching plus a standardized tmuxp workspace for new sessions
 - **Git workflow**: Enhanced git commands, lazygit, neogit, octo.nvim for GitHub
 
 ### 🔧 Developer Experience
@@ -180,10 +180,16 @@ just dump
 
 - **Prefix**: `Ctrl-a` (instead of default Ctrl-b)
 - `prefix + h/v` → Split horizontally/vertically
-- `prefix + o` → Session manager (sesh)
+- `prefix + o` → Session manager backed by `sesh` sources and the standard tmuxp launcher
 - `prefix + r` → Reload configuration
 - `Ctrl-Shift-h/l` → Switch windows
 - `Alt + arrows` → Resize panes
+
+#### Session Workflow
+
+- `ta <session-name|path>` → Attach to a running tmux session, a configured sesh session, or create a standardized session for a directory
+- `tnew [path]` → Create or attach to the standardized tmuxp session for the current directory or an explicit path
+- Configured long-lived sessions live in `~/.config/sesh/sesh.toml`
 
 #### Zsh
 
