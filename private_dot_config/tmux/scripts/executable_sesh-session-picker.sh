@@ -4,6 +4,11 @@ set -euo pipefail
 
 SELF="$HOME/.config/tmux/scripts/sesh-session-picker.sh"
 STARTER="$HOME/.config/tmux/scripts/start-standard-session.sh"
+BLUE=$'\033[34m'
+YELLOW=$'\033[33m'
+CYAN=$'\033[36m'
+MAGENTA=$'\033[35m'
+RESET=$'\033[39m'
 
 shorten_home() {
     local value="$1"
@@ -22,7 +27,7 @@ print_list() {
 
     case "$mode" in
     all)
-        filter='select(.Src == "tmux" or .Src == "config" or .Src == "zoxide")'
+        filter='select(.Src == "tmux" or .Src == "config")'
         ;;
     tmux)
         filter='select(.Src == "tmux")'
@@ -36,7 +41,7 @@ print_list() {
     find)
         fd -H -d 2 -t d -E .Trash . ~ | while IFS= read -r path; do
             pretty=$(shorten_home "$path")
-            printf '\t%s\t%s\tfind\t%s\t%s\n' "$pretty" "$pretty" "$pretty" "$path"
+            printf '%s%s\t%s\t%s\tfind\t%s\t%s\n' "$MAGENTA" "$RESET" "$pretty" "$pretty" "$pretty" "$path"
         done
         return
         ;;
@@ -49,15 +54,15 @@ print_list() {
     sesh list --json 2>/dev/null | jq -r ".[] | $filter | [.Src, .Name, (.Path // \"\")] | @tsv" | while IFS=$'\t' read -r src name path; do
         case "$src" in
         tmux)
-            icon=''
+            icon="${BLUE}${RESET}"
             label="$name"
             ;;
         config)
-            icon=''
+            icon="${YELLOW}${RESET}"
             label="$name"
             ;;
         zoxide)
-            icon=''
+            icon="${CYAN}${RESET}"
             label="$name"
             ;;
         *)
@@ -170,9 +175,9 @@ pick_entry() {
             --with-nth=1,2,3 \
             --no-sort \
             --ansi \
-            --border-label '  TMUX Session Manager ' \
+            --border-label '  TMUX Session Manager (sesh) ' \
             --prompt '  ' \
-            --header '  ^a all ^s tmux ^g config ^x zoxide ^f find ^d tmux kill' \
+            --header '  ^a tmux+config ^s tmux ^g config ^x zoxide ^f find ^d tmux kill' \
             --bind "tab:down,btab:up" \
             --bind "ctrl-a:change-prompt(  )+reload($SELF list all)" \
             --bind "ctrl-s:change-prompt(  )+reload($SELF list tmux)" \
