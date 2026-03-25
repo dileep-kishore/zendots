@@ -188,8 +188,8 @@ just dump
 #### Session Workflow
 
 - `ta <session-name|path>` → Attach to a running tmux session, a configured sesh session, or create a standardized session for a directory
-- `tnew [path]` → Create or attach to the standardized tmuxp session for the current directory or an explicit path
-- Configured long-lived sessions live in `~/.config/sesh/sesh.toml`
+- `tnew <session-name> [directory]` → Register the session in local `~/.config/sesh/sesh.toml`, then create or attach to the standard tmuxp session
+- `~/.config/sesh/sesh.toml` is now machine-local and intentionally not managed by chezmoi
 
 #### Zsh
 

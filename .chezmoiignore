@@ -47,3 +47,4 @@ bin/
 
 # misc
 tests/
+.config/sesh/sesh.toml
