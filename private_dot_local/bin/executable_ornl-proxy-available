@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/nc -z -w 1 snowman.ornl.gov 3128 >/dev/null 2>&1
