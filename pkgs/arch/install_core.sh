@@ -59,6 +59,7 @@ echo -e "${BLUE}========================================${NC}"
 # Official repository packages (pacman)
 PACMAN_PACKAGES=(
     gnome-keyring
+    libsecret
     blueman
     aichat
     aria2
