@@ -26,7 +26,7 @@ alias ls=eza
 alias lt='eza --tree'
 
 # Tmux
-alias ta="$HOME/.config/tmux/scripts/sesh-session-picker.sh connect"
+alias ta="$HOME/.config/tmux/scripts/sesh-session-picker.py connect"
 alias tdetach="tmux detach"
 alias tkill="tmux kill-session -t"
 alias tlist="sesh list -ct --icons"
@@ -38,7 +38,7 @@ tnew() {
 
     local target_dir="${2:-$PWD}"
     ~/.config/tmux/scripts/register-sesh-session.sh "$1" "$target_dir" &&
-        ~/.config/tmux/scripts/start-standard-session.sh "$target_dir" "$1"
+        ~/.config/tmux/scripts/start-standard-session.py "$target_dir" "$1"
 }
 
 # Claude
