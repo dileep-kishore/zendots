@@ -1,3 +1,4 @@
 #!/bin/sh
 
-exec /usr/bin/nc -z -w 1 snowman.ornl.gov 3128 >/dev/null 2>&1
+# Bound the connect phase on macOS/BSD netcat so ssh Match exec never hangs.
+exec /usr/bin/nc -G 1 -z snowman.ornl.gov 3128 >/dev/null 2>&1
