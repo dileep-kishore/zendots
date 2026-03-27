@@ -131,6 +131,7 @@ spawn-at-startup "awww-daemon"
 spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && zotero"
+spawn-sh-at-startup "sleep 10 && PASSWORD_STORE_BACKEND=gnome-libsecret ~/.local/bin/vibe-typer --password-store=gnome-libsecret"
 spawn-sh-at-startup "sleep 5 && (pidof syncthing || syncthing --no-browser)"
 spawn-sh-at-startup "sleep 10 && syncthingtray"
 spawn-sh-at-startup "sleep 2 && awww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
@@ -743,4 +744,3 @@ binds {
  // Application switch keybinds
     // NOTE: These were moved to wlr-which-key
 }
-
