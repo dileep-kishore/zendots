@@ -327,6 +327,26 @@ window-rule {
     }
 }
 window-rule {
+    match app-id="^vibe-typer$" title="^Recording Indicator$"
+    open-floating true
+    open-fullscreen false
+    open-maximized false
+    open-maximized-to-edges false
+    default-floating-position x=0 y=32 relative-to="top"
+    default-column-width {
+        fixed 720
+    }
+    default-window-height {
+        fixed 96
+    }
+    border {
+        off
+    }
+    shadow {
+        off
+    }
+}
+window-rule {
     match app-id="^com\\.mitchellh\\.ghostty$" is-active=true
     match app-id="^kitty$" is-active=true
     opacity 0.97
