@@ -11,5 +11,5 @@ function tnew
     end
 
     ~/.config/tmux/scripts/register-sesh-session.sh $session_name $target
-    and ~/.config/tmux/scripts/start-standard-session.sh $target $session_name
+    and ~/.config/tmux/scripts/start-standard-session.py $target $session_name
 end
