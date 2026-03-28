@@ -42,3 +42,15 @@ DISABLE_THOUGHT_LOGGING = "true"
 
 [projects."/home/dileep/zendots"]
 trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Personal/Startup/healthfile"]
+trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Work/DataLakehouse/co-scientist"]
+trust_level = "trusted"
+
+[plugins."google-calendar@openai-curated"]
+enabled = true
+
+[plugins."github@openai-curated"]
+enabled = true
