@@ -49,6 +49,9 @@ trust_level = "trusted"
 [projects."/home/dileep/Documents/Work/DataLakehouse/co-scientist"]
 trust_level = "trusted"
 
+[projects."/home/dileep/Documents/Work/Collaborations/BERIL-research-observatory"]
+trust_level = "trusted"
+
 [plugins."google-calendar@openai-curated"]
 enabled = true
 
