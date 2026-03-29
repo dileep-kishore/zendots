@@ -10,6 +10,6 @@ function tnew
         set target $argv[2]
     end
 
-    ~/.config/tmux/scripts/register-sesh-session.sh $session_name $target
+    ~/.config/tmux/scripts/register-sesh-session.py $session_name $target
     and ~/.config/tmux/scripts/start-standard-session.py $target $session_name
 end
