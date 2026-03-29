@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import json
 import os
 import shlex
@@ -9,7 +7,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import NoReturn
+from typing import Dict, List, NoReturn
 
 SELF = str(Path.home() / ".config" / "tmux" / "scripts" / "sesh-session-picker.py")
 STARTER = str(Path.home() / ".config" / "tmux" / "scripts" / "start-standard-session.py")
@@ -36,11 +34,11 @@ def shorten_home(value: str) -> str:
     return value
 
 
-def sesh_entries() -> list[dict[str, object]]:
+def sesh_entries() -> List[Dict[str, object]]:
     result = subprocess.run(
         ["sesh", "list", "--json"],
         stdout=subprocess.PIPE,
-        text=True,
+        universal_newlines=True,
         stderr=subprocess.DEVNULL,
         check=False,
     )
@@ -56,7 +54,7 @@ def sesh_entries() -> list[dict[str, object]]:
     return data if isinstance(data, list) else []
 
 
-def print_rows(rows: list[list[str]]) -> None:
+def print_rows(rows: List[List[str]]) -> None:
     for row in rows:
         print("\t".join(row))
 
@@ -65,11 +63,12 @@ def print_list(mode: str = "all") -> None:
     if mode == "find":
         result = subprocess.run(
             ["fd", "-H", "-d", "2", "-t", "d", "-E", ".Trash", ".", str(Path.home())],
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
             check=True,
         )
-        rows: list[list[str]] = []
+        rows: List[List[str]] = []
         for raw_path in result.stdout.splitlines():
             pretty = shorten_home(raw_path)
             rows.append(
@@ -110,9 +109,9 @@ def preview_entry(source: str, name: str, path: str = "") -> None:
     if source == "tmux":
         result = subprocess.run(
             ["tmux", "capture-pane", "-e", "-p", "-t", name],
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
+            universal_newlines=True,
             check=False,
         )
         lines = result.stdout.splitlines()[-200:]
@@ -127,7 +126,7 @@ def preview_entry(source: str, name: str, path: str = "") -> None:
             result = subprocess.run(
                 ["eza", "--icons", "auto", "--git", "-la", path],
                 stdout=subprocess.PIPE,
-                text=True,
+                universal_newlines=True,
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
@@ -152,11 +151,11 @@ def tmux_session_exists(session_name: str) -> bool:
     return result.returncode == 0
 
 
-def exec_command(command: list[str]) -> NoReturn:
+def exec_command(command: List[str]) -> NoReturn:
     os.execvp(command[0], command)
 
 
-def connect_entry(args: list[str]) -> None:
+def connect_entry(args: List[str]) -> None:
     if len(args) == 1:
         target = os.path.expanduser(args[0])
 
@@ -181,7 +180,7 @@ def connect_entry(args: list[str]) -> None:
             result = subprocess.run(
                 ["zoxide", "query", target],
                 stdout=subprocess.PIPE,
-                text=True,
+                universal_newlines=True,
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
@@ -212,8 +211,9 @@ def connect_entry(args: list[str]) -> None:
 def pick_entry() -> None:
     source_rows = subprocess.run(
         [sys.executable, __file__, "list", "all"],
-        capture_output=True,
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
         check=True,
     ).stdout
 
@@ -255,8 +255,9 @@ def pick_entry() -> None:
     selected = subprocess.run(
         fzf_command,
         input=source_rows,
-        capture_output=True,
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
         check=False,
     )
 
@@ -270,7 +271,7 @@ def pick_entry() -> None:
     connect_entry(fields[3:6])
 
 
-def main(argv: list[str]) -> None:
+def main(argv: List[str]) -> None:
     command = argv[1] if len(argv) > 1 else "pick"
 
     if command == "list":

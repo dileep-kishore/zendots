@@ -37,7 +37,7 @@ tnew() {
     fi
 
     local target_dir="${2:-$PWD}"
-    ~/.config/tmux/scripts/register-sesh-session.sh "$1" "$target_dir" &&
+    ~/.config/tmux/scripts/register-sesh-session.py "$1" "$target_dir" &&
         ~/.config/tmux/scripts/start-standard-session.py "$target_dir" "$1"
 }
 

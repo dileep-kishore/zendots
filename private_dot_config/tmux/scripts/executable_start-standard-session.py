@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import hashlib
 import os
 import re
@@ -9,7 +7,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import NoReturn
+from typing import List, NoReturn, Optional
 
 
 def fail(message: str) -> NoReturn:
@@ -22,7 +20,7 @@ def short_name(value: str) -> str:
     return normalized or "session"
 
 
-def resolve_dir(raw_input: str | None) -> str:
+def resolve_dir(raw_input: Optional[str]) -> str:
     candidate = os.path.expanduser(raw_input or os.getcwd())
     path = Path(candidate)
 
@@ -46,14 +44,15 @@ def tmux_session_exists(session_name: str) -> bool:
 def existing_session_path(session_name: str) -> str:
     result = subprocess.run(
         ["tmux", "display-message", "-p", "-t", session_name, "#{session_path}"],
-        capture_output=True,
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        universal_newlines=True,
         check=False,
     )
     return result.stdout.strip() if result.returncode == 0 else ""
 
 
-def tmuxp_command() -> list[str]:
+def tmuxp_command() -> List[str]:
     if shutil.which("tmuxp"):
         return ["tmuxp"]
 
@@ -63,7 +62,7 @@ def tmuxp_command() -> list[str]:
     fail("tmuxp is not installed and uv is unavailable.")
 
 
-def main(argv: list[str]) -> None:
+def main(argv: List[str]) -> None:
     root_dir = resolve_dir(argv[1] if len(argv) > 1 else os.getcwd())
     explicit_name = argv[2] if len(argv) > 2 else ""
     workspace = Path.home() / ".config" / "tmuxp" / "standard.yaml"
