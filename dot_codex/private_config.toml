@@ -57,3 +57,6 @@ enabled = true
 
 [plugins."github@openai-curated"]
 enabled = true
+
+[plugins."linear@openai-curated"]
+enabled = true
