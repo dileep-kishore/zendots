@@ -133,7 +133,6 @@ spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && zotero"
 spawn-sh-at-startup "sleep 10 && bash -c 'PASSWORD_STORE_BACKEND=gnome-libsecret ~/.local/bin/vibe-typer --password-store=gnome-libsecret'"
 spawn-sh-at-startup "sleep 5 && (pidof syncthing || syncthing --no-browser)"
-spawn-sh-at-startup "sleep 10 && syncthingtray"
 spawn-sh-at-startup "sleep 2 && awww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
 // NOTE: This is disabled because it causes issues where the last copied text is not pasted
 // spawn-sh-at-startup "sleep 10 && wl-clip-persist --clipboard regular"
