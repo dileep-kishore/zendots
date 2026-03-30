@@ -120,7 +120,7 @@ layout {
 }
 spawn-at-startup "hypridle"
 // spawn-at-startup "espanso" "daemon"  // Autostarts via systemd
-spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-at-startup "bash" "-c" "qs -c noctalia-shell"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "helium-browser"
 spawn-at-startup "ghostty"
@@ -131,7 +131,7 @@ spawn-at-startup "awww-daemon"
 spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
 spawn-sh-at-startup "sleep 5 && zotero"
-spawn-sh-at-startup "sleep 10 && PASSWORD_STORE_BACKEND=gnome-libsecret ~/.local/bin/vibe-typer --password-store=gnome-libsecret"
+spawn-sh-at-startup "sleep 10 && bash -c 'PASSWORD_STORE_BACKEND=gnome-libsecret ~/.local/bin/vibe-typer --password-store=gnome-libsecret'"
 spawn-sh-at-startup "sleep 5 && (pidof syncthing || syncthing --no-browser)"
 spawn-sh-at-startup "sleep 10 && syncthingtray"
 spawn-sh-at-startup "sleep 2 && awww img ~/Pictures/wallpapers/sushi-dark.png --transition-type center"
@@ -744,3 +744,4 @@ binds {
  // Application switch keybinds
     // NOTE: These were moved to wlr-which-key
 }
+
