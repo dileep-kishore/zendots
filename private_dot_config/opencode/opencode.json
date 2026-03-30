@@ -4,6 +4,13 @@
 	"autoupdate": false,
 	"default_agent": "plan",
 	"model": "openai/gpt-5.4",
+	"plugin": [
+		"opencode-pty",
+		"@franlol/opencode-md-table-formatter@latest",
+		"@mohak34/opencode-notifier@latest",
+		"opencode-background-agents",
+		"@plannotator/opencode@latest"
+	],
 	"permission": {
 		"edit": "allow",
 		"bash": "allow",
