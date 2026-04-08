@@ -46,6 +46,15 @@ trust_level = "trusted"
 [projects."/home/dileep/Documents/Work/Collaborations/BERIL-research-observatory"]
 trust_level = "trusted"
 
+[projects."/Users/g8k/zendots"]
+trust_level = "trusted"
+
+[projects."/Users/g8k/Documents/Work/DataLake/g2pai_client"]
+trust_level = "trusted"
+
+[projects."/Users/g8k/Documents/Work/DataLake/co-scientist"]
+trust_level = "trusted"
+
 [plugins."google-calendar@openai-curated"]
 enabled = true
 
