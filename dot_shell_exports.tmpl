@@ -47,5 +47,6 @@ if [[ $(hostname) == "mac148593" ]]; then
 
   if [ -f "$CERT_FILE" ]; then
     export NODE_EXTRA_CA_CERTS="$CERT_FILE"
+    export SSL_CERT_FILE="${NODE_EXTRA_CA_CERTS}"
   fi
 fi
