@@ -39,7 +39,8 @@ export DISABLE_TELEMETRY=1
 
 # Export certificates for Claude Code and other Node applications
 if [[ $(hostname) == "mac148593" ]]; then
-  CERT_FILE="$HOME/corporate-certs.pem"
+  # CERT_FILE="$HOME/corporate-certs.pem"
+  CERT_FILE="/etc/ssl/cert.pem"
 
   if [ ! -f "$CERT_FILE" ]; then
     security find-certificate -a -p /Library/Keychains/System.keychain > "$CERT_FILE" 2>/dev/null
@@ -47,6 +48,6 @@ if [[ $(hostname) == "mac148593" ]]; then
 
   if [ -f "$CERT_FILE" ]; then
     export NODE_EXTRA_CA_CERTS="$CERT_FILE"
-    export SSL_CERT_FILE="${NODE_EXTRA_CA_CERTS}"
+    export SSL_CERT_FILE="$CERT_FILE"
   fi
 fi
