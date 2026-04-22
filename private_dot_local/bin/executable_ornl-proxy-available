@@ -1,4 +1,5 @@
 #!/bin/sh
 
 # Bound the connect phase on macOS/BSD netcat so ssh Match exec never hangs.
-exec /usr/bin/nc -G 1 -z snowman.ornl.gov 3128 >/dev/null 2>&1
+# The bastion host is only reachable on the ORNL network or VPN.
+exec /usr/bin/nc -G 1 -z bstn-wks-gate.ornl.gov 22 >/dev/null 2>&1
