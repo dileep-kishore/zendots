@@ -37,17 +37,52 @@ export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
 export DISABLE_TELEMETRY=1
 # export CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192
 
-# Export certificates for Claude Code and other Node applications
+# Corporate TLS interception (work macOS): export Keychain -> PEM,
+# then point every tool at it. No single env var covers all runtimes.
 if [[ $(hostname) == "mac148593" ]]; then
-  # CERT_FILE="$HOME/corporate-certs.pem"
-  CERT_FILE="/etc/ssl/cert.pem"
+  CERT_FILE="$HOME/.config/corporate-certs.pem"
 
-  if [ ! -f "$CERT_FILE" ]; then
-    security find-certificate -a -p /Library/Keychains/System.keychain > "$CERT_FILE" 2>/dev/null
+  # Refresh weekly or if missing; combines user+system+system-root keychains
+  if [[ ! -f "$CERT_FILE" ]] || [[ -n $(find "$CERT_FILE" -mtime +7 2>/dev/null) ]]; then
+    mkdir -p "$(dirname "$CERT_FILE")"
+    {
+      security find-certificate -a -p /Library/Keychains/System.keychain
+      security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain
+    } > "$CERT_FILE" 2>/dev/null
+
+    # Narrow bundle for strict rustls tools (forge) that choke on
+    # UnsupportedCriticalExtension in the broad dump. LBL uses Netskope.
+    security find-certificate -a -c "ENTRUST MANAGED SERVICES ROOT CA" \
+      -p /Library/Keychains/System.keychain \
+      > "$HOME/.config/netskope-root.pem" 2>/dev/null
   fi
 
-  if [ -f "$CERT_FILE" ]; then
-    export NODE_EXTRA_CA_CERTS="$CERT_FILE"
+  if [[ -f "$CERT_FILE" ]]; then
+    # OpenSSL / curl / rustls-native-certs / uv / git / cargo / aws
     export SSL_CERT_FILE="$CERT_FILE"
+    export CURL_CA_BUNDLE="$CERT_FILE"
+    export GIT_SSL_CAINFO="$CERT_FILE"
+    export CARGO_HTTP_CAINFO="$CERT_FILE"
+    export AWS_CA_BUNDLE="$CERT_FILE"
+
+    # Python (pip, requests, httpx)
+    export REQUESTS_CA_BUNDLE="$CERT_FILE"
+    export PIP_CERT="$CERT_FILE"
+
+    # Node.js + npm (classic CA bundle path)
+    export NODE_EXTRA_CA_CERTS="$CERT_FILE"
+    # Node 22+ / Bun: read Keychain directly (fixes Bun-based Claude Code)
+    export NODE_USE_SYSTEM_CA=1
+
+    # uv: use OS trust store via rustls-platform-verifier
+    export UV_SYSTEM_CERTS=true
+
+    # GUI apps launched from Dock don't inherit shell env; launchctl setenv
+    # covers this session. For permanent coverage add a LaunchAgent.
+    if command -v launchctl >/dev/null 2>&1; then
+      launchctl setenv SSL_CERT_FILE "$CERT_FILE" 2>/dev/null
+      launchctl setenv NODE_EXTRA_CA_CERTS "$CERT_FILE" 2>/dev/null
+      launchctl setenv NODE_USE_SYSTEM_CA 1 2>/dev/null
+    fi
   fi
 fi
