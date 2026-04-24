@@ -66,6 +66,8 @@ if command -q asdf
     end
 end
 
+fish_add_path "{{ .chezmoi.homeDir }}/.cargo/bin"
+
 {{- if eq .chezmoi.hostname "tsuki" }}
 fish_add_path -a "{{ .chezmoi.homeDir }}/.juliaup/bin"
 {{- end }}
