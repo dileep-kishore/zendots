@@ -9,7 +9,8 @@
 		"@franlol/opencode-md-table-formatter@latest",
 		"@mohak34/opencode-notifier@latest",
 		"opencode-background-agents",
-		"@plannotator/opencode@latest"
+		"@plannotator/opencode@latest",
+		"superpowers@git+https://github.com/obra/superpowers.git"
 	],
 	"permission": {
 		"edit": "allow",
