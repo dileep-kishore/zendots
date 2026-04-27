@@ -137,7 +137,6 @@ spawn-sh-at-startup "sleep 2 && awww img ~/Pictures/wallpapers/sushi-dark.png --
 // NOTE: This is disabled because it causes issues where the last copied text is not pasted
 // spawn-sh-at-startup "sleep 10 && wl-clip-persist --clipboard regular"
 spawn-sh-at-startup "sleep 15 && wl-paste --watch cliphist store"
-spawn-sh-at-startup "python ~/.config/niri/scripts/blur-wallpaper.py"
 spawn-sh-at-startup "python ~/.config/niri/scripts/change-wallpaper.py"
 spawn-at-startup "nm-applet"
 spawn-sh-at-startup "sleep 10 && protonvpn-app"
@@ -153,6 +152,12 @@ hotkey-overlay {
 }
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
+blur {
+    passes 3
+    offset 3.0
+    noise 0.02
+    saturation 1.5
+}
 // Animation settings.
 animations {
     workspace-switch {
@@ -197,6 +202,9 @@ layer-rule {
     }
     baba-is-float true
     geometry-corner-radius 10
+    background-effect {
+        blur true
+    }
 }
 layer-rule {
     match namespace="^(vicinae)$"
@@ -204,6 +212,9 @@ layer-rule {
         on
     }
     geometry-corner-radius 10
+    background-effect {
+        blur true
+    }
 }
 layer-rule {
     match namespace="^(wlr_which_key)$"
@@ -212,6 +223,9 @@ layer-rule {
     }
     geometry-corner-radius 10
     baba-is-float true
+    background-effect {
+        blur true
+    }
 }
 window-rule {
     match app-id="^(ulauncher)$"
@@ -303,6 +317,15 @@ window-rule {
 
     }
 }
+window-rule {
+    match app-id="^com\\.mitchellh\\.ghostty$"
+    match app-id="^kitty$"
+    match app-id="^scratchpad$"
+    match app-id="^org\\.wezfurlong\\.wezterm$"
+    background-effect {
+        blur true
+    }
+}
 // floating terminal
 window-rule {
     match app-id="scratchpad"
@@ -349,6 +372,7 @@ window-rule {
 window-rule {
     match app-id="^com\\.mitchellh\\.ghostty$" is-active=true
     match app-id="^kitty$" is-active=true
+    match app-id="^org\\.wezfurlong\\.wezterm$" is-active=true
     opacity 0.97
 }
 // floating
@@ -379,6 +403,9 @@ window-rule {
 window-rule {
     match is-active=false
     opacity 0.95
+    background-effect {
+        blur true
+    }
 }
 binds {
     Mod+Slash {
@@ -743,4 +770,3 @@ binds {
  // Application switch keybinds
     // NOTE: These were moved to wlr-which-key
 }
-
