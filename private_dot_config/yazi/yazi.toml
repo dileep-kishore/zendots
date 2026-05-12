@@ -13,21 +13,21 @@ edit = [
 
 [open]
 prepend_rules = [
-  { name = "*.tex", use = "edit" },
+  { url = "*.tex", use = "edit" },
 ]
 
 [[plugin.prepend_fetchers]]
-id = "git"
-name = "*"
+url = "*"
 run = "git"
+group = "git"
 
 [[plugin.prepend_fetchers]]
-id = "git"
-name = "*/"
+url = "*/"
 run = "git"
+group = "git"
 
 [[plugin.prepend_previewers]]
-name = "*.md"
+url = "*.md"
 run = "piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dracula \"$1\""
 
 [[plugin.prepend_previewers]]
@@ -39,9 +39,9 @@ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}"
 run = "ouch"
 
 [[plugin.prepend_previewers]]
-name = "*.rst"
+url = "*.rst"
 run = "rich-preview"
 
 [[plugin.prepend_previewers]]
-name = "*.ipynb"
+url = "*.ipynb"
 run = "rich-preview"
