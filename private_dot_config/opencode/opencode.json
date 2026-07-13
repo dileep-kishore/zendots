@@ -10,7 +10,8 @@
 		"@mohak34/opencode-notifier@latest",
 		"opencode-background-agents",
 		"@plannotator/opencode@latest",
-		"superpowers@git+https://github.com/obra/superpowers.git"
+		"superpowers@git+https://github.com/obra/superpowers.git",
+		"@dietrichgebert/ponytail"
 	],
 	"permission": {
 		"edit": "allow",
