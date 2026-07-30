@@ -22,6 +22,5 @@ x-scheme-handler/discord=vesktop.desktop
 application/pdf=org.pwmt.zathura.desktop
 text/plain=nvim.desktop
 x-scheme-handler/opencode=opencode-desktop-handler.desktop
-x-scheme-handler/vibetyper=com.vibetyper.app.desktop
 x-scheme-handler/slack=slack.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
