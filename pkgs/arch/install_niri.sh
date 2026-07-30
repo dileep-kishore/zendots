@@ -71,6 +71,9 @@ PACMAN_PACKAGES=(
     proton-vpn-gtk-app
     papirus-icon-theme
     nwg-look
+    # Handy types transcriptions via wtype; without it Handy falls back to
+    # XTEST, which cannot reach native Wayland windows.
+    wtype
 )
 
 AUR_PACKAGES=(
@@ -84,6 +87,7 @@ AUR_PACKAGES=(
     ulauncher
     vicinae-bin
     polycat
+    handy-bin
 )
 
 for pkg in "${PACMAN_PACKAGES[@]}"; do
