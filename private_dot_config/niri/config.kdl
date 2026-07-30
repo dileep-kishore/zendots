@@ -348,6 +348,37 @@ window-rule {
         proportion 0.333
     }
 }
+// Handy's recording overlay, forced to a regular window by
+// HANDY_NO_GTK_LAYER_SHELL (see environment.d/95-handy.conf). open-focused
+// must stay false or the overlay steals focus and wtype types into it
+// instead of the window you were dictating to.
+window-rule {
+    match app-id="^handy$" title="^Recording$"
+    open-floating true
+    open-focused false
+    open-fullscreen false
+    open-maximized false
+    open-maximized-to-edges false
+    default-floating-position x=0 y=60 relative-to="bottom"
+    // Pinned to Handy's own overlay size (OVERLAY_STREAM_WIDTH/HEIGHT). Width
+    // takes; height does NOT — the window has a 200px floor (120/160 both come
+    // back as 200, 300 takes), so ~80px of window sits above the 118px card.
+    // That strip is visible because the webview's transparent background paints
+    // an opaque gradient under WebKitGTK here. Set Handy's overlay style to
+    // None to be rid of it entirely.
+    default-column-width {
+        fixed 400
+    }
+    default-window-height {
+        fixed 120
+    }
+    border {
+        off
+    }
+    shadow {
+        off
+    }
+}
 window-rule {
     match app-id="^com\\.mitchellh\\.ghostty$" is-active=true
     match app-id="^kitty$" is-active=true
@@ -415,6 +446,20 @@ binds {
     }
     Mod+Ctrl+C {
         spawn "bash" "-c" "hyprpicker | wl-copy"
+    }
+    // Handy's own hotkeys use tauri-plugin-global-shortcut (X11 XGrabKey), which
+    // never fires under Wayland. Drive it from the compositor instead; these are
+    // toggles, not push-to-talk, since niri binds only fire on key press.
+    // repeat=false is required: these are toggles, and niri binds repeat by
+    // default, so holding the key re-fires spawn and flips recording on/off.
+    Mod+Z repeat=false {
+        spawn "handy" "--toggle-transcription"
+    }
+    Mod+Shift+Z repeat=false {
+        spawn "handy" "--toggle-post-process"
+    }
+    Mod+Ctrl+Z repeat=false {
+        spawn "handy" "--cancel"
     }
     Mod+Alt+W {
         spawn-sh "qs -c noctalia-shell ipc call bar toggle"
