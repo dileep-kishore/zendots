@@ -102,6 +102,15 @@ This repository is the **source** for dotfiles. The typical workflow is:
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
 
+#### Applying changes (agent rules)
+
+- **Never run a bare `chezmoi apply`.** Always scope it to the target paths you
+  actually modified: `chezmoi apply ~/.config/niri/config.kdl ~/.config/mimeapps.list`.
+  A bare apply sweeps in unrelated pending changes (e.g. `.agents/.skill-lock.json` churn).
+- **Ask for confirmation before applying.** Show the scoped `chezmoi diff <paths>`
+  first and wait for the user to approve. Do not apply as part of a larger action.
+- Use the **destination** paths (`~/.config/...`), not the source names (`private_dot_config/...`).
+
 ### Theme Consistency
 
 The entire environment uses **Catppuccin Mocha** color scheme:
