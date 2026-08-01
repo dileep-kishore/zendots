@@ -1,197 +1,150 @@
-# Agent skills migration (one-time, per machine)
+# Agent skills cleanup on the Mac (one-time)
 
-One-time cleanup for a machine whose home directory predates commit `1ea4eda`.
-The repo half of the migration is already done and arrives via `chezmoi update`;
-what remains is local state that chezmoi cannot fix on its own, because it never
-managed it.
+The Mac is in a specific half-migrated state, not a fresh one:
 
-Run this once on the Mac. After that, `CLAUDE.md` → *Agent Skills* is the whole
-story and this file is history.
+- **Its `~/zendots` source is already post-cleanup**, because Syncthing
+  replicates the repo. `dot_agents/skills/` holds the 11-skill store, the two
+  `private_dot_local/bin` scripts are there, and the old per-skill `symlink_`
+  entries are gone.
+- **Its home directory is still pre-cleanup**, because the migration commits
+  only deleted things from the chezmoi *source*. chezmoi never removes a target
+  when its source entry disappears, so everything the old layout applied is
+  still sitting in the Mac's home as an orphan.
+
+So this is not "set up the new layout" — it is "delete what the old layout left
+behind". Run once, then delete nothing else; `CLAUDE.md` → *Agent Skills* covers
+everything after.
+
+Reference commits: `6dab4a8` is the last pre-cleanup state, `1ea4eda` is the
+migration.
 
 ## End state
 
-- `~/.agents/skills/` is the only place a skill's files exist. It is vendored in
-  the repo as `dot_agents/skills/`, so `chezmoi apply` restores every skill with
-  no network and no node.
-- `~/.claude/skills/<name>` is a **symlink** into that store for every skill in
-  it. Claude Code is the only harness that needs links.
+- `~/.agents/skills/` is the only place a skill's files exist, and matches
+  `dot_agents/skills/` exactly.
+- `~/.claude/skills/<name>` is a symlink into that store for every skill in it.
 - `~/.codex/skills/` and `~/.config/opencode/skills/` contain **nothing** from
-  the store. Codex and OpenCode resolve `~/.agents/skills` themselves; a link
+  the store. Codex and OpenCode resolve `~/.agents/skills` themselves; an entry
   there makes them load the skill twice.
 - `~/.local/bin/agent-skills.sh` and `~/.local/bin/link-agent-skills.sh` exist
   and are executable.
-- No skill name appears as real content in two stores at once.
 
-## Background: why it was broken
+## 1. Check the sync landed before touching anything
 
-`npx skills` and chezmoi were both claiming the same packages. `npx skills` had
-updated some of them in place, while chezmoi still held older copies in its
-source, so the next `chezmoi apply` would have silently reverted them. Other
-skills the installer had added were tracked nowhere and would not survive a move
-to a new machine.
-
-The fix was to split ownership: `npx skills` installs, `chezmoi` records, and
-neither writes where the other reads.
-
-Two facts worth not re-deriving:
-
-- **Codex and OpenCode read `~/.agents/skills` natively.** `npx skills add`
-  prints them under `universal:` and writes no link for them; only Claude Code
-  appears under `symlinked:`. Both binaries contain the literal string
-  `.agents/skills`. This is why the fanout script targets Claude alone.
-- **The store is visible to Claude through those symlinks**, so a skill that an
-  enabled Claude plugin already ships will appear twice in one session if you
-  also put it in the store.
-
-## Steps
-
-### 0. Apply
-
-`~/zendots` reaches this machine over Syncthing, not `git pull`, so the source
-tree — including `dot_agents/skills/` and the two `private_dot_local/bin`
-scripts — is likely already present. Confirm before doing anything else:
+A half-synced source will apply garbage.
 
 ```bash
 cd ~/zendots
-ls docs/agent-skills-migration.md private_dot_local/bin/executable_agent-skills.sh
-git log --oneline -1        # should be at or past the skills commit
-find . -name '*.sync-conflict*' | head   # resolve these first
+git log --oneline -1                      # expect 5f5514e or later
+ls private_dot_local/bin/executable_agent-skills.sh
+ls dot_agents/skills                      # expect 11 entries, incl. orca-worktree-hooks
+find . -name '*.sync-conflict*'           # expect nothing
 ```
 
-If Syncthing left conflict files, clear them with `rm-sync-conflict.sh` before
-applying — a half-synced source will apply garbage.
+If conflict files exist, clear them with `rm-sync-conflict.sh` and let Syncthing
+settle first.
+
+## 2. Apply
 
 ```bash
-chezmoi diff ~/.agents ~/.local/bin ~/.claude/skills   # review first
+chezmoi diff ~/.agents ~/.local/bin ~/.claude/skills
 chezmoi apply ~/.agents ~/.local/bin ~/.claude/skills
 ```
 
-Do not run a bare `chezmoi apply`; it sweeps in unrelated pending changes.
+Never a bare `chezmoi apply`; it sweeps in unrelated pending changes.
 
-`run_after_40_link-agent-skills.sh` fires during apply and creates the Claude
-symlinks. If you scoped the apply and it did not run, run it directly:
+This writes the store and both scripts, and `run_after_40_link-agent-skills.sh`
+creates the Claude symlinks. If the scoped apply skipped the script, run
+`~/.local/bin/link-agent-skills.sh` directly.
+
+## 3. Delete the orphans the old layout left
+
+These are the exact source entries the migration deleted, and the target each
+one left behind. The Mac only has a given orphan if it applied `6dab4a8`, so
+every command below is conditional — safe to run either way.
+
+| orphaned target | why it must go |
+|---|---|
+| `~/.codex/skills/orca-worktree-hooks` | Codex reads the store natively; this makes it load the skill twice |
+| `~/.config/opencode/skills/orca-worktree-hooks` | same, for OpenCode |
+| `~/.claude/skills/find-docs` | real directory shadowing the store copy of the ctx7 skill |
+| `~/.agents/skills/prd-to-plan` | renamed upstream to `to-spec`; still in the store, so it would get linked into Claude |
+| `~/.agents/skills/write-a-prd` | renamed upstream to `wayfinder`; same |
+| `~/.agents/symlink_skills/` | empty directory; chezmoi does not honour `symlink_` on directories |
+
+`~/.claude/skills/orca-worktree-hooks` is **not** an orphan to delete — it points
+into the store and is exactly what `link-agent-skills.sh` would create. Leave it.
 
 ```bash
+# double-loading entries in the two harnesses that read the store natively
+rm -f ~/.codex/skills/orca-worktree-hooks
+rm -f ~/.config/opencode/skills/orca-worktree-hooks
+
+# real directory shadowing the store; confirm it is redundant first
+if [ -d ~/.claude/skills/find-docs ] && [ ! -L ~/.claude/skills/find-docs ]; then
+  diff -r ~/.claude/skills/find-docs ~/.agents/skills/find-docs \
+    && rm -rf ~/.claude/skills/find-docs \
+    || echo "DIFFERENT - reconcile by hand, keep the store copy"
+fi
+
+# skills renamed upstream, otherwise they get linked into Claude forever
+rm -rf ~/.agents/skills/prd-to-plan ~/.agents/skills/write-a-prd
+
+# empty cruft directory
+rmdir ~/.agents/symlink_skills 2>/dev/null || true
+
+# recreate find-docs as a symlink and prune links left dangling by the above
 ~/.local/bin/link-agent-skills.sh
 ```
 
-### 1. Record skills the Mac has but the repo does not
+The last command also cleans up any `~/.claude/skills/prd-to-plan` or
+`write-a-prd` symlink, since those now fail to resolve.
 
-The Mac may have skills installed locally that were never committed. Find them:
+## 4. Reconcile skills the Mac has and the repo does not
+
+The store is synced, so the Mac now holds this machine's 11 skills. Anything
+extra it had locally is untracked and will not survive the next machine:
 
 ```bash
 diff <(ls ~/.agents/skills) <(ls ~/zendots/dot_agents/skills)
 ```
 
-Lines starting `<` exist only on the Mac. Decide per skill:
+Expect no output. If `<` lines appear, those are Mac-only skills — decide each:
 
-- **Keep it** → record and commit:
+- **Keep** → `agent-skills.sh update` first (so you record current versions, not
+  stale ones), then:
   ```bash
   chezmoi add ~/.agents/skills ~/.agents/.skill-lock.json
   cd ~/zendots && git add -A && git commit -m "feat(skills): add <name> from macOS"
   ```
-- **Drop it** → `agent-skills.sh remove <name>`
+- **Drop** → `agent-skills.sh remove <name>`
 
-Lines starting `>` exist only in the repo and will appear after step 0.
+## 5. Refresh the diverged `frontend-design` copy
 
-Beware of recording a *stale* skill: `chezmoi add` snapshots whatever is on
-disk, so if the Mac is behind on `npx skills update`, run
-`agent-skills.sh update` first.
-
-### 2. Remove real directories that shadow the store
-
-Anything in `~/.claude/skills/` that is a real directory **and** has the same
-name as a skill in the store is a leftover duplicate. `link-agent-skills.sh`
-refuses to overwrite these and prints a warning naming each one:
-
-```
-link-agent-skills: /Users/<you>/.claude/skills/find-docs is not a symlink, leaving it alone
-```
-
-For each one, confirm it is genuinely redundant before deleting:
-
-```bash
-diff -r ~/.claude/skills/<name> ~/.agents/skills/<name>   # expect no output
-rm -rf ~/.claude/skills/<name>
-~/.local/bin/link-agent-skills.sh                          # symlink takes over
-```
-
-On this machine that was `find-docs` (the ctx7 skill) — byte-identical, safe.
-If `diff` shows differences, stop and reconcile by hand; the store copy is the
-one that must survive, since it is what the repo carries.
-
-### 3. Remove links that cause double-loading
-
-Any entry in `~/.codex/skills/` or `~/.config/opencode/skills/` whose name also
-exists in the store makes that harness load the skill twice:
-
-```bash
-cd ~ && for d in .codex/skills .config/opencode/skills; do
-  for e in "$d"/*/; do n=$(basename "${e%/}")
-    [ -e ".agents/skills/$n" ] && echo "DOUBLE-LOAD: $n in $d"
-  done
-done 2>/dev/null; echo "(no lines above = clean)"
-```
-
-Delete anything it reports. Leave entries that are *not* in the store alone —
-those are that harness's own skills, not duplicates.
-
-### 4. Audit for Claude plugin overlap
-
-A skill in the store that an enabled plugin also ships shows up twice in a
-Claude session. Check:
-
-```bash
-cd ~/.claude/plugins && python3 - <<'PY'
-import json, os, glob
-ip = json.load(open('installed_plugins.json'))['plugins']
-prov = {}
-for key, insts in ip.items():
-    for i in insts:
-        p = i.get('installPath', '')
-        if p and os.path.isdir(p):
-            for f in glob.glob(p + '/**/SKILL.md', recursive=True):
-                prov.setdefault(os.path.basename(os.path.dirname(f)), set()).add(key)
-h = os.path.expanduser('~')
-def names(d): return set(os.listdir(d)) if os.path.isdir(d) else set()
-for store in ('/.agents/skills', '/.claude/skills', '/.agentskills',
-              '/.config/opencode/superpowers/skills'):
-    dup = sorted(names(h + store) & set(prov))
-    if dup:
-        print('###', store)
-        for d in dup:
-            print(f'   {d:32} also from plugin: {", ".join(sorted(prov[d]))}')
-PY
-```
-
-Expected on a clean machine: overlap only in `~/.agentskills` and
-`~/.config/opencode/superpowers/skills`. Those two stores exist deliberately —
-they give OpenCode what Claude gets from plugins, and each harness loads only
-its own copy. **Do not fold them into `~/.agents/skills`**; doing so would
-duplicate roughly fifteen skills into Claude.
-
-Overlap reported in `~/.agents/skills` or `~/.claude/skills` is a real problem:
-remove the local copy and let the plugin provide it.
-
-### 5. Refresh the diverged `frontend-design` copy
-
-`~/.agentskills/frontend-design` and the `frontend-design@claude-plugins-official`
-plugin ship different versions of the same skill. The plugin's is newer. Since
-`~/.agentskills` is unmanaged, this must be redone per machine:
+`~/.agentskills/` is unmanaged, so this must be redone per machine. Its
+`frontend-design` is an older version of the one the
+`frontend-design@claude-plugins-official` plugin ships, and Claude loads both.
 
 ```bash
 P=~/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/skills/frontend-design
-diff -q "$P/SKILL.md" ~/.agentskills/frontend-design/SKILL.md \
-  || cp "$P/SKILL.md" ~/.agentskills/frontend-design/SKILL.md
+[ -f "$P/SKILL.md" ] && { diff -q "$P/SKILL.md" ~/.agentskills/frontend-design/SKILL.md \
+  || cp "$P/SKILL.md" ~/.agentskills/frontend-design/SKILL.md; }
 ```
 
-### 6. Verify
+Adjust the path if that plugin is not enabled on the Mac.
+
+Do **not** fold `~/.agentskills/` or `~/.config/opencode/superpowers/skills` into
+`~/.agents/skills`. Those two stores give OpenCode what Claude gets from
+plugins; merging them would duplicate about fifteen skills into Claude, because
+the store is visible to Claude through the symlinks.
+
+## 6. Verify
 
 ```bash
 # fully synced -- expect no output
 chezmoi status ~/.agents ~/.local/bin ~/.claude/skills
 
-# source matches store exactly
+# store matches the repo exactly
 diff <(ls ~/.agents/skills) <(ls ~/zendots/dot_agents/skills) && echo "parity ok"
 
 # every skill linked into Claude
@@ -199,46 +152,37 @@ for s in ~/.agents/skills/*/; do n=$(basename "${s%/}")
   [ -L ~/.claude/skills/"$n" ] || echo "MISSING LINK: $n"
 done; echo "link check done"
 
+# nothing double-loaded in the natively-reading harnesses
+for d in ~/.codex/skills ~/.config/opencode/skills; do
+  for e in "$d"/*/; do n=$(basename "${e%/}")
+    [ -e ~/.agents/skills/"$n" ] && echo "DOUBLE-LOAD: $n in $d"
+  done
+done 2>/dev/null; echo "double-load check done"
+
 # nothing dangling
 find ~/.claude/skills ~/.config/opencode/skills ~/.agents/skills \
-  -maxdepth 1 -xtype l -print
+  -maxdepth 1 -type l ! -exec test -e {} \; -print
 
 # scripts landed
 ls -l ~/.local/bin/agent-skills.sh ~/.local/bin/link-agent-skills.sh
 ```
 
-Then confirm a skill actually loads: start Claude Code and check that a
-store-only skill such as `orca-worktree-hooks` appears in its skill list.
+Then start Claude Code and confirm a store-only skill such as
+`orca-worktree-hooks` appears in its skill list.
 
-## macOS notes
+If step 3 or 4 changed anything under `dot_agents/`, commit it so this machine
+and the Mac agree.
+
+## Notes
 
 - Both scripts are macOS-safe: plain `readlink`, `ln -sfn`, and the bash `-ef`
-  test all behave the same on BSD userland, and no GNU-only flags are used.
-- The audit snippets above avoid `stat -c`, which is GNU-only. If you reach for
-  `stat`, use `stat -f` on macOS.
-- Paths are identical apart from `$HOME` (`/Users/<you>` rather than
-  `/home/<you>`). `~/.config/opencode` is correct on macOS too — OpenCode uses
-  XDG on both platforms.
-- `~/.claude/plugins/cache/...` paths in step 5 depend on which plugins are
-  installed; adjust if `frontend-design` is not enabled on the Mac.
-
-## After this
-
-Nothing here is repeatable maintenance. From now on the workflow is just:
-
-```bash
-agent-skills.sh add <repo>       # install + record + link
-cd ~/zendots && git add -A && git commit && git push
-```
-
-On the other machine the source arrives over Syncthing, so it is usually just:
-
-```bash
-chezmoi apply ~/.agents ~/.claude/skills
-```
-
-**Install a skill on one machine only.** Both machines write to the same synced
-source, so running `agent-skills.sh add` for the same skill on each produces
-competing writes to `dot_agents/skills/` and `dot_agents/dot_skill-lock.json`,
-which Syncthing resolves as `*.sync-conflict*` files. Install on one, let it
-sync, apply on the other. See `CLAUDE.md` → *Agent Skills*.
+  test behave the same on BSD userland, and no GNU-only flags are used. The
+  snippets above avoid `stat -c`, which is GNU-only — use `stat -f` on macOS.
+- Paths differ only in `$HOME` (`/Users/<you>`). `~/.config/opencode` is correct
+  on macOS too; OpenCode uses XDG on both platforms.
+- `find -xtype l` is GNU-only, which is why the dangling-link check above uses
+  `-type l ! -exec test -e {} \;` instead.
+- **Install a given skill on one machine only.** Both machines write to the same
+  Syncthing-replicated source, so installing the same skill on each produces
+  competing writes to `dot_agents/skills/` and `dot_agents/dot_skill-lock.json`
+  that surface as `*.sync-conflict*` files.
