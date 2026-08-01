@@ -13,6 +13,7 @@ LICENSE
 assets/
 justfile
 temp.py
+docs/
 .env
 CLAUDE.md
 pkgs/
