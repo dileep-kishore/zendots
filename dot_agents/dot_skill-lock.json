@@ -1,32 +1,90 @@
 {
   "version": 3,
   "skills": {
-    "write-a-prd": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/mattpocock/skills.git",
-      "skillPath": "write-a-prd/SKILL.md",
-      "skillFolderHash": "566c485ddc02f2338f1d5be6c0188db74e278678",
-      "installedAt": "2026-03-19T23:13:00.788Z",
-      "updatedAt": "2026-03-19T23:13:00.788Z"
-    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/vercel-labs/skills.git",
       "skillPath": "skills/find-skills/SKILL.md",
-      "skillFolderHash": "3013fdeb8a11b10b1eb795ec3ae8bfca38f7c26d",
+      "skillFolderHash": "76a98a285cb0434f3d39e1a873823556330e398b",
       "installedAt": "2026-03-19T23:13:05.878Z",
-      "updatedAt": "2026-03-19T23:13:05.878Z"
+      "updatedAt": "2026-08-01T04:31:16.878Z"
     },
-    "prd-to-plan": {
+    "orca-cli": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orca-cli/SKILL.md",
+      "skillFolderHash": "97f6596bb43a56c6e81246f077c35144c9025343",
+      "installedAt": "2026-07-30T03:54:59.843Z",
+      "updatedAt": "2026-07-30T04:07:07.830Z"
+    },
+    "orca-linear": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orca-linear/SKILL.md",
+      "skillFolderHash": "091d9bcc279d7ec7f4d3f63929f01f8b9e3db68d",
+      "installedAt": "2026-07-30T03:56:16.288Z",
+      "updatedAt": "2026-07-30T03:56:16.288Z"
+    },
+    "orchestration": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orchestration/SKILL.md",
+      "skillFolderHash": "9aa26fde93c0592e5983cdca1ccd33b402802255",
+      "installedAt": "2026-07-30T04:06:13.265Z",
+      "updatedAt": "2026-07-30T04:07:07.830Z"
+    },
+    "computer-use": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/computer-use/SKILL.md",
+      "skillFolderHash": "2072384f53670cb61d93f4f6264ad2d8f6b5239c",
+      "installedAt": "2026-07-30T04:07:07.829Z",
+      "updatedAt": "2026-07-30T04:07:07.829Z"
+    },
+    "grill-with-docs": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/mattpocock/skills.git",
-      "skillPath": "prd-to-plan/SKILL.md",
-      "skillFolderHash": "7317892c8d1978d485a166e8f7464fd4a45e9c08",
-      "installedAt": "2026-03-19T23:16:19.769Z",
-      "updatedAt": "2026-03-19T23:16:19.769Z"
+      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
+      "skillFolderHash": "5fdcdeedf2d0c73b3ecb1da0a464dd885590f8d6",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-01T04:40:39.166Z",
+      "updatedAt": "2026-08-01T04:40:39.166Z"
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "skillFolderHash": "bce229692e60dff3462e49bc5e774e83bef348e6",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-01T04:40:39.167Z",
+      "updatedAt": "2026-08-01T04:40:39.167Z"
+    },
+    "to-spec": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/to-spec/SKILL.md",
+      "skillFolderHash": "bf698b96b5d8798d110d9872e32b9310728555b0",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-01T04:40:39.167Z",
+      "updatedAt": "2026-08-01T04:40:39.167Z"
+    },
+    "wayfinder": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/wayfinder/SKILL.md",
+      "skillFolderHash": "33ed747fb30668c0e7b61698af5268c25c0d75cb",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-01T04:40:39.167Z",
+      "updatedAt": "2026-08-01T04:40:39.167Z"
     }
   },
   "dismissed": {
@@ -35,16 +93,17 @@
   "lastSelectedAgents": [
     "amp",
     "antigravity",
+    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
     "deepagents",
-    "firebender",
     "gemini-cli",
     "github-copilot",
-    "kimi-cli",
+    "kimi-code-cli",
     "opencode",
     "warp",
+    "zed",
     "claude-code"
   ]
 }
