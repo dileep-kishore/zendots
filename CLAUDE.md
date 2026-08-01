@@ -86,6 +86,9 @@ unrecorded. Commit and push afterwards; the other machine gets it via
   out of `~/.agents/skills` -- folding them in would duplicate ~15 skills into
   Claude.
 
+One-time cleanup for a machine whose home predates this layout:
+`docs/agent-skills-migration.md`.
+
 ### Package Management
 
 ```bash
