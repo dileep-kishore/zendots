@@ -69,8 +69,10 @@ agent-skills.sh update
 Always install through `agent-skills.sh`, never a bare `npx skills`: the wrapper
 runs the installer from `$HOME` (it installs project-locally when the cwd is a
 git repo) and then `chezmoi add`s the store, so the install is never left
-unrecorded. Commit and push afterwards; the other machine gets it via
-`chezmoi update`.
+unrecorded. Commit afterwards; the source reaches the other machine over
+Syncthing, where `chezmoi apply ~/.agents ~/.claude/skills` picks it up. Install
+a given skill on one machine only -- both write to the same synced source, so
+installing on both produces Syncthing conflict files.
 
 - **Only Claude Code needs symlinks.** Codex and OpenCode resolve
   `~/.agents/skills` natively -- `npx skills` classifies them as "universal" and

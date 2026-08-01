@@ -45,10 +45,23 @@ Two facts worth not re-deriving:
 
 ## Steps
 
-### 0. Pull and apply
+### 0. Apply
+
+`~/zendots` reaches this machine over Syncthing, not `git pull`, so the source
+tree — including `dot_agents/skills/` and the two `private_dot_local/bin`
+scripts — is likely already present. Confirm before doing anything else:
 
 ```bash
-cd ~/zendots && git pull
+cd ~/zendots
+ls docs/agent-skills-migration.md private_dot_local/bin/executable_agent-skills.sh
+git log --oneline -1        # should be at or past the skills commit
+find . -name '*.sync-conflict*' | head   # resolve these first
+```
+
+If Syncthing left conflict files, clear them with `rm-sync-conflict.sh` before
+applying — a half-synced source will apply garbage.
+
+```bash
 chezmoi diff ~/.agents ~/.local/bin ~/.claude/skills   # review first
 chezmoi apply ~/.agents ~/.local/bin ~/.claude/skills
 ```
@@ -218,4 +231,14 @@ agent-skills.sh add <repo>       # install + record + link
 cd ~/zendots && git add -A && git commit && git push
 ```
 
-and `chezmoi update` on the other machine. See `CLAUDE.md` → *Agent Skills*.
+On the other machine the source arrives over Syncthing, so it is usually just:
+
+```bash
+chezmoi apply ~/.agents ~/.claude/skills
+```
+
+**Install a skill on one machine only.** Both machines write to the same synced
+source, so running `agent-skills.sh add` for the same skill on each produces
+competing writes to `dot_agents/skills/` and `dot_agents/dot_skill-lock.json`,
+which Syncthing resolves as `*.sync-conflict*` files. Install on one, let it
+sync, apply on the other. See `CLAUDE.md` → *Agent Skills*.
