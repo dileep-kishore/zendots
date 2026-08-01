@@ -1,9 +1,14 @@
 # Agent skills cleanup on the Mac (one-time)
 
+> **Done — 2026-08-01.** Ran as written, with two deltas folded in below: the
+> apply needs `--force`, and the Mac carried a twelfth skill
+> (`plannotator-compound`) that is now in the store. Kept as the record of what
+> the old layout left behind; nothing here needs running again.
+
 The Mac is in a specific half-migrated state, not a fresh one:
 
 - **Its `~/zendots` source is already post-cleanup**, because Syncthing
-  replicates the repo. `dot_agents/skills/` holds the 11-skill store, the two
+  replicates the repo. `dot_agents/skills/` holds the store, the two
   `private_dot_local/bin` scripts are there, and the old per-skill `symlink_`
   entries are gone.
 - **Its home directory is still pre-cleanup**, because the migration commits
@@ -37,7 +42,7 @@ A half-synced source will apply garbage.
 cd ~/zendots
 git log --oneline -1                      # expect 5f5514e or later
 ls private_dot_local/bin/executable_agent-skills.sh
-ls dot_agents/skills                      # expect 11 entries, incl. orca-worktree-hooks
+ls dot_agents/skills                      # expect 12 entries, incl. orca-worktree-hooks
 find . -name '*.sync-conflict*'           # expect nothing
 ```
 
@@ -48,10 +53,17 @@ settle first.
 
 ```bash
 chezmoi diff ~/.agents ~/.local/bin ~/.claude/skills
-chezmoi apply ~/.agents ~/.local/bin ~/.claude/skills
+chezmoi apply --force ~/.agents ~/.local/bin ~/.claude/skills
 ```
 
 Never a bare `chezmoi apply`; it sweeps in unrelated pending changes.
+
+`--force` is needed because `.skill-lock.json` is written by `npx skills`, not
+by chezmoi, so it always shows as changed-since-last-write and chezmoi stops to
+prompt — which fails outright with `could not open a new TTY` in a non-interactive
+shell. The repo's copy is the newer one whenever the other machine ran
+`agent-skills.sh update` more recently; read the `chezmoi diff` above to confirm
+that before forcing.
 
 This writes the store and both scripts, and `run_after_40_link-agent-skills.sh`
 creates the Claude symlinks. If the scoped apply skipped the script, run
@@ -68,6 +80,7 @@ every command below is conditional — safe to run either way.
 | `~/.codex/skills/orca-worktree-hooks` | Codex reads the store natively; this makes it load the skill twice |
 | `~/.config/opencode/skills/orca-worktree-hooks` | same, for OpenCode |
 | `~/.claude/skills/find-docs` | real directory shadowing the store copy of the ctx7 skill |
+| `~/.claude/skills/plannotator-compound` | same shape: a real directory holding a byte-identical copy of a store skill |
 | `~/.agents/skills/prd-to-plan` | removed upstream from `mattpocock/skills`, so it is no longer in the repo store — but chezmoi leaves the directory, and `link-agent-skills.sh` links whatever is in the store into Claude |
 | `~/.agents/skills/write-a-prd` | same |
 | `~/.agents/symlink_skills/` | empty directory; chezmoi does not honour `symlink_` on directories |
@@ -80,12 +93,13 @@ into the store and is exactly what `link-agent-skills.sh` would create. Leave it
 rm -f ~/.codex/skills/orca-worktree-hooks
 rm -f ~/.config/opencode/skills/orca-worktree-hooks
 
-# real directory shadowing the store; confirm it is redundant first
-if [ -d ~/.claude/skills/find-docs ] && [ ! -L ~/.claude/skills/find-docs ]; then
-  diff -r ~/.claude/skills/find-docs ~/.agents/skills/find-docs \
-    && rm -rf ~/.claude/skills/find-docs \
-    || echo "DIFFERENT - reconcile by hand, keep the store copy"
-fi
+# real directories shadowing the store; confirm each is redundant first
+for n in find-docs plannotator-compound; do
+  [ -d ~/.claude/skills/"$n" ] && [ ! -L ~/.claude/skills/"$n" ] || continue
+  diff -r ~/.claude/skills/"$n" ~/.agents/skills/"$n" \
+    && rm -rf ~/.claude/skills/"$n" \
+    || echo "DIFFERENT: $n - reconcile by hand, keep the store copy"
+done
 
 # dropped upstream from mattpocock/skills; they are not in the repo store, and
 # anything left in ~/.agents/skills keeps getting linked into Claude
@@ -103,7 +117,7 @@ The last command also cleans up any `~/.claude/skills/prd-to-plan` or
 
 ## 4. Reconcile skills the Mac has and the repo does not
 
-The store is synced, so the Mac now holds this machine's 11 skills. Anything
+The store is synced, so the Mac now holds the other machine's skills. Anything
 extra it had locally is untracked and will not survive the next machine:
 
 ```bash
@@ -119,6 +133,13 @@ Expect no output. If `<` lines appear, those are Mac-only skills — decide each
   cd ~/zendots && git add -A && git commit -m "feat(skills): add <name> from macOS"
   ```
 - **Drop** → `agent-skills.sh remove <name>`
+
+The one that turned up was `plannotator-compound`, kept and now in the store.
+Skip `agent-skills.sh update` for a skill `npx skills` never installed — it is
+absent from `.skill-lock.json`, so a plain `chezmoi add` is the whole job. Check
+`~/.claude/plugins` before keeping anything: an enabled plugin that ships the
+same skill would make Claude load it twice. The `plannotator` plugin ships
+commands, not this skill, so there is no clash.
 
 ## 5. Refresh the diverged `frontend-design` copy
 
@@ -161,7 +182,7 @@ for d in ~/.codex/skills ~/.config/opencode/skills; do
 done 2>/dev/null; echo "double-load check done"
 
 # nothing dangling
-find ~/.claude/skills ~/.config/opencode/skills ~/.agents/skills \
+find ~/.claude/skills ~/.config/opencode/skills ~/.codex/skills ~/.agents/skills \
   -maxdepth 1 -type l ! -exec test -e {} \; -print
 
 # scripts landed
