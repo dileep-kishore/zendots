@@ -33,6 +33,8 @@ The repository follows chezmoi's naming conventions where files/directories are 
 
 - **`private_dot_local/bin/`** → Custom executable scripts
 
+- **`dot_agents/skills/`** → Agent skills, shared by every harness (`~/.agents/skills/`)
+
 - **`dot_pixi/`** → Pixi package manager manifests
 
 ## Common Commands
@@ -53,6 +55,36 @@ chezmoi diff
 # Edit a file in the repository (chezmoi will handle the dot_ prefix translation)
 chezmoi edit ~/.zshrc
 ```
+
+### Agent Skills
+
+`~/.agents/skills/` is the single store, vendored as `dot_agents/skills/` so
+`chezmoi apply` reproduces every skill on a new machine with no network.
+
+```bash
+agent-skills.sh add mattpocock/skills   # or: just skills add ...
+agent-skills.sh update
+```
+
+Always install through `agent-skills.sh`, never a bare `npx skills`: the wrapper
+runs the installer from `$HOME` (it installs project-locally when the cwd is a
+git repo) and then `chezmoi add`s the store, so the install is never left
+unrecorded. Commit and push afterwards; the other machine gets it via
+`chezmoi update`.
+
+- **Only Claude Code needs symlinks.** Codex and OpenCode resolve
+  `~/.agents/skills` natively -- `npx skills` classifies them as "universal" and
+  writes no link. Never link a skill into `~/.codex/skills` or
+  `~/.config/opencode/skills`; that makes those harnesses load it twice.
+  `link-agent-skills.sh` handles `~/.claude/skills` and runs on every apply.
+- **Check for an existing Claude plugin before adding a skill to the store.**
+  The store is visible to Claude Code through those symlinks, so adding a skill
+  an enabled plugin already provides puts two copies in one session. Compare
+  against `~/.claude/plugins` and `enabledPlugins` in `~/.claude/settings.json`.
+- `~/.agentskills/` and `~/.config/opencode/superpowers/skills` are separate,
+  unmanaged stores that give OpenCode what Claude gets from plugins. Leave them
+  out of `~/.agents/skills` -- folding them in would duplicate ~15 skills into
+  Claude.
 
 ### Package Management
 
