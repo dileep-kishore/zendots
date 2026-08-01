@@ -68,8 +68,8 @@ every command below is conditional — safe to run either way.
 | `~/.codex/skills/orca-worktree-hooks` | Codex reads the store natively; this makes it load the skill twice |
 | `~/.config/opencode/skills/orca-worktree-hooks` | same, for OpenCode |
 | `~/.claude/skills/find-docs` | real directory shadowing the store copy of the ctx7 skill |
-| `~/.agents/skills/prd-to-plan` | renamed upstream to `to-spec`; still in the store, so it would get linked into Claude |
-| `~/.agents/skills/write-a-prd` | renamed upstream to `wayfinder`; same |
+| `~/.agents/skills/prd-to-plan` | removed upstream from `mattpocock/skills`, so it is no longer in the repo store — but chezmoi leaves the directory, and `link-agent-skills.sh` links whatever is in the store into Claude |
+| `~/.agents/skills/write-a-prd` | same |
 | `~/.agents/symlink_skills/` | empty directory; chezmoi does not honour `symlink_` on directories |
 
 `~/.claude/skills/orca-worktree-hooks` is **not** an orphan to delete — it points
@@ -87,7 +87,8 @@ if [ -d ~/.claude/skills/find-docs ] && [ ! -L ~/.claude/skills/find-docs ]; the
     || echo "DIFFERENT - reconcile by hand, keep the store copy"
 fi
 
-# skills renamed upstream, otherwise they get linked into Claude forever
+# dropped upstream from mattpocock/skills; they are not in the repo store, and
+# anything left in ~/.agents/skills keeps getting linked into Claude
 rm -rf ~/.agents/skills/prd-to-plan ~/.agents/skills/write-a-prd
 
 # empty cruft directory
