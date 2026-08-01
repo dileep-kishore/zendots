@@ -26,3 +26,11 @@ install:
 sync-gtk:
   chezmoi add ~/.config/gtk-3.0/settings.ini
   chezmoi add ~/.config/gtk-4.0/settings.ini
+
+# Install/update agent skills, e.g. `just skills add mattpocock/skills`
+skills *ARGS:
+  agent-skills.sh {{ARGS}}
+
+# Relink ~/.agents/skills into Claude Code
+link-skills:
+  link-agent-skills.sh
