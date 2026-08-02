@@ -1,0 +1,65 @@
+name: catppuccin-mocha
+description: Catppuccin Mocha — soothing pastel dark theme
+
+colors:
+  background: "#1e1e2e"
+
+  ui_accent: "#cba6f7"
+  ui_primary: "#b4befe"
+  banner_accent: "#cba6f7"
+  banner_title: "#b4befe"
+
+  ui_text: "#cdd6f4"
+  banner_text: "#cdd6f4"
+  banner_dim: "#9399b2"
+
+  ui_border: "#585b70"
+  banner_border: "#585b70"
+
+  ui_ok: "#a6e3a1"
+  ui_warn: "#f9e2af"
+  ui_error: "#f38ba8"
+  ui_label: "#89b4fa"
+
+  ui_tool: "#89dceb"
+  ui_thinking: "#a6adc8"
+
+  diff_added: "#313244"
+  diff_removed: "#313244"
+  diff_added_word: "#a6e3a1"
+  diff_removed_word: "#f38ba8"
+
+  syntax_string: "#a6e3a1"
+  syntax_number: "#fab387"
+  syntax_keyword: "#cba6f7"
+  syntax_comment: "#6c7086"
+
+  prompt: "#cdd6f4"
+  input_rule: "#cba6f7"
+  response_border: "#89b4fa"
+  shell_dollar: "#a6e3a1"
+  selection_bg: "#45475a"
+  session_label: "#89b4fa"
+  session_border: "#585b70"
+
+  status_bar_bg: "#181825"
+  status_bar_text: "#bac2de"
+  status_bar_strong: "#cdd6f4"
+  status_bar_dim: "#6c7086"
+  status_bar_good: "#a6e3a1"
+  status_bar_warn: "#f9e2af"
+  status_bar_bad: "#fab387"
+  status_bar_critical: "#f38ba8"
+  voice_status_bg: "#181825"
+
+  completion_menu_bg: "#181825"
+  completion_menu_current_bg: "#45475a"
+  completion_menu_meta_bg: "#11111b"
+  completion_menu_meta_current_bg: "#585b70"
+
+branding:
+  agent_name: Hermes Agent
+  prompt_symbol: "❯"
+  help_header: "Commands"
+
+tool_prefix: "┊"
