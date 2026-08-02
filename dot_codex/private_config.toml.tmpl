@@ -4,7 +4,7 @@
        Keep the rendered output comment-free: codex strips comments when it
        rewrites, which would otherwise show up as a permanent chezmoi diff. */ -}}
 model = "gpt-5.6-sol"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
 service_tier = "default"
 {{- if eq .chezmoi.os "darwin" }}
@@ -234,6 +234,39 @@ trusted_hash = "sha256:fcc4f818401ea39cd4580898087cd3856443b2012b53a8b8d86017fa5
 
 [hooks.state."/home/dileep/Documents/Personal/Startup/billlens-landing/.codex/hooks.json:post_tool_use:0:0"]
 trusted_hash = "sha256:ad7750c4f45a0ff2621e1a2fc7d173630cd853d57f337f34fb81e03c9e5e1149"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:session_start:0:0"]
+trusted_hash = "sha256:5f81d38f47448a1581c08ec877e044d9e04dd6f814dce3f2671f7a8edadd719b"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:6a6f42bc3b58d6262db38bfd74d7f340fcca2b09cdb134aad365063f0bfefca4"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:1423b56c1322f96c8f74c51c1e7ae9a047b904c1fa43ee9165d462fd7a6e70ef"
+
+[hooks.state."/home/dileep/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:f764e2879811b86ad6eb1e7aa778f4b8554522d4c1e707a4faafd208615b2e69"
+
+[hooks.state."/home/dileep/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:2e7a0d5562611cc33d35ed6f9c500d558baec1b94414b4be7ac5dcae78087823"
+
+[hooks.state."/home/dileep/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:94a95b18811e4a93133cfff1e9b94a4601619343dbfb887de33558e819d3e1fc"
+
+[hooks.state."/home/dileep/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:22a1c5205d014ebb68b407086c9029c3b5653b6d825360e7957b49809e706908"
+
+[hooks.state."/home/dileep/.codex/hooks.json:user_prompt_submit:1:0"]
+trusted_hash = "sha256:af087d9371ab06ccbb0a1579663a5b8d906dc180385c048ae59bddf34a53349c"
+
+[hooks.state."/home/dileep/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:9421e863e811c22cb82c5a76749353c67f7ebf0e57bce3a6929f3d7accd84c62"
+
+[hooks.state."/home/dileep/.codex/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:6c15548d7994a6a5bece708d7557dbfc8443e141e3b3458a2b10421f68c80c43"
+
+[hooks.state."/home/dileep/.codex/hooks.json:stop:1:0"]
+trusted_hash = "sha256:183c76d4ff4a9c2b29c58c4657a9697fe9ed3f092a62be060522d0db30ff3af8"
 {{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
@@ -306,3 +339,8 @@ memories = true
 [memories]
 generate_memories = true
 use_memories = true
+{{- if eq .chezmoi.os "linux" }}
+
+[projects."/home/dileep/Documents/Personal/personal-portfolio"]
+trust_level = "trusted"
+{{- end }}
