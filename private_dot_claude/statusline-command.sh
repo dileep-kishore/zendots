@@ -22,6 +22,7 @@ BLUE='\033[38;2;137;180;250m'
 PEACH='\033[38;2;250;179;135m'
 LAVENDER='\033[38;2;180;190;254m'
 TEAL='\033[38;2;148;226;213m'
+SUBTEXT1='\033[38;2;186;194;222m'
 GREEN='\033[38;2;166;227;161m'
 YELLOW='\033[38;2;249;226;175m'
 RED='\033[38;2;243;139;168m'
@@ -46,7 +47,16 @@ MINS=$((DURATION_MS / 60000))
 SECS=$(((DURATION_MS % 60000) / 1000))
 
 BRANCH=""
-git rev-parse --git-dir >/dev/null 2>&1 && BRANCH=" $SEP ${PEACH} $(git branch --show-current 2>/dev/null)${RESET}"
+GIT_SEG=""
+if git rev-parse --git-dir >/dev/null 2>&1; then
+    BRANCH=" $SEP ${PEACH} $(git branch --show-current 2>/dev/null)${RESET}"
+    # Uncommitted work vs HEAD: one call covers both staged and unstaged.
+    read -r GIT_ADD GIT_DEL < <(git diff --numstat HEAD 2>/dev/null |
+        awk '{a+=$1; d+=$2} END {print a+0, d+0}')
+    if [ "${GIT_ADD:-0}" -gt 0 ] || [ "${GIT_DEL:-0}" -gt 0 ]; then
+        GIT_SEG=" ${GREEN}+${GIT_ADD}${RESET} ${RED}-${GIT_DEL}${RESET}"
+    fi
+fi
 
 # Worktree name is only worth a segment when it isn't already the branch or the dir.
 WT_SEG=""
@@ -70,11 +80,11 @@ esac
 
 DIFF_SEG=""
 if [ "$ADDED" -gt 0 ] || [ "$REMOVED" -gt 0 ]; then
-    DIFF_SEG=" $SEP ${GREEN}+${ADDED}${RESET} ${RED}-${REMOVED}${RESET}"
+    DIFF_SEG=" ${SURFACE}·${RESET} ${GREEN}+${ADDED}${RESET} ${RED}-${REMOVED}${RESET}"
 fi
 
 # --- Output ---
 COST_FMT=$(printf '$%.2f' "$COST")
 
-echo -e "${VIM_SEG}${MAUVE}󰧑 $MODEL${RESET}$EFFORT_SEG $SEP ${BLUE} ${DIR##*/}${RESET}$BRANCH$WT_SEG"
-echo -e "${BAR_COLOR}${BAR}${RESET} ${OVERLAY}${PCT}%${RESET} $SEP ${YELLOW}${COST_FMT}${RESET}$DIFF_SEG $SEP ${OVERLAY}󱎫 ${MINS}m ${SECS}s${RESET}"
+echo -e "${VIM_SEG}${MAUVE}󰧑 $MODEL${RESET}$EFFORT_SEG $SEP ${BLUE} ${DIR##*/}${RESET}$BRANCH$GIT_SEG$WT_SEG"
+echo -e "${BAR_COLOR}${BAR}${RESET} ${OVERLAY}${PCT}%${RESET} $SEP ${YELLOW}${COST_FMT}${RESET} $SEP ${SUBTEXT1}󱎫 ${MINS}m ${SECS}s${RESET}$DIFF_SEG"
