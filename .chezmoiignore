@@ -16,6 +16,9 @@ temp.py
 docs/
 .env
 CLAUDE.md
+# Symlink to CLAUDE.md; without this chezmoi follows it and deploys the
+# repo guide to ~/AGENTS.md, where Codex/OpenCode read it as global rules.
+AGENTS.md
 pkgs/
 misc/
 
