@@ -36,6 +36,14 @@ ls -A "$(git rev-parse --show-toplevel)"
 match nothing, and misses untracked files that were never ignored. Work from
 what is actually on disk.
 
+The `head -50` above truncates, and nested ignored paths never show up in a
+top-level `ls`, so agent config gets missed constantly. Check for it explicitly:
+
+```bash
+git status --ignored --porcelain | grep '^!!' \
+  | grep -Ei '\.(claude|agents|codex|cursor|opencode|windsurf|aider)|AGENTS|CLAUDE|GEMINI'
+```
+
 Then size every ignored top-level entry, since size drives the copy/link call:
 
 ```bash
@@ -64,6 +72,23 @@ Put each one in exactly one bucket.
 **Copy** — small, machine-local config the worktree must be able to diverge on:
 `.env`, `.env.local`, `.envrc`, `secrets.toml`, local settings overrides. Copy
 rather than link so editing it in a worktree does not mutate the main checkout.
+
+This bucket includes **gitignored agent config and skills** — `.claude/skills/`,
+`.claude/settings.local.json`, `.claude/agents/`, `.agents/skills/`, `.codex/`,
+`.cursor/rules/`, `AGENTS.md`, `CLAUDE.local.md`. An agent is the first thing to
+run in a new Orca worktree, and it lands there with none of the skills or
+permissions it had in the main checkout. Copy each ignored path that exists,
+merging into whatever the worktree already tracks rather than replacing it:
+
+```bash
+for p in .claude .agents .codex .cursor; do
+  [ -d "$ORCA_ROOT_PATH/$p" ] && cp -RTn "$ORCA_ROOT_PATH/$p" "$ORCA_WORKTREE_PATH/$p" || true
+done
+```
+
+`-n` keeps tracked files the worktree already has; `-T` copies contents rather
+than nesting the directory. On macOS use `rsync -a --ignore-existing` instead —
+BSD `cp` has no `-T`.
 
 **Symlink** — large and immutable, and identical across worktrees: datasets,
 model weights, fixture corpora, media, downloaded checkpoints, `.cache/`. Never
@@ -104,7 +129,9 @@ Both scripts must:
 - `cd "$ORCA_WORKTREE_PATH"` first — never rely on the inherited cwd
 - quote every `"$ORCA_*"` expansion (paths can contain spaces)
 - be idempotent and safe to re-run: `ln -sfn`, `mkdir -p`, and guard each copy
-  with `[ -f "$src" ] &&` so a missing optional file does not abort the hook
+  with `[ -f "$src" ] && cp ... || true` so a missing optional file does not abort
+  the hook — without the `|| true` a failed test on a loop's last iteration is
+  itself a nonzero exit under `set -e`
 - `echo` one line per step, so Orca's hook output is readable when it fails
 - do real work only — no commentary the user did not ask for
 
@@ -124,7 +151,12 @@ cd "$ORCA_WORKTREE_PATH"
 
 echo "==> Copying local config"
 for f in .env .env.local; do
-  [ -f "$ORCA_ROOT_PATH/$f" ] && cp "$ORCA_ROOT_PATH/$f" "$ORCA_WORKTREE_PATH/$f"
+  [ -f "$ORCA_ROOT_PATH/$f" ] && cp "$ORCA_ROOT_PATH/$f" "$ORCA_WORKTREE_PATH/$f" || true
+done
+
+echo "==> Copying agent config"
+for p in .claude .agents; do
+  [ -d "$ORCA_ROOT_PATH/$p" ] && cp -RTn "$ORCA_ROOT_PATH/$p" "$ORCA_WORKTREE_PATH/$p" || true
 done
 
 echo "==> Linking shared data"
