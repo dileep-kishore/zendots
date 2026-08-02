@@ -11,7 +11,6 @@
   "permissions": {
     "defaultMode": "plan"
   },
-  "model": "opus[1m]",
   "hooks": {
     "PermissionRequest": [
       {
@@ -139,6 +138,14 @@
         "hooks": [
           {
             "type": "command",
+            "command": "[ -n \"$SUPERSET_HOME_DIR\" ] && [ -x \"$SUPERSET_HOME_DIR/hooks/notify.sh\" ] && SUPERSET_AGENT_ID=claude \"$SUPERSET_HOME_DIR/hooks/notify.sh\" || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "if [ -f '{{ .chezmoi.homeDir }}/.orca/agent-hooks/claude-hook.sh' ] && [ -r '{{ .chezmoi.homeDir }}/.orca/agent-hooks/claude-hook.sh' ] && [ -x '{{ .chezmoi.homeDir }}/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '{{ .chezmoi.homeDir }}/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
             "timeout": 10
           }
@@ -242,6 +249,8 @@
   "editorMode": "vim",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "agentPushNotifEnabled": true,
   "theme": "custom:catppuccin-mocha",
   "voiceEnabled": true
 }
