@@ -1,33 +1,35 @@
 #!/usr/bin/env bash
 input=$(cat)
 
-MODEL=$(echo "$input" | jq -r '.model.display_name')
+# "Opus 5 (1M context)" -> "Opus 5 (1M)"; the window size is what the context bar is a percentage of.
+MODEL=$(echo "$input" | jq -r '.model.display_name' | sed 's/ context)/)/')
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
 DURATION_MS=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
-FIVE_HR=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
-SEVEN_DAY=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
+ADDED=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
+REMOVED=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
+WORKTREE=$(echo "$input" | jq -r '.worktree.name // empty')
+EFFORT=$(echo "$input" | jq -r '.effort.level // empty')
+# Only present when editorMode is vim.
+VIM=$(echo "$input" | jq -r '.vim.mode // empty')
+# Not every Claude Code build reports effort in the status payload; settings is authoritative.
+[ -z "$EFFORT" ] && EFFORT=$(jq -r '.effortLevel // empty' ~/.claude/settings.json 2>/dev/null)
 
-CYAN='\033[36m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-RED='\033[31m'
-DIM='\033[2m'
+# --- Catppuccin Mocha ---
+MAUVE='\033[38;2;203;166;247m'
+BLUE='\033[38;2;137;180;250m'
+PEACH='\033[38;2;250;179;135m'
+LAVENDER='\033[38;2;180;190;254m'
+TEAL='\033[38;2;148;226;213m'
+GREEN='\033[38;2;166;227;161m'
+YELLOW='\033[38;2;249;226;175m'
+RED='\033[38;2;243;139;168m'
+OVERLAY='\033[38;2;127;132;156m'
+SURFACE='\033[38;2;88;91;112m'
 RESET='\033[0m'
 
-usage_color() {
-    local val=$1
-    if [ -z "$val" ]; then
-        echo "$DIM"
-        return
-    fi
-    if [ "$val" -ge 90 ]; then
-        echo "$RED"
-    elif [ "$val" -ge 70 ]; then
-        echo "$YELLOW"
-    else echo "$GREEN"; fi
-}
+SEP="${SURFACE}|${RESET}"
 
 # --- Context bar ---
 if [ "$PCT" -ge 90 ]; then
@@ -44,18 +46,35 @@ MINS=$((DURATION_MS / 60000))
 SECS=$(((DURATION_MS % 60000) / 1000))
 
 BRANCH=""
-git rev-parse --git-dir >/dev/null 2>&1 && BRANCH=" |  $(git branch --show-current 2>/dev/null)"
+git rev-parse --git-dir >/dev/null 2>&1 && BRANCH=" $SEP ${PEACH} $(git branch --show-current 2>/dev/null)${RESET}"
+
+# Worktree name is only worth a segment when it isn't already the branch or the dir.
+WT_SEG=""
+if [ -n "$WORKTREE" ]; then
+    if [ "$WORKTREE" = "$(git branch --show-current 2>/dev/null)" ] || [ "$WORKTREE" = "${DIR##*/}" ]; then
+        WT_SEG=" ${LAVENDER}󰙅${RESET}"
+    else
+        WT_SEG=" ${LAVENDER}󰙅 ${WORKTREE}${RESET}"
+    fi
+fi
+
+EFFORT_SEG=""
+[ -n "$EFFORT" ] && EFFORT_SEG=" ${SURFACE}·${RESET} ${TEAL}${EFFORT}${RESET}"
+
+VIM_SEG=""
+case "$VIM" in
+    NORMAL) VIM_SEG="${BLUE}NOR${RESET} $SEP " ;;
+    INSERT) VIM_SEG="${GREEN}INS${RESET} $SEP " ;;
+    VISUAL) VIM_SEG="${MAUVE}VIS${RESET} $SEP " ;;
+esac
+
+DIFF_SEG=""
+if [ "$ADDED" -gt 0 ] || [ "$REMOVED" -gt 0 ]; then
+    DIFF_SEG=" $SEP ${GREEN}+${ADDED}${RESET} ${RED}-${REMOVED}${RESET}"
+fi
 
 # --- Output ---
-echo -e "${CYAN}󱜙 $MODEL${RESET} |  ${DIR##*/}$BRANCH"
 COST_FMT=$(printf '$%.2f' "$COST")
 
-USAGE_SEG=""
-if [ -n "$FIVE_HR" ]; then
-    USAGE_SEG=" | $(usage_color "$FIVE_HR")󱨵 5h:${FIVE_HR}%${RESET}"
-fi
-if [ -n "$SEVEN_DAY" ]; then
-    USAGE_SEG="${USAGE_SEG} $(usage_color "$SEVEN_DAY")7d:${SEVEN_DAY}%${RESET}"
-fi
-
-echo -e "${BAR_COLOR}${BAR}${RESET} ${PCT}% | ${YELLOW}${COST_FMT}${RESET} | 󱎫 ${MINS}m ${SECS}s${USAGE_SEG}"
+echo -e "${VIM_SEG}${MAUVE}󰧑 $MODEL${RESET}$EFFORT_SEG $SEP ${BLUE} ${DIR##*/}${RESET}$BRANCH$WT_SEG"
+echo -e "${BAR_COLOR}${BAR}${RESET} ${OVERLAY}${PCT}%${RESET} $SEP ${YELLOW}${COST_FMT}${RESET}$DIFF_SEG $SEP ${OVERLAY}󱎫 ${MINS}m ${SECS}s${RESET}"
