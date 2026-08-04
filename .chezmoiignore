@@ -41,6 +41,7 @@ bin/
 .config/walker
 .config/wlr-which-key
 .config/ulauncher
+.config/fontconfig
 {{- end }}
 
 # Platform-specific: macOS-only configs (ignore on Linux)
