@@ -1,0 +1,13 @@
+[Desktop Entry]
+# Overrides /usr/share/applications/stably-orca.desktop so the launcher goes
+# through the wrapper that sets a private fontconfig cache. Absolute path
+# because a desktop launcher's PATH may not include ~/.local/bin.
+Name=Orca
+GenericName=Agentic Coding IDE
+Comment=Electron-based agentic coding IDE by Stably AI
+Exec={{ .chezmoi.homeDir }}/.local/bin/stably-orca-fc %U
+Terminal=false
+Type=Application
+Icon=stably-orca
+Categories=Development;IDE;TextEditor;
+StartupWMClass=orca

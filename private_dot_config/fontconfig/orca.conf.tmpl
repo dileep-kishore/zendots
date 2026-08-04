@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+<!--
+  Font config for apps that bundle their own fontconfig, pointed at by
+  FONTCONFIG_FILE in ~/.local/bin/stably-orca-fc, which the desktop entry
+  ~/.local/share/applications/stably-orca.desktop launches instead of the
+  packaged stably-orca.
+
+  System fontconfig (2.18.2) writes caches that an app bundling an older
+  fontconfig (Orca and Chrome both ship 2.17.1) refuses to read. On seeing
+  them it declines to regenerate anything, so every font installed after the
+  system upgrade is invisible to that app, including Monaspace Mixed from
+  pkgs/make_monaspace_mixed.py.
+
+  A private cachedir sidesteps the refusal: the bundled fontconfig finds no
+  foreign caches there and scans the font dirs itself. The shared cachedirs
+  are deliberately not inherited, which is why fonts.conf is not included;
+  conf.d is, since it carries the rendering rules and no cachedir of its own.
+
+  Note: no "==" style dashes in these comments. A malformed config makes
+  fontconfig fall back to the default one silently, reintroducing the very
+  cachedirs this file exists to avoid.
+
+  Delete this file and the .desktop override once Orca ships fontconfig
+  2.18.1 or newer; it works around a version skew, not a preference.
+-->
+<fontconfig>
+  <dir>/usr/share/fonts</dir>
+  <dir>/usr/local/share/fonts</dir>
+  <dir prefix="xdg">fonts</dir>
+  <dir>~/.fonts</dir>
+  <!-- Absolute path: neither "~" nor prefix="xdg" is honoured for cachedir,
+       and one fontconfig cannot resolve is skipped for the shared default. -->
+  <cachedir>{{ .chezmoi.homeDir }}/.cache/fontconfig-orca</cachedir>
+  <include ignore_missing="yes">/etc/fonts/conf.d</include>
+  <include ignore_missing="yes" prefix="xdg">fontconfig/conf.d</include>
+</fontconfig>
