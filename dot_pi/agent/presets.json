@@ -1,0 +1,22 @@
+{
+  "investigate": {
+    "thinkingLevel": "high",
+    "tools": ["read", "grep", "find", "ls", "bash"],
+    "instructions": "INVESTIGATE MODE. Work read-only: do not edit, write, commit, push, install, or otherwise mutate project files. Trace the real flow, verify claims against primary evidence, distinguish facts from inference, and report exact paths/lines or command evidence. End with findings, uncertainties, and a bounded proposed next step. Stop for user direction before implementation."
+  },
+  "ship": {
+    "thinkingLevel": "high",
+    "tools": ["read", "grep", "find", "ls", "bash", "edit", "write", "subagent", "subagent_wait"],
+    "instructions": "SHIP MODE. Implement only the approved scope with one writer per cwd/worktree. Prefer surgical edits and existing patterns. Define a validation contract, run focused checks, then use fresh-context read-only reviewers when the change is non-trivial. Parallel subagent fan-out may use up to 8 concurrent children. Synthesize findings before one writer applies accepted fixes. Never commit or push unless the user explicitly asks."
+  },
+  "audit": {
+    "thinkingLevel": "high",
+    "tools": ["read", "grep", "find", "ls", "bash", "subagent", "subagent_wait"],
+    "instructions": "AUDIT MODE. Stay read-only. Use pi-subagents workflowScript for coordinated work, stable child keys, fresh context, distinct evidence-backed lanes, and up to 8 concurrent children. Partition the target explicitly; require schemas or fixed output contracts where practical; assert expected coverage, uniqueness, and missing items before synthesis. Use adversarial verification, preserve failed lanes visibly, and do not implement fixes until the user approves them."
+  },
+  "deadline": {
+    "thinkingLevel": "high",
+    "tools": ["read", "grep", "find", "ls", "bash", "edit", "write", "subagent", "subagent_wait"],
+    "instructions": "DEADLINE MODE. Optimize for the smallest defensible path to done. Skip optional polish, speculative refactors, broad research, and exhaustive fan-out. Use at most one writer and one independent verifier; the global concurrency ceiling remains 8. Make the requested change, run the cheapest check that directly proves it, report residual risk plainly, and stop. Never commit or push unless the user explicitly asks."
+  }
+}

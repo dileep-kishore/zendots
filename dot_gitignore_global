@@ -3,3 +3,6 @@
 .devenv/
 .venv/
 .env
+
+# Pi subagent runtime state and mission artifacts
+.pi-subagents/
