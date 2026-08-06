@@ -1,0 +1,18 @@
+{{- /* chezmoi:modify-template */ -}}
+{{ default "{}" .chezmoi.stdin | fromJson
+  | setValueAtPath "defaultProvider" "openai-codex"
+  | setValueAtPath "defaultModel" "gpt-5.6-sol"
+  | setValueAtPath "defaultThinkingLevel" "high"
+  | setValueAtPath "theme" "dark"
+  | setValueAtPath "enabledModels" (list
+      "openai-codex/gpt-5.6-sol"
+      "openai-codex/gpt-5.5"
+      "openai-codex/gpt-5.4"
+      "openai-codex/gpt-5.4-mini"
+      "openai-codex/gpt-5.3-codex-spark"
+    )
+  | setValueAtPath "packages" (list
+      "npm:pi-subagents@0.42.0"
+      "git:github.com/DietrichGebert/ponytail@v4.8.4"
+    )
+  | toPrettyJson }}

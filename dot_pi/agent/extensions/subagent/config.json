@@ -1,0 +1,10 @@
+{
+  "asyncByDefault": true,
+  "forceTopLevelAsync": true,
+  "globalConcurrencyLimit": 8,
+  "artifactDir": "session",
+  "toolDescriptionMode": "full",
+  "fleetView": true,
+  "fleetViewPlacement": "belowEditor",
+  "asyncWidget": false
+}
