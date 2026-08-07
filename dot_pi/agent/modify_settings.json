@@ -3,7 +3,9 @@
   | setValueAtPath "defaultProvider" "openai-codex"
   | setValueAtPath "defaultModel" "gpt-5.6-sol"
   | setValueAtPath "defaultThinkingLevel" "high"
-  | setValueAtPath "theme" "dark"
+  | setValueAtPath "theme" "catppuccin-mocha"
+  | setValueAtPath "collapseChangelog" true
+  | setValueAtPath "autocompleteMaxVisible" 8
   | setValueAtPath "enabledModels" (list
       "openai-codex/gpt-5.6-sol"
       "openai-codex/gpt-5.5"
