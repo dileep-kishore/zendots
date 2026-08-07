@@ -124,6 +124,7 @@ spawn-at-startup "bash" "-c" "qs -c noctalia-shell"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "helium-browser"
 spawn-at-startup "ghostty"
+spawn-sh-at-startup "sleep 2 && stably-orca"
 spawn-at-startup "bash" "-c" "helium-browser --app='https://app.todoist.com/app/today'"
 spawn-sh-at-startup "sleep 2 && sunsama"
 spawn-at-startup "sleep 4 && notion-app"
@@ -280,6 +281,10 @@ window-rule {
     default-column-width {
         proportion 0.75
     }
+}
+window-rule {
+    match at-startup=true app-id="^orca$"
+    open-on-workspace "terminal"
 }
 window-rule {
     match app-id="^Morgen$"
