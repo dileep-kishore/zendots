@@ -11,8 +11,16 @@ import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const BAR_WIDTH = 12;
 
-type Totals = { input: number; output: number; cost: number };
-type DiffStat = { added: number; removed: number };
+type Totals = { input: number; output: number; cacheRead: number; cacheWrite: number; cost: number };
+type GitStat = {
+  added: number;
+  removed: number;
+  staged: number;
+  unstaged: number;
+  untracked: number;
+  ahead: number;
+  behind: number;
+};
 
 function fitBorder(left: string, width: number, color: (text: string) => string): string {
   if (width <= 0) return "";
@@ -43,7 +51,7 @@ function formatDuration(ms: number): string {
 }
 
 function totals(ctx: ExtensionContext): Totals {
-  const result: Totals = { input: 0, output: 0, cost: 0 };
+  const result: Totals = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0 };
 
   // ponytail: a branch scan keeps this extension stateless; cache if huge sessions make rendering measurable.
   for (const entry of ctx.sessionManager.getBranch()) {
@@ -51,6 +59,8 @@ function totals(ctx: ExtensionContext): Totals {
     const message = entry.message as AssistantMessage;
     result.input += message.usage.input ?? 0;
     result.output += message.usage.output ?? 0;
+    result.cacheRead += message.usage.cacheRead ?? 0;
+    result.cacheWrite += message.usage.cacheWrite ?? 0;
     result.cost += message.usage.cost.total ?? 0;
   }
   return result;
@@ -69,7 +79,7 @@ export default function pretty(pi: ExtensionAPI) {
   let spinner = 0;
   let timer: ReturnType<typeof setInterval> | undefined;
   let tui: TUI | undefined;
-  let diff: DiffStat | undefined;
+  let git: GitStat | undefined;
   let activeMs = 0;
   let activeSince: number | undefined;
 
@@ -78,24 +88,38 @@ export default function pretty(pi: ExtensionAPI) {
     timer = undefined;
   };
 
-  const refreshDiff = async (ctx: ExtensionContext) => {
-    const result = await pi.exec("git", ["diff", "--numstat", "HEAD"], { cwd: ctx.cwd }).catch(() => undefined);
-    if (!result || result.code !== 0) {
-      diff = undefined;
+  const refreshGit = async (ctx: ExtensionContext) => {
+    const [diffResult, statusResult] = await Promise.all([
+      pi.exec("git", ["diff", "--numstat", "HEAD"], { cwd: ctx.cwd }).catch(() => undefined),
+      pi.exec("git", ["status", "--porcelain=v2", "--branch"], { cwd: ctx.cwd }).catch(() => undefined),
+    ]);
+    if (!diffResult || diffResult.code !== 0 || !statusResult || statusResult.code !== 0) {
+      git = undefined;
       return;
     }
 
-    diff = result.stdout.split("\n").reduce<DiffStat>(
-      (sum, line) => {
-        const [added, removed] = line.split("\t");
-        if (added !== "-" && removed !== "-") {
-          sum.added += Number(added) || 0;
-          sum.removed += Number(removed) || 0;
-        }
-        return sum;
-      },
-      { added: 0, removed: 0 },
-    );
+    const next: GitStat = { added: 0, removed: 0, staged: 0, unstaged: 0, untracked: 0, ahead: 0, behind: 0 };
+    for (const line of diffResult.stdout.split("\n")) {
+      const [added, removed] = line.split("\t");
+      if (added !== "-" && removed !== "-") {
+        next.added += Number(added) || 0;
+        next.removed += Number(removed) || 0;
+      }
+    }
+    for (const line of statusResult.stdout.split("\n")) {
+      const divergence = line.match(/^# branch\.ab \+(\d+) -(\d+)$/);
+      if (divergence) {
+        next.ahead = Number(divergence[1]);
+        next.behind = Number(divergence[2]);
+      } else if (line.startsWith("? ")) {
+        next.untracked++;
+      } else if (/^[12u] /.test(line)) {
+        const status = line.slice(2, 4);
+        if (status[0] !== ".") next.staged++;
+        if (status[1] !== ".") next.unstaged++;
+      }
+    }
+    git = next;
     tui?.requestRender();
   };
 
@@ -117,7 +141,7 @@ export default function pretty(pi: ExtensionAPI) {
     tui?.requestRender();
   });
 
-  pi.on("turn_end", (_event, ctx) => void refreshDiff(ctx));
+  pi.on("turn_end", (_event, ctx) => void refreshGit(ctx));
   pi.on("session_shutdown", () => {
     stopSpinner();
     tui = undefined;
@@ -128,7 +152,7 @@ export default function pretty(pi: ExtensionAPI) {
 
     ctx.ui.setTitle(`pi · ${ctx.cwd.split("/").pop() || ctx.cwd}`);
     ctx.ui.setWorkingVisible(false);
-    void refreshDiff(ctx);
+    void refreshGit(ctx);
 
     ctx.ui.setFooter((instance, theme, footerData) => {
       const unsubscribe = footerData.onBranchChange(() => instance.requestRender());
@@ -153,16 +177,30 @@ export default function pretty(pi: ExtensionAPI) {
           let leftTop = `${theme.fg("accent", `󰧑 ${model}`)} ${theme.fg("thinkingText", pi.getThinkingLevel())}`;
           leftTop += ` ${theme.fg("borderMuted", "│")} ${theme.fg("toolTitle", ` ${project}`)}`;
           if (branch) leftTop += ` ${theme.fg("borderMuted", "│")} ${theme.fg("warning", ` ${branch}`)}`;
-          if (diff && (diff.added || diff.removed)) {
-            leftTop += ` ${theme.fg("success", `+${diff.added}`)} ${theme.fg("error", `-${diff.removed}`)}`;
+          if (git) {
+            const state = [
+              git.ahead ? theme.fg("success", `↑${git.ahead}`) : "",
+              git.behind ? theme.fg("error", `↓${git.behind}`) : "",
+              git.staged ? theme.fg("success", `+${git.staged}`) : "",
+              git.unstaged ? theme.fg("warning", `!${git.unstaged}`) : "",
+              git.untracked ? theme.fg("accent", `?${git.untracked}`) : "",
+            ].filter(Boolean);
+            if (state.length) leftTop += ` ${theme.fg("borderMuted", "[")}${state.join(" ")}${theme.fg("borderMuted", "]")}`;
+            if (git.added || git.removed) {
+              leftTop += ` ${theme.fg("success", `+${git.added}`)} ${theme.fg("error", `-${git.removed}`)}`;
+            }
           }
 
           const rightTop = statuses ? `${theme.fg("accent", "✦")} ${statuses}` : "";
           const window = context?.contextWindow ?? ctx.model?.contextWindow;
           const used = context?.tokens ?? 0;
           const leftBottom = `${bar} ${theme.fg("dim", `${percent}%`)} ${theme.fg("borderMuted", "│")} ${theme.fg("muted", `${compactNumber(used)}/${window ? compactNumber(window) : "?"}`)}`;
-          const cost = stats.cost ? ` ${theme.fg("warning", `$${stats.cost.toFixed(2)}`)} ${theme.fg("borderMuted", "│")}` : "";
-          const rightBottom = `${theme.fg("muted", `↑${compactNumber(stats.input)} ↓${compactNumber(stats.output)}`)}${cost} ${theme.fg("muted", `󱎫 ${formatDuration(elapsed)}`)}`;
+          const promptTokens = stats.input + stats.cacheRead + stats.cacheWrite;
+          const cache = stats.cacheRead && promptTokens
+            ? ` ${theme.fg("borderMuted", "│")} ${theme.fg("muted", `󰆼 ${Math.round((stats.cacheRead / promptTokens) * 100)}%`)}`
+            : "";
+          const cost = stats.cost ? ` ${theme.fg("borderMuted", "│")} ${theme.fg("warning", `$${stats.cost.toFixed(2)}`)}` : "";
+          const rightBottom = `${theme.fg("muted", `↑${compactNumber(stats.input)} ↓${compactNumber(stats.output)}`)}${cache}${cost} ${theme.fg("borderMuted", "│")} ${theme.fg("muted", `󱎫 ${formatDuration(elapsed)}`)}`;
 
           return [fitLine(leftTop, rightTop, width), fitLine(leftBottom, rightBottom, width), ""];
         },
