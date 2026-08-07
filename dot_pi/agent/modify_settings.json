@@ -15,6 +15,9 @@
     )
   | setValueAtPath "packages" (list
       "npm:pi-subagents@0.42.0"
+      "npm:pi-web-search@1.3.1"
+      "npm:@juicesharp/rpiv-ask-user-question@2.4.0"
+      "npm:@juicesharp/rpiv-todo@2.4.0"
       "git:github.com/DietrichGebert/ponytail@v4.8.4"
     )
   | toPrettyJson }}
