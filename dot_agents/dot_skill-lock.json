@@ -15,9 +15,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/stablyai/orca.git",
       "skillPath": "skills/orca-cli/SKILL.md",
-      "skillFolderHash": "97f6596bb43a56c6e81246f077c35144c9025343",
+      "skillFolderHash": "a5a90c9731fbee834eca6d655b39eaa795dd2323",
       "installedAt": "2026-07-30T03:54:59.843Z",
-      "updatedAt": "2026-07-30T04:07:07.830Z"
+      "updatedAt": "2026-08-10T14:47:02.620Z"
     },
     "orca-linear": {
       "source": "stablyai/orca",
