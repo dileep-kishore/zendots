@@ -32,17 +32,27 @@ from fontTools.ttLib import TTFont
 
 FAMILY = sys.argv[1] if len(sys.argv) > 1 else "Monaspace Mixed"
 
+IS_MAC = platform.system() == "Darwin"
+
 # (source filename, subfamily, usWeightClass, italic slot)
 # Weights are relabelled to 400/700 so a request for any normal weight lands on
-# the Light faces rather than falling back to a heavier one.
-FACES = [
-    ("MonaspaceNeonFrozen-Light.ttf", "Regular", 400, False),
-    ("MonaspaceRadonFrozen-Light.ttf", "Italic", 400, True),
-    ("MonaspaceKryptonFrozen-Bold.ttf", "Bold", 700, False),
-    ("MonaspaceRadonFrozen-Bold.ttf", "Bold Italic", 700, True),
-]
-
-IS_MAC = platform.system() == "Darwin"
+# the Light faces rather than falling back to a heavier one. macOS keeps the
+# working Frozen build; Linux uses terminal-sized Nerd Font glyphs for Orca.
+FACES = (
+    [
+        ("MonaspaceNeonFrozen-Light.ttf", "Regular", 400, False),
+        ("MonaspaceRadonFrozen-Light.ttf", "Italic", 400, True),
+        ("MonaspaceKryptonFrozen-Bold.ttf", "Bold", 700, False),
+        ("MonaspaceRadonFrozen-Bold.ttf", "Bold Italic", 700, True),
+    ]
+    if IS_MAC
+    else [
+        ("MonaspiceNeNerdFont-Light.otf", "Regular", 400, False),
+        ("MonaspiceRnNerdFont-Light.otf", "Italic", 400, True),
+        ("MonaspiceKrNerdFont-Bold.otf", "Bold", 700, False),
+        ("MonaspiceRnNerdFont-Bold.otf", "Bold Italic", 700, True),
+    ]
+)
 SEARCH_DIRS = (
     [Path.home() / "Library/Fonts", Path("/Library/Fonts")]
     if IS_MAC
@@ -68,7 +78,11 @@ def find_source(filename: str) -> Path:
                 return hit
     sys.exit(
         f"error: {filename} not found under {', '.join(str(d) for d in SEARCH_DIRS)}\n"
-        "Install Monaspace Frozen first (Linux: ttf-monaspace-frozen)."
+        + (
+            "Install Monaspace Frozen from monaspace.githubnext.com."
+            if IS_MAC
+            else "Install Monaspice Nerd Font (Arch: otf-monaspace-nerd)."
+        )
     )
 
 
@@ -100,7 +114,7 @@ def build(filename: str, subfamily: str, weight: int, italic: bool) -> Path:
     os2.fsSelection, head.macStyle = selection, mac_style
     # glyphs are upright even in the italic slots, so italicAngle stays 0
 
-    out = OUT_DIR / f"{postscript}.ttf"
+    out = OUT_DIR / f"{postscript}{Path(filename).suffix}"
     font.save(out)
     return out
 
