@@ -1,0 +1,21 @@
+{{- /* chezmoi:modify-template */ -}}
+{{ default "{}" .chezmoi.stdin | fromYaml
+  | setValueAtPath "modelRoles.default" "openai-codex/gpt-5.6-sol:high"
+  | setValueAtPath "symbolPreset" "nerd"
+  | setValueAtPath "theme.dark" "catppuccin-mocha-minimal"
+  | setValueAtPath "statusLine.preset" "custom"
+  | setValueAtPath "statusLine.separator" "pipe"
+  | setValueAtPath "statusLine.sessionAccent" false
+  | setValueAtPath "statusLine.transparent" true
+  | setValueAtPath "statusLine.compactThinkingLevel" false
+  | setValueAtPath "statusLine.leftSegments" (list "pi" "model" "mode" "path" "git" "pr" "subagents")
+  | setValueAtPath "statusLine.rightSegments" (list "context_pct" "cost" "session_name")
+  | setValueAtPath "statusLine.segmentOptions.model.showThinkingLevel" true
+  | setValueAtPath "statusLine.segmentOptions.path.abbreviate" true
+  | setValueAtPath "statusLine.segmentOptions.path.maxLength" 35
+  | setValueAtPath "statusLine.segmentOptions.path.stripWorkPrefix" true
+  | setValueAtPath "statusLine.segmentOptions.git.showBranch" true
+  | setValueAtPath "statusLine.segmentOptions.git.showStaged" true
+  | setValueAtPath "statusLine.segmentOptions.git.showUnstaged" true
+  | setValueAtPath "statusLine.segmentOptions.git.showUntracked" true
+  | toYaml -}}
