@@ -61,30 +61,27 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/mattpocock/skills.git",
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
-      "skillFolderHash": "bce229692e60dff3462e49bc5e774e83bef348e6",
-      "pluginName": "mattpocock-skills",
+      "skillFolderHash": "6a971d1f5b109ac817e18c0f0419c2a32d60f26a",
       "installedAt": "2026-08-01T04:40:39.167Z",
-      "updatedAt": "2026-08-01T04:40:39.167Z"
+      "updatedAt": "2026-08-14T16:59:46.510Z"
     },
     "to-spec": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/mattpocock/skills.git",
       "skillPath": "skills/engineering/to-spec/SKILL.md",
-      "skillFolderHash": "bf698b96b5d8798d110d9872e32b9310728555b0",
-      "pluginName": "mattpocock-skills",
+      "skillFolderHash": "dc32a36159f99c854cb470f371106cd38513a15f",
       "installedAt": "2026-08-01T04:40:39.167Z",
-      "updatedAt": "2026-08-01T04:40:39.167Z"
+      "updatedAt": "2026-08-14T16:59:47.498Z"
     },
     "wayfinder": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/mattpocock/skills.git",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
-      "skillFolderHash": "33ed747fb30668c0e7b61698af5268c25c0d75cb",
-      "pluginName": "mattpocock-skills",
+      "skillFolderHash": "48c3a8b0a9705d6310d37f7f9b53bcb2c55955c7",
       "installedAt": "2026-08-01T04:40:39.167Z",
-      "updatedAt": "2026-08-01T04:40:39.167Z"
+      "updatedAt": "2026-08-14T16:59:48.378Z"
     }
   },
   "dismissed": {
