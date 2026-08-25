@@ -18,6 +18,9 @@ export PATH="$PATH:/var/lib/flatpak/exports/bin"
 export PATH="$PATH:$HOME/npm-global/bin"
 export PATH="$HOME/.pixi/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
+{{- if eq .chezmoi.os "darwin" }}
+export PATH="$(brew --prefix rustup)/bin:$PATH"
+{{- end }}
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # AI secrets
