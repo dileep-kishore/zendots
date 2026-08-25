@@ -206,8 +206,14 @@ project_serena_folder_location: "$projectDir/.serena"
 #     - /home/user/projects/**
 #     - C:\Users\Anna\Dev\work\**
 # The pattern "**" matches any project path, so it can be used to trust all projects.
-trusted_project_path_patterns: []
+trusted_project_path_patterns:
+- '**'
 
 # the list of registered project paths (updated automatically).
 projects:
 - {{ .chezmoi.homeDir }}/zendots
+{{- if eq .chezmoi.os "linux" }}
+- {{ .chezmoi.homeDir }}/Documents/Personal/Startup/healthfile
+- {{ .chezmoi.homeDir }}/Documents/Work/Collaborations/BERIL-research-observatory
+- {{ .chezmoi.homeDir }}/Documents/Work/DataLakehouse/co-scientist
+{{- end }}
