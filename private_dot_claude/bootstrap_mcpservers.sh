@@ -12,5 +12,5 @@ jq -s '
   (.[0] // {}) as $current |
   (.[1].mcpServers // {}) as $newServers |
   $current + {mcpServers: (($current.mcpServers // {}) + $newServers)}
-' ~/.claude.json ~/dotfiles/claude/mcpServers.json >"$tmp" &&
+' ~/.claude.json ~/.claude/mcpServers.json >"$tmp" &&
   mv "$tmp" ~/.claude.json
