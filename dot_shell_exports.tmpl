@@ -54,11 +54,6 @@ if [[ $(hostname) == "mac148593" ]]; then
       security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain
     } > "$CERT_FILE" 2>/dev/null
 
-    # Narrow bundle for strict rustls tools (forge) that choke on
-    # UnsupportedCriticalExtension in the broad dump. LBL uses Netskope.
-    security find-certificate -a -c "ENTRUST MANAGED SERVICES ROOT CA" \
-      -p /Library/Keychains/System.keychain \
-      > "$HOME/.config/netskope-root.pem" 2>/dev/null
   fi
 
   if [[ -f "$CERT_FILE" ]]; then
