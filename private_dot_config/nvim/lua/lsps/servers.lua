@@ -117,8 +117,4 @@ servers.cssls = {}
 
 servers.html = {}
 
-servers.copilot = {}
-
-servers.copilot_ls = {}
-
 return servers

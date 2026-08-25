@@ -12,9 +12,7 @@ return {
       "folke/snacks.nvim",
     },
     opts = {
-      -- NOTE: You can use claude code with ACP:
-      -- provider = "claude-code",
-      provider = "copilot",
+      provider = "claude-code",
       instructions_file = "CLAUDE.md",
       mode = "agentic",
       acp_providers = {
