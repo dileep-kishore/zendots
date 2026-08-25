@@ -10,9 +10,6 @@ windows:
   - window_name: git
     layout: main-horizontal
     panes: [lazygit]
-  - window_name: ai
-    layout: main-horizontal
-    panes: [abtop]
   - window_name: term
     layout: even-vertical
     panes: [null, null]
