@@ -33,18 +33,32 @@ url = "https://mcp.grep.app"
 
 [mcp_servers.playwright]
 command = "npx"
-args = ["-y", "@playwright/mcp@latest"]
+args = [
+    "-y",
+    "@playwright/mcp@latest",
+]
 
 [mcp_servers.serena]
 command = "uvx"
-args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "codex", "--project-from-cwd"]
+args = [
+    "--from",
+    "git+https://github.com/oraios/serena",
+    "serena",
+    "start-mcp-server",
+    "--context",
+    "codex",
+    "--project-from-cwd",
+]
 
 [mcp_servers.linear]
 url = "https://mcp.linear.app/mcp"
 
 [mcp_servers.sequential-thinking]
 command = "npx"
-args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+args = [
+    "-y",
+    "@modelcontextprotocol/server-sequential-thinking",
+]
 
 [mcp_servers.sequential-thinking.env]
 DISABLE_THOUGHT_LOGGING = "true"
@@ -79,6 +93,26 @@ enabled = false
 {{- end }}
 {{- if eq .chezmoi.os "linux" }}
 
+[mcp_servers.node_repl]
+args = []
+command = "/usr/lib/chatgpt/resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/usr/lib/chatgpt/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/dileep/.codex:/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/dileep/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_TINYSKY_ENABLED = "0"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.818.21641"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/dileep/.codex/plugins/cache/openai-bundled/browser/26.818.21641/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
+
 [projects."/home/dileep/zendots"]
 trust_level = "trusted"
 
@@ -108,6 +142,21 @@ trust_level = "trusted"
 
 [projects."/home/dileep/Documents/Personal/Startup/billlens-landing"]
 trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Work/antibiotic_prediction"]
+trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Work/BERIL-research-observatory"]
+trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Work/BERIL/BERIL-v2"]
+trust_level = "trusted"
+
+[projects."/home/dileep/Documents/Codex/2026-08-14/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/home/dileep/.config/orca/rate-limit-pty-cwd"]
+trust_level = "trusted"
 {{- end }}
 [plugins."google-calendar@openai-curated"]
 enabled = true
@@ -123,6 +172,80 @@ enabled = true
 
 [plugins."ponytail@ponytail"]
 enabled = true
+{{- if eq .chezmoi.os "linux" }}
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."claude-md-management@claude-plugins-official"]
+enabled = true
+
+[plugins."code-review@claude-plugins-official"]
+enabled = true
+
+[plugins."code-simplifier@claude-plugins-official"]
+enabled = true
+
+[plugins."commit-commands@claude-plugins-official"]
+enabled = true
+
+[plugins."feature-dev@claude-plugins-official"]
+enabled = true
+
+[plugins."frontend-design@claude-plugins-official"]
+enabled = true
+
+[plugins."linear@claude-plugins-official"]
+enabled = true
+
+[plugins."pr-review-toolkit@claude-plugins-official"]
+enabled = true
+
+[plugins."pyright-lsp@claude-plugins-official"]
+enabled = true
+
+[plugins."serena@claude-plugins-official"]
+enabled = true
+
+[plugins."skill-creator@claude-plugins-official"]
+enabled = true
+
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
+[plugins."codex@openai-codex"]
+enabled = true
+
+[plugins."plannotator@plannotator"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+{{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
 [plugins."documents@openai-primary-runtime"]
@@ -166,10 +289,38 @@ source = "{{ .chezmoi.homeDir }}/.cache/codex-runtimes/codex-primary-runtime/plu
 {{- if eq .chezmoi.os "linux" }}
 
 [marketplaces.ponytail]
-last_updated = "2026-07-30T02:56:34Z"
-last_revision = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"
+last_updated = "2026-08-08T02:59:43Z"
+last_revision = "2ed6c52c9d7e5e56942508591085fd45dea277d3"
 source_type = "git"
 source = "https://github.com/DietrichGebert/ponytail.git"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-08-22T18:20:03Z"
+source_type = "local"
+source = "/home/dileep/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-08-22T18:20:42Z"
+source_type = "local"
+source = "/home/dileep/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[marketplaces.claude-plugins-official]
+last_updated = "2026-08-22T02:20:28Z"
+last_revision = "340e33aef211d95769d252324854497af871dafe"
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
+
+[marketplaces.openai-codex]
+last_updated = "2026-08-15T04:22:39Z"
+last_revision = "db52e28f4d9ded852ab3942cea316258ae4ef346"
+source_type = "git"
+source = "https://github.com/openai/codex-plugin-cc.git"
+
+[marketplaces.plannotator]
+last_updated = "2026-08-22T02:20:36Z"
+last_revision = "8a8d0544c685166acccaba0d0b08c5a88babe628"
+source_type = "git"
+source = "https://github.com/backnotprop/plannotator.git"
 {{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
@@ -227,6 +378,27 @@ trusted_hash = "sha256:6c15548d7994a6a5bece708d7557dbfc8443e141e3b3458a2b10421f6
 
 [hooks.state."/home/dileep/.codex/hooks.json:stop:1:0"]
 trusted_hash = "sha256:183c76d4ff4a9c2b29c58c4657a9697fe9ed3f092a62be060522d0db30ff3af8"
+
+[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:12efdd54b3c8a0778d63d1056073a7cbeec09518b5bfd46e2893c96b2292af7f"
+
+[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:15e2e58db3e02eb8b44667e15b8ae7c28d08178d5dd1c1ed4b9369ef3ecf56d9"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:e6b9df143de11443eb576c38874cf6e0c48358f948170948fdf630f1c047c098"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:bc55a03ac0094c5deb4af95c405b75b34735f318b3d9bd64a2f9902973861606"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:3dfaa7e4f022570b260b8a8cf4ac7585c986175256b887a4723fac4f358a482f"
+
+[hooks.state."plannotator@plannotator:hooks/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:c14c21d72b8ddb7a4dbd7eedcac9d3fff0d7b4b97e4f24dd8f6277d78c45329e"
+
+[hooks.state."plannotator@plannotator:hooks/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:c8ae3770a85b13f9f51aabce263943340a878625c5e71eadb429bb2743835d9e"
 {{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
@@ -294,6 +466,10 @@ followUpQueueMode = "queue"
 dock-icon-preference = "codex-system"
 show-context-window-usage = true
 git-branch-prefix = ""
+{{- if eq .chezmoi.os "linux" }}
+external-agent-import-sync-enabled = false
+conversationDetailMode = "STEPS_COMMANDS"
+{{- end }}
 
 [desktop.appearanceLightChromeTheme]
 accent = "#8839ef"
@@ -336,6 +512,15 @@ memories = true
 generate_memories = true
 use_memories = true
 {{- if eq .chezmoi.os "linux" }}
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "7fe0e1c59da4bc68f9d6ab81ae8d349b53fee44b074f49be0effbc1105a5f1d3"
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+CLAUDE_CODE_SHELL = "/bin/bash"
+DISABLE_AUTOUPDATER = "1"
 
 [projects."/home/dileep/Documents/Personal/personal-portfolio"]
 trust_level = "trusted"
