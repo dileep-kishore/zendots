@@ -8,7 +8,7 @@ model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
 service_tier = "default"
 {{- if eq .chezmoi.os "darwin" }}
-notify = ["/Users/g8k/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+notify = ["{{ .chezmoi.homeDir }}/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
 {{- end }}
 
 [tui]
@@ -59,16 +59,16 @@ startup_timeout_sec = 120
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
 NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/g8k/.codex"
-CODEX_HOME = "/Users/g8k/.codex"
+NODE_REPL_TRUSTED_CODE_PATHS = "{{ .chezmoi.homeDir }}/.codex"
+CODEX_HOME = "{{ .chezmoi.homeDir }}/.codex"
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "14e425736668bf21b5b39f2cc022ee8684728617fb5c49f35533c2e349f47193,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.721.81911"
-SKY_CUA_SERVICE_PATH = "/Users/g8k/.codex/computer-use/Codex Computer Use.app"
+BROWSER_USE_CODEX_APP_VERSION = "26.818.61809"
+SKY_CUA_SERVICE_PATH = "{{ .chezmoi.homeDir }}/.codex/computer-use/Codex Computer Use.app"
 CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
 
 [mcp_servers.computer-use]
@@ -109,42 +109,6 @@ trust_level = "trusted"
 [projects."/home/dileep/Documents/Personal/Startup/billlens-landing"]
 trust_level = "trusted"
 {{- end }}
-{{- if eq .chezmoi.os "darwin" }}
-
-[projects."/Users/g8k/zendots"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/DataLake/g2pai_client"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/DataLake/co-scientist"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/DataLake/Datalakehouse_ETL"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/Collaborations/CommScores"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/Collaborations/BERIL-research-observatory"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/Collaborations/beril-pi-agent"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/traitweaver"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/Documents/Work/Manuscripts/trait-prediction-manuscript"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/.superset/projects/BERIL-research-observatory"]
-trust_level = "trusted"
-
-[projects."/Users/g8k/.superset/projects/lakehousev3"]
-trust_level = "trusted"
-{{- end }}
-
 [plugins."google-calendar@openai-curated"]
 enabled = true
 
@@ -191,19 +155,13 @@ enabled = true
 [plugins."browser@openai-bundled"]
 enabled = true
 
-[[skills.config]]
-path = "/Users/g8k/.codex/plugins/cache/openai-curated/github/610a632ae9a27eca49f7d937fbe60379fd04257b/skills/gh-address-comments/SKILL.md"
-enabled = false
-
 [marketplaces.openai-bundled]
-last_updated = "2026-07-30T01:31:37Z"
 source_type = "local"
-source = "/Users/g8k/.codex/.tmp/bundled-marketplaces/openai-bundled"
+source = "{{ .chezmoi.homeDir }}/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-08-02T04:49:01Z"
 source_type = "local"
-source = "/Users/g8k/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+source = "{{ .chezmoi.homeDir }}/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 {{- end }}
 {{- if eq .chezmoi.os "linux" }}
 
@@ -272,17 +230,6 @@ trusted_hash = "sha256:183c76d4ff4a9c2b29c58c4657a9697fe9ed3f092a62be060522d0db3
 {{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
-[hooks.state."/Users/g8k/.codex/hooks.json:session_start:0:0"]
-enabled = true
-trusted_hash = "sha256:2d82837ad0242b592718a3cc3a5a6da6d8e32db080f968d3e6d34ffff433b1cc"
-
-[hooks.state."/Users/g8k/.codex/hooks.json:stop:0:0"]
-enabled = true
-trusted_hash = "sha256:a8cc3a896451419ee3f8a78ae1ba035edb534834a1c3de13775b347e8d34f687"
-
-[hooks.state."/Users/g8k/.codex/hooks.json:user_prompt_submit:0:0"]
-trusted_hash = "sha256:b0cdce479981b6a3335da13439a325f366b42906f6e880486228830b4177bab5"
-
 [hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:session_start:0:0"]
 trusted_hash = "sha256:5f81d38f47448a1581c08ec877e044d9e04dd6f814dce3f2671f7a8edadd719b"
 
@@ -292,29 +239,38 @@ trusted_hash = "sha256:6a6f42bc3b58d6262db38bfd74d7f340fcca2b09cdb134aad365063f0
 [hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:subagent_start:0:0"]
 trusted_hash = "sha256:1423b56c1322f96c8f74c51c1e7ae9a047b904c1fa43ee9165d462fd7a6e70ef"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:pre_tool_use:0:0"]
-trusted_hash = "sha256:49db299fd6b0703ddb442ac4e3ea558ac565f03c90e0bd7fa68550774a942a4e"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:b5496899e1743f93c9b198682a29eda134626e2302ab514d92db4c2c43a24e53"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:permission_request:0:0"]
-trusted_hash = "sha256:d9f42f1575c21bdd4d422e133672bcec5dca5f193aa3766f97f54200dea8261c"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:31c6425a46cd8b5b95be9ed841b0dcd5566d19b97f1129ffdadb47dc0045f82a"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:post_tool_use:0:0"]
-trusted_hash = "sha256:bf2d47113e969845fe4b34b3bd97a7ca167b8cb120bf8d1e821505e43567ecf8"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:3698b5c10b15ef5e062987c8438df9a03b75462a216c1e9a6389aebdd1053dc2"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:session_start:1:0"]
-trusted_hash = "sha256:9d258fa5adda39f1e9e8f70382d795d5065a9fc9e32ae0529f59c7f2b26d84f9"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:cae409326d6401eff8ddfe0e055552f84f2337faaa167a918ddb76a309ba3910"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:user_prompt_submit:1:0"]
-trusted_hash = "sha256:b61d83c3e6fc9732569cf6ac44eb0e0a4b58eaf2cdc296e8bca195ccb87bd43e"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:e1c6b0c2560cb1755b40a0a656ab0b249131153cdb4ed80e725ec167065eac8b"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:subagent_start:0:0"]
-trusted_hash = "sha256:9577356266156615ee51a722b2e85d0f5492c127860baddb2b7436a34899fca7"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:e8043aaf1f147cb8280ee327640a49ad7da10ec0e587542aaf6e1ec7d3e70965"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:subagent_stop:0:0"]
-trusted_hash = "sha256:8a1834646f1f9d5cbf07b5ff6b5825911df428c915bc26a4ed53153e1681ce17"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:user_prompt_submit:1:0"]
+trusted_hash = "sha256:f0d1f409289a8f169b2f879c4f738d5bd08a7595d0ffacbd54209ea29c2ae2f1"
 
-[hooks.state."/Users/g8k/.codex/hooks.json:stop:1:0"]
-trusted_hash = "sha256:98767beeeebd7eb883a3430c1b24572b61031e977f1c4759400cfbf13916e31f"
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:4384c0995a268c2ef12bf1e4e639861ee75e1a32797195bf7802acdb51973b2f"
+
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:19480ac77b806aacf1f3f31e7133580c515732b705f79dec9c8505e2ce2dfb43"
+
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:2856fdf3b97d2706253e1621e37af1a42cf0efaf9c739a615d5337b4ecb5e854"
+
+[hooks.state."{{ .chezmoi.homeDir }}/.codex/hooks.json:stop:1:0"]
+trusted_hash = "sha256:c310f4de8293fb35dd214878c422de858be36b2db69c3e34dee0c357399e536b"
 {{- end }}
 
 [notice]
@@ -370,10 +326,6 @@ skill = "#cba6f7"
 
 [desktop.open-in-target-preferences]
 global = "vscode"
-
-[desktop.open-in-target-preferences.perPath]
-"/Users/g8k/Documents/Work/traitweaver" = "fileManager"
-"/Users/g8k/.superset/worktrees/CommScores/slime-sleep" = "vscode"
 {{- end }}
 
 [features]
@@ -393,11 +345,11 @@ trust_level = "trusted"
 [shell_environment_policy.set]
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "14e425736668bf21b5b39f2cc022ee8684728617fb5c49f35533c2e349f47193,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/g8k/.codex"
+NODE_REPL_TRUSTED_CODE_PATHS = "{{ .chezmoi.homeDir }}/.codex"
 
-[projects."/Users/g8k/Documents/Work/evalome"]
+[projects."{{ .chezmoi.homeDir }}/zendots"]
 trust_level = "trusted"
 
-[projects."/Users/g8k/Library/Application Support/orca/rate-limit-pty-cwd"]
+[projects."{{ .chezmoi.homeDir }}/Documents/Codex/2026-08-24/i-ha"]
 trust_level = "trusted"
 {{- end }}
