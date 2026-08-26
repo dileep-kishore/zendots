@@ -16,6 +16,9 @@ alias exportforge="export PATH=$HOME/miniforge3/bin:$PATH"
 alias myip="curl http://ipecho.net/plain; echo"
 alias screenoff-niri="niri msg action power-off-monitors"
 alias sshconfig='$EDITOR ~/.ssh/config'
+{{- if eq .chezmoi.os "darwin" }}
+alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+{{- end }}
 
 # eza
 alias eza='eza --icons auto --git'
