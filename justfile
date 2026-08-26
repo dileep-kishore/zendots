@@ -18,7 +18,7 @@ sync-from-home:
   ./private_dot_local/bin/executable_chezmoi-sync-from-home.sh
 
 dump:
-  cd pkgs && rm Brewfile && brew bundle dump
+  cd pkgs && rm Brewfile && brew bundle dump --no-vscode
 
 install:
   cd pkgs && brew bundle install
