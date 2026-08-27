@@ -23,13 +23,15 @@ export PATH="$(brew --prefix rustup)/bin:$PATH"
 {{- end }}
 export PATH="$HOME/.cargo/bin:$PATH"
 
-# AI secrets
-export OPENAI_API_KEY="$(cat ~/.secrets/openai.txt)"
-export ANTHROPIC_API_KEY="$(cat ~/.secrets/anthropic.txt)"
-export GEMINI_API_KEY="$(cat ~/.secrets/gemini.txt)"
-export TAVILY_API_KEY="$(cat ~/.secrets/tavily.txt)"
-export CBORG_API_KEY="$(cat ~/.secrets/cborg.txt)"
-export CONTEXT7_API_KEY="$(cat ~/.secrets/context7.txt)"
+# API keys. Source of truth is the age-encrypted
+# private_dot_config/encrypted_private_secrets.env.age in the chezmoi repo;
+# `chezmoi apply` decrypts it here. Add a key with:
+#   chezmoi edit ~/.config/secrets.env --apply
+if [ -f "$HOME/.config/secrets.env" ]; then
+    set -a
+    . "$HOME/.config/secrets.env"
+    set +a
+fi
 
 # Codex (CBORG)
 ## export OPENAI_API_KEY=$CBORG_API_KEY
