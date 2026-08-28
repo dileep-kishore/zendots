@@ -1,4 +1,4 @@
-"""Cross-machine handoff planning and execution."""
+"""Cross-machine Orca worktree handoff planning and execution."""
 
 from __future__ import annotations
 
@@ -17,7 +17,6 @@ from .handoff import (
     preflight_repository,
     rebuild_index,
     sync_worktree_files,
-    transfer_refs,
 )
 from .manifest import Folder, Host, UsageError
 from .syncthing import Syncthing
@@ -136,7 +135,7 @@ def _require_no_active_main(repo: OrcaRepo) -> None:
 
 
 class Handoff:
-    """Plan all repositories first, then perform a one-way handoff."""
+    """Plan all external worktrees first, then perform a one-way handoff."""
 
     def __init__(self, runner: Runner, syncthing: Syncthing, orca: Orca) -> None:
         self.runner = runner
@@ -170,7 +169,6 @@ class Handoff:
                     target,
                     folder.path(target),
                     excludes=folder.ignore,
-                    allow_branch_switch=True,
                     fallback_identity=folder.id,
                 )
             except UsageError as error:
@@ -202,7 +200,7 @@ class Handoff:
                                 pair.source.path,
                                 target,
                                 pair.target.path,
-                                excludes=folder.ignore,
+                                excludes=(*folder.ignore, *folder.worktree_ignore),
                                 allow_clean_target_difference=True,
                                 fallback_identity=folder.id,
                             )
@@ -275,7 +273,10 @@ class Handoff:
                     missing.pair.source.path,
                     plan.target,
                     created.path,
-                    excludes=folder_plan.folder.ignore,
+                    excludes=(
+                        *folder_plan.folder.ignore,
+                        *folder_plan.folder.worktree_ignore,
+                    ),
                     allow_clean_target_difference=True,
                     fallback_identity=folder_plan.folder.id,
                 )
@@ -283,8 +284,6 @@ class Handoff:
                     (WorktreePair(missing.pair.source, created), created_plan)
                 )
 
-            transfer_refs(self.runner, folder_plan.main)
-            rebuild_index(self.runner, folder_plan.main)
             for pair, worktree_plan in external:
                 assert pair.target is not None
                 recovery = (
@@ -299,7 +298,10 @@ class Handoff:
                     plan.target,
                     pair.target.path,
                     recovery,
-                    excludes=folder_plan.folder.ignore,
+                    excludes=(
+                        *folder_plan.folder.ignore,
+                        *folder_plan.folder.worktree_ignore,
+                    ),
                     dry_run=False,
                 )
                 rebuild_index(self.runner, worktree_plan)

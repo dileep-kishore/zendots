@@ -10,19 +10,27 @@ import pytest
 from typer.testing import CliRunner
 
 from work_sync.cli import app
+from work_sync.coordinator import FolderHandoff, Handoff, HandoffPlan
 from work_sync.handoff import (
     Orca,
+    OrcaInventory,
     OrcaRepo,
     OrcaWorktree,
-    canonical_origin,
+    RepositoryPlan,
+    RepoState,
     pair_worktrees,
     parse_orca_inventory,
     preflight_repository,
     sync_worktree_files,
-    transfer_git_state,
 )
-from work_sync.manifest import UsageError, detect_host, load_manifest
-from work_sync.syncthing import folder_payload, managed_patterns
+from work_sync.manifest import Folder, UsageError, detect_host, load_manifest
+from work_sync.syncthing import (
+    Syncthing,
+    folder_payload,
+    managed_patterns,
+    reconcile_ignore_text,
+    statuses_converged,
+)
 from work_sync.system import Runner
 
 ENTRY: dict[str, object] = {
@@ -32,7 +40,7 @@ ENTRY: dict[str, object] = {
     "tsuki": "/home/dileep/Documents/Work/Manuscripts/QBio_perspective",
     "class": "git",
     "git": "local",
-    "ignore": [".git"],
+    "ignore": [],
 }
 
 
@@ -65,6 +73,15 @@ def test_manifest_selects_by_id_or_label(tmp_path: Path) -> None:
 
     assert manifest.select("qbio").label == "QBio_perspective"
     assert manifest.select("QBio_perspective").id == "qbio"
+
+
+def test_manifest_supports_worktree_only_ignores(tmp_path: Path) -> None:
+    path = tmp_path / "folders.json"
+    write_manifest(path, [{**ENTRY, "worktree_ignore": ["/data"]}])
+
+    folder = load_manifest(path).select("qbio")
+
+    assert folder.worktree_ignore == ("/data",)
 
 
 def test_manifest_git_folders_filters_non_git_defaults(tmp_path: Path) -> None:
@@ -150,6 +167,142 @@ def test_sensitive_project_files_are_not_default_ignores(tmp_path: Path) -> None
     assert ".codex/config.toml" not in patterns
     assert ".pi/settings.json" not in patterns
     assert ".pixi" in patterns
+    assert ".git" not in patterns
+    assert ".git/worktrees" in patterns
+    assert ".git/config.worktree" in patterns
+    assert ".git/**.lock" in patterns
+
+
+def test_ignore_reconciliation_replaces_legacy_git_rule_and_keeps_local_rules(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "folders.json"
+    write_manifest(path, [ENTRY])
+    folder = load_manifest(path).select("qbio")
+
+    updated = reconcile_ignore_text(".git\n/local-only\n", folder)
+
+    assert ".git\n" not in updated
+    assert ".git/worktrees\n" in updated
+    assert "/local-only\n" in updated
+
+
+def test_git_filesystem_settings_move_to_machine_local_config(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-b", "main")
+    git(repo, "config", "core.filemode", "false")
+    git(repo, "config", "core.ignorecase", "true")
+
+    Syncthing(Runner(local_host="mac"))._migrate_git_config("mac", repo)
+
+    shared = (repo / ".git/config").read_text(encoding="utf-8")
+    local = (repo / ".git/config.worktree").read_text(encoding="utf-8")
+    assert "worktreeConfig = true" in shared
+    assert "filemode" not in shared
+    assert "ignorecase" not in shared
+    assert "filemode = false" in local
+    assert "ignorecase = true" in local
+
+
+def test_syncthing_control_files_are_locally_git_ignored(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-b", "main")
+
+    Syncthing(Runner(local_host="mac"))._add_local_git_exclude("mac", repo)
+
+    excludes = (repo / ".git/info/exclude").read_text(encoding="utf-8").splitlines()
+    assert ".stignore" in excludes
+    assert ".stfolder" in excludes
+
+
+def test_syncthing_idle_status_requires_cross_device_sequence_convergence() -> None:
+    statuses = {
+        "mac": {
+            "state": "idle",
+            "sequence": 10,
+            "remoteSequence": {"tsuki": 8},
+        },
+        "tsuki": {
+            "state": "idle",
+            "sequence": 12,
+            "remoteSequence": {"mac": 8},
+        },
+    }
+
+    assert not statuses_converged(statuses)
+    statuses["mac"]["remoteSequence"] = {"tsuki": 12}
+    statuses["tsuki"]["remoteSequence"] = {"mac": 10}
+    assert statuses_converged(statuses)
+
+
+def test_syncthing_scan_uses_authenticated_rest_post() -> None:
+    calls: list[tuple[list[str], str | None]] = []
+
+    def execute(argv: list[str], input_text: str | None) -> str:
+        calls.append((argv, input_text))
+        if "apikey" in argv:
+            return "secret"
+        if "raw-address" in argv:
+            return "127.0.0.1:8384"
+        return ""
+
+    Syncthing(Runner(local_host="mac", execute=execute)).scan("mac", "folder-id")
+
+    assert calls[-1] == (
+        [
+            "curl",
+            "-fsS",
+            "-X",
+            "POST",
+            "-H",
+            "@-",
+            "http://127.0.0.1:8384/rest/db/scan?folder=folder-id",
+        ],
+        "X-API-Key: secret\n",
+    )
+
+
+def test_handoff_with_no_external_worktrees_does_not_touch_main_git_state() -> None:
+    class NoMainMutationRunner:
+        local_host = "mac"
+
+        def run(self, *args: object, **kwargs: object) -> str:
+            raise AssertionError("main Git state must be left to Syncthing")
+
+    folder = Folder(
+        "project",
+        "project",
+        Path("/Volumes/WorkSSD/Work/project"),
+        Path("/home/dileep/Documents/Work/project"),
+        "git",
+        "local",
+        (),
+    )
+    state = RepoState(
+        "mac",
+        folder.mac,
+        "github.com/example/project",
+        "main",
+        "a" * 40,
+        {"main": "a" * 40},
+        "",
+        "",
+    )
+    repository = RepositoryPlan(
+        NoMainMutationRunner(), state, replace(state, host="tsuki", path=folder.tsuki)
+    )  # type: ignore[arg-type]
+    plan = HandoffPlan(
+        "mac",
+        "tsuki",
+        (FolderHandoff(folder, repository, None, None, (), ()),),
+        Path("/tmp/recovery"),
+    )
+
+    results = Handoff(NoMainMutationRunner(), None, None).execute(plan)  # type: ignore[arg-type]
+
+    assert results[0].worktrees == 0
 
 
 def test_preflight_ignores_unrelated_lock_but_rejects_index_lock(
@@ -181,66 +334,7 @@ def test_preflight_ignores_unrelated_lock_but_rejects_index_lock(
         )
 
 
-def test_git_handoff_reproduces_branch_index_and_worktree(tmp_path: Path) -> None:
-    source = tmp_path / "source"
-    target = tmp_path / "target"
-    source.mkdir()
-    git(source, "init", "-b", "main")
-    git(source, "config", "user.name", "Work Sync Test")
-    git(source, "config", "user.email", "work-sync@example.test")
-    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
-    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
-    (source / "delete-me.txt").write_text("delete me\n", encoding="utf-8")
-    (source / "script.sh").write_text("#!/bin/sh\necho base\n", encoding="utf-8")
-    git(source, "add", ".")
-    git(source, "commit", "-m", "base")
-
-    git(tmp_path, "clone", str(source), str(target))
-    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
-    git(target, "config", "work-sync.marker", "target-local")
-
-    (source / "committed.txt").write_text("committed\n", encoding="utf-8")
-    git(source, "add", "committed.txt")
-    git(source, "commit", "-m", "source ahead")
-    (source / "tracked.txt").write_text("staged\n", encoding="utf-8")
-    git(source, "add", "tracked.txt")
-    (source / "tracked.txt").write_text("unstaged\n", encoding="utf-8")
-    (source / "untracked.txt").write_text("untracked\n", encoding="utf-8")
-    (source / "delete-me.txt").unlink()
-    (source / "script.sh").chmod(0o755)
-    git(source, "add", "script.sh")
-
-    subprocess.run(
-        [
-            "rsync",
-            "-r",
-            "--delete",
-            "--executability",
-            "--exclude=.git/",
-            f"{source}/",
-            f"{target}/",
-        ],
-        check=True,
-    )
-    runner = Runner(local_host="mac")
-
-    plan = preflight_repository(runner, "mac", source, "mac", target)
-    transfer_git_state(runner, plan)
-
-    assert git(target, "rev-parse", "HEAD") == git(source, "rev-parse", "HEAD")
-    assert git(target, "diff", "--cached", "--binary") == git(
-        source, "diff", "--cached", "--binary"
-    )
-    assert git(target, "diff", "--binary") == git(source, "diff", "--binary")
-    assert git(target, "status", "--short") == git(source, "status", "--short")
-    assert (target / "script.sh").stat().st_mode & 0o111
-    assert git(target, "config", "work-sync.marker") == "target-local"
-    assert canonical_origin(runner, "mac", target) == "github.com/example/project"
-
-
-def test_git_handoff_switches_target_main_checkout_to_source_branch(
-    tmp_path: Path,
-) -> None:
+def test_preflight_rejects_syncthing_conflict_copies(tmp_path: Path) -> None:
     source = tmp_path / "source"
     target = tmp_path / "target"
     source.mkdir()
@@ -251,72 +345,14 @@ def test_git_handoff_switches_target_main_checkout_to_source_branch(
     (source / "tracked.txt").write_text("base\n", encoding="utf-8")
     git(source, "add", ".")
     git(source, "commit", "-m", "base")
-    base = git(source, "rev-parse", "HEAD")
     git(tmp_path, "clone", str(source), str(target))
     git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    conflict = source / "notes.sync-conflict-20260828-120000-DEVICE.txt"
+    conflict.write_text("unresolved\n", encoding="utf-8")
 
-    git(source, "switch", "-c", "feat/runtime")
-    (source / "tracked.txt").write_text("feature\n", encoding="utf-8")
-    git(source, "commit", "-am", "feature")
-    subprocess.run(
-        [
-            "rsync",
-            "-r",
-            "--delete",
-            "--exclude=.git/",
-            f"{source}/",
-            f"{target}/",
-        ],
-        check=True,
-    )
-
-    runner = Runner(local_host="mac")
-    plan = preflight_repository(
-        runner,
-        "mac",
-        source,
-        "mac",
-        target,
-        allow_branch_switch=True,
-    )
-    transfer_git_state(runner, plan)
-
-    assert git(target, "branch", "--show-current") == "feat/runtime"
-    assert git(target, "rev-parse", "HEAD") == git(source, "rev-parse", "HEAD")
-    assert git(target, "rev-parse", "main") == base
-    assert git(target, "status", "--short") == git(source, "status", "--short")
-
-
-def test_git_handoff_rejects_switch_to_a_branch_checked_out_elsewhere(
-    tmp_path: Path,
-) -> None:
-    source = tmp_path / "source"
-    target = tmp_path / "target"
-    linked = tmp_path / "linked"
-    source.mkdir()
-    git(source, "init", "-b", "main")
-    git(source, "config", "user.name", "Work Sync Test")
-    git(source, "config", "user.email", "work-sync@example.test")
-    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
-    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
-    git(source, "add", ".")
-    git(source, "commit", "-m", "base")
-    git(tmp_path, "clone", str(source), str(target))
-    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
-    git(target, "worktree", "add", "-b", "feat/runtime", str(linked))
-    git(source, "switch", "-c", "feat/runtime")
-    (source / "tracked.txt").write_text("feature\n", encoding="utf-8")
-    git(source, "commit", "-am", "feature")
-    (target / "tracked.txt").write_text("feature\n", encoding="utf-8")
-
-    with pytest.raises(UsageError, match="checked out elsewhere"):
+    with pytest.raises(UsageError, match="Syncthing conflict"):
         preflight_repository(
-            Runner(local_host="mac"),
-            "mac",
-            source,
-            "mac",
-            target,
-            allow_branch_switch=True,
+            Runner(local_host="mac"), "mac", source, "mac", target
         )
 
 
@@ -614,12 +650,19 @@ def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     recovery = tmp_path / "recovery"
     source.mkdir()
     target.mkdir()
+    external = tmp_path / "external-data"
+    external.mkdir()
+    (target / "data").symlink_to(external, target_is_directory=True)
     (source / "changed.txt").write_text("source\n", encoding="utf-8")
     (source / "script.sh").write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
     (source / "script.sh").chmod(0o755)
     (target / "changed.txt").write_text("target\n", encoding="utf-8")
     (target / "target-only.txt").write_text("keep me\n", encoding="utf-8")
     (target / ".git").write_text("gitdir: target-local\n", encoding="utf-8")
+    (source / "nested/.git").mkdir(parents=True)
+    (target / "nested/.git").mkdir(parents=True)
+    (source / "nested/.git/index").write_text("source\n", encoding="utf-8")
+    (target / "nested/.git/index").write_text("target\n", encoding="utf-8")
     (source / ".stfolder").mkdir()
     (target / ".stfolder").mkdir()
     (source / ".stfolder/marker").write_text("source\n", encoding="utf-8")
@@ -656,8 +699,10 @@ def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     assert (target / "changed.txt").read_text(encoding="utf-8") == "source\n"
     assert not (target / "target-only.txt").exists()
     assert (target / ".git").read_text(encoding="utf-8") == "gitdir: target-local\n"
+    assert (target / "nested/.git/index").read_text(encoding="utf-8") == "target\n"
     assert (target / ".stfolder/marker").read_text(encoding="utf-8") == "target\n"
     assert (target / ".serena/project.yml").read_text(encoding="utf-8") == "target\n"
+    assert (target / "data").readlink() == external
     assert (target / "script.sh").stat().st_mode & 0o111
     assert (recovery / "changed.txt").read_text(encoding="utf-8") == "target\n"
     assert (recovery / "target-only.txt").read_text(encoding="utf-8") == "keep me\n"
@@ -707,15 +752,15 @@ def test_reverse_rsync_uses_the_mac_client() -> None:
         dry_run=True,
     )
 
-    assert calls[0][:5] == [
+    rsync_call = next(call for call in calls if "rsync " in call[-1])
+    assert rsync_call[:5] == [
         "ssh",
         "-o",
         "BatchMode=yes",
         "-o",
         "ConnectTimeout=8",
     ]
-    assert "rsync " in calls[0][-1]
-    assert "tsuki:/tmp/source/ /private/tmp/target/" in calls[0][-1]
+    assert "tsuki:/tmp/source/ /private/tmp/target/" in rsync_call[-1]
 
 
 def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
@@ -829,11 +874,38 @@ def test_orca_create_renames_version_normalized_branch() -> None:
     )
 
 
+def test_orca_verification_uses_stable_path_and_branch() -> None:
+    path = Path("/target/worktree")
+    current = OrcaWorktree(
+        "inventory-id", "repo", path, "feat/a", "feat/a", False, ()
+    )
+    repo = OrcaRepo(
+        "repo",
+        Path("/target"),
+        "project",
+        "github.com/example/project",
+        (current,),
+    )
+
+    class InventoryOrca(Orca):
+        def inventory(self, host: str) -> OrcaInventory:  # type: ignore[override]
+            return OrcaInventory((repo,))
+
+    created = OrcaWorktree(
+        "create-response-id", "repo", path, "feat/a", "feat/a", False, ()
+    )
+
+    InventoryOrca(Runner(local_host="mac")).verify_worktree(
+        "mac", repo.path, created
+    )
+
+
 def test_root_help_contains_handoff_examples() -> None:
     result = CliRunner().invoke(app, ["--help"])
 
     assert result.exit_code == 0
     assert "target means the receiving machine" in result.stdout.lower()
+    assert "orca worktrees" in result.stdout.lower()
     assert "work-sync handoff tsuki --dry-run" in result.stdout
 
 
@@ -842,6 +914,7 @@ def test_no_arguments_show_help() -> None:
 
     assert result.exit_code == 0
     assert "bootstrap" in result.stdout
+    assert "conflicts" in result.stdout
     assert "handoff" in result.stdout
 
 

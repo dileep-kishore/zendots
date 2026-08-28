@@ -1,1 +1,2 @@
-find . -type f -name "*.sync-conflict*" -exec rm -f {} \;
+#!/bin/sh
+exec work-sync conflicts "$@"

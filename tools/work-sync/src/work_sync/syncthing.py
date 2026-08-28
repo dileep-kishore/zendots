@@ -32,6 +32,12 @@ LOCAL_STATE_IGNORES = (
     ".serena/project.yml",
     ".serena/project.local.yml",
 )
+MACHINE_LOCAL_GIT_KEYS = (
+    "core.filemode",
+    "core.ignorecase",
+    "core.precomposeunicode",
+    "core.symlinks",
+)
 
 
 @dataclass(frozen=True)
@@ -90,7 +96,50 @@ def folder_payload(
 
 def managed_patterns(folder: Folder) -> tuple[str, ...]:
     """Return manifest and shared ignore patterns without duplicates."""
-    return tuple(dict.fromkeys((*folder.ignore, *LOCAL_STATE_IGNORES)))
+    git_state = (
+        (".git/worktrees", ".git/config.worktree", ".git/**.lock")
+        if folder.git != "none"
+        else ()
+    )
+    return tuple(dict.fromkeys((*folder.ignore, *git_state, *LOCAL_STATE_IGNORES)))
+
+
+def reconcile_ignore_text(current: str, folder: Folder) -> str:
+    """Replace the legacy whole-.git ignore while preserving local rules."""
+    lines = [line for line in current.splitlines() if line not in {".git", "/.git"}]
+    lines.extend(
+        pattern for pattern in managed_patterns(folder) if pattern not in lines
+    )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def statuses_converged(statuses: dict[Host, dict[str, Any]]) -> bool:
+    """Return whether both devices are idle, complete, and mutually current."""
+    if not all(
+        status.get("state") == "idle"
+        and sum(
+            int(status.get(key, 0))
+            for key in (
+                "needFiles",
+                "needDirectories",
+                "needDeletes",
+                "needBytes",
+            )
+        )
+        == 0
+        and not status.get("errors")
+        and not status.get("invalid")
+        for status in statuses.values()
+    ):
+        return False
+    for host, other in (("mac", "tsuki"), ("tsuki", "mac")):
+        remote_sequences = {
+            int(value)
+            for value in statuses[host].get("remoteSequence", {}).values()
+        }
+        if int(statuses[other].get("sequence", -1)) not in remote_sequences:
+            return False
+    return True
 
 
 class Syncthing:
@@ -260,28 +309,78 @@ class Syncthing:
         if not exclude_path.is_absolute():
             exclude_path = repo / exclude_path
         current = self._read_text(host, exclude_path)
-        if ".stignore" in current.splitlines():
+        lines = current.splitlines()
+        missing = [name for name in (".stignore", ".stfolder") if name not in lines]
+        if not missing:
             return
-        updated = current.rstrip() + "\n.stignore\n"
+        updated = current.rstrip() + "\n" + "\n".join(missing) + "\n"
         self._write_text(host, exclude_path, updated.lstrip("\n"), "0644")
+
+    def _migrate_git_config(self, host: Host, repo: Path) -> None:
+        values: dict[str, str] = {}
+        for key in MACHINE_LOCAL_GIT_KEYS:
+            try:
+                values[key] = self.runner.run(
+                    host,
+                    ["git", "-C", str(repo), "config", "--local", "--get", key],
+                )
+            except subprocess.CalledProcessError:
+                pass
+        self.runner.run(
+            host,
+            [
+                "git",
+                "-C",
+                str(repo),
+                "config",
+                "--local",
+                "extensions.worktreeConfig",
+                "true",
+            ],
+        )
+        for key, value in values.items():
+            self.runner.run(
+                host,
+                ["git", "-C", str(repo), "config", "--local", "--unset-all", key],
+            )
+            self.runner.run(
+                host,
+                ["git", "-C", str(repo), "config", "--worktree", key, value],
+            )
+
+    def _folder_repositories(self, host: Host, folder: Folder) -> tuple[Path, ...]:
+        if folder.folder_class == "git":
+            return (folder.path(host),)
+        output = self.runner.run(
+            host,
+            [
+                "find",
+                str(folder.path(host)),
+                "-type",
+                "d",
+                "-name",
+                ".git",
+                "-prune",
+                "-print",
+            ],
+        )
+        return tuple(Path(line).parent for line in output.splitlines())
 
     def _install_ignores(
         self,
         folder: Folder,
         repository_managed: bool,
     ) -> None:
-        if repository_managed:
-            return
-        patterns = managed_patterns(folder)
         for host in ("mac", "tsuki"):
             ignore_path = folder.path(host) / ".stignore"
-            current = self._read_text(host, ignore_path)
-            lines = current.splitlines()
-            lines.extend(pattern for pattern in patterns if pattern not in lines)
-            updated = "\n".join(lines).rstrip() + "\n"
-            if updated != current:
-                self._write_text(host, ignore_path, updated, "0644")
-            if folder.folder_class == "git":
+            if not repository_managed:
+                current = self._read_text(host, ignore_path)
+                updated = reconcile_ignore_text(current, folder)
+                if updated != current:
+                    self._write_text(host, ignore_path, updated, "0644")
+            for repo in self._folder_repositories(host, folder):
+                self._migrate_git_config(host, repo)
+            if folder.folder_class == "git" and not repository_managed:
                 self._add_local_git_exclude(host, folder.path(host))
 
     def _backup_configs(self) -> None:
@@ -391,8 +490,27 @@ class Syncthing:
                 "set",
                 "false",
             )
+            self.scan(host, folder.id)
         self.wait_idle(folder.id, timeout)
         return plan
+
+    def scan(self, host: Host, folder_id: str) -> None:
+        """Request an immediate authenticated folder scan."""
+        key = self.st(host, "config", "gui", "apikey", "get")
+        address = self.st(host, "config", "gui", "raw-address", "get")
+        self.runner.run(
+            host,
+            [
+                "curl",
+                "-fsS",
+                "-X",
+                "POST",
+                "-H",
+                "@-",
+                f"http://{address}/rest/db/scan?folder={folder_id}",
+            ],
+            input_text=f"X-API-Key: {key}\n",
+        )
 
     def status(self, host: Host, folder_id: str) -> dict[str, Any]:
         """Read one folder status through Syncthing's local REST endpoint."""
@@ -419,22 +537,7 @@ class Syncthing:
             statuses: dict[Host, dict[str, Any]] = {
                 host: self.status(host, folder_id) for host in ("mac", "tsuki")
             }
-            if all(
-                status.get("state") == "idle"
-                and sum(
-                    int(status.get(key, 0))
-                    for key in (
-                        "needFiles",
-                        "needDirectories",
-                        "needDeletes",
-                        "needBytes",
-                    )
-                )
-                == 0
-                and not status.get("errors")
-                and not status.get("invalid")
-                for status in statuses.values()
-            ):
+            if statuses_converged(statuses):
                 return statuses
             if self.monotonic() >= deadline:
                 raise UsageError(
