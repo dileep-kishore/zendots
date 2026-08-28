@@ -5,3 +5,4 @@ docs/plans/
 *.pyc
 /.superpowers/brainstorm
 /private_dot_config/work-sync/folders.json
+docs/superpowers/
