@@ -178,6 +178,31 @@ class Syncthing:
         except subprocess.CalledProcessError as error:
             raise UsageError(f"missing {host} directory: {path}") from error
 
+    def _target_state(self, host: Host, path: Path) -> str:
+        """Return whether a prospective target is missing, empty, or nonempty."""
+        try:
+            self.runner.run(host, ["test", "-e", str(path)])
+        except subprocess.CalledProcessError:
+            return "missing"
+        try:
+            self.runner.run(host, ["test", "-d", str(path)])
+        except subprocess.CalledProcessError as error:
+            raise UsageError(f"destination is not a directory: {path}") from error
+        output = self.runner.run(
+            host,
+            [
+                "find",
+                str(path),
+                "-mindepth",
+                "1",
+                "-maxdepth",
+                "1",
+                "-print",
+                "-quit",
+            ],
+        )
+        return "nonempty" if output else "empty"
+
     def _git_preflight(self, folder: Folder) -> None:
         if folder.folder_class != "git":
             return
@@ -300,6 +325,25 @@ class Syncthing:
                 )
         return True
 
+    def _stignore_preflight_new(self, folder: Folder, source: Host) -> bool:
+        if folder.folder_class != "git" or not self._tracked_stignore(
+            source, folder.path(source)
+        ):
+            return False
+        required = set(folder.ignore) | {
+            ".git/worktrees",
+            ".git/config.worktree",
+            ".git/**.lock",
+        }
+        current = self._read_text(source, folder.path(source) / ".stignore")
+        missing = required - set(current.splitlines())
+        if missing:
+            raise UsageError(
+                "tracked .stignore is missing required Git patterns: "
+                + ", ".join(sorted(missing))
+            )
+        return True
+
     def _add_local_git_exclude(self, host: Host, repo: Path) -> None:
         raw_path = self.runner.run(
             host,
@@ -366,22 +410,42 @@ class Syncthing:
         )
         return tuple(Path(line).parent for line in output.splitlines())
 
+    def _install_ignore_file(
+        self,
+        host: Host,
+        folder: Folder,
+        repository_managed: bool,
+        managed_text: str | None = None,
+    ) -> None:
+        ignore_path = folder.path(host) / ".stignore"
+        if repository_managed:
+            if managed_text is not None:
+                self._write_text(host, ignore_path, managed_text, "0644")
+            return
+        current = self._read_text(host, ignore_path)
+        updated = reconcile_ignore_text(current, folder)
+        if updated != current:
+            self._write_text(host, ignore_path, updated, "0644")
+
+    def _install_git_state(
+        self,
+        host: Host,
+        folder: Folder,
+        repository_managed: bool,
+    ) -> None:
+        for repo in self._folder_repositories(host, folder):
+            self._migrate_git_config(host, repo)
+        if folder.folder_class == "git" and not repository_managed:
+            self._add_local_git_exclude(host, folder.path(host))
+
     def _install_ignores(
         self,
         folder: Folder,
         repository_managed: bool,
     ) -> None:
         for host in ("mac", "tsuki"):
-            ignore_path = folder.path(host) / ".stignore"
-            if not repository_managed:
-                current = self._read_text(host, ignore_path)
-                updated = reconcile_ignore_text(current, folder)
-                if updated != current:
-                    self._write_text(host, ignore_path, updated, "0644")
-            for repo in self._folder_repositories(host, folder):
-                self._migrate_git_config(host, repo)
-            if folder.folder_class == "git" and not repository_managed:
-                self._add_local_git_exclude(host, folder.path(host))
+            self._install_ignore_file(host, folder, repository_managed)
+            self._install_git_state(host, folder, repository_managed)
 
     def _backup_configs(self) -> None:
         stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
@@ -464,6 +528,99 @@ class Syncthing:
             if current is not None:
                 self._validate_existing(current, expected[host])
         return BootstrapPlan(folder, configs, expected, repository_managed)
+
+    def plan_new(self, folder: Folder, source: Host) -> BootstrapPlan:
+        """Validate a one-sided folder before its first synchronization."""
+        target: Host = "tsuki" if source == "mac" else "mac"
+        self._check_directory(source, folder.path(source))
+        configs: dict[Host, dict[str, Any]] = {
+            host: self.config(host) for host in ("mac", "tsuki")
+        }
+        target_current = next(
+            (
+                item
+                for item in configs[target].get("folders", [])
+                if item.get("id") == folder.id
+            ),
+            None,
+        )
+        if (
+            self._target_state(target, folder.path(target)) == "nonempty"
+            and not target_current
+        ):
+            raise UsageError(f"refusing nonempty destination: {folder.path(target)}")
+        repository_managed = self._stignore_preflight_new(folder, source)
+        for host in ("mac", "tsuki"):
+            self._overlap_preflight(host, folder, configs[host])
+        mac_id = self.runner.run("mac", [MAC_SYNCTHING, "device-id"])
+        tsuki_id = self.runner.run("tsuki", ["syncthing", "device-id"])
+        expected: dict[Host, dict[str, Any]] = {
+            host: folder_payload(
+                json.loads(
+                    self.st(host, "config", "defaults", "folder", "dump-json")
+                ),
+                folder,
+                mac_id,
+                tsuki_id,
+                host,
+            )
+            for host in ("mac", "tsuki")
+        }
+        for host in ("mac", "tsuki"):
+            current = next(
+                (
+                    item
+                    for item in configs[host].get("folders", [])
+                    if item.get("id") == folder.id
+                ),
+                None,
+            )
+            if current is not None:
+                self._validate_existing(current, expected[host])
+        return BootstrapPlan(folder, configs, expected, repository_managed)
+
+    def apply_new(
+        self,
+        plan: BootstrapPlan,
+        source: Host,
+        *,
+        timeout: int,
+    ) -> None:
+        """Install and synchronize a folder that exists on only one host."""
+        folder = plan.folder
+        target: Host = "tsuki" if source == "mac" else "mac"
+        self._backup_configs()
+        self.runner.run(target, ["mkdir", "-p", str(folder.path(target))])
+        managed_text = (
+            self._read_text(source, folder.path(source) / ".stignore")
+            if plan.repository_managed_ignore
+            else None
+        )
+        self._install_ignore_file(source, folder, plan.repository_managed_ignore)
+        self._install_ignore_file(
+            target,
+            folder,
+            plan.repository_managed_ignore,
+            managed_text,
+        )
+        self._install_git_state(source, folder, plan.repository_managed_ignore)
+        for host in ("mac", "tsuki"):
+            self._add_or_pause(host, plan.configs[host], plan.expected[host])
+            self.st(
+                host,
+                "config",
+                "folders",
+                folder.id,
+                "paused",
+                "set",
+                "false",
+            )
+            self.scan(host, folder.id)
+        self.wait_idle(folder.id, timeout)
+        self._install_git_state(target, folder, plan.repository_managed_ignore)
+        for host in ("mac", "tsuki"):
+            self.scan(host, folder.id)
+        self.wait_idle(folder.id, timeout)
 
     def bootstrap(
         self,

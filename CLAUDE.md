@@ -101,6 +101,13 @@ macmini and tsuki from `~/.config/work-sync/folders.json`, then adds the file to
 that checkout's `.git/info/exclude`. Do not ignore `.stignore` globally or add it
 to project `.gitignore` files.
 
+New folders use the same relative path beneath `/Volumes/WorkSSD` on macmini
+and `/home/dileep/Documents` on tsuki. Run `work-sync add` from the new folder,
+or pass its path explicitly. The command detects Git repositories, previews both
+paths, updates the private manifest, configures Syncthing, and waits for both
+machines. Use `--type container` only for a non-Git parent containing nested Git
+repositories; `--yes` skips the confirmation prompt.
+
 Project folders sync their complete normal Git repository, including `.git`.
 Only `.git/worktrees`, `.git/config.worktree`, and transient Git lock files stay
 local because linked worktree indexes, paths, filesystem settings, and active

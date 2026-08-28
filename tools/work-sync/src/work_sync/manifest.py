@@ -25,6 +25,9 @@ TSUKI_ROOTS = (
     "/home/dileep/Documents/LifeOS",
     "/home/dileep/zendots",
 )
+MAC_SYNC_ROOT = Path("/Volumes/WorkSSD")
+TSUKI_SYNC_ROOT = Path("/home/dileep/Documents")
+ZENDOTS_PATHS = (Path("/Users/dkishore/zendots"), Path("/home/dileep/zendots"))
 
 
 class UsageError(ValueError):
@@ -118,6 +121,19 @@ def _folder(raw: object) -> Folder:
         raise UsageError(f"unsafe Mac path: {raw['mac']}")
     if not _within(raw["tsuki"], TSUKI_ROOTS):
         raise UsageError(f"unsafe tsuki path: {raw['tsuki']}")
+    mac_path = Path(raw["mac"])
+    tsuki_path = Path(raw["tsuki"])
+    if (mac_path, tsuki_path) != ZENDOTS_PATHS:
+        try:
+            paths_match = mac_path.relative_to(
+                MAC_SYNC_ROOT
+            ) == tsuki_path.relative_to(TSUKI_SYNC_ROOT)
+        except ValueError:
+            paths_match = False
+        if not paths_match:
+            raise UsageError(
+                f"cross-machine relative paths differ: {mac_path} and {tsuki_path}"
+            )
     ignores = raw["ignore"]
     if not isinstance(ignores, list) or any(
         not isinstance(pattern, str) or not pattern for pattern in ignores

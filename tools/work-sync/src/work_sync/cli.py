@@ -17,6 +17,12 @@ from rich.console import Console
 from rich.prompt import Confirm
 from rich.table import Table
 
+from .add import (
+    infer_destination,
+    install_manifest,
+    manifest_with_folder,
+    source_folder,
+)
 from .conflicts import apply_conflicts, scan_conflicts
 from .coordinator import Handoff, HandoffPlan, verify_manifest_copies
 from .handoff import Orca
@@ -31,6 +37,7 @@ Examples:
 
     work-sync bootstrap QBio_perspective
     work-sync bootstrap QBio_perspective --apply
+    work-sync add /Volumes/WorkSSD/Work/my-project
     work-sync handoff tsuki
     work-sync handoff tsuki --dry-run
 """
@@ -40,6 +47,14 @@ Examples:
 
     work-sync bootstrap QBio_perspective
     work-sync bootstrap QBio_perspective --apply
+"""
+
+ADD_EPILOG = """
+Examples:
+
+    cd /Volumes/WorkSSD/Work/my-project && work-sync add
+    work-sync add /home/dileep/Documents/Personal/my-project
+    work-sync add . --yes
 """
 
 HANDOFF_EPILOG = """
@@ -83,6 +98,14 @@ class Target(StrEnum):
         return "mac" if self is Target.MACMINI else "tsuki"
 
 
+class FolderKind(StrEnum):
+    """Manifest folder classes."""
+
+    GIT = "git"
+    PLAIN = "plain"
+    CONTAINER = "container"
+
+
 @app.callback()
 def main(ctx: typer.Context) -> None:
     """Show help when no command is provided."""
@@ -123,6 +146,24 @@ def _show_bootstrap(plan: BootstrapPlan, apply: bool) -> None:
         if apply
         else "Dry run passed. Add [bold]--apply[/bold] to configure the folder."
     )
+
+
+def _show_add(plan: BootstrapPlan) -> None:
+    table = Table(title="New Syncthing folder")
+    table.add_column("Folder")
+    table.add_column("Type")
+    table.add_column("ID")
+    table.add_column("macmini")
+    table.add_column("tsuki")
+    folder = plan.folder
+    table.add_row(
+        folder.label,
+        folder.folder_class,
+        folder.id,
+        str(folder.mac),
+        str(folder.tsuki),
+    )
+    console.print(table)
 
 
 def _show_handoff(plan: HandoffPlan, dry_run: bool) -> None:
@@ -191,6 +232,65 @@ def bootstrap(
     except (UsageError, subprocess.CalledProcessError) as error:
         _abort(error)
     _show_bootstrap(plan, apply)
+
+
+@app.command(epilog=ADD_EPILOG, rich_help_panel="Syncthing")
+def add(
+    source: Annotated[
+        Path,
+        typer.Argument(help="Existing folder on this machine."),
+    ] = Path("."),
+    destination: Annotated[
+        Path | None,
+        typer.Option(
+            "--destination",
+            help="Expected path on the other machine. Relative paths must match.",
+        ),
+    ] = None,
+    kind: Annotated[
+        FolderKind | None,
+        typer.Option("--type", help="Override automatic Git/plain detection."),
+    ] = None,
+    yes: Annotated[
+        bool,
+        typer.Option("--yes", help="Skip the confirmation prompt."),
+    ] = False,
+    timeout: Annotated[
+        int,
+        typer.Option(min=1, help="Seconds to wait for synchronization."),
+    ] = 300,
+) -> None:
+    """Add a new folder using the same relative path on both machines."""
+    try:
+        host = detect_host()
+        local_source = source.expanduser().resolve()
+        inferred = infer_destination(host, local_source)
+        target = destination or inferred
+        if target != inferred:
+            raise UsageError(
+                f"destination must preserve the relative path; expected {inferred}"
+            )
+        runner = Runner(host)
+        verify_manifest_copies(runner)
+        current = DEFAULT_MANIFEST_PATH.read_text(encoding="utf-8")
+        folder = source_folder(
+            host,
+            local_source,
+            target,
+            folder_class=kind.value if kind else None,
+        )
+        updated = manifest_with_folder(current, folder)
+        service = Syncthing(runner)
+        plan = service.plan_new(folder, host)
+        _show_add(plan)
+        if not yes and not Confirm.ask("Add and synchronize this folder?"):
+            console.print("Cancelled. Nothing changed.")
+            return
+        install_manifest(runner, service, current, updated, timeout=timeout)
+        service.apply_new(plan, host, timeout=timeout)
+    except (OSError, UsageError, subprocess.CalledProcessError) as error:
+        _abort(error)
+    console.print("[green]Added and synchronized on both machines.[/green]")
 
 
 @app.command(epilog=HANDOFF_EPILOG, rich_help_panel="Git")
