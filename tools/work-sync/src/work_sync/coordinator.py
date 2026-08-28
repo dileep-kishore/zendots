@@ -207,7 +207,7 @@ class Handoff:
                             )
                         except UsageError as error:
                             raise UsageError(
-                                f"{folder.label} [{pair.source.branch}]: {error}"
+                                f"{folder.label} ({pair.source.branch}): {error}"
                             ) from error
                         existing.append((pair, external))
                         continue
@@ -221,7 +221,7 @@ class Handoff:
                         )
                     except UsageError as error:
                         raise UsageError(
-                            f"{folder.label} [{pair.source.branch}]: {error}"
+                            f"{folder.label} ({pair.source.branch}): {error}"
                         ) from error
                     old_commit = main.target.branches.get(pair.source.branch)
                     missing.append(
