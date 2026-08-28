@@ -323,6 +323,21 @@ class Orca:
             raise UsageError(f"Orca verification failed: {worktree.path}")
 
 
+def _rsync_endpoints(
+    source_host: Host,
+    source_path: Path,
+    target_host: Host,
+    target_path: Path,
+) -> tuple[Host, tuple[str, str]]:
+    if source_host == "tsuki" and target_host == "mac":
+        return "mac", (f"tsuki:{source_path}/", f"{target_path}/")
+    destination = f"{target_path}/"
+    if target_host != source_host:
+        alias = "tsuki" if target_host == "tsuki" else "macmini"
+        destination = f"{alias}:{destination}"
+    return source_host, (f"{source_path}/", destination)
+
+
 def sync_worktree_files(
     runner: Runner,
     source_host: Host,
@@ -337,10 +352,12 @@ def sync_worktree_files(
     """Mirror external worktree files and retain replaced target files."""
     if source_host != runner.local_host:
         raise UsageError("handoff source must be the current host")
-    destination = str(target_path) + "/"
-    if target_host != runner.local_host:
-        alias = "tsuki" if target_host == "tsuki" else "macmini"
-        destination = f"{alias}:{destination}"
+    rsync_host, endpoints = _rsync_endpoints(
+        source_host,
+        source_path,
+        target_host,
+        target_path,
+    )
     command = [
         "rsync",
         "-rlic",
@@ -371,9 +388,8 @@ def sync_worktree_files(
         if any(path.startswith(bare + "/") for path in included_paths):
             pattern = pattern.rstrip("/") + "/***"
         command.append(f"--exclude={pattern}")
-    endpoints = (str(source_path) + "/", destination)
     deletion_scan = runner.run(
-        source_host,
+        rsync_host,
         [*command, "--dry-run", "--delete-after", *endpoints],
     )
     if dry_run:
@@ -405,7 +421,7 @@ def sync_worktree_files(
         )
 
     updated = runner.run(
-        source_host,
+        rsync_host,
         [
             *command,
             "--backup",
@@ -414,7 +430,7 @@ def sync_worktree_files(
         ],
     )
     deleted = runner.run(
-        source_host,
+        rsync_host,
         [*command, "--delete-after", *endpoints],
     )
     return tuple(
@@ -567,10 +583,12 @@ def _working_tree_changes(
 ) -> tuple[str, ...]:
     if source.host != runner.local_host:
         raise UsageError("handoff source must be the current host")
-    destination = str(target.path) + "/"
-    if target.host != runner.local_host:
-        alias = "tsuki" if target.host == "tsuki" else "macmini"
-        destination = f"{alias}:{destination}"
+    rsync_host, endpoints = _rsync_endpoints(
+        source.host,
+        source.path,
+        target.host,
+        target.path,
+    )
     command = [
         "rsync",
         "-rlinc",
@@ -581,8 +599,8 @@ def _working_tree_changes(
     for pattern in (*TREE_EXCLUDES, *excludes):
         if not pattern.startswith("!"):
             command.append(f"--exclude={pattern}")
-    command.extend((str(source.path) + "/", destination))
-    output = runner.run(source.host, command)
+    command.extend(endpoints)
+    output = runner.run(rsync_host, command)
     return tuple(
         line for line in output.splitlines() if line and not line.startswith(".")
     )
