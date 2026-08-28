@@ -456,6 +456,35 @@ def test_rsync_honors_manifest_reincludes(tmp_path: Path) -> None:
     assert not (target / "build/disposable.log").exists()
 
 
+def test_reverse_rsync_uses_the_mac_client() -> None:
+    calls: list[list[str]] = []
+
+    def execute(argv: list[str], input_text: str | None) -> str:
+        calls.append(argv)
+        return ""
+
+    sync_worktree_files(
+        Runner(local_host="tsuki", execute=execute),
+        "tsuki",
+        Path("/tmp/source"),
+        "mac",
+        Path("/private/tmp/target"),
+        Path("/private/tmp/recovery"),
+        excludes=(),
+        dry_run=True,
+    )
+
+    assert calls[0][:5] == [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=8",
+    ]
+    assert "rsync " in calls[0][-1]
+    assert "tsuki:/tmp/source/ /private/tmp/target/" in calls[0][-1]
+
+
 def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
     calls: list[list[str]] = []
 
