@@ -7,6 +7,7 @@ import os
 import subprocess
 from collections.abc import Iterator
 from contextlib import contextmanager, nullcontext
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, NoReturn
@@ -16,6 +17,7 @@ from rich.console import Console
 from rich.prompt import Confirm
 from rich.table import Table
 
+from .conflicts import apply_conflicts, scan_conflicts
 from .coordinator import Handoff, HandoffPlan, verify_manifest_copies
 from .handoff import Orca
 from .manifest import Host, UsageError, detect_host, load_manifest
@@ -50,9 +52,16 @@ Examples:
     work-sync handoff tsuki --dry-run
 """
 
+CONFLICTS_EPILOG = """
+Examples:
+
+    work-sync conflicts .
+    work-sync conflicts /path/to/project --apply
+"""
+
 app = typer.Typer(
     name="work-sync",
-    help="Synchronize project folders and hand Git state to the other machine.",
+    help="Configure project sync and hand external Orca worktrees to the other machine.",
     epilog=ROOT_EPILOG,
     invoke_without_command=True,
     no_args_is_help=False,
@@ -117,7 +126,7 @@ def _show_bootstrap(plan: BootstrapPlan, apply: bool) -> None:
 
 
 def _show_handoff(plan: HandoffPlan, dry_run: bool) -> None:
-    table = Table(title=f"Handoff {plan.source} -> {plan.target}")
+    table = Table(title=f"Orca worktree handoff {plan.source} -> {plan.target}")
     table.add_column("Repository")
     table.add_column("Branch")
     table.add_column("External worktrees")
@@ -218,7 +227,7 @@ def handoff(
         ),
     ] = DEFAULT_MANIFEST_PATH,
 ) -> None:
-    """Hand committed and working Git state to the target machine."""
+    """Hand external Orca worktrees to the target machine."""
     source = detect_host()
     if target.host == source:
         raise typer.BadParameter("target is the current host", param_hint="TARGET")
@@ -246,6 +255,62 @@ def handoff(
             f"{result.worktrees} external worktrees; "
             f"recovery {result.recovery_root}"
         )
+
+
+@app.command(epilog=CONFLICTS_EPILOG, rich_help_panel="Syncthing")
+def conflicts(
+    path: Annotated[
+        Path,
+        typer.Argument(help="Folder to scan recursively."),
+    ] = Path("."),
+    apply: Annotated[
+        bool,
+        typer.Option("--apply", help="Recover or quarantine safe conflict copies."),
+    ] = False,
+    recovery_root: Annotated[
+        Path | None,
+        typer.Option(
+            "--recovery-root",
+            help="Recovery directory. Defaults under ~/.local/state/work-sync.",
+        ),
+    ] = None,
+) -> None:
+    """Scan Syncthing conflicts without blindly deleting unique data."""
+    try:
+        root = path.expanduser().resolve()
+        if apply:
+            stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+            recovery = (
+                recovery_root.expanduser().resolve()
+                if recovery_root
+                else Path.home() / ".local/state/work-sync/conflicts" / stamp
+            )
+            report = apply_conflicts(root, recovery)
+        else:
+            found = scan_conflicts(root)
+            report = None
+    except UsageError as error:
+        _abort(error)
+    if not apply:
+        restorable = sum(item.action.startswith("restore-") for item in found)
+        quarantinable = sum(item.action == "quarantine" for item in found)
+        unresolved = sum(item.action == "unresolved" for item in found)
+        console.print(
+            f"Found {len(found)}; restorable {restorable}; "
+            f"quarantinable {quarantinable}; unresolved {unresolved}."
+        )
+        if found:
+            raise typer.Exit(1)
+        return
+    assert report is not None
+    console.print(
+        f"Found {report.total}; restored {report.restored}; "
+        f"quarantined {report.quarantined}; unresolved {report.unresolved}."
+    )
+    if report.recovery_root:
+        console.print(f"Recovery: {report.recovery_root}")
+    if report.unresolved:
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

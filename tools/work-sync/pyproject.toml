@@ -1,7 +1,7 @@
 [project]
 name = "work-sync"
 version = "0.1.0"
-description = "Safe Syncthing setup and Git worktree handoffs"
+description = "Safe Syncthing setup and Orca worktree handoffs"
 requires-python = ">=3.12"
 dependencies = [
     "rich>=14.0",

@@ -1,4 +1,4 @@
-"""Explicit Git state handoff without copying .git directories."""
+"""External Orca worktree inspection and handoff."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from .syncthing import LOCAL_STATE_IGNORES
 from .system import Runner
 
 TREE_EXCLUDES = (
-    "/.git",
+    ".git",
     "/.stignore",
     "/.stfolder/",
     *LOCAL_STATE_IGNORES,
@@ -296,11 +296,10 @@ class Orca:
         repo_path: Path,
         worktree: OrcaWorktree,
     ) -> None:
-        """Verify a worktree still has the expected ID, path, and branch."""
+        """Verify a worktree still has the expected path and branch."""
         repo = self.repo_for_path(self.inventory(host), repo_path)
         if not any(
-            current.id == worktree.id
-            and current.path == worktree.path
+            current.path == worktree.path
             and current.branch == worktree.branch
             for current in repo.worktrees
         ):
@@ -320,6 +319,33 @@ def _rsync_endpoints(
         alias = "tsuki" if target_host == "tsuki" else "macmini"
         destination = f"{alias}:{destination}"
     return source_host, (f"{source_path}/", destination)
+
+
+def _absolute_symlink_excludes(
+    runner: Runner,
+    host: Host,
+    root: Path,
+) -> tuple[str, ...]:
+    output = runner.run(
+        host,
+        [
+            "find",
+            str(root),
+            "-mindepth",
+            "1",
+            "-maxdepth",
+            "1",
+            "-type",
+            "l",
+            "-print",
+        ],
+    )
+    excluded: list[str] = []
+    for raw_path in output.splitlines():
+        target = runner.run(host, ["readlink", raw_path])
+        if Path(target).is_absolute():
+            excluded.append("/" + Path(raw_path).name)
+    return tuple(excluded)
 
 
 def sync_worktree_files(
@@ -351,7 +377,15 @@ def sync_worktree_files(
         "--no-group",
         "--out-format=%i %n%L",
     ]
-    patterns = (*TREE_EXCLUDES, *excludes)
+    local_links = tuple(
+        dict.fromkeys(
+            (
+                *_absolute_symlink_excludes(runner, source_host, source_path),
+                *_absolute_symlink_excludes(runner, target_host, target_path),
+            )
+        )
+    )
+    patterns = (*TREE_EXCLUDES, *excludes, *local_links)
     include_rules: list[str] = []
     for pattern in patterns:
         if not pattern.startswith("!"):
@@ -516,6 +550,21 @@ def inspect_repo(
     fallback_identity: str | None = None,
 ) -> RepoState:
     """Inspect a repository without changing it."""
+    conflict = runner.run(
+        host,
+        [
+            "find",
+            str(repo),
+            "-type",
+            "f",
+            "-name",
+            "*.sync-conflict-*",
+            "-print",
+            "-quit",
+        ],
+    )
+    if conflict:
+        raise UsageError(f"Syncthing conflict on {host}: {conflict}")
     try:
         branch = _git(runner, host, repo, "branch", "--show-current")
         head = _git(runner, host, repo, "rev-parse", "HEAD")
@@ -592,7 +641,19 @@ def _tree_changes(
     ]
     if delete:
         command.append("--delete")
-    for pattern in (*TREE_EXCLUDES, *excludes):
+    local_links = tuple(
+        dict.fromkeys(
+            (
+                *_absolute_symlink_excludes(
+                    runner, source.host, source.path
+                ),
+                *_absolute_symlink_excludes(
+                    runner, target.host, target.path
+                ),
+            )
+        )
+    )
+    for pattern in (*TREE_EXCLUDES, *excludes, *local_links):
         if not pattern.startswith("!"):
             command.append(f"--exclude={pattern}")
     command.extend(endpoints)
@@ -611,7 +672,6 @@ def preflight_repository(
     *,
     excludes: tuple[str, ...] = (),
     allow_clean_target_difference: bool = False,
-    allow_branch_switch: bool = False,
     fallback_identity: str | None = None,
 ) -> RepositoryPlan:
     """Validate one source and target repository without changing either."""
@@ -631,24 +691,10 @@ def preflight_repository(
         raise UsageError(
             f"origin mismatch: {source.origin} != {target.origin}"
         )
-    if source.branch != target.branch and not allow_branch_switch:
+    if source.branch != target.branch:
         raise UsageError(
             f"checked-out branches differ: {source.branch} != {target.branch}"
         )
-    if source.branch != target.branch:
-        checked_out = _git(
-            runner,
-            target.host,
-            target.path,
-            "for-each-ref",
-            "--format=%(worktreepath)",
-            f"refs/heads/{source.branch}",
-        )
-        if checked_out:
-            raise UsageError(
-                f"target branch is checked out elsewhere: "
-                f"{source.branch} ({checked_out})"
-            )
     for branch, source_commit in source.branches.items():
         target_commit = target.branches.get(branch)
         if target_commit:
@@ -718,63 +764,6 @@ def preflight_missing_worktree(
     return source
 
 
-def _source_remote(source: RepoState, target: RepoState) -> str:
-    if source.host == target.host:
-        return str(source.path)
-    alias = "macmini" if source.host == "mac" else "tsuki"
-    return f"{alias}:{source.path}"
-
-
-def _cleanup_incoming(plan: RepositoryPlan) -> None:
-    refs = _git(
-        plan.runner,
-        plan.target.host,
-        plan.target.path,
-        "for-each-ref",
-        "--format=%(refname)",
-        "refs/work-sync/incoming",
-    )
-    for ref in refs.splitlines():
-        if ref:
-            _git(plan.runner, plan.target.host, plan.target.path, "update-ref", "-d", ref)
-
-
-def transfer_refs(runner: Runner, plan: RepositoryPlan) -> None:
-    """Transfer every source branch without deleting target-only branches."""
-    source = plan.source
-    target = plan.target
-    refspec = "+refs/heads/*:refs/work-sync/incoming/*"
-    _git(
-        runner,
-        target.host,
-        target.path,
-        "fetch",
-        "--no-tags",
-        "--no-write-fetch-head",
-        _source_remote(source, target),
-        refspec,
-    )
-    try:
-        for branch, source_commit in source.branches.items():
-            incoming = _git(
-                runner,
-                target.host,
-                target.path,
-                "rev-parse",
-                f"refs/work-sync/incoming/{branch}",
-            )
-            if incoming != source_commit:
-                raise UsageError(f"fetched branch changed during handoff: {branch}")
-            ref = f"refs/heads/{branch}"
-            target_commit = target.branches.get(branch)
-            args = ["update-ref", ref, source_commit]
-            if target_commit:
-                args.append(target_commit)
-            _git(runner, target.host, target.path, *args)
-    finally:
-        _cleanup_incoming(plan)
-
-
 def rebuild_index(runner: Runner, plan: RepositoryPlan) -> None:
     """Reproduce one source checkout's staged state on its target checkout."""
     source = plan.source
@@ -824,9 +813,3 @@ def rebuild_index(runner: Runner, plan: RepositoryPlan) -> None:
     )
     if actual_head != source.head or actual_patch != source.staged_patch:
         raise UsageError(f"Git verification failed: {target.path}")
-
-
-def transfer_git_state(runner: Runner, plan: RepositoryPlan) -> None:
-    """Transfer source branches and index state into a validated target."""
-    transfer_refs(runner, plan)
-    rebuild_index(runner, plan)

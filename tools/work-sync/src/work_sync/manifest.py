@@ -42,6 +42,7 @@ class Folder:
     folder_class: FolderClass
     git: GitPolicy
     ignore: tuple[str, ...]
+    worktree_ignore: tuple[str, ...] = ()
 
     def path(self, host: Host) -> Path:
         """Return this folder's path on a host."""
@@ -122,6 +123,12 @@ def _folder(raw: object) -> Folder:
         not isinstance(pattern, str) or not pattern for pattern in ignores
     ):
         raise UsageError(f"invalid ignore patterns for {raw['label']}")
+    worktree_ignores = raw.get("worktree_ignore", [])
+    if not isinstance(worktree_ignores, list) or any(
+        not isinstance(pattern, str) or not pattern
+        for pattern in worktree_ignores
+    ):
+        raise UsageError(f"invalid worktree ignore patterns for {raw['label']}")
     return Folder(
         id=raw["id"],
         label=raw["label"],
@@ -130,6 +137,7 @@ def _folder(raw: object) -> Folder:
         folder_class=cast(FolderClass, raw["class"]),
         git=cast(GitPolicy, raw["git"]),
         ignore=tuple(ignores),
+        worktree_ignore=tuple(worktree_ignores),
     )
 
 

@@ -101,12 +101,26 @@ macmini and tsuki from `~/.config/work-sync/folders.json`, then adds the file to
 that checkout's `.git/info/exclude`. Do not ignore `.stignore` globally or add it
 to project `.gitignore` files.
 
+Project folders sync their complete normal Git repository, including `.git`.
+Only `.git/worktrees`, `.git/config.worktree`, and transient Git lock files stay
+local because linked worktree indexes, paths, filesystem settings, and active
+locks are machine-specific. Shared branch and remote configuration remains in
+`.git/config`. Use one machine at a time and wait for Syncthing to report `Up to
+Date` before opening the repository on the other machine.
+
 The shared defaults cover disposable caches and machine-local runtime state.
 Files such as `.env`, `.claude/settings.json`, `.codex/config.toml`, and
 `.pi/settings.json` sync by default. If one is machine-specific for a particular
 project, add its pattern to that project's `ignore` list in the manifest, then
 rerun `work-sync bootstrap <label> --apply`. Extra lines added directly
 to one `.stignore` stay local to that machine.
+
+`work-sync handoff` is only for external Orca worktrees, including older
+worktrees still registered from Superset paths. Main checkout Git state belongs
+to Syncthing. Run `work-sync conflicts <path>` before deleting any
+`.sync-conflict-*` file; add `--apply` only after reviewing the scan.
+Use a manifest entry's optional `worktree_ignore` list for machine-local data in
+external worktrees; it does not change the main folder's Syncthing ignores.
 
 ### Package Management
 
