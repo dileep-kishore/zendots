@@ -72,7 +72,9 @@ class Manifest:
         folders = (
             tuple(self.select(selector) for selector in selectors)
             if selectors
-            else self.folders
+            else tuple(
+                folder for folder in self.folders if folder.folder_class == "git"
+            )
         )
         non_git = [folder.label for folder in folders if folder.folder_class != "git"]
         if non_git:
