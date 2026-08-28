@@ -238,6 +238,88 @@ def test_git_handoff_reproduces_branch_index_and_worktree(tmp_path: Path) -> Non
     assert canonical_origin(runner, "mac", target) == "github.com/example/project"
 
 
+def test_git_handoff_switches_target_main_checkout_to_source_branch(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    source.mkdir()
+    git(source, "init", "-b", "main")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    base = git(source, "rev-parse", "HEAD")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+
+    git(source, "switch", "-c", "feat/runtime")
+    (source / "tracked.txt").write_text("feature\n", encoding="utf-8")
+    git(source, "commit", "-am", "feature")
+    subprocess.run(
+        [
+            "rsync",
+            "-r",
+            "--delete",
+            "--exclude=.git/",
+            f"{source}/",
+            f"{target}/",
+        ],
+        check=True,
+    )
+
+    runner = Runner(local_host="mac")
+    plan = preflight_repository(
+        runner,
+        "mac",
+        source,
+        "mac",
+        target,
+        allow_branch_switch=True,
+    )
+    transfer_git_state(runner, plan)
+
+    assert git(target, "branch", "--show-current") == "feat/runtime"
+    assert git(target, "rev-parse", "HEAD") == git(source, "rev-parse", "HEAD")
+    assert git(target, "rev-parse", "main") == base
+    assert git(target, "status", "--short") == git(source, "status", "--short")
+
+
+def test_git_handoff_rejects_switch_to_a_branch_checked_out_elsewhere(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    linked = tmp_path / "linked"
+    source.mkdir()
+    git(source, "init", "-b", "main")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    git(target, "worktree", "add", "-b", "feat/runtime", str(linked))
+    git(source, "switch", "-c", "feat/runtime")
+    (source / "tracked.txt").write_text("feature\n", encoding="utf-8")
+    git(source, "commit", "-am", "feature")
+    (target / "tracked.txt").write_text("feature\n", encoding="utf-8")
+
+    with pytest.raises(UsageError, match="checked out elsewhere"):
+        preflight_repository(
+            Runner(local_host="mac"),
+            "mac",
+            source,
+            "mac",
+            target,
+            allow_branch_switch=True,
+        )
+
+
 def test_git_handoff_rejects_target_only_files(tmp_path: Path) -> None:
     source = tmp_path / "source"
     target = tmp_path / "target"
@@ -496,6 +578,36 @@ def test_orca_pairing_rejects_an_active_agent() -> None:
         pair_worktrees(source, target)
 
 
+def test_orca_pairing_rejects_a_target_only_active_worktree() -> None:
+    source = OrcaRepo(
+        "source",
+        Path("/source"),
+        "project",
+        "github.com/example/project",
+        (),
+    )
+    target = OrcaRepo(
+        "target",
+        Path("/target"),
+        "project",
+        "github.com/example/project",
+        (
+            OrcaWorktree(
+                id="target::/target/feat/a",
+                repo_id="target",
+                path=Path("/target/feat/a"),
+                branch="feat/a",
+                display_name="feat/a",
+                is_main=False,
+                active_agents=("codex",),
+            ),
+        ),
+    )
+
+    with pytest.raises(UsageError, match="active agent"):
+        pair_worktrees(source, target)
+
+
 def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     source = tmp_path / "source"
     target = tmp_path / "target"
@@ -744,7 +856,8 @@ def test_handoff_help_documents_repeatable_folder_and_confirmation() -> None:
 
 
 def test_handoff_rejects_current_machine_as_target() -> None:
-    result = CliRunner().invoke(app, ["handoff", "macmini", "--dry-run"])
+    target = "macmini" if detect_host() == "mac" else "tsuki"
+    result = CliRunner().invoke(app, ["handoff", target, "--dry-run"])
 
     assert result.exit_code == 2
     assert "target is the current host" in result.output
