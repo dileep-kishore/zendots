@@ -6,7 +6,7 @@ import json
 import re
 import subprocess
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -275,7 +275,7 @@ class Orca:
                     f"Orca did not return created worktree: {source.branch}"
                 )
             return matches[0]
-        return OrcaWorktree(
+        created = OrcaWorktree(
             id=str(raw.get("id") or raw.get("worktreeId") or ""),
             repo_id=str(raw.get("repoId") or repo.id),
             path=Path(str(raw.get("path", ""))),
@@ -284,6 +284,17 @@ class Orca:
             is_main=bool(raw.get("isMainWorktree")),
             active_agents=(),
         )
+        if created.branch != source.branch:
+            _git(
+                self.runner,
+                host,
+                created.path,
+                "branch",
+                "-m",
+                source.branch,
+            )
+            created = replace(created, branch=source.branch)
+        return created
 
     def verify_worktree(
         self,
