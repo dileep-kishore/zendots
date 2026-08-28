@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
@@ -46,6 +48,329 @@ class RepositoryPlan:
     runner: Runner
     source: RepoState
     target: RepoState
+
+
+@dataclass(frozen=True)
+class OrcaWorktree:
+    """One Orca-managed checkout."""
+
+    id: str
+    repo_id: str
+    path: Path
+    branch: str
+    display_name: str
+    is_main: bool
+    active_agents: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class OrcaRepo:
+    """One Orca repository and its worktrees."""
+
+    id: str
+    path: Path
+    display_name: str
+    identity: str | None
+    worktrees: tuple[OrcaWorktree, ...]
+
+
+@dataclass(frozen=True)
+class OrcaInventory:
+    """Validated Orca repository inventory."""
+
+    repos: tuple[OrcaRepo, ...]
+
+
+@dataclass(frozen=True)
+class WorktreePair:
+    """A source worktree and its existing or missing target."""
+
+    source: OrcaWorktree
+    target: OrcaWorktree | None
+
+
+def _orca_result(payload: Mapping[str, object], key: str) -> list[dict[str, object]]:
+    if payload.get("ok") is not True or not isinstance(payload.get("result"), dict):
+        raise UsageError("Orca returned an unsuccessful response")
+    result = payload["result"]
+    assert isinstance(result, dict)
+    items = result.get(key)
+    if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
+        raise UsageError(f"Orca response is missing {key}")
+    return items
+
+
+def parse_orca_inventory(
+    repos_payload: Mapping[str, object],
+    worktrees_payload: Mapping[str, object],
+) -> OrcaInventory:
+    """Parse the installed Orca CLI's JSON envelopes."""
+    worktrees_by_repo: dict[str, list[OrcaWorktree]] = {}
+    for raw in _orca_result(worktrees_payload, "worktrees"):
+        repo_id = str(raw.get("repoId", ""))
+        branch = str(raw.get("branch", "")).removeprefix("refs/heads/")
+        if not repo_id or not branch:
+            continue
+        agents = raw.get("agents")
+        if not isinstance(agents, list):
+            agents = []
+        active_agents = tuple(
+            str(agent.get("agentType", "agent"))
+            for agent in agents
+            if isinstance(agent, dict)
+            and agent.get("state") not in {"done", "idle", "stopped"}
+        )
+        worktree = OrcaWorktree(
+            id=str(raw.get("worktreeId", "")),
+            repo_id=repo_id,
+            path=Path(str(raw.get("path", ""))),
+            branch=branch,
+            display_name=str(raw.get("displayName") or branch),
+            is_main=bool(raw.get("isMainWorktree")),
+            active_agents=active_agents,
+        )
+        worktrees_by_repo.setdefault(repo_id, []).append(worktree)
+    repos: list[OrcaRepo] = []
+    for raw in _orca_result(repos_payload, "repos"):
+        repo_id = str(raw.get("id", ""))
+        remote = raw.get("gitRemoteIdentity")
+        identity = (
+            str(remote.get("canonicalKey"))
+            if isinstance(remote, dict) and remote.get("canonicalKey")
+            else None
+        )
+        repos.append(
+            OrcaRepo(
+                id=repo_id,
+                path=Path(str(raw.get("path", ""))),
+                display_name=str(raw.get("displayName", "")),
+                identity=identity,
+                worktrees=tuple(worktrees_by_repo.get(repo_id, [])),
+            )
+        )
+    return OrcaInventory(tuple(repos))
+
+
+def pair_worktrees(source: OrcaRepo, target: OrcaRepo) -> tuple[WorktreePair, ...]:
+    """Pair external worktrees by branch while preserving target paths."""
+    if source.identity and target.identity and source.identity != target.identity:
+        raise UsageError(
+            f"Orca repository identity mismatch: {source.identity} != {target.identity}"
+        )
+    target_by_branch: dict[str, OrcaWorktree] = {}
+    for worktree in target.worktrees:
+        if worktree.is_main:
+            continue
+        if worktree.branch in target_by_branch:
+            raise UsageError(f"duplicate target worktree branch: {worktree.branch}")
+        target_by_branch[worktree.branch] = worktree
+    pairs: list[WorktreePair] = []
+    for worktree in source.worktrees:
+        if worktree.is_main:
+            continue
+        target_worktree = target_by_branch.get(worktree.branch)
+        active = worktree.active_agents + (
+            target_worktree.active_agents if target_worktree else ()
+        )
+        if active:
+            raise UsageError(
+                f"active agent in worktree {worktree.branch}: {', '.join(active)}"
+            )
+        pairs.append(WorktreePair(worktree, target_worktree))
+    return tuple(pairs)
+
+
+class Orca:
+    """Read and update Orca-managed repository state."""
+
+    def __init__(self, runner: Runner) -> None:
+        self.runner = runner
+
+    @staticmethod
+    def _binary(host: Host) -> str:
+        return "orca" if host == "mac" else "orca-ide"
+
+    def _call(self, host: Host, *args: str) -> dict[str, object]:
+        try:
+            payload = json.loads(
+                self.runner.run(host, [self._binary(host), *args, "--json"])
+            )
+        except (json.JSONDecodeError, subprocess.CalledProcessError) as error:
+            raise UsageError(f"Orca command failed on {host}: {' '.join(args)}") from error
+        if not isinstance(payload, dict) or payload.get("ok") is not True:
+            raise UsageError(f"Orca command failed on {host}: {' '.join(args)}")
+        return payload
+
+    def inventory(self, host: Host) -> OrcaInventory:
+        """Return the live Orca repository and worktree inventory."""
+        repos = self._call(host, "repo", "list")
+        worktrees = self._call(host, "worktree", "ps")
+        return parse_orca_inventory(repos, worktrees)
+
+    @staticmethod
+    def repo_for_path(inventory: OrcaInventory, path: Path) -> OrcaRepo:
+        """Find exactly one Orca repository by its main checkout path."""
+        matches = [repo for repo in inventory.repos if repo.path == path]
+        if len(matches) != 1:
+            raise UsageError(f"Orca repository path must match once: {path}")
+        return matches[0]
+
+    @staticmethod
+    def require_idle_agents(repo: OrcaRepo) -> None:
+        """Reject any worktree in a repository with a running agent."""
+        active = [
+            f"{worktree.branch} ({', '.join(worktree.active_agents)})"
+            for worktree in repo.worktrees
+            if worktree.active_agents
+        ]
+        if active:
+            raise UsageError(
+                f"active agent in Orca repository {repo.display_name}: "
+                + ", ".join(active)
+            )
+
+    def create_worktree(
+        self,
+        host: Host,
+        repo: OrcaRepo,
+        source: OrcaWorktree,
+        base_ref: str,
+    ) -> OrcaWorktree:
+        """Create one missing target worktree with setup hooks skipped."""
+        payload = self._call(
+            host,
+            "worktree",
+            "create",
+            "--repo",
+            f"id:{repo.id}",
+            "--name",
+            source.branch,
+            "--base-branch",
+            base_ref,
+            "--setup",
+            "skip",
+            "--no-parent",
+        )
+        result = payload.get("result")
+        raw = result.get("worktree") if isinstance(result, dict) else None
+        if not isinstance(raw, dict):
+            refreshed = self.repo_for_path(self.inventory(host), repo.path)
+            matches = [
+                worktree
+                for worktree in refreshed.worktrees
+                if worktree.branch == source.branch
+            ]
+            if len(matches) != 1:
+                raise UsageError(
+                    f"Orca did not return created worktree: {source.branch}"
+                )
+            return matches[0]
+        return OrcaWorktree(
+            id=str(raw.get("id") or raw.get("worktreeId") or ""),
+            repo_id=str(raw.get("repoId") or repo.id),
+            path=Path(str(raw.get("path", ""))),
+            branch=str(raw.get("branch", "")).removeprefix("refs/heads/"),
+            display_name=str(raw.get("displayName") or source.display_name),
+            is_main=bool(raw.get("isMainWorktree")),
+            active_agents=(),
+        )
+
+    def verify_worktree(
+        self,
+        host: Host,
+        repo_path: Path,
+        worktree: OrcaWorktree,
+    ) -> None:
+        """Verify a worktree still has the expected ID, path, and branch."""
+        repo = self.repo_for_path(self.inventory(host), repo_path)
+        if not any(
+            current.id == worktree.id
+            and current.path == worktree.path
+            and current.branch == worktree.branch
+            for current in repo.worktrees
+        ):
+            raise UsageError(f"Orca verification failed: {worktree.path}")
+
+
+def sync_worktree_files(
+    runner: Runner,
+    source_host: Host,
+    source_path: Path,
+    target_host: Host,
+    target_path: Path,
+    recovery_path: Path,
+    *,
+    excludes: tuple[str, ...],
+    dry_run: bool,
+) -> tuple[str, ...]:
+    """Mirror external worktree files and retain replaced target files."""
+    if source_host != runner.local_host:
+        raise UsageError("handoff source must be the current host")
+    destination = str(target_path) + "/"
+    if target_host != runner.local_host:
+        alias = "tsuki" if target_host == "tsuki" else "macmini"
+        destination = f"{alias}:{destination}"
+    command = [
+        "rsync",
+        "-rlic",
+        "--executability",
+        "--no-perms",
+        "--no-owner",
+        "--no-group",
+        "--out-format=%i %n%L",
+    ]
+    for pattern in (*TREE_EXCLUDES, *excludes):
+        if not pattern.startswith("!"):
+            command.append(f"--exclude={pattern}")
+    endpoints = (str(source_path) + "/", destination)
+    deletion_scan = runner.run(
+        source_host,
+        [*command, "--dry-run", "--delete-after", *endpoints],
+    )
+    if dry_run:
+        return tuple(line for line in deletion_scan.splitlines() if line)
+
+    runner.run(target_host, ["mkdir", "-p", str(recovery_path)])
+    deletion_paths: list[Path] = []
+    for line in deletion_scan.splitlines():
+        if not line.startswith("*deleting "):
+            continue
+        relative = Path(line.removeprefix("*deleting ").rstrip("/"))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise UsageError(f"unsafe rsync deletion path: {relative}")
+        deletion_paths.append(relative)
+    minimal_deletions = [
+        path
+        for path in sorted(set(deletion_paths), key=lambda item: len(item.parts))
+        if not any(parent in deletion_paths for parent in path.parents)
+    ]
+    if len(minimal_deletions) > 10_000:
+        raise UsageError("refusing more than 10000 worktree deletions")
+    for relative in minimal_deletions:
+        source_item = target_path / relative
+        recovery_item = recovery_path / relative
+        runner.run(target_host, ["mkdir", "-p", str(recovery_item.parent)])
+        runner.run(
+            target_host,
+            ["cp", "-pR", str(source_item), str(recovery_item)],
+        )
+
+    updated = runner.run(
+        source_host,
+        [
+            *command,
+            "--backup",
+            f"--backup-dir={recovery_path}",
+            *endpoints,
+        ],
+    )
+    deleted = runner.run(
+        source_host,
+        [*command, "--delete-after", *endpoints],
+    )
+    return tuple(
+        line for line in (*updated.splitlines(), *deleted.splitlines()) if line
+    )
 
 
 def _git(runner: Runner, host: Host, repo: Path, *args: str) -> str:

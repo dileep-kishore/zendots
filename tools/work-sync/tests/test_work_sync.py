@@ -7,8 +7,14 @@ from pathlib import Path
 import pytest
 
 from work_sync.handoff import (
+    Orca,
+    OrcaRepo,
+    OrcaWorktree,
     canonical_origin,
+    pair_worktrees,
+    parse_orca_inventory,
     preflight_repository,
+    sync_worktree_files,
     transfer_git_state,
 )
 from work_sync.manifest import UsageError, detect_host, load_manifest
@@ -216,3 +222,234 @@ def test_git_handoff_rejects_divergence_without_changing_refs(tmp_path: Path) ->
         preflight_repository(Runner(local_host="mac"), "mac", source, "mac", target)
 
     assert git(target, "show-ref") == before
+
+
+def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
+    repos = {
+        "ok": True,
+        "result": {
+            "repos": [
+                {
+                    "id": "repo-1",
+                    "path": "/Volumes/WorkSSD/Work/project",
+                    "displayName": "project",
+                    "gitRemoteIdentity": {
+                        "canonicalKey": "github.com/example/project"
+                    },
+                }
+            ]
+        },
+    }
+    source_worktrees = {
+        "ok": True,
+        "result": {
+            "worktrees": [
+                {
+                    "worktreeId": "repo-1::/Volumes/WorkSSD/Work/project",
+                    "repoId": "repo-1",
+                    "path": "/Volumes/WorkSSD/Work/project",
+                    "branch": "refs/heads/main",
+                    "displayName": "main",
+                    "isMainWorktree": True,
+                    "agents": [],
+                },
+                {
+                    "worktreeId": "repo-1::/Volumes/WorkSSD/superset/worktrees/project/feat/a",
+                    "repoId": "repo-1",
+                    "path": "/Volumes/WorkSSD/superset/worktrees/project/feat/a",
+                    "branch": "refs/heads/feat/a",
+                    "displayName": "feat/a",
+                    "isMainWorktree": False,
+                    "agents": [],
+                },
+                {
+                    "worktreeId": "repo-1::/Volumes/WorkSSD/orca/workspaces/project/feat-b",
+                    "repoId": "repo-1",
+                    "path": "/Volumes/WorkSSD/orca/workspaces/project/feat-b",
+                    "branch": "refs/heads/feat/b",
+                    "displayName": "feat/b",
+                    "isMainWorktree": False,
+                    "agents": [],
+                },
+            ]
+        },
+    }
+    target_worktrees = {
+        "ok": True,
+        "result": {
+            "worktrees": [
+                {
+                    "worktreeId": "repo-1::/home/dileep/Documents/Work/project",
+                    "repoId": "repo-1",
+                    "path": "/home/dileep/Documents/Work/project",
+                    "branch": "refs/heads/main",
+                    "displayName": "main",
+                    "isMainWorktree": True,
+                    "agents": [],
+                },
+                {
+                    "worktreeId": "repo-1::/home/dileep/.superset/worktrees/project/feat/a",
+                    "repoId": "repo-1",
+                    "path": "/home/dileep/.superset/worktrees/project/feat/a",
+                    "branch": "refs/heads/feat/a",
+                    "displayName": "feat/a",
+                    "isMainWorktree": False,
+                    "agents": [],
+                },
+            ]
+        },
+    }
+    source = parse_orca_inventory(repos, source_worktrees).repos[0]
+    target = parse_orca_inventory(repos, target_worktrees).repos[0]
+
+    pairs = pair_worktrees(source, target)
+
+    assert pairs[0].target is not None
+    assert pairs[0].target.path == Path(
+        "/home/dileep/.superset/worktrees/project/feat/a"
+    )
+    assert pairs[0].target.id.endswith("/home/dileep/.superset/worktrees/project/feat/a")
+    assert pairs[1].source.branch == "feat/b"
+    assert pairs[1].target is None
+
+
+def test_orca_pairing_rejects_an_active_agent() -> None:
+    source_worktree = OrcaWorktree(
+        id="source::/source/feat/a",
+        repo_id="source",
+        path=Path("/source/feat/a"),
+        branch="feat/a",
+        display_name="feat/a",
+        is_main=False,
+        active_agents=("claude",),
+    )
+    target_worktree = OrcaWorktree(
+        id="target::/target/feat/a",
+        repo_id="target",
+        path=Path("/target/feat/a"),
+        branch="feat/a",
+        display_name="feat/a",
+        is_main=False,
+        active_agents=(),
+    )
+    source = OrcaRepo(
+        "source",
+        Path("/source"),
+        "project",
+        "github.com/example/project",
+        (source_worktree,),
+    )
+    target = OrcaRepo(
+        "target",
+        Path("/target"),
+        "project",
+        "github.com/example/project",
+        (target_worktree,),
+    )
+
+    with pytest.raises(UsageError, match="active agent"):
+        pair_worktrees(source, target)
+
+
+def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    recovery = tmp_path / "recovery"
+    source.mkdir()
+    target.mkdir()
+    (source / "changed.txt").write_text("source\n", encoding="utf-8")
+    (source / "script.sh").write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    (source / "script.sh").chmod(0o755)
+    (target / "changed.txt").write_text("target\n", encoding="utf-8")
+    (target / "target-only.txt").write_text("keep me\n", encoding="utf-8")
+    (target / ".git").write_text("gitdir: target-local\n", encoding="utf-8")
+
+    changes = sync_worktree_files(
+        Runner(local_host="mac"),
+        "mac",
+        source,
+        "mac",
+        target,
+        recovery,
+        excludes=(),
+        dry_run=True,
+    )
+    assert changes
+    assert (target / "changed.txt").read_text(encoding="utf-8") == "target\n"
+
+    sync_worktree_files(
+        Runner(local_host="mac"),
+        "mac",
+        source,
+        "mac",
+        target,
+        recovery,
+        excludes=(),
+        dry_run=False,
+    )
+
+    assert (target / "changed.txt").read_text(encoding="utf-8") == "source\n"
+    assert not (target / "target-only.txt").exists()
+    assert (target / ".git").read_text(encoding="utf-8") == "gitdir: target-local\n"
+    assert (target / "script.sh").stat().st_mode & 0o111
+    assert (recovery / "changed.txt").read_text(encoding="utf-8") == "target\n"
+    assert (recovery / "target-only.txt").read_text(encoding="utf-8") == "keep me\n"
+
+
+def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
+    calls: list[list[str]] = []
+
+    def execute(argv: list[str], input_text: str | None) -> str:
+        calls.append(argv)
+        return json.dumps(
+            {
+                "ok": True,
+                "result": {
+                    "worktree": {
+                        "id": "target::/home/dileep/orca/workspaces/project/feat-a",
+                        "repoId": "target",
+                        "path": "/home/dileep/orca/workspaces/project/feat-a",
+                        "branch": "refs/heads/feat/a",
+                        "displayName": "feat/a",
+                        "isMainWorktree": False,
+                        "agents": [],
+                    }
+                },
+            }
+        )
+
+    runner = Runner(local_host="mac", execute=execute)
+    source = OrcaWorktree(
+        "source::/source/feat-a",
+        "source",
+        Path("/source/feat-a"),
+        "feat/a",
+        "feat/a",
+        False,
+        (),
+    )
+    target_repo = OrcaRepo(
+        "target",
+        Path("/target"),
+        "project",
+        "github.com/example/project",
+        (),
+    )
+
+    created = Orca(runner).create_worktree("tsuki", target_repo, source, "main")
+
+    assert created.branch == "feat/a"
+    assert calls == [
+        [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "ConnectTimeout=8",
+            "tsuki",
+            (
+                "orca-ide worktree create --repo id:target --name feat/a "
+                "--base-branch main --setup skip --no-parent --json"
+            ),
+        ]
+    ]
