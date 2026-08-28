@@ -162,15 +162,18 @@ class Handoff:
         target_inventory = self.orca.inventory(target)
         planned: list[FolderHandoff] = []
         for folder in folders:
-            main = preflight_repository(
-                self.runner,
-                source,
-                folder.path(source),
-                target,
-                folder.path(target),
-                excludes=folder.ignore,
-                fallback_identity=folder.id,
-            )
+            try:
+                main = preflight_repository(
+                    self.runner,
+                    source,
+                    folder.path(source),
+                    target,
+                    folder.path(target),
+                    excludes=folder.ignore,
+                    fallback_identity=folder.id,
+                )
+            except UsageError as error:
+                raise UsageError(f"{folder.label} main: {error}") from error
             source_orca = _find_orca_repo(
                 source_inventory.repos,
                 folder.path(source),
@@ -191,25 +194,35 @@ class Handoff:
                 _require_no_active_main(target_orca)
                 for pair in pair_worktrees(source_orca, target_orca):
                     if pair.target:
-                        external = preflight_repository(
+                        try:
+                            external = preflight_repository(
+                                self.runner,
+                                source,
+                                pair.source.path,
+                                target,
+                                pair.target.path,
+                                excludes=folder.ignore,
+                                allow_clean_target_difference=True,
+                                fallback_identity=folder.id,
+                            )
+                        except UsageError as error:
+                            raise UsageError(
+                                f"{folder.label} [{pair.source.branch}]: {error}"
+                            ) from error
+                        existing.append((pair, external))
+                        continue
+                    try:
+                        source_state = preflight_missing_worktree(
                             self.runner,
                             source,
                             pair.source.path,
-                            target,
-                            pair.target.path,
-                            excludes=folder.ignore,
-                            allow_clean_target_difference=True,
+                            main.target,
                             fallback_identity=folder.id,
                         )
-                        existing.append((pair, external))
-                        continue
-                    source_state = preflight_missing_worktree(
-                        self.runner,
-                        source,
-                        pair.source.path,
-                        main.target,
-                        fallback_identity=folder.id,
-                    )
+                    except UsageError as error:
+                        raise UsageError(
+                            f"{folder.label} [{pair.source.branch}]: {error}"
+                        ) from error
                     old_commit = main.target.branches.get(pair.source.branch)
                     missing.append(
                         MissingWorktree(
