@@ -11,21 +11,14 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from .manifest import Host, UsageError
+from .syncthing import LOCAL_STATE_IGNORES
 from .system import Runner
 
 TREE_EXCLUDES = (
     "/.git",
     "/.stignore",
     "/.stfolder/",
-    ".DS_Store",
-    "._*",
-    "__pycache__/",
-    ".pytest_cache/",
-    ".ruff_cache/",
-    ".venv/",
-    "node_modules/",
-    ".claude/worktrees/",
-    ".serena/cache/",
+    *LOCAL_STATE_IGNORES,
 )
 
 
