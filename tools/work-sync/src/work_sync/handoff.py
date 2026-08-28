@@ -16,6 +16,7 @@ from .system import Runner
 TREE_EXCLUDES = (
     "/.git",
     "/.stignore",
+    "/.stfolder/",
     ".DS_Store",
     "._*",
     "__pycache__/",

@@ -392,6 +392,10 @@ def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     (target / "changed.txt").write_text("target\n", encoding="utf-8")
     (target / "target-only.txt").write_text("keep me\n", encoding="utf-8")
     (target / ".git").write_text("gitdir: target-local\n", encoding="utf-8")
+    (source / ".stfolder").mkdir()
+    (target / ".stfolder").mkdir()
+    (source / ".stfolder/marker").write_text("source\n", encoding="utf-8")
+    (target / ".stfolder/marker").write_text("target\n", encoding="utf-8")
 
     changes = sync_worktree_files(
         Runner(local_host="mac"),
@@ -420,6 +424,7 @@ def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     assert (target / "changed.txt").read_text(encoding="utf-8") == "source\n"
     assert not (target / "target-only.txt").exists()
     assert (target / ".git").read_text(encoding="utf-8") == "gitdir: target-local\n"
+    assert (target / ".stfolder/marker").read_text(encoding="utf-8") == "target\n"
     assert (target / "script.sh").stat().st_mode & 0o111
     assert (recovery / "changed.txt").read_text(encoding="utf-8") == "target\n"
     assert (recovery / "target-only.txt").read_text(encoding="utf-8") == "keep me\n"
