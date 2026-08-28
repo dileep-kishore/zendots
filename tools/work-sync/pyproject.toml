@@ -1,0 +1,30 @@
+[project]
+name = "work-sync"
+version = "0.1.0"
+description = "Safe Syncthing setup and Git worktree handoffs"
+requires-python = ">=3.12"
+dependencies = [
+    "rich>=14.0",
+    "typer>=0.21.1",
+]
+
+[project.scripts]
+work-sync = "work_sync.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "ruff>=0.14",
+    "ty>=0.0.1a30",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
