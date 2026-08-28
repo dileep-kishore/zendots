@@ -148,6 +148,8 @@ def parse_orca_inventory(
 
 def pair_worktrees(source: OrcaRepo, target: OrcaRepo) -> tuple[WorktreePair, ...]:
     """Pair external worktrees by branch while preserving target paths."""
+    Orca.require_idle_agents(source)
+    Orca.require_idle_agents(target)
     target_by_branch: dict[str, OrcaWorktree] = {}
     for worktree in target.worktrees:
         if worktree.is_main:
@@ -160,13 +162,6 @@ def pair_worktrees(source: OrcaRepo, target: OrcaRepo) -> tuple[WorktreePair, ..
         if worktree.is_main:
             continue
         target_worktree = target_by_branch.get(worktree.branch)
-        active = worktree.active_agents + (
-            target_worktree.active_agents if target_worktree else ()
-        )
-        if active:
-            raise UsageError(
-                f"active agent in worktree {worktree.branch}: {', '.join(active)}"
-            )
         pairs.append(WorktreePair(worktree, target_worktree))
     return tuple(pairs)
 
@@ -389,7 +384,7 @@ def sync_worktree_files(
     for line in deletion_scan.splitlines():
         if not line.startswith("*deleting "):
             continue
-        relative = Path(line.removeprefix("*deleting ").rstrip("/"))
+        relative = Path(line.removeprefix("*deleting ").lstrip().rstrip("/"))
         if relative.is_absolute() or ".." in relative.parts:
             raise UsageError(f"unsafe rsync deletion path: {relative}")
         deletion_paths.append(relative)
@@ -616,6 +611,7 @@ def preflight_repository(
     *,
     excludes: tuple[str, ...] = (),
     allow_clean_target_difference: bool = False,
+    allow_branch_switch: bool = False,
     fallback_identity: str | None = None,
 ) -> RepositoryPlan:
     """Validate one source and target repository without changing either."""
@@ -635,10 +631,24 @@ def preflight_repository(
         raise UsageError(
             f"origin mismatch: {source.origin} != {target.origin}"
         )
-    if source.branch != target.branch:
+    if source.branch != target.branch and not allow_branch_switch:
         raise UsageError(
             f"checked-out branches differ: {source.branch} != {target.branch}"
         )
+    if source.branch != target.branch:
+        checked_out = _git(
+            runner,
+            target.host,
+            target.path,
+            "for-each-ref",
+            "--format=%(worktreepath)",
+            f"refs/heads/{source.branch}",
+        )
+        if checked_out:
+            raise UsageError(
+                f"target branch is checked out elsewhere: "
+                f"{source.branch} ({checked_out})"
+            )
     for branch, source_commit in source.branches.items():
         target_commit = target.branches.get(branch)
         if target_commit:
@@ -769,6 +779,15 @@ def rebuild_index(runner: Runner, plan: RepositoryPlan) -> None:
     """Reproduce one source checkout's staged state on its target checkout."""
     source = plan.source
     target = plan.target
+    if source.branch != target.branch:
+        _git(
+            runner,
+            target.host,
+            target.path,
+            "symbolic-ref",
+            "HEAD",
+            f"refs/heads/{source.branch}",
+        )
     _git(
         runner,
         target.host,

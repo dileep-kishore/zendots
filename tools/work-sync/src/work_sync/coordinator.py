@@ -170,6 +170,7 @@ class Handoff:
                     target,
                     folder.path(target),
                     excludes=folder.ignore,
+                    allow_branch_switch=True,
                     fallback_identity=folder.id,
                 )
             except UsageError as error:
