@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 import sys
 from dataclasses import replace
@@ -9,6 +10,14 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+import work_sync.add as add_module
+from work_sync.add import (
+    folder_id,
+    infer_destination,
+    install_manifest,
+    manifest_with_folder,
+    source_folder,
+)
 from work_sync.cli import app
 from work_sync.coordinator import FolderHandoff, Handoff, HandoffPlan
 from work_sync.handoff import (
@@ -66,6 +75,24 @@ def test_load_manifest_rejects_duplicate_ids(tmp_path: Path) -> None:
         load_manifest(path)
 
 
+def test_manifest_rejects_mismatched_cross_machine_relative_paths(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "folders.json"
+    write_manifest(
+        path,
+        [
+            {
+                **ENTRY,
+                "tsuki": "/home/dileep/Documents/Personal/QBio_perspective",
+            }
+        ],
+    )
+
+    with pytest.raises(UsageError, match="relative paths differ"):
+        load_manifest(path)
+
+
 def test_manifest_selects_by_id_or_label(tmp_path: Path) -> None:
     path = tmp_path / "folders.json"
     write_manifest(path, [ENTRY])
@@ -106,6 +133,130 @@ def test_detect_host_rejects_unknown_platform() -> None:
     assert detect_host("Linux") == "tsuki"
     with pytest.raises(UsageError, match="unsupported host"):
         detect_host("Plan9")
+
+
+def test_add_infers_the_same_relative_path_in_both_directions() -> None:
+    mac = Path("/Volumes/WorkSSD/Work/Collaborations/new-project")
+    tsuki = Path("/home/dileep/Documents/Work/Collaborations/new-project")
+
+    assert infer_destination("mac", mac) == tsuki
+    assert infer_destination("tsuki", tsuki) == mac
+
+
+def test_add_rejects_a_source_outside_the_shared_roots() -> None:
+    with pytest.raises(UsageError, match="outside /Volumes/WorkSSD"):
+        infer_destination("mac", Path("/Users/dkishore/project"))
+
+
+def test_add_detects_root_git_repository_and_plain_folder(tmp_path: Path) -> None:
+    repo = tmp_path / "project"
+    plain = tmp_path / "notes"
+    repo.mkdir()
+    plain.mkdir()
+    git(repo, "init", "-b", "main")
+
+    assert (
+        source_folder("mac", repo, Path("/home/dileep/Documents/project")).folder_class
+        == "git"
+    )
+    assert (
+        source_folder(
+            "mac", plain, Path("/home/dileep/Documents/notes")
+        ).folder_class
+        == "plain"
+    )
+
+
+def test_add_uses_a_stable_id_from_the_relative_path() -> None:
+    relative = Path("Work/Collaborations/new-project")
+
+    assert folder_id(relative) == folder_id(relative)
+    assert folder_id(relative).startswith("new-project-")
+
+
+def test_add_appends_only_the_new_manifest_entry(tmp_path: Path) -> None:
+    path = tmp_path / "folders.json"
+    original = json.dumps([ENTRY], indent=2) + "\n"
+    path.write_text(original, encoding="utf-8")
+    folder = source_folder(
+        "mac",
+        tmp_path,
+        Path("/home/dileep/Documents/Work/new-project"),
+        folder_class="plain",
+    )
+
+    updated = manifest_with_folder(original, folder)
+    entries = json.loads(updated)
+
+    assert entries[0] == ENTRY
+    assert entries[1] == {
+        "id": folder.id,
+        "label": tmp_path.name,
+        "mac": str(tmp_path),
+        "tsuki": "/home/dileep/Documents/Work/new-project",
+        "class": "plain",
+        "git": "none",
+        "ignore": [],
+    }
+    assert manifest_with_folder(updated, folder) == updated
+
+
+def test_add_preserves_existing_manifest_formatting(tmp_path: Path) -> None:
+    original = '[\n  {"id": "existing", "ignore": ["/one"]}\n]\n'
+    folder = source_folder(
+        "mac",
+        tmp_path,
+        Path("/home/dileep/Documents/Work/new-project"),
+        folder_class="plain",
+    )
+
+    updated = manifest_with_folder(original, folder)
+
+    assert updated.startswith(original[:-3] + ",\n")
+
+
+def test_manifest_install_writes_directly_without_chezmoi(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = {
+        "mac": (tmp_path / "mac-source", tmp_path / "mac-applied"),
+        "tsuki": (tmp_path / "tsuki-source", tmp_path / "tsuki-applied"),
+    }
+    files = {str(path): "old\n" for pair in paths.values() for path in pair}
+    calls: list[list[str]] = []
+
+    def execute(argv: list[str], input_text: str | None) -> str:
+        command = shlex.split(argv[-1]) if argv and argv[0] == "ssh" else argv
+        calls.append(command)
+        if command[0] == "cat":
+            return files[command[1]].strip()
+        if command[0] == "tee":
+            files[command[1]] = input_text or ""
+        return ""
+
+    class FakeSyncthing:
+        def scan(self, host: str, folder_id: str) -> None:
+            pass
+
+        def wait_idle(self, folder_id: str, timeout: int) -> None:
+            files[str(paths["tsuki"][0])] = files[str(paths["mac"][0])]
+
+    monkeypatch.setattr(add_module, "MANIFEST_PATHS", paths)
+    monkeypatch.setattr(add_module, "verify_manifest_copies", lambda runner: "ok")
+
+    install_manifest(
+        Runner(local_host="mac", execute=execute),
+        FakeSyncthing(),  # type: ignore[arg-type]
+        "old\n",
+        "new\n",
+        timeout=10,
+    )
+
+    assert all(
+        files[str(path)] == "new\n" for pair in paths.values() for path in pair
+    )
+    assert not any(command[0] == "chezmoi" for command in calls)
 
 
 def test_runner_wraps_remote_arguments() -> None:
@@ -262,6 +413,17 @@ def test_syncthing_scan_uses_authenticated_rest_post() -> None:
         ],
         "X-API-Key: secret\n",
     )
+
+
+def test_new_folder_target_must_be_missing_or_empty(tmp_path: Path) -> None:
+    service = Syncthing(Runner(local_host="mac"))
+    target = tmp_path / "target"
+
+    assert service._target_state("mac", target) == "missing"
+    target.mkdir()
+    assert service._target_state("mac", target) == "empty"
+    (target / "existing.txt").write_text("keep\n", encoding="utf-8")
+    assert service._target_state("mac", target) == "nonempty"
 
 
 def test_handoff_with_no_external_worktrees_does_not_touch_main_git_state() -> None:
@@ -913,9 +1075,19 @@ def test_no_arguments_show_help() -> None:
     result = CliRunner().invoke(app, [])
 
     assert result.exit_code == 0
+    assert "add" in result.stdout
     assert "bootstrap" in result.stdout
     assert "conflicts" in result.stdout
     assert "handoff" in result.stdout
+
+
+def test_add_help_documents_smart_destination_and_confirmation() -> None:
+    result = CliRunner().invoke(app, ["add", "--help"])
+
+    assert result.exit_code == 0
+    assert "--destination" in result.stdout
+    assert "--yes" in result.stdout
+    assert "work-sync add" in result.stdout
 
 
 def test_handoff_help_documents_repeatable_folder_and_confirmation() -> None:
