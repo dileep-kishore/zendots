@@ -295,6 +295,15 @@ class Orca:
                 source.branch,
             )
             created = replace(created, branch=source.branch)
+            self._call(
+                host,
+                "worktree",
+                "set",
+                "--worktree",
+                f"path:{created.path}",
+                "--display-name",
+                source.display_name,
+            )
         return created
 
     def verify_worktree(

@@ -521,7 +521,7 @@ def test_orca_create_renames_version_normalized_branch() -> None:
     def execute(argv: list[str], input_text: str | None) -> str:
         calls.append(argv)
         if "worktree create" not in argv[-1]:
-            return ""
+            return json.dumps({"ok": True, "result": {}})
         return json.dumps(
             {
                 "ok": True,
@@ -560,7 +560,11 @@ def test_orca_create_renames_version_normalized_branch() -> None:
     created = Orca(runner).create_worktree("tsuki", target_repo, source, "main")
 
     assert created.branch == "feat/a"
-    assert calls[-1][-1] == "git -C /target/worktree branch -m feat/a"
+    assert calls[-2][-1] == "git -C /target/worktree branch -m feat/a"
+    assert calls[-1][-1] == (
+        "orca-ide worktree set --worktree path:/target/worktree "
+        "--display-name feat/a --json"
+    )
 
 
 def test_root_help_contains_handoff_examples() -> None:
