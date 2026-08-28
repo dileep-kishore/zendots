@@ -5,7 +5,9 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from typer.testing import CliRunner
 
+from work_sync.cli import app
 from work_sync.handoff import (
     Orca,
     OrcaRepo,
@@ -224,6 +226,33 @@ def test_git_handoff_rejects_divergence_without_changing_refs(tmp_path: Path) ->
     assert git(target, "show-ref") == before
 
 
+def test_external_handoff_allows_overwriting_a_clean_target(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    source.mkdir()
+    git(source, "init", "-b", "feat/a")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("source work\n", encoding="utf-8")
+
+    plan = preflight_repository(
+        Runner(local_host="mac"),
+        "mac",
+        source,
+        "mac",
+        target,
+        allow_clean_target_difference=True,
+    )
+
+    assert plan.target.path == target
+
+
 def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
     repos = {
         "ok": True,
@@ -396,6 +425,32 @@ def test_rsync_mirrors_worktree_and_keeps_recovery_copy(tmp_path: Path) -> None:
     assert (recovery / "target-only.txt").read_text(encoding="utf-8") == "keep me\n"
 
 
+def test_rsync_honors_manifest_reincludes(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    recovery = tmp_path / "recovery"
+    (source / "build").mkdir(parents=True)
+    target.mkdir()
+    (source / "build/main.pdf").write_bytes(b"main")
+    (source / "build/supplement.pdf").write_bytes(b"supplement")
+    (source / "build/disposable.log").write_text("ignore\n", encoding="utf-8")
+
+    sync_worktree_files(
+        Runner(local_host="mac"),
+        "mac",
+        source,
+        "mac",
+        target,
+        recovery,
+        excludes=("!/build/main.pdf", "!/build/supplement.pdf", "/build"),
+        dry_run=False,
+    )
+
+    assert (target / "build/main.pdf").read_bytes() == b"main"
+    assert (target / "build/supplement.pdf").read_bytes() == b"supplement"
+    assert not (target / "build/disposable.log").exists()
+
+
 def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
     calls: list[list[str]] = []
 
@@ -453,3 +508,36 @@ def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
             ),
         ]
     ]
+
+
+def test_root_help_contains_handoff_examples() -> None:
+    result = CliRunner().invoke(app, ["--help"])
+
+    assert result.exit_code == 0
+    assert "target means the receiving machine" in result.stdout.lower()
+    assert "work-sync handoff tsuki --dry-run" in result.stdout
+
+
+def test_no_arguments_show_help() -> None:
+    result = CliRunner().invoke(app, [])
+
+    assert result.exit_code == 0
+    assert "bootstrap" in result.stdout
+    assert "handoff" in result.stdout
+
+
+def test_handoff_help_documents_repeatable_folder_and_confirmation() -> None:
+    result = CliRunner().invoke(app, ["handoff", "--help"])
+
+    assert result.exit_code == 0
+    assert "--folder" in result.stdout
+    assert "--dry-run" in result.stdout
+    assert "--yes" in result.stdout
+    assert "work-sync handoff macmini --folder LifeOS" in result.stdout
+
+
+def test_handoff_rejects_current_machine_as_target() -> None:
+    result = CliRunner().invoke(app, ["handoff", "macmini", "--dry-run"])
+
+    assert result.exit_code == 2
+    assert "target is the current host" in result.output
