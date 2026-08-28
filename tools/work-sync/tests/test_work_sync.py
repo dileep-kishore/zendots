@@ -510,6 +510,54 @@ def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
     ]
 
 
+def test_orca_create_renames_version_normalized_branch() -> None:
+    calls: list[list[str]] = []
+
+    def execute(argv: list[str], input_text: str | None) -> str:
+        calls.append(argv)
+        if "worktree create" not in argv[-1]:
+            return ""
+        return json.dumps(
+            {
+                "ok": True,
+                "result": {
+                    "worktree": {
+                        "id": "target::/target/worktree",
+                        "repoId": "target",
+                        "path": "/target/worktree",
+                        "branch": "refs/heads/feat/feat-a",
+                        "displayName": "feat/a",
+                        "isMainWorktree": False,
+                        "agents": [],
+                    }
+                },
+            }
+        )
+
+    runner = Runner(local_host="mac", execute=execute)
+    source = OrcaWorktree(
+        "source::/source/feat-a",
+        "source",
+        Path("/source/feat-a"),
+        "feat/a",
+        "feat/a",
+        False,
+        (),
+    )
+    target_repo = OrcaRepo(
+        "target",
+        Path("/target"),
+        "project",
+        "github.com/example/project",
+        (),
+    )
+
+    created = Orca(runner).create_worktree("tsuki", target_repo, source, "main")
+
+    assert created.branch == "feat/a"
+    assert calls[-1][-1] == "git -C /target/worktree branch -m feat/a"
+
+
 def test_root_help_contains_handoff_examples() -> None:
     result = CliRunner().invoke(app, ["--help"])
 
