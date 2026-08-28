@@ -148,10 +148,6 @@ def parse_orca_inventory(
 
 def pair_worktrees(source: OrcaRepo, target: OrcaRepo) -> tuple[WorktreePair, ...]:
     """Pair external worktrees by branch while preserving target paths."""
-    if source.identity and target.identity and source.identity != target.identity:
-        raise UsageError(
-            f"Orca repository identity mismatch: {source.identity} != {target.identity}"
-        )
     target_by_branch: dict[str, OrcaWorktree] = {}
     for worktree in target.worktrees:
         if worktree.is_main:
@@ -495,12 +491,23 @@ def _operation_in_progress(runner: Runner, host: Host, repo: Path) -> str | None
     ):
         if _exists(runner, host, git_dir / name):
             return name
-    locks = runner.run(
-        host,
-        ["find", str(git_dir), "-name", "*.lock", "-print", "-quit"],
-    )
-    if locks:
-        return Path(locks).name
+    for name in (
+        "index.lock",
+        "HEAD.lock",
+        "packed-refs.lock",
+        "config.lock",
+        "shallow.lock",
+    ):
+        if _exists(runner, host, git_dir / name):
+            return name
+    refs = git_dir / "refs"
+    if _exists(runner, host, refs):
+        locks = runner.run(
+            host,
+            ["find", str(refs), "-name", "*.lock", "-print", "-quit"],
+        )
+        if locks:
+            return str(Path(locks).relative_to(git_dir))
     if _git(runner, host, repo, "ls-files", "-u"):
         return "unmerged index"
     return None

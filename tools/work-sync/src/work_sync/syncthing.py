@@ -23,6 +23,7 @@ LOCAL_STATE_IGNORES = (
     ".pytest_cache",
     ".ruff_cache",
     ".uv-cache",
+    ".pixi",
     ".venv",
     "node_modules",
     ".claude/settings.local.json",

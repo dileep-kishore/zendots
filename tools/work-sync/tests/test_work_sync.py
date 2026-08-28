@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -148,6 +149,36 @@ def test_sensitive_project_files_are_not_default_ignores(tmp_path: Path) -> None
     assert ".claude/settings.json" not in patterns
     assert ".codex/config.toml" not in patterns
     assert ".pi/settings.json" not in patterns
+    assert ".pixi" in patterns
+
+
+def test_preflight_ignores_unrelated_lock_but_rejects_index_lock(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    source.mkdir()
+    git(source, "init", "-b", "main")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    git_dir = Path(git(source, "rev-parse", "--absolute-git-dir"))
+    (git_dir / "project.lock").touch()
+
+    assert preflight_repository(
+        Runner(local_host="mac"), "mac", source, "mac", target
+    )
+
+    (git_dir / "index.lock").touch()
+    with pytest.raises(UsageError, match="index.lock"):
+        preflight_repository(
+            Runner(local_host="mac"), "mac", source, "mac", target
+        )
 
 
 def test_git_handoff_reproduces_branch_index_and_worktree(tmp_path: Path) -> None:
@@ -414,6 +445,7 @@ def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
     }
     source = parse_orca_inventory(repos, source_worktrees).repos[0]
     target = parse_orca_inventory(repos, target_worktrees).repos[0]
+    target = replace(target, identity="github.com/example/upstream")
 
     pairs = pair_worktrees(source, target)
 
