@@ -575,14 +575,14 @@ def _require_fast_forward(
         ) from error
 
 
-def _working_tree_changes(
+def _tree_changes(
     runner: Runner,
     source: RepoState,
     target: RepoState,
     excludes: tuple[str, ...],
+    *,
+    delete: bool,
 ) -> tuple[str, ...]:
-    if source.host != runner.local_host:
-        raise UsageError("handoff source must be the current host")
     rsync_host, endpoints = _rsync_endpoints(
         source.host,
         source.path,
@@ -592,10 +592,11 @@ def _working_tree_changes(
     command = [
         "rsync",
         "-rlinc",
-        "--delete",
         "--executability",
         "--out-format=%i %n%L",
     ]
+    if delete:
+        command.append("--delete")
     for pattern in (*TREE_EXCLUDES, *excludes):
         if not pattern.startswith("!"):
             command.append(f"--exclude={pattern}")
@@ -648,13 +649,26 @@ def preflight_repository(
                 target_commit,
                 source_commit,
             )
-    differences = _working_tree_changes(
+    differences = _tree_changes(
         runner,
         source,
         target,
         excludes,
+        delete=True,
     )
-    if differences and not (allow_clean_target_difference and not target.dirty):
+    target_only = ()
+    if differences and allow_clean_target_difference and target.dirty:
+        target_only = _tree_changes(
+            runner,
+            target,
+            source,
+            excludes,
+            delete=False,
+        )
+    safe_external_update = allow_clean_target_difference and (
+        not target.dirty or not target_only
+    )
+    if differences and not safe_external_update:
         preview = ", ".join(differences[:3])
         raise UsageError(f"target files differ from source: {preview}")
     return RepositoryPlan(runner, source, target)

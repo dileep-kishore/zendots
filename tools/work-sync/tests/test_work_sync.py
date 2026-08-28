@@ -253,6 +253,63 @@ def test_external_handoff_allows_overwriting_a_clean_target(tmp_path: Path) -> N
     assert plan.target.path == target
 
 
+def test_external_handoff_allows_source_additions_with_shared_target_dirt(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    source.mkdir()
+    git(source, "init", "-b", "feat/a")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    for repo in (source, target):
+        (repo / "shared-untracked.txt").write_text("shared\n", encoding="utf-8")
+    (source / "source-only.txt").write_text("new\n", encoding="utf-8")
+
+    plan = preflight_repository(
+        Runner(local_host="mac"),
+        "mac",
+        source,
+        "mac",
+        target,
+        allow_clean_target_difference=True,
+    )
+
+    assert plan.target.path == target
+
+
+def test_external_handoff_rejects_target_only_dirty_content(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    source.mkdir()
+    git(source, "init", "-b", "feat/a")
+    git(source, "config", "user.name", "Work Sync Test")
+    git(source, "config", "user.email", "work-sync@example.test")
+    git(source, "remote", "add", "origin", "git@github.com:example/project.git")
+    (source / "tracked.txt").write_text("base\n", encoding="utf-8")
+    git(source, "add", ".")
+    git(source, "commit", "-m", "base")
+    git(tmp_path, "clone", str(source), str(target))
+    git(target, "remote", "set-url", "origin", "git@github.com:example/project.git")
+    (target / "target-only.txt").write_text("unique\n", encoding="utf-8")
+
+    with pytest.raises(UsageError, match="target files differ"):
+        preflight_repository(
+            Runner(local_host="mac"),
+            "mac",
+            source,
+            "mac",
+            target,
+            allow_clean_target_difference=True,
+        )
+
+
 def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
     repos = {
         "ok": True,
