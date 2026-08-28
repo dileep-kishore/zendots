@@ -24,6 +24,7 @@ def _execute(argv: list[str], input_text: str | None) -> str:
         argv,
         input=input_text,
         text=True,
+        errors="replace",
         capture_output=True,
         check=True,
     ).stdout.strip()
