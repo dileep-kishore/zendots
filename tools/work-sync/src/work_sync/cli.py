@@ -6,7 +6,7 @@ import fcntl
 import os
 import subprocess
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, NoReturn
@@ -223,19 +223,20 @@ def handoff(
     if target.host == source:
         raise typer.BadParameter("target is the current host", param_hint="TARGET")
     try:
-        runner = Runner(source)
-        selected = load_manifest(manifest_path).git_folders(tuple(folders or ()))
-        service = Handoff(runner, Syncthing(runner), Orca(runner))
-        plan = service.preflight(selected, target.host, timeout=timeout)
-        _show_handoff(plan, dry_run)
-        if dry_run:
-            return
-        if not yes and not Confirm.ask(
-            f"Hand {len(plan.folders)} repositories to {target.value}?"
-        ):
-            console.print("Cancelled. Nothing changed.")
-            return
-        with _handoff_lock():
+        lock = nullcontext() if dry_run else _handoff_lock()
+        with lock:
+            runner = Runner(source)
+            selected = load_manifest(manifest_path).git_folders(tuple(folders or ()))
+            service = Handoff(runner, Syncthing(runner), Orca(runner))
+            plan = service.preflight(selected, target.host, timeout=timeout)
+            _show_handoff(plan, dry_run)
+            if dry_run:
+                return
+            if not yes and not Confirm.ask(
+                f"Hand {len(plan.folders)} repositories to {target.value}?"
+            ):
+                console.print("Cancelled. Nothing changed.")
+                return
             results = service.execute(plan)
     except (UsageError, subprocess.CalledProcessError) as error:
         _abort(error)
