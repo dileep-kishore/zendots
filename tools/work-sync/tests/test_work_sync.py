@@ -65,6 +65,23 @@ def test_manifest_selects_by_id_or_label(tmp_path: Path) -> None:
     assert manifest.select("QBio_perspective").id == "qbio"
 
 
+def test_manifest_git_folders_filters_non_git_defaults(tmp_path: Path) -> None:
+    plain = {
+        **ENTRY,
+        "id": "presentations",
+        "label": "Presentations",
+        "class": "plain",
+        "git": "none",
+    }
+    path = tmp_path / "folders.json"
+    write_manifest(path, [ENTRY, plain])
+    manifest = load_manifest(path)
+
+    assert [folder.id for folder in manifest.git_folders()] == ["qbio"]
+    with pytest.raises(UsageError, match="Git folders only"):
+        manifest.git_folders(("Presentations",))
+
+
 def test_detect_host_rejects_unknown_platform() -> None:
     assert detect_host("Darwin") == "mac"
     assert detect_host("Linux") == "tsuki"
