@@ -21,6 +21,7 @@ CLAUDE.md
 AGENTS.md
 pkgs/
 misc/
+tools/
 
 # Editconfig
 .editorconfig
