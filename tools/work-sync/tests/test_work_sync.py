@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from work_sync.manifest import UsageError, detect_host, load_manifest
+from work_sync.syncthing import folder_payload, managed_patterns
 from work_sync.system import Runner
 
 ENTRY: dict[str, object] = {
@@ -71,3 +72,28 @@ def test_runner_wraps_remote_arguments() -> None:
             None,
         )
     ]
+
+
+def test_folder_payload_disables_metadata_sync(tmp_path: Path) -> None:
+    path = tmp_path / "folders.json"
+    write_manifest(path, [ENTRY])
+    folder = load_manifest(path).select("qbio")
+
+    payload = folder_payload({}, folder, "MAC-ID", "TSUKI-ID", "mac")
+
+    assert payload["ignorePerms"] is False
+    assert payload["syncOwnership"] is False
+    assert payload["sendOwnership"] is False
+    assert payload["syncXattrs"] is False
+    assert payload["sendXattrs"] is False
+
+
+def test_sensitive_project_files_are_not_default_ignores(tmp_path: Path) -> None:
+    path = tmp_path / "folders.json"
+    write_manifest(path, [ENTRY])
+    patterns = managed_patterns(load_manifest(path).select("qbio"))
+
+    assert ".env" not in patterns
+    assert ".claude/settings.json" not in patterns
+    assert ".codex/config.toml" not in patterns
+    assert ".pi/settings.json" not in patterns
