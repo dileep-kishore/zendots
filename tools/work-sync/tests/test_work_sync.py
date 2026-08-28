@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -113,6 +114,15 @@ def test_runner_wraps_remote_arguments() -> None:
             None,
         )
     ]
+
+
+def test_runner_replaces_undecodable_command_output() -> None:
+    output = Runner(local_host="mac").run(
+        "mac",
+        [sys.executable, "-c", "import os; os.write(1, b'\\xef')"],
+    )
+
+    assert output == "�"
 
 
 def test_folder_payload_disables_metadata_sync(tmp_path: Path) -> None:
