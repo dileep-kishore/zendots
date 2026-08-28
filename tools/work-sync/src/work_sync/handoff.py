@@ -39,6 +39,7 @@ class RepoState:
     head: str
     branches: dict[str, str]
     staged_patch: str
+    dirty: str
 
 
 @dataclass(frozen=True)
@@ -235,22 +236,31 @@ class Orca:
         repo: OrcaRepo,
         source: OrcaWorktree,
         base_ref: str,
+        existing_commit: str | None = None,
     ) -> OrcaWorktree:
         """Create one missing target worktree with setup hooks skipped."""
-        payload = self._call(
-            host,
-            "worktree",
-            "create",
-            "--repo",
-            f"id:{repo.id}",
-            "--name",
-            source.branch,
-            "--base-branch",
-            base_ref,
-            "--setup",
-            "skip",
-            "--no-parent",
-        )
+        ref = f"refs/heads/{source.branch}"
+        if existing_commit:
+            _git(self.runner, host, repo.path, "update-ref", "-d", ref, existing_commit)
+        try:
+            payload = self._call(
+                host,
+                "worktree",
+                "create",
+                "--repo",
+                f"id:{repo.id}",
+                "--name",
+                source.branch,
+                "--base-branch",
+                base_ref,
+                "--setup",
+                "skip",
+                "--no-parent",
+            )
+        except Exception:
+            if existing_commit:
+                _git(self.runner, host, repo.path, "update-ref", ref, existing_commit)
+            raise
         result = payload.get("result")
         raw = result.get("worktree") if isinstance(result, dict) else None
         if not isinstance(raw, dict):
@@ -319,9 +329,27 @@ def sync_worktree_files(
         "--no-group",
         "--out-format=%i %n%L",
     ]
-    for pattern in (*TREE_EXCLUDES, *excludes):
+    patterns = (*TREE_EXCLUDES, *excludes)
+    include_rules: list[str] = []
+    for pattern in patterns:
         if not pattern.startswith("!"):
-            command.append(f"--exclude={pattern}")
+            continue
+        included = pattern[1:]
+        parts = included.strip("/").split("/")[:-1]
+        for index in range(1, len(parts) + 1):
+            parent = "/" + "/".join(parts[:index]) + "/"
+            if parent not in include_rules:
+                include_rules.append(parent)
+        include_rules.append(included)
+    command.extend(f"--include={pattern}" for pattern in include_rules)
+    included_paths = [pattern.strip("/") for pattern in include_rules]
+    for pattern in patterns:
+        if pattern.startswith("!"):
+            continue
+        bare = pattern.rstrip("/").strip("/")
+        if any(path.startswith(bare + "/") for path in included_paths):
+            pattern = pattern.rstrip("/") + "/***"
+        command.append(f"--exclude={pattern}")
     endpoints = (str(source_path) + "/", destination)
     deletion_scan = runner.run(
         source_host,
@@ -448,7 +476,13 @@ def _operation_in_progress(runner: Runner, host: Host, repo: Path) -> str | None
     return None
 
 
-def inspect_repo(runner: Runner, host: Host, repo: Path) -> RepoState:
+def inspect_repo(
+    runner: Runner,
+    host: Host,
+    repo: Path,
+    *,
+    fallback_identity: str | None = None,
+) -> RepoState:
     """Inspect a repository without changing it."""
     try:
         branch = _git(runner, host, repo, "branch", "--show-current")
@@ -460,14 +494,21 @@ def inspect_repo(runner: Runner, host: Host, repo: Path) -> RepoState:
     operation = _operation_in_progress(runner, host, repo)
     if operation:
         raise UsageError(f"Git operation or lock on {host}: {repo} ({operation})")
+    try:
+        origin = canonical_origin(runner, host, repo)
+    except UsageError:
+        if not fallback_identity:
+            raise
+        origin = f"manifest:{fallback_identity}"
     return RepoState(
         host=host,
         path=repo,
-        origin=canonical_origin(runner, host, repo),
+        origin=origin,
         branch=branch,
         head=head,
         branches=_branches(runner, host, repo),
         staged_patch=_git(runner, host, repo, "diff", "--cached", "--binary", "HEAD", "--"),
+        dirty=_git(runner, host, repo, "status", "--porcelain=v1", "--untracked-files=all"),
     )
 
 
@@ -534,10 +575,22 @@ def preflight_repository(
     target_path: Path,
     *,
     excludes: tuple[str, ...] = (),
+    allow_clean_target_difference: bool = False,
+    fallback_identity: str | None = None,
 ) -> RepositoryPlan:
     """Validate one source and target repository without changing either."""
-    source = inspect_repo(runner, source_host, source_path)
-    target = inspect_repo(runner, target_host, target_path)
+    source = inspect_repo(
+        runner,
+        source_host,
+        source_path,
+        fallback_identity=fallback_identity,
+    )
+    target = inspect_repo(
+        runner,
+        target_host,
+        target_path,
+        fallback_identity=fallback_identity,
+    )
     if source.origin != target.origin:
         raise UsageError(
             f"origin mismatch: {source.origin} != {target.origin}"
@@ -562,10 +615,44 @@ def preflight_repository(
         target,
         excludes,
     )
-    if differences:
+    if differences and not (allow_clean_target_difference and not target.dirty):
         preview = ", ".join(differences[:3])
         raise UsageError(f"target files differ from source: {preview}")
     return RepositoryPlan(runner, source, target)
+
+
+def preflight_missing_worktree(
+    runner: Runner,
+    source_host: Host,
+    source_path: Path,
+    target_repo: RepoState,
+    *,
+    fallback_identity: str | None = None,
+) -> RepoState:
+    """Validate the source branch for a worktree missing on the target."""
+    source = inspect_repo(
+        runner,
+        source_host,
+        source_path,
+        fallback_identity=fallback_identity,
+    )
+    if source.origin != target_repo.origin:
+        raise UsageError(
+            f"origin mismatch: {source.origin} != {target_repo.origin}"
+        )
+    if source.branch == target_repo.branch:
+        raise UsageError(
+            f"worktree layout conflict on target branch: {source.branch}"
+        )
+    base_commit = target_repo.branches.get(source.branch, target_repo.head)
+    _require_fast_forward(
+        runner,
+        source,
+        source.branch,
+        base_commit,
+        source.head,
+    )
+    return source
 
 
 def _source_remote(source: RepoState, target: RepoState) -> str:
@@ -589,8 +676,8 @@ def _cleanup_incoming(plan: RepositoryPlan) -> None:
             _git(plan.runner, plan.target.host, plan.target.path, "update-ref", "-d", ref)
 
 
-def transfer_git_state(runner: Runner, plan: RepositoryPlan) -> None:
-    """Transfer source branch and index state into a validated target."""
+def transfer_refs(runner: Runner, plan: RepositoryPlan) -> None:
+    """Transfer every source branch without deleting target-only branches."""
     source = plan.source
     target = plan.target
     refspec = "+refs/heads/*:refs/work-sync/incoming/*"
@@ -621,41 +708,53 @@ def transfer_git_state(runner: Runner, plan: RepositoryPlan) -> None:
             if target_commit:
                 args.append(target_commit)
             _git(runner, target.host, target.path, *args)
-        _git(
-            runner,
-            target.host,
-            target.path,
-            "reset",
-            "-q",
-            "--mixed",
-            source.head,
-        )
-        if source.staged_patch:
-            runner.run(
-                target.host,
-                [
-                    "git",
-                    "-C",
-                    str(target.path),
-                    "apply",
-                    "--cached",
-                    "--binary",
-                    "-",
-                ],
-                input_text=source.staged_patch + "\n",
-            )
-        actual_head = _git(runner, target.host, target.path, "rev-parse", "HEAD")
-        actual_patch = _git(
-            runner,
-            target.host,
-            target.path,
-            "diff",
-            "--cached",
-            "--binary",
-            "HEAD",
-            "--",
-        )
-        if actual_head != source.head or actual_patch != source.staged_patch:
-            raise UsageError(f"Git verification failed: {target.path}")
     finally:
         _cleanup_incoming(plan)
+
+
+def rebuild_index(runner: Runner, plan: RepositoryPlan) -> None:
+    """Reproduce one source checkout's staged state on its target checkout."""
+    source = plan.source
+    target = plan.target
+    _git(
+        runner,
+        target.host,
+        target.path,
+        "reset",
+        "-q",
+        "--mixed",
+        source.head,
+    )
+    if source.staged_patch:
+        runner.run(
+            target.host,
+            [
+                "git",
+                "-C",
+                str(target.path),
+                "apply",
+                "--cached",
+                "--binary",
+                "-",
+            ],
+            input_text=source.staged_patch + "\n",
+        )
+    actual_head = _git(runner, target.host, target.path, "rev-parse", "HEAD")
+    actual_patch = _git(
+        runner,
+        target.host,
+        target.path,
+        "diff",
+        "--cached",
+        "--binary",
+        "HEAD",
+        "--",
+    )
+    if actual_head != source.head or actual_patch != source.staged_patch:
+        raise UsageError(f"Git verification failed: {target.path}")
+
+
+def transfer_git_state(runner: Runner, plan: RepositoryPlan) -> None:
+    """Transfer source branches and index state into a validated target."""
+    transfer_refs(runner, plan)
+    rebuild_index(runner, plan)

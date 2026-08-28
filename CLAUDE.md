@@ -91,6 +91,23 @@ installing on both produces Syncthing conflict files.
 One-time cleanup for a machine whose home predates this layout:
 `docs/agent-skills-migration.md`.
 
+### Syncthing project folders
+
+`.stignore` is Syncthing's per-folder ignore file. Syncthing never synchronizes
+the file itself. A Git-tracked `.stignore` belongs to that repository; the
+helper validates its manifest patterns and never edits it. For an untracked
+`.stignore`, `work-sync bootstrap` writes the managed rules independently on
+macmini and tsuki from `~/.config/work-sync/folders.json`, then adds the file to
+that checkout's `.git/info/exclude`. Do not ignore `.stignore` globally or add it
+to project `.gitignore` files.
+
+The shared defaults cover disposable caches and machine-local runtime state.
+Files such as `.env`, `.claude/settings.json`, `.codex/config.toml`, and
+`.pi/settings.json` sync by default. If one is machine-specific for a particular
+project, add its pattern to that project's `ignore` list in the manifest, then
+rerun `work-sync bootstrap <label> --apply`. Extra lines added directly
+to one `.stignore` stay local to that machine.
+
 ### Package Management
 
 ```bash
