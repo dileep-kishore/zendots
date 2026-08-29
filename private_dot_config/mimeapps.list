@@ -24,3 +24,5 @@ text/plain=nvim.desktop
 x-scheme-handler/opencode=opencode-desktop-handler.desktop
 x-scheme-handler/slack=slack.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/codex=chatgpt.desktop
+x-scheme-handler/webcal=helium.desktop

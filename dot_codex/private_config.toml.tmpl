@@ -109,8 +109,8 @@ BROWSER_USE_TINYSKY_ENABLED = "0"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.818.21641"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/dileep/.codex/plugins/cache/openai-bundled/browser/26.818.21641/scripts/browser-service.mjs"}'
+BROWSER_USE_CODEX_APP_VERSION = "26.818.41705"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/dileep/.codex/plugins/cache/openai-bundled/browser/26.818.41705/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
 
 [projects."/home/dileep/zendots"]
@@ -295,12 +295,10 @@ source_type = "git"
 source = "https://github.com/DietrichGebert/ponytail.git"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-08-22T18:20:03Z"
 source_type = "local"
 source = "/home/dileep/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-08-22T18:20:42Z"
 source_type = "local"
 source = "/home/dileep/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -355,6 +353,54 @@ trusted_hash = "sha256:6a6f42bc3b58d6262db38bfd74d7f340fcca2b09cdb134aad365063f0
 [hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:subagent_start:0:0"]
 trusted_hash = "sha256:1423b56c1322f96c8f74c51c1e7ae9a047b904c1fa43ee9165d462fd7a6e70ef"
 
+[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:12efdd54b3c8a0778d63d1056073a7cbeec09518b5bfd46e2893c96b2292af7f"
+
+[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:15e2e58db3e02eb8b44667e15b8ae7c28d08178d5dd1c1ed4b9369ef3ecf56d9"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:e6b9df143de11443eb576c38874cf6e0c48358f948170948fdf630f1c047c098"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:bc55a03ac0094c5deb4af95c405b75b34735f318b3d9bd64a2f9902973861606"
+
+[hooks.state."codex@openai-codex:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:3dfaa7e4f022570b260b8a8cf4ac7585c986175256b887a4723fac4f358a482f"
+
+[hooks.state."plannotator@plannotator:hooks/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:c14c21d72b8ddb7a4dbd7eedcac9d3fff0d7b4b97e4f24dd8f6277d78c45329e"
+
+[hooks.state."plannotator@plannotator:hooks/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:c8ae3770a85b13f9f51aabce263943340a878625c5e71eadb429bb2743835d9e"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:b4d8fea77fcec3864a0bbf0c274cd840f67b3c476e84435fc0cd4ae992e141e5"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:pre_tool_use:1:0"]
+trusted_hash = "sha256:132ba1500e9d22e1b29940496c83647376c8d557a2ef224ff59f04efadd9a0b2"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:d1deebd6c543d8efb50edd2b946b9eb8748cd699202fae1ce8597c7cfb9047b3"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:aa108a98be1c09ec45588e6886e3ad528b8f7406a783b275c580df3088c62a82"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:post_tool_use:1:0"]
+trusted_hash = "sha256:d5a688a8b84441ace3cbcce7b9b4b3f018c33f44be0967ddf7b4ff89a73b8907"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:d4efe081405f8eb3b787cf5f047fd55807936b930e686824167e94b326e7df50"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:98b61ee24d258362db1d22f0b1ce5b1b94ae2694b68f0cabb23d3f09ada4aaf4"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:12752d6548d4060dd399e160a9506feff9bc32b762a0bb95f55f33332096fc28"
+
+[hooks.state."/home/dileep/Documents/Work/BERIL-research-observatory/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:669912d24a4588acd7b84e564bd9b1b089362329eacdfb1a08c8f9878c93cdcb"
+
 [hooks.state."/home/dileep/.codex/hooks.json:pre_tool_use:0:0"]
 trusted_hash = "sha256:f764e2879811b86ad6eb1e7aa778f4b8554522d4c1e707a4faafd208615b2e69"
 
@@ -378,27 +424,6 @@ trusted_hash = "sha256:6c15548d7994a6a5bece708d7557dbfc8443e141e3b3458a2b10421f6
 
 [hooks.state."/home/dileep/.codex/hooks.json:stop:1:0"]
 trusted_hash = "sha256:183c76d4ff4a9c2b29c58c4657a9697fe9ed3f092a62be060522d0db30ff3af8"
-
-[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:post_tool_use:0:0"]
-trusted_hash = "sha256:12efdd54b3c8a0778d63d1056073a7cbeec09518b5bfd46e2893c96b2292af7f"
-
-[hooks.state."/home/dileep/Documents/Personal/personal-portfolio/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:15e2e58db3e02eb8b44667e15b8ae7c28d08178d5dd1c1ed4b9369ef3ecf56d9"
-
-[hooks.state."codex@openai-codex:hooks/hooks.json:session_start:0:0"]
-trusted_hash = "sha256:e6b9df143de11443eb576c38874cf6e0c48358f948170948fdf630f1c047c098"
-
-[hooks.state."codex@openai-codex:hooks/hooks.json:session_end:0:0"]
-trusted_hash = "sha256:bc55a03ac0094c5deb4af95c405b75b34735f318b3d9bd64a2f9902973861606"
-
-[hooks.state."codex@openai-codex:hooks/hooks.json:stop:0:0"]
-trusted_hash = "sha256:3dfaa7e4f022570b260b8a8cf4ac7585c986175256b887a4723fac4f358a482f"
-
-[hooks.state."plannotator@plannotator:hooks/hooks.json:pre_tool_use:0:0"]
-trusted_hash = "sha256:c14c21d72b8ddb7a4dbd7eedcac9d3fff0d7b4b97e4f24dd8f6277d78c45329e"
-
-[hooks.state."plannotator@plannotator:hooks/hooks.json:permission_request:0:0"]
-trusted_hash = "sha256:c8ae3770a85b13f9f51aabce263943340a878625c5e71eadb429bb2743835d9e"
 {{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 
