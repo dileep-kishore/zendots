@@ -213,7 +213,10 @@ trusted_project_path_patterns:
 projects:
 {{- if eq .chezmoi.os "linux" }}
 - {{ .chezmoi.homeDir }}/Documents/Personal/Startup/healthfile
+- {{ .chezmoi.homeDir }}/Documents/Work/BERIL/beril-workbench
 - {{ .chezmoi.homeDir }}/Documents/Work/Collaborations/BERIL-research-observatory
 - {{ .chezmoi.homeDir }}/Documents/Work/DataLakehouse/co-scientist
+- {{ .chezmoi.homeDir }}/orca/workspaces/beril-workbench/dedicated-agents-design
+- {{ .chezmoi.homeDir }}/orca/workspaces/evalome/feat-langfuse-integration
 {{- end }}
 - {{ .chezmoi.homeDir }}/zendots
