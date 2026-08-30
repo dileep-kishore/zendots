@@ -24,11 +24,11 @@ from .system import Runner
 
 MANIFEST_PATHS: dict[Host, tuple[Path, Path]] = {
     "mac": (
-        Path("/Users/dkishore/zendots/private_dot_config/work-sync/folders.json"),
+        Path("/Users/dkishore/zendots/private_dot_config/work-sync/private_folders.json"),
         Path("/Users/dkishore/.config/work-sync/folders.json"),
     ),
     "tsuki": (
-        Path("/home/dileep/zendots/private_dot_config/work-sync/folders.json"),
+        Path("/home/dileep/zendots/private_dot_config/work-sync/private_folders.json"),
         Path("/home/dileep/.config/work-sync/folders.json"),
     ),
 }
