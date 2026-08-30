@@ -174,7 +174,7 @@ class Orca:
 
     @staticmethod
     def _binary(host: Host) -> str:
-        return "orca" if host == "mac" else "orca-ide"
+        return "orca"
 
     def _call(self, host: Host, *args: str) -> dict[str, object]:
         try:

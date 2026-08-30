@@ -977,7 +977,7 @@ def test_orca_create_uses_linux_cli_and_skips_setup() -> None:
             "ConnectTimeout=8",
             "tsuki",
             (
-                "orca-ide worktree create --repo id:target --name feat/a "
+                "orca worktree create --repo id:target --name feat/a "
                 "--base-branch main --setup skip --no-parent --json"
             ),
         ]
@@ -1031,7 +1031,7 @@ def test_orca_create_renames_version_normalized_branch() -> None:
     assert created.branch == "feat/a"
     assert calls[-2][-1] == "git -C /target/worktree branch -m feat/a"
     assert calls[-1][-1] == (
-        "orca-ide worktree set --worktree path:/target/worktree "
+        "orca worktree set --worktree path:/target/worktree "
         "--display-name feat/a --json"
     )
 
