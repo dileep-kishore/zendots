@@ -34,3 +34,7 @@ skills *ARGS:
 # Relink ~/.agents/skills into Claude Code
 link-skills:
   link-agent-skills.sh
+
+# Capture managed keys from a live tool config into its fragment, e.g. `just capture codex`
+capture tool:
+  uv run tools/cfg-capture.py {{tool}}
