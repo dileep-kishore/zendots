@@ -1,0 +1,83 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["tomlkit==0.13.2"]
+# ///
+# chezmoi modify script for ~/.codex/config.toml: enforce the managed keys
+# from .chezmoidata/codex_managed.toml over the live file on stdin. Codex
+# rewrites this file at runtime; every key absent from the fragment passes
+# through untouched. A semantic no-op emits stdin byte-for-byte.
+import base64
+import copy
+import json
+import sys
+from collections.abc import MutableMapping
+
+import tomlkit
+
+MANAGED = json.loads(base64.b64decode("{{ .codex_managed | toJson | b64enc }}"))
+
+
+def die(msg):
+    print("modify config.toml: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def enforce(node, desired, path=""):
+    for key, value in desired.items():
+        here = path + "." + key if path else key
+        if isinstance(value, dict):
+            if not value:
+                continue
+            if key not in node:
+                node[key] = value
+            elif isinstance(node[key], MutableMapping):
+                enforce(node[key], value, here)
+            else:
+                die("type conflict at " + here + ": fragment mapping vs live non-mapping")
+        elif key not in node or node[key] != value:
+            node[key] = value
+
+
+def unmanaged(tree, desired):
+    out = {}
+    for key, value in tree.items():
+        if key in desired and isinstance(desired[key], dict) and desired[key]:
+            if isinstance(value, dict):
+                sub = unmanaged(value, desired[key])
+                if sub:
+                    out[key] = sub
+            else:
+                out[key] = value
+        elif key in desired:
+            continue
+        else:
+            out[key] = value
+    return out
+
+
+raw = sys.stdin.read()
+if raw.strip():
+    try:
+        doc = tomlkit.parse(raw)
+    except Exception as exc:
+        die("cannot parse stdin: " + str(exc))
+else:
+    doc = tomlkit.document()
+
+before = doc.unwrap()
+if not isinstance(before, dict):
+    die("root is not a mapping")
+
+merged = copy.deepcopy(before)
+enforce(merged, MANAGED)
+if merged == before:
+    sys.stdout.write(raw)
+    sys.exit(0)
+
+enforce(doc, MANAGED)
+out = tomlkit.dumps(doc)
+after = tomlkit.parse(out).unwrap()
+if unmanaged(after, MANAGED) != unmanaged(before, MANAGED):
+    die("unmanaged values changed during rewrite; refusing to write")
+sys.stdout.write(out)

@@ -1,0 +1,55 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# ///
+# chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
+# from .chezmoidata/claude_managed.json over the live file on stdin. Claude
+# Code (and Orca/Superset hook injection) rewrite this file at runtime; every
+# key absent from the fragment passes through untouched. A semantic no-op
+# emits stdin byte-for-byte.
+import base64
+import copy
+import json
+import sys
+
+MANAGED = json.loads(base64.b64decode("{{ .claude_managed | toJson | b64enc }}"))
+
+
+def die(msg):
+    print("modify settings.json: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def enforce(node, desired, path=""):
+    for key, value in desired.items():
+        here = path + "." + key if path else key
+        if isinstance(value, dict):
+            if not value:
+                continue
+            if key not in node:
+                node[key] = value
+            elif isinstance(node[key], dict):
+                enforce(node[key], value, here)
+            else:
+                die("type conflict at " + here + ": fragment mapping vs live non-mapping")
+        else:
+            node[key] = value
+
+
+raw = sys.stdin.read()
+if raw.strip():
+    try:
+        doc = json.loads(raw)
+    except Exception as exc:
+        die("cannot parse stdin: " + str(exc))
+else:
+    doc = {}
+if not isinstance(doc, dict):
+    die("root is not a mapping")
+
+before = copy.deepcopy(doc)
+enforce(doc, MANAGED)
+if doc == before:
+    sys.stdout.write(raw)
+    sys.exit(0)
+sys.stdout.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")

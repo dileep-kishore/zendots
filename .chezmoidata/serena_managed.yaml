@@ -1,0 +1,6 @@
+serena_managed:
+  gui_log_window: false
+  web_dashboard: false
+  web_dashboard_open_on_launch: false
+  trusted_project_path_patterns:
+    - "**"

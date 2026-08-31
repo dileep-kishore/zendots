@@ -1,0 +1,80 @@
+{
+  "claude_managed": {
+    "env": {
+      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+      "CLAUDE_CODE_SHELL": "/bin/bash",
+      "DISABLE_AUTOUPDATER": "1",
+      "FORCE_AUTOUPDATE_PLUGINS": "1"
+    },
+    "attribution": {
+      "commit": "",
+      "pr": ""
+    },
+    "permissions": {
+      "defaultMode": "plan"
+    },
+    "statusLine": {
+      "type": "command",
+      "command": "bash \"$HOME/.claude/statusline-command.sh\""
+    },
+    "enabledPlugins": {
+      "frontend-design@claude-plugins-official": true,
+      "github@claude-plugins-official": true,
+      "code-review@claude-plugins-official": true,
+      "feature-dev@claude-plugins-official": true,
+      "serena@claude-plugins-official": true,
+      "commit-commands@claude-plugins-official": true,
+      "pyright-lsp@claude-plugins-official": true,
+      "code-simplifier@claude-plugins-official": true,
+      "ralph-loop@claude-plugins-official": false,
+      "superpowers@claude-plugins-official": true,
+      "productivity@knowledge-work-plugins": true,
+      "bio-research@knowledge-work-plugins": true,
+      "claude-md-management@claude-plugins-official": true,
+      "pr-review-toolkit@claude-plugins-official": true,
+      "linear@claude-plugins-official": true,
+      "skill-creator@claude-plugins-official": true,
+      "plannotator@plannotator": true,
+      "codex@openai-codex": true,
+      "ponytail@ponytail": true
+    },
+    "extraKnownMarketplaces": {
+      "plannotator": {
+        "source": {
+          "source": "github",
+          "repo": "backnotprop/plannotator"
+        },
+        "autoUpdate": true
+      },
+      "openai-codex": {
+        "source": {
+          "source": "github",
+          "repo": "openai/codex-plugin-cc"
+        },
+        "autoUpdate": true
+      },
+      "ponytail": {
+        "source": {
+          "source": "github",
+          "repo": "DietrichGebert/ponytail"
+        },
+        "autoUpdate": true
+      },
+      "knowledge-work-plugins": {
+        "source": {
+          "source": "github",
+          "repo": "anthropics/knowledge-work-plugins"
+        },
+        "autoUpdate": true
+      }
+    },
+    "alwaysThinkingEnabled": true,
+    "tui": "fullscreen",
+    "autoDreamEnabled": true,
+    "skipDangerousModePermissionPrompt": true,
+    "skipWorkflowUsageWarning": true,
+    "theme": "custom:catppuccin-mocha",
+    "editorMode": "vim",
+    "agentPushNotifEnabled": true
+  }
+}

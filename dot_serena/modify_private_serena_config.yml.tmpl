@@ -1,0 +1,65 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["ruamel.yaml==0.18.6"]
+# ///
+# chezmoi modify script for ~/.serena/serena_config.yml: enforce the managed
+# keys from .chezmoidata/serena_managed.yaml over the live file on stdin.
+# Serena rewrites this file (notably the projects list); every key absent from
+# the fragment passes through untouched, comments included. A semantic no-op
+# emits stdin byte-for-byte.
+import base64
+import copy
+import io
+import json
+import sys
+from collections.abc import MutableMapping
+
+from ruamel.yaml import YAML
+
+MANAGED = json.loads(base64.b64decode("{{ .serena_managed | toJson | b64enc }}"))
+
+
+def die(msg):
+    print("modify serena_config.yml: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def enforce(node, desired, path=""):
+    for key, value in desired.items():
+        here = path + "." + key if path else key
+        if isinstance(value, dict):
+            if not value:
+                continue
+            if key not in node:
+                node[key] = value
+            elif isinstance(node[key], MutableMapping):
+                enforce(node[key], value, here)
+            else:
+                die("type conflict at " + here + ": fragment mapping vs live non-mapping")
+        elif key not in node or node[key] != value:
+            node[key] = value
+
+
+yaml = YAML()
+yaml.preserve_quotes = True
+
+raw = sys.stdin.read()
+if raw.strip():
+    try:
+        doc = yaml.load(raw)
+    except Exception as exc:
+        die("cannot parse stdin: " + str(exc))
+else:
+    doc = yaml.load("{}")
+if not isinstance(doc, MutableMapping):
+    die("root is not a mapping")
+
+before = copy.deepcopy(doc)
+enforce(doc, MANAGED)
+if doc == before:
+    sys.stdout.write(raw)
+    sys.exit(0)
+buf = io.StringIO()
+yaml.dump(doc, buf)
+sys.stdout.write(buf.getvalue())
