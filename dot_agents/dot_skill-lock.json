@@ -17,7 +17,7 @@
       "skillPath": "skills/orca-cli/SKILL.md",
       "skillFolderHash": "ee3a35c76f875ea6ebaf68947af13ba6346b13f2",
       "installedAt": "2026-07-30T03:54:59.843Z",
-      "updatedAt": "2026-08-22T13:02:44.335Z"
+      "updatedAt": "2026-08-26T03:34:22.753Z"
     },
     "orca-linear": {
       "source": "stablyai/orca",
@@ -35,7 +35,7 @@
       "skillPath": "skills/orchestration/SKILL.md",
       "skillFolderHash": "9aa26fde93c0592e5983cdca1ccd33b402802255",
       "installedAt": "2026-07-30T04:06:13.265Z",
-      "updatedAt": "2026-07-30T04:07:07.830Z"
+      "updatedAt": "2026-08-26T03:34:22.755Z"
     },
     "computer-use": {
       "source": "stablyai/orca",
