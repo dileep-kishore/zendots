@@ -197,4 +197,6 @@ export PATH
 export PATH={{ .chezmoi.homeDir }}/.opencode/bin:$PATH
 
 # bun completions
-[ -s "{{ .chezmoi.homeDir }}/.bun/_bun" ] && source "{{ .chezmoi.homeDir }}/.bun/_bun"
+if [[ -s "{{ .chezmoi.homeDir }}/.bun/_bun" ]]; then
+    source "{{ .chezmoi.homeDir }}/.bun/_bun"
+fi
