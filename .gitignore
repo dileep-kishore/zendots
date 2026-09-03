@@ -4,5 +4,5 @@
 docs/plans/
 *.pyc
 /.superpowers/brainstorm
-/private_dot_config/work-sync/folders.json
+/private_dot_config/work-sync/private_folders.json
 docs/superpowers/
