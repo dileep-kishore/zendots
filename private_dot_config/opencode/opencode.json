@@ -17,7 +17,11 @@
 		"edit": "allow",
 		"bash": "allow",
 		"webfetch": "allow",
-		"external_directory": "ask"
+		"external_directory": "ask",
+		"skill": {
+			"create-skill": "ask",
+			"orca-independent-review": "ask"
+		}
 	},
 	"instructions": ["~/.config/opencode/AGENTS.md"],
 	"tools": {
