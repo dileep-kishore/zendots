@@ -1,278 +1,231 @@
-# zendots
+<div align="center">
+  <img src="assets/logo.svg" width="120" alt="zendots logo">
+  <h1>zendots</h1>
+  <p><strong>Zen dotfiles — a modern, minimal, keyboard-centric terminal environment</strong></p>
+</div>
 
-**Zen dotfiles - A modern, minimal terminal-based development environment**
-
-A comprehensive dotfiles repository managed by [chezmoi](https://www.chezmoi.io/), featuring configurations for Neovim, Zsh, Tmux, and various CLI tools. Built for productivity with keyboard-centric and terminal-based workflows and consistent theming across all tools.
+A [chezmoi](https://www.chezmoi.io/)-managed dotfiles repository covering Neovim,
+Zsh, Tmux, a fleet of AI coding agents, and the CLI tools that hold it all
+together. Templated for both macOS (AeroSpace + SketchyBar) and Linux (niri /
+Hyprland + Waybar), with Catppuccin Mocha theming throughout.
 
 **Be sure to ⭐️ or 🔱 this repo if you find it useful! 😃**
 
-## Screenshots
+## The Stack
 
-<!-- TODO: Add screenshots -->
+### Core
 
-![Terminal Setup](assets/terminal.png)
-![Neovim Setup](assets/neovim.png)
-![Tmux Workflow](assets/tmux.png)
+| | |
+|---|---|
+| **Dotfile manager** | [chezmoi](https://www.chezmoi.io/) |
+| **Shell** | Zsh + [Zinit](https://github.com/zdharma-continuum/zinit), [carapace](https://carapace.sh/) completions |
+| **Prompt** | [Oh-My-Posh](https://ohmyposh.dev/) (with a custom transient prompt) |
+| **Terminal** | [Ghostty](https://ghostty.org/), [Kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) |
+| **Editor** | [Neovim](https://neovim.io/) + [lazy.nvim](https://github.com/folke/lazy.nvim) |
+| **Multiplexer** | [Tmux](https://github.com/tmux/tmux) + [TPM](https://github.com/tmux-plugins/tpm), [sesh](https://github.com/joshmedeski/sesh), [tmuxp](https://tmuxp.git-pull.com/) |
+| **File manager** | [Yazi](https://yazi-rs.github.io/) |
+| **Git UI** | [Lazygit](https://github.com/jesseduffield/lazygit) + [delta](https://github.com/dandavison/delta) |
+| **Theme** | [Catppuccin Mocha](https://catppuccin.com/), everywhere |
 
-## Setup
+### AI Agents
 
-- **Dotfile Manager**: [chezmoi](https://www.chezmoi.io/)
-- **Shell**: Zsh with [Zinit](https://github.com/zdharma-continuum/zinit) plugin manager
-- **Prompt**: [Oh-My-Posh](https://ohmyposh.dev/)
-- **Terminal**: [Ghostty](https://ghostty.org/), [Kitty](https://sw.kovidgoyal.net/kitty/), and [Warp](https://www.warp.dev/)
-- **Editor**: [Neovim](https://neovim.io/) with [lazy.nvim](https://github.com/folke/lazy.nvim)
-- **Multiplexer**: [Tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm)
-- **File Manager**: [Yazi](https://yazi-rs.github.io/)
-- **Git UI**: [Lazygit](https://github.com/jesseduffield/lazygit)
-- **Theme**: [Catppuccin Mocha](https://catppuccin.com/) (consistent across all tools)
-- **Fonts**: Monaspace, Dank Mono, MonaLisa, Cartograph, Fira Code, Victor Mono, Cascadia Code, Recursive, Maple Mono, SN-Pro, IA-Writer, Font Awesome
-- **AI Tools**: [aichat](https://github.com/sigoden/aichat), [claude-code](https://claude.com/claude-code)
-- **Package Managers**: [Homebrew](https://brew.sh/), [pipx](https://pipx.pypa.io/), [pixi](https://pixi.sh/)
+The agent setup is the part that moves fastest. All of these are configured here:
 
-## Features
+| | |
+|---|---|
+| [**Orca**](https://www.onorca.dev/) | Worktree-based agentic IDE — the primary driver ([docs](https://www.onorca.dev/docs)) |
+| [**Claude Code**](https://claude.com/claude-code) | `~/.claude` settings, plugins, statusline, MCP servers |
+| [**Codex**](https://github.com/openai/codex) | `~/.codex` config, plus [CodexBar](https://codexbar.app/) in the menu bar |
+| [**OpenCode**](https://opencode.ai/) | `~/.config/opencode`, incl. oh-my-opencode |
+| [**T3 Code**](https://t3.codes/) | Minimal desktop GUI for driving coding agents |
+| [**Pi**](https://pi.dev/) | `~/.pi` agent config — see [`docs/pi-workflow.md`](docs/pi-workflow.md) |
+| [**aichat**](https://github.com/sigoden/aichat) | Inline shell command generation (`Alt-e`) |
+| **Neovim** | [sidekick.nvim](https://github.com/folke/sidekick.nvim), [avante.nvim](https://github.com/yetone/avante.nvim), Copilot |
 
-### 🎨 Consistent Theming
+Skills are vendored once in `dot_agents/skills/` → `~/.agents/skills/`, so
+`chezmoi apply` reproduces every skill on a new machine with no network access.
+See [Agent skills](#agent-skills) below.
 
-- Catppuccin Mocha color scheme across shell, editor, terminal, and all CLI tools
-- Custom Oh-My-Posh prompt with git integration
-- Beautiful status bars in both Neovim and Tmux
+### CLI Toolbelt
 
-### ⚡ Productivity Tools
+| | |
+|---|---|
+| **Navigate** | [zoxide](https://github.com/ajeetdsouza/zoxide) · [eza](https://eza.rocks/) · [fd](https://github.com/sharkdp/fd) |
+| **Search** | [ripgrep](https://github.com/BurntSushi/ripgrep) · [ast-grep](https://ast-grep.github.io/) · [fzf](https://github.com/junegunn/fzf) · [television](https://github.com/alexpasmantier/television) |
+| **Read** | [bat](https://github.com/sharkdp/bat) · [glow](https://github.com/charmbracelet/glow) · [rich-cli](https://github.com/Textualize/rich-cli) · [tealdeer](https://github.com/tealdeer-rs/tealdeer) |
+| **Inspect** | [btop](https://github.com/aristocratos/btop) · [procs](https://github.com/dalance/procs) · [dua-cli](https://github.com/Byron/dua-cli) · [fastfetch](https://github.com/fastfetch-cli/fastfetch) |
+| **Data** | [jq](https://jqlang.github.io/jq/) · [yq](https://github.com/mikefarah/yq) · [jc](https://github.com/kellyjonbrazil/jc) |
+| **Git** | [gh](https://cli.github.com/) · [git-delta](https://github.com/dandavison/delta) · [git-cliff](https://git-cliff.org/) · [git-extras](https://github.com/tj/git-extras) |
+| **Shell** | [atuin](https://atuin.sh/) · [carapace](https://carapace.sh/) · [direnv](https://direnv.net/) · [vivid](https://github.com/sharkdp/vivid) |
+| **Run** | [just](https://github.com/casey/just) · [entr](https://github.com/eradman/entr) · [lazydocker](https://github.com/jesseduffield/lazydocker) · [OrbStack](https://orbstack.dev/) |
+| **Languages** | [uv](https://docs.astral.sh/uv/) · [pixi](https://pixi.sh/) · [pipx](https://pipx.pypa.io/) · Node · Go · Rust · Lua |
+| **Misc** | [ouch](https://github.com/ouch-org/ouch) · [age](https://github.com/FiloSottile/age) · [aria2](https://aria2.github.io/) · ffmpeg |
 
-- **Shell enhancements**: `zoxide` (smart cd), `atuin` (shell history), `fzf` (fuzzy finder), `eza` (modern ls)
-- **AI integration**: Command generation with `aichat` (Alt-e), AI-assisted editing in Neovim
-- **Session management**: Tmux with `sesh` for quick session switching plus a standardized tmuxp workspace for new sessions
-- **Git workflow**: Enhanced git commands, lazygit, neogit, octo.nvim for GitHub
+Full list: [`pkgs/Brewfile`](pkgs/Brewfile).
 
-### 🔧 Developer Experience
+### Desktop
 
-- **LSP support**: Full language server protocol setup with Mason
-- **Smart completions**: nvim-cmp with multiple sources
-- **Code formatting**: Automatic formatting with conform.nvim
-- **Git integration**: Inline blame, diff view, conflict resolution
-- **Tmux workflows**: Custom window icons, git status in status bar, split management
-
-### 📦 Package Management
-
-- Declarative package installation via Brewfile
-- Python tools managed with pipx
-- Project-specific environments with pixi
-- Plugin managers for Tmux, Neovim, Zsh, and Yazi
+- **macOS**: [AeroSpace](https://github.com/nikitabobko/AeroSpace) (tiling), [SketchyBar](https://felixkratz.github.io/SketchyBar/), [borders](https://github.com/FelixKratz/JankyBorders), AltTab, Raycast
+- **Linux**: [niri](https://github.com/YaLTeR/niri) or Hyprland, Waybar, walker/wofi, swaync
 
 ## Installation
 
 ### Prerequisites
 
-1. Install [Homebrew](https://brew.sh/) (macOS/Linux)
-2. Install chezmoi:
-   ```bash
-   brew install chezmoi
-   ```
+Install [Homebrew](https://brew.sh/), then chezmoi:
+
+```bash
+brew install chezmoi
+```
 
 ### Quick Start
 
-1. **Clone and initialize dotfiles**:
+```bash
+# 1. Initialize, preview, apply
+chezmoi init git@github.com:dileep-kishore/zendots.git
+chezmoi diff
+chezmoi apply
 
-   ```bash
-   # Initialize chezmoi with this repository
-   chezmoi init https://github.com/dileep-kishore/zendots.git
+# 2. Install packages
+cd ~/.local/share/chezmoi/pkgs
+brew bundle install        # Homebrew formulae, casks, fonts
+./pipx_packages.sh         # Python CLI tools
+./download_yazi_plugins.sh # Yazi plugins
+./misc_setup.sh            # bat cache, TPM clone
+```
 
-   # Preview what will be changed
-   chezmoi diff
+Linux hosts use the platform scripts under `pkgs/arch/` and `pkgs/fedora/`
+instead of the Brewfile.
 
-   # Apply the dotfiles
-   chezmoi apply
-   ```
+Then start tmux and press `Ctrl-a + Shift-i` to install the tmux plugins.
 
-2. **Install packages**:
-
-   ```bash
-   # Install all Homebrew packages
-   cd ~/.local/share/chezmoi/pkgs
-   brew bundle install
-
-   # Install Yazi plugins
-   ./download_yazi_plugins.sh
-
-   # Install Python packages
-   ./pipx_packages.sh
-
-   # Run miscellaneous setup tasks
-   ./misc_setup.sh
-   ```
-
-3. **Setup Tmux plugins**:
-
-   ```bash
-   # Start tmux
-   tmux
-
-   # Install plugins (inside tmux)
-   # Press: Ctrl-a + Shift-i
-   ```
-
-4. **Install Superpowers skills for OpenCode**:
-
-   Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
-
-   Or, after chezmoi has installed the managed helper scripts:
-
-   ```bash
-   ~/.config/opencode/sync_skill_collections.sh
-   ```
-
-   The helper only installs the Superpowers OpenCode plugin and skills.
-
-### Font Setup (Manual)
-
-Install the following fonts manually:
-
-1. [Monaspace](https://github.com/githubnext/monaspace)
-2. Dank Mono (from patched fonts collection)
-3. MonaLisa (from patched fonts collection)
-4. Cartograph (from patched fonts collection)
-5. [Nerd Fonts](https://www.nerdfonts.com/): Fira Code, Victor Mono, Cascadia Code
-6. [Recursive](https://www.recursive.design/)
-7. [Maple Mono](https://github.com/subframe7536/maple-font)
-8. SN-Pro
-9. IA-Writer (Quattro, Duospace)
-10. [Font Awesome](https://fontawesome.com/)
+Fonts install from the Brewfile (Monaspace, Maple Mono NF, SF Mono/Pro, and
+several Nerd Fonts). Licensed fonts kept outside Homebrew — Dank Mono,
+MonaLisa, Cartograph, IA Writer — install manually with `font-install.sh`.
 
 ## Usage
 
 ### Chezmoi Workflow
 
+This repository is the **source**. Edit files here, never in `~/.config`.
+
 ```bash
-# Edit a dotfile (chezmoi handles the dot_ prefix translation)
-chezmoi edit ~/.zshrc
-
-# Preview changes before applying
-chezmoi diff
-
-# Apply changes from repository to home directory
-chezmoi apply
-
-# Quickly edit and apply
+chezmoi edit ~/.zshrc              # Edit (handles the dot_ prefix for you)
+chezmoi diff ~/.zshrc              # Preview
+chezmoi apply ~/.zshrc             # Apply — always scope to the paths you changed
 chezmoi edit --apply ~/.config/nvim/init.lua
 ```
 
-### Common Commands
-
-Using the included [justfile](https://github.com/casey/just):
+### Just Recipes
 
 ```bash
-# Apply dotfiles
-just apply
-
-# Show diff
-just diff
-
-# Install packages from Brewfile
-just install
-
-# Update Brewfile with current packages
-just dump
+just apply          # chezmoi apply
+just diff           # chezmoi diff
+just install        # brew bundle install
+just dump           # regenerate the Brewfile from installed packages
+just skills add …   # install an agent skill
+just link-skills    # relink ~/.agents/skills into Claude Code
+just capture codex  # capture live config keys back into the managed fragment
 ```
+
+### Agent skills
+
+`~/.agents/skills/` is the single store for every harness. Always install
+through the wrapper so the result gets recorded in chezmoi:
+
+```bash
+agent-skills.sh add mattpocock/skills   # or: just skills add …
+agent-skills.sh update
+agent-skills.sh sync                    # after hand-authoring a skill
+```
+
+Only Claude Code needs symlinks (`link-agent-skills.sh`, run on every apply) —
+Codex and OpenCode resolve `~/.agents/skills` natively. Install a given skill on
+one machine only; the source syncs over Syncthing.
 
 ### Key Bindings
 
-#### Tmux
+**Tmux** — prefix is `Ctrl-a`
 
-- **Prefix**: `Ctrl-a` (instead of default Ctrl-b)
-- `prefix + h/v` → Split horizontally/vertically
-- `prefix + o` → Session manager backed by `sesh` sources and the standard tmuxp launcher
-- `prefix + r` → Reload configuration
-- `Ctrl-Shift-h/l` → Switch windows
-- `Alt + arrows` → Resize panes
+| | |
+|---|---|
+| `prefix + h` / `v` | Split horizontally / vertically |
+| `prefix + o` | Session manager (sesh + tmuxp) |
+| `prefix + r` | Reload config |
+| `Ctrl-Shift-h` / `l` | Switch windows |
+| `Alt + arrows` | Resize panes |
 
-#### Session Workflow
+**Sessions**
 
-- `ta <session-name|path>` → Attach to a running tmux session, a configured sesh session, or create a standardized session for a directory
-- `tnew <session-name> [directory]` → Register the session in local `~/.config/sesh/sesh.toml`, then create or attach to the standard tmuxp session
-- `~/.config/sesh/sesh.toml` is now machine-local and intentionally not managed by chezmoi
+- `ta <name\|path>` — attach to a tmux/sesh session, or create a standard one for a directory
+- `tnew <name> [dir]` — register in `~/.config/sesh/sesh.toml`, then create/attach
 
-#### Zsh
+`sesh.toml` is machine-local and intentionally unmanaged.
 
-- `Ctrl-r` → Search history with atuin
-- `Alt-e` → AI-assisted command generation with aichat
-- `Ctrl-t` → Fuzzy file finder
+**Zsh**
 
-#### Neovim (Normal Mode)
+| | |
+|---|---|
+| `Ctrl-r` | atuin history search |
+| `Ctrl-t` | fuzzy file finder |
+| `Alt-e` | aichat command generation |
 
-- `Space` → Leader key
-- `<leader>ff` → Find files
-- `<leader>fg` → Live grep
-- `<leader>gl` → Open lazygit
-- See full keymaps in `private_dot_config/nvim/lua/keymaps/`
+**Neovim** — leader is `Space`
+
+| | |
+|---|---|
+| `<leader>ff` | Find files |
+| `<leader>fg` | Find git files |
+| `<leader>sg` | Grep search |
+| `<leader>gl` | Lazygit |
+
+Full keymaps: `private_dot_config/nvim/lua/keymaps/`.
+
+## Extras
+
+- **`work-sync`** (`tools/work-sync/`) — manages Syncthing project folders across
+  machines: `.stignore` generation, conflict scanning, and Orca worktree handoff.
+- **`chezmoi-sync-from-home.sh`** — pull drifted changes back from `~` into the repo.
+- **`cfg-capture.py`** — capture keys from a live tool config into its managed fragment.
 
 ## Maintenance
 
-### Updating Packages
-
 ```bash
-# Update Homebrew packages
-brew update && brew upgrade
-
-# Update Neovim plugins
-nvim +Lazy sync
-
-# Update Tmux plugins
-# Inside tmux: prefix + U
-
-# Update Yazi plugins
-ya pack -u
+brew update && brew upgrade   # packages
+nvim +Lazy sync               # Neovim plugins
+ya pkg upgrade                # Yazi plugins
+agent-skills.sh update        # agent skills
+# tmux plugins: prefix + U
 ```
 
-### Syncing Dotfiles
+Syncing the repo itself:
 
 ```bash
-# Pull latest changes
-cd ~/.local/share/chezmoi
-git pull
-
-# Apply changes
-chezmoi apply
+chezmoi cd && git pull && chezmoi apply
 ```
 
 ## Troubleshooting
 
-### Chezmoi not applying changes
+**Changes not applying** — make sure you edited the chezmoi source, not `~`.
+`chezmoi cd` gets you there.
 
-Make sure you're editing files in the chezmoi source directory:
+**Tmux plugins not loading** — `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`, then `prefix + I`.
 
-```bash
-chezmoi cd  # Navigate to source directory
-```
+**Neovim LSP not working** — `:Mason`, install the missing server.
 
-### Tmux plugins not loading
+**Shell completions broken** — `rm ~/.zcompdump* && exec zsh`.
 
-1. Ensure TPM is installed: `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`
-2. Inside tmux, press `prefix + I` to install plugins
+## Credits
 
-### Neovim LSP not working
-
-Run `:Mason` and install the required language servers.
-
-### Shell completions not working
-
-Rebuild the completion cache:
-
-```bash
-rm ~/.zcompdump*
-exec zsh
-```
-
-## Credits and Inspiration
-
-- [chezmoi](https://www.chezmoi.io/) - Dotfile management
-- [Catppuccin](https://catppuccin.com/) - Color scheme
-- [Neovim](https://neovim.io/) community for amazing plugins
-- Various dotfile repositories across GitHub
+[chezmoi](https://www.chezmoi.io/) · [Catppuccin](https://catppuccin.com/) ·
+the Neovim plugin community · and a long tail of dotfiles repos across GitHub.
 
 ## License
 
-MIT License - Feel free to use and modify as you wish!
+MIT. Use and modify as you wish.
 
 ---
 
-**Note**: This is a personal dotfiles repository. While you're welcome to use it as inspiration, you may need to adjust configurations to match your preferences and system setup.
+**Note**: This is a personal dotfiles repository. Take it as inspiration rather
+than something to apply wholesale — you will want to adjust it to your own
+machines and preferences.
