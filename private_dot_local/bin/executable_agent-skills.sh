@@ -5,6 +5,7 @@
 #   agent-skills.sh add mattpocock/skills
 #   agent-skills.sh update
 #   agent-skills.sh remove wayfinder
+#   agent-skills.sh sync            # record a hand-authored skill, no installer
 set -euo pipefail
 
 require_cmd() {
@@ -14,12 +15,14 @@ require_cmd() {
   }
 }
 
-require_cmd npx
 require_cmd chezmoi
 
 # `skills` installs project-locally when the cwd is a git repo; run from $HOME so
 # it always resolves to the global store, whether or not -g was passed.
-(cd "$HOME" && npx -y skills@latest "$@")
+if [ "${1:-}" != "sync" ]; then
+  require_cmd npx
+  (cd "$HOME" && npx -y skills@latest "$@")
+fi
 
 # Snapshot the whole store rather than just the new skill: it is the record of
 # what is installed, and picking up sibling updates is the point of syncing.

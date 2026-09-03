@@ -64,7 +64,11 @@ chezmoi edit ~/.zshrc
 ```bash
 agent-skills.sh add mattpocock/skills   # or: just skills add ...
 agent-skills.sh update
+agent-skills.sh sync                    # after hand-authoring a skill in the store
 ```
+
+To author a skill, invoke the `create-skill` skill; it covers layout, the
+manual-only frontmatter for each harness, and recording the result.
 
 Always install through `agent-skills.sh`, never a bare `npx skills`: the wrapper
 runs the installer from `$HOME` (it installs project-locally when the cwd is a
