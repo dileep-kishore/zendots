@@ -33,18 +33,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/stablyai/orca.git",
       "skillPath": "skills/orchestration/SKILL.md",
-      "skillFolderHash": "9aa26fde93c0592e5983cdca1ccd33b402802255",
+      "skillFolderHash": "4199ec6988801dd491631706cba62631b4bed8fb",
       "installedAt": "2026-07-30T04:06:13.265Z",
-      "updatedAt": "2026-08-26T03:34:22.755Z"
+      "updatedAt": "2026-09-03T12:30:24.257Z"
     },
     "computer-use": {
       "source": "stablyai/orca",
       "sourceType": "github",
       "sourceUrl": "https://github.com/stablyai/orca.git",
       "skillPath": "skills/computer-use/SKILL.md",
-      "skillFolderHash": "2072384f53670cb61d93f4f6264ad2d8f6b5239c",
+      "skillFolderHash": "f0561c41d1f709a953684aef5d5368f8c58d269f",
       "installedAt": "2026-07-30T04:07:07.829Z",
-      "updatedAt": "2026-07-30T04:07:07.829Z"
+      "updatedAt": "2026-09-03T12:30:29.741Z"
     },
     "grill-with-docs": {
       "source": "mattpocock/skills",
