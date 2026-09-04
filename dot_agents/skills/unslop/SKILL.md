@@ -1,11 +1,37 @@
 ---
 name: unslop
-description: Cut AI tells from any writing. Must always apply.
+description: |
+  Cut AI tells from assistant-authored natural-language prose. Must always apply
+  to prose, but never to code, identifiers, commands, structured data, quoted
+  text, or exact strings.
 ---
 
 # Unslop
 
 Edit text to remove AI patterns and add human voice.
+
+## Scope
+
+Apply automatically only to natural-language prose authored by the assistant in
+the current response. Apply to existing prose only when the user explicitly
+asks for editing or rewriting.
+
+These scope rules override every pattern below.
+
+Never rewrite code, identifiers, public APIs, commands, configuration, structured
+data, regular expressions, SQL, string literals, snapshots, quoted text, or
+other exact content. Preserve inline code and technical terms verbatim.
+
+Do not edit comments or documentation inside source files unless the task
+explicitly asks for prose editing. When it does, preserve technical meaning,
+normative terms, examples, and referenced identifiers exactly.
+
+During coding tasks, apply these rules to the assistant's explanatory prose,
+not to the code. Do not add opinions or first-person voice to technical, legal,
+reference, or factual writing unless the user explicitly requests that voice.
+
+This skill is locally maintained and intentionally absent from
+`~/.agents/.skill-lock.json`. Do not reinstall it from upstream.
 
 ## Process
 
