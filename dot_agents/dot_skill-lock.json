@@ -85,15 +85,6 @@
       "pluginName": "mattpocock-skills",
       "installedAt": "2026-08-01T04:40:39.167Z",
       "updatedAt": "2026-08-01T04:40:39.167Z"
-    },
-    "unslop": {
-      "source": "cursor/plugins",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/cursor/plugins.git",
-      "skillPath": "pstack/skills/unslop/SKILL.md",
-      "skillFolderHash": "6161508c5c7959b156ff0e4e10b510863b51f9cc",
-      "installedAt": "2026-08-20T01:23:24.788Z",
-      "updatedAt": "2026-08-20T01:23:24.788Z"
     }
   },
   "dismissed": {
