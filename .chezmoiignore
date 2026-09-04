@@ -31,6 +31,10 @@ Makefile
 
 # bin
 bin/
+# sketchybar helpers compile C sources into nested bin/ dirs. The pattern
+# above only matches the top-level bin. Do not broaden this to **/bin/:
+# that would also match .local/bin and unmanage the scripts in it.
+.config/sketchybar/helpers/**/bin/
 
 # Platform-specific: Linux-only configs (ignore on macOS)
 {{- if eq .chezmoi.os "darwin" }}
