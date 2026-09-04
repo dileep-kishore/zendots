@@ -1,5 +1,11 @@
 {{- /* chezmoi:modify-template */ -}}
-{{ default "{}" .chezmoi.stdin | fromYaml
+{{- /* Pi rewrites this file with its own YAML serializer (key order, list
+       indent). fromYaml|toYaml renormalizes to Go's style, so the two ping-pong
+       forever even when the data is identical. Parse stdin twice: enforce the
+       managed keys on one copy, and if that changed nothing semantically, emit
+       stdin byte-for-byte so Pi's formatting survives. */ -}}
+{{- $orig := default "{}" .chezmoi.stdin | fromYaml -}}
+{{- $merged := default "{}" .chezmoi.stdin | fromYaml
   | setValueAtPath "modelRoles.default" "openai-codex/gpt-5.6-sol:high"
   | setValueAtPath "symbolPreset" "nerd"
   | setValueAtPath "theme.dark" "catppuccin-mocha-minimal"
@@ -19,5 +25,9 @@
   | setValueAtPath "statusLine.segmentOptions.git.showBranch" true
   | setValueAtPath "statusLine.segmentOptions.git.showStaged" true
   | setValueAtPath "statusLine.segmentOptions.git.showUnstaged" true
-  | setValueAtPath "statusLine.segmentOptions.git.showUntracked" true
-  | toYaml -}}
+  | setValueAtPath "statusLine.segmentOptions.git.showUntracked" true -}}
+{{- if eq (toYaml $orig) (toYaml $merged) -}}
+{{- .chezmoi.stdin -}}
+{{- else -}}
+{{- toYaml $merged -}}
+{{- end -}}
