@@ -14,9 +14,12 @@
   reasonable assumptions, record them, and continue within the authorized scope.
 - Keep changes focused and complexity proportionate. Preserve unrelated and
   in-progress work in the checkout.
-- Scale planning and verification to the change; check affected behavior and
-  distinguish actual results from assumptions. Prefer TDD and meaningful coverage
-  targets without making them mandatory; honor repository requirements.
+- Scale verification to the change and check affected behavior. Prefer TDD when
+  it helps clarify behavior, especially for bug fixes, but treat tests as
+  lasting maintenance: add or update them only when they meaningfully protect
+  behavior or a likely regression. For reversible, low-impact changes, prefer
+  a targeted smoke check over tests that mirror the implementation or exist
+  only to raise coverage. Honor repository requirements and explicit requests.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. Be concise without dropping meaningful detail.
 - Explicit user requests take precedence over skill guidelines. If a skill
