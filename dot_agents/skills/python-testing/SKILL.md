@@ -1,7 +1,8 @@
 ---
 name: python-testing
-description: Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements.
-origin: ECC
+description: Python testing strategies using pytest, TDD, fixtures, mocking, parametrization, and coverage guidance.
+metadata:
+  origin: ECC
 ---
 
 # Python Testing Patterns
@@ -10,7 +11,7 @@ Comprehensive testing strategies for Python applications using pytest, TDD metho
 
 ## When to Activate
 
-- Writing new Python code (follow TDD: red, green, refactor)
+- Writing or changing Python tests
 - Designing test suites for Python projects
 - Reviewing Python test coverage
 - Setting up testing infrastructure
@@ -19,7 +20,11 @@ Comprehensive testing strategies for Python applications using pytest, TDD metho
 
 ### Test-Driven Development (TDD)
 
-Always follow the TDD cycle:
+Prefer TDD when it helps establish the intended behavior, especially for bug
+fixes. It is a default approach, not a mandatory gate; follow the task and
+repository requirements and scale verification to the change.
+
+When using TDD:
 
 1. **RED**: Write a failing test for the desired behavior
 2. **GREEN**: Write minimal code to make the test pass
@@ -38,10 +43,12 @@ def add(a, b):
 # Step 3: Refactor if needed (REFACTOR)
 ```
 
-### Coverage Requirements
+### Coverage Guidance
 
-- **Target**: 80%+ code coverage
-- **Critical paths**: 100% coverage required
+- Prefer meaningful coverage targets appropriate to the project; do not impose
+  a universal percentage or add a coverage gate unless requested or required.
+- Focus on critical behavior, realistic failure paths, and regressions.
+- Coverage measurements identify gaps; they do not establish correctness.
 - Use `pytest --cov` to measure coverage
 
 ```bash
@@ -638,13 +645,13 @@ class TestUserService:
 
 ### DO
 
-- **Follow TDD**: Write tests before code (red-green-refactor)
+- **Prefer TDD**: Use red-green-refactor when useful, without making it a gate
 - **Test one thing**: Each test should verify a single behavior
 - **Use descriptive names**: `test_user_login_with_invalid_credentials_fails`
 - **Use fixtures**: Eliminate duplication with fixtures
 - **Mock external dependencies**: Don't depend on external services
 - **Test edge cases**: Empty inputs, None values, boundary conditions
-- **Aim for 80%+ coverage**: Focus on critical paths
+- **Prefer meaningful coverage targets**: Follow project goals and focus on critical paths
 - **Keep tests fast**: Use marks to separate slow tests
 
 ### DON'T
