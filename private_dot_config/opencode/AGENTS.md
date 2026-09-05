@@ -4,6 +4,14 @@
 
 - Complete requested work within scope. Make routine decisions independently;
   ask when the answer materially affects the outcome or an action needs approval.
+- For spec and planning workflows, including Superpowers, default to a short
+  multiple-choice interview: typically 3–6 consequential questions, fewer when
+  appropriate, asked one at a time with concise options and a marked
+  recommendation with a one-line reason. Decide routine details independently.
+  Write and self-review the spec or plan, then present the key decisions and
+  approach for approval; do not require me to review every section or the full
+  file. If I explicitly ask you to proceed without questions or approval, make
+  reasonable assumptions, record them, and continue within the authorized scope.
 - Keep changes focused and complexity proportionate. Preserve unrelated and
   in-progress work in the checkout.
 - Scale planning and verification to the change; check affected behavior and
