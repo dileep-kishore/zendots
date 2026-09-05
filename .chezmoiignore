@@ -53,6 +53,7 @@ bin/
 {{- if eq .chezmoi.os "linux" }}
 .aerospace.toml
 .config/sketchybar
+.zprofile
 {{- end }}
 
 # misc
