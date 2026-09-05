@@ -10,7 +10,9 @@ correctness rather than trusting any summary.
   this checkout. The only file you create is the report at the path below.
 - Do the whole review yourself. Do not spawn subagents or ask another model for
   a second opinion; if the diff is large, review it in passes and say so.
-- Review execution against the stated intent. Do not argue with the intent.
+- Review execution against the stated intent. Flag a flawed assumption when
+  evidence shows it prevents the intended outcome; do not substitute your own
+  product preferences.
 - Report only actionable, evidence-backed findings. If the change is clean,
   say so plainly.
 
@@ -21,6 +23,8 @@ correctness rather than trusting any summary.
 ## Scope
 
 Target: {TARGET}
+Checkout: {CHECKOUT}
+Pinned state: {PINNED_STATE}
 
 ```bash
 {LOG_CMD}
@@ -43,8 +47,9 @@ Target: {TARGET}
 3. Correctness: trace changed behaviour end to end. Reachable edge cases,
    error paths, concurrency, idempotency, data loss. A symptom patched in one
    caller while siblings stay broken is a finding.
-4. Verification: do the tests exercise real behaviour rather than mocks or
-   proxies? Did anything that should have a test lose one?
+4. Verification: do tests meaningfully cover changed behaviour and relevant
+   contracts? Mocks are appropriate for isolation, but do not prove an external
+   integration works. Report consequential gaps, not a blanket coverage quota.
 5. Standards: violations of the project standards above. Skip anything a
    linter or formatter already enforces.
 6. Security: only issues you can trace to a reachable path.
@@ -58,8 +63,11 @@ Target: {TARGET}
 
 ## Report
 
-Write the report to `{REPORT_PATH}`, then print `Review complete` in the
-terminal. Use exactly this shape:
+Write the report to `{REPORT_PATH}`. Append `{COMPLETION_TOKEN}` as its last
+line only after the review is finished, then return that token to the
+coordinator. If the launcher only supports a final response, return the report
+and token there for the coordinator to save unchanged. Prefer this shape unless
+the user requests another:
 
 ```markdown
 # Review: {TARGET}
