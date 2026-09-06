@@ -100,10 +100,15 @@ completion plus its final report when available. For interactive sessions, requi
 the brief's unique completion token as the report's last line; terminal idle or
 a nonempty file alone does not mean the review finished.
 
-Use bounded waits with progress updates and a deadline appropriate to the review
-size, normally up to an hour. At the deadline, report incomplete work and its
-handles. Do not silently abandon owned processes; stop them when cancellation
-is authorized, or explicitly hand them off. Preserve reports for inspection.
+Set a deadline appropriate to the review size, normally up to an hour. Native
+subagents and harness-tracked background tasks notify on completion; do not poll
+them. Start external CLIs in the background or with a timeout well under the
+shell tool's cap, since a killed shell call kills the reviewer mid-run. Then
+poll: wait a bounded interval, check the report for the token, repeat until it
+appears or the deadline passes, with a brief progress update every few cycles.
+At the deadline, report incomplete work and its handles. Do not silently
+abandon owned processes; stop them when cancellation is authorized, or
+explicitly hand them off. Preserve reports for inspection.
 
 For dual review, wait for both before combined triage. If one fails, label any
 available findings as a partial review; do not imply both completed.
