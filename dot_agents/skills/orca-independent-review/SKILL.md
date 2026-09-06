@@ -27,9 +27,14 @@ or start another coordinator. It requires the sibling `independent-review` skill
 4. Send one short instruction with the quoted absolute brief path, asking the
    reviewer to read it and write to its assigned report path. Keep substantive
    prompts in files because long terminal input can be mangled by the TUI.
-5. Track terminal handles and reports separately. Use bounded terminal waits
-   and reads from the live guide, with individual waits at most 60 seconds.
-   Follow the shared completion rules; `tui-idle` is not review completion.
+5. Track terminal handles and reports separately. Orca's wait only detects
+   `exit` or `tui-idle`, neither of which is review completion, so poll: wait
+   for `tui-idle` with a timeout of at most 60 seconds, check the report for
+   the brief's completion token as its last line, read the terminal for a
+   blocking prompt or error, then repeat until the token appears or the shared
+   deadline passes. Give a brief progress update every few cycles. Never
+   return after a single wait, and never treat idle or a nonempty report as
+   done.
 
 For a requested handoff, return terminal handles, report paths, and the current
 CLI command to inspect each terminal. Otherwise wait, read completed reports,
