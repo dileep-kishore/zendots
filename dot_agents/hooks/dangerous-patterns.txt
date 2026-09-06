@@ -1,0 +1,32 @@
+# Local accident filter, inspired by github.com/davidondrej/skills/tree/main/hooks.
+# One POSIX ERE per line. Comments and empty lines are ignored. @HOME@ is escaped
+# by the guard, not expanded by a shell. Regex is not a complete shell parser:
+# indirect variables, aliases, scripts, and alternate APIs can escape detection.
+# Fail closed on policy/input/dependency errors. No single-secret read blocks.
+# Git/GitHub mutations, installer pipes, database operations and ordinary cleanup
+# are intentionally outside this initial policy. This is not a sandbox.
+
+# Harmless permanent interception probe (including quoted/wrapped variants).
+AGENT_GUARD_CANARY_20260905
+
+# Root, home trees, named Linux/macOS homes, and current home as any rm operand.
+# Absolute/quoted executable spellings and preceding sudo are also recognized.
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?rm["']?[[:space:]]+([^;&|]*[[:space:]])?["']?(/+|/+\*|/(home|Users)(/[^/[:space:]"']+)?/?(\*)?|(~|\$HOME|\$\{HOME\})/?(\*)?)["']?([[:space:];&|]|$)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?rm["']?[[:space:]]+([^;&|]*[[:space:]])?["']?@HOME@/?(\*)?["']?([[:space:];&|]|$)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?rm["']?[[:space:]][^;&|]*--no-preserve-root([[:space:];&|]|$)
+
+# Raw disk writes and formatting. /dev/null and regular image files stay allowed.
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?dd["']?[[:space:]][^;&|]*of=["']?/dev/(r?disk|sd[a-z]|nvme|vd[a-z]|xvd[a-z]|mmcblk)
+>[[:space:]]*["']?/dev/(r?disk|sd[a-z]|nvme|vd[a-z]|xvd[a-z]|mmcblk)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?mkfs(\.[A-Za-z0-9]+)?["']?[[:space:]]+([^;&|]*[[:space:]])?["']?/dev/
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?diskutil["']?[[:space:]]+(erase[A-Za-z]*|partitionDisk|zeroDisk|secureErase|apfs[[:space:]]+(delete|erase)[A-Za-z]*)([[:space:]]|$)
+
+# Whole-system permission damage and the canonical fork bomb.
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?chmod["']?[[:space:]][^;&|]*777[[:space:]]+([^;&|]*[[:space:]])?["']?/["']?([[:space:];&|]|$)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?chown["']?[[:space:]][^;&|]*(-[A-Za-z]*R|--recursive)[[:space:]][^;&|]*[[:space:]]["']?/["']?([[:space:];&|]|$)
+:\(\)[[:space:]]*\{[[:space:]]*:[[:space:]]*\|[[:space:]]*:[[:space:]]*&[[:space:]]*\}[[:space:]]*;[[:space:]]*:
+
+# Bulk credential exports. Individual credential reads/injection stay unblocked.
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?gpg["']?[[:space:]][^;&|]*--export-secret-(keys?|subkeys)([[:space:]=]|$)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?(bw|lpass)["']?[[:space:]]+export([[:space:]]|$)
+(^|[;&|[:space:]])["']?(/[^[:space:]"']*/)?security["']?[[:space:]]+(-[^[:space:]]+[[:space:]]+)*dump-keychain([[:space:]]|$)
