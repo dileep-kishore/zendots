@@ -1,0 +1,14 @@
+#!/bin/sh
+# Re-runs when the scheduler unit changes so the daily agent-update job is
+# (re)loaded after `chezmoi apply`.
+{{- if eq .chezmoi.os "linux" }}
+# {{ include "private_dot_config/systemd/user/agent-update.timer" | sha256sum }}
+# {{ include "private_dot_config/systemd/user/agent-update.service" | sha256sum }}
+systemctl --user daemon-reload
+systemctl --user enable --now agent-update.timer
+{{- else if eq .chezmoi.os "darwin" }}
+# {{ include "private_Library/LaunchAgents/com.dkishore.agent-update.plist" | sha256sum }}
+plist="$HOME/Library/LaunchAgents/com.dkishore.agent-update.plist"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+{{- end }}
