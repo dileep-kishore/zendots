@@ -38,6 +38,7 @@ bin/
 
 # Platform-specific: Linux-only configs (ignore on macOS)
 {{- if eq .chezmoi.os "darwin" }}
+.config/systemd
 .config/niri
 .config/hypr
 .config/waybar
@@ -51,6 +52,7 @@ bin/
 
 # Platform-specific: macOS-only configs (ignore on Linux)
 {{- if eq .chezmoi.os "linux" }}
+Library
 .aerospace.toml
 .config/sketchybar
 .zprofile

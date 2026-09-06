@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.dkishore.agent-update</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/dkishore/.local/bin/agent-update</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/Users/dkishore/.local/bin:/Users/dkishore/npm-global/bin:/Users/dkishore/.bun/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict>
+      <key>Hour</key>
+      <integer>9</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key>
+      <integer>12</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key>
+      <integer>15</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key>
+      <integer>21</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+  </array>
+  <key>StandardOutPath</key>
+  <string>/Users/dkishore/.local/state/agent-update.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/dkishore/.local/state/agent-update.log</string>
+</dict>
+</plist>

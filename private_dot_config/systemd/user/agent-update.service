@@ -1,0 +1,7 @@
+[Unit]
+Description=Update coding agents (claude, codex, pi, omp, opencode)
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:%h/npm-global/bin:%h/.cargo/bin:%h/.bun/bin:%h/.opencode/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/bin/agent-update

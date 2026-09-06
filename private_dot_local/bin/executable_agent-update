@@ -1,0 +1,118 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["rich>=14.0"]
+# ///
+"""Update every coding agent in one go.
+
+Each tool's own updater already checks for a newer release and is a no-op
+when current, so this doubles as the scheduled "check and update" job.
+"""
+
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+
+UPDATERS = {
+    "claude": ["claude", "update"],
+    "codex": ["codex", "update"],
+    "pi": ["pi", "update"],
+    "omp": ["omp", "update"],
+    "opencode": ["opencode", "upgrade"],
+}
+VERSION_RE = re.compile(r"\d+\.\d+\.\d+")
+TIMEOUT = 600
+
+
+def run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
+    """Run in its own process group so a timeout kills the whole tree."""
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.DEVNULL,
+        text=True,
+        start_new_session=True,
+    )
+    try:
+        out, err = proc.communicate(timeout=TIMEOUT)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGKILL)
+        proc.wait()
+        raise
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+
+
+def version(tool: str) -> str:
+    out = run([tool, "--version"])
+    match = VERSION_RE.search(out.stdout + out.stderr)
+    return match.group() if match else "?"
+
+
+def update(tool: str) -> dict:
+    if shutil.which(tool) is None:
+        return {"tool": tool, "status": "missing"}
+    result = {"tool": tool}
+    try:
+        result["before"] = version(tool)
+        proc = run(UPDATERS[tool])
+        if proc.returncode != 0:
+            log = (proc.stderr or proc.stdout).strip().splitlines()
+            return result | {"status": "failed", "log": log[-5:]}
+        result["after"] = version(tool)
+    except subprocess.TimeoutExpired:
+        return result | {"status": "timeout"}
+    except OSError as exc:
+        return result | {"status": "failed", "log": [str(exc)]}
+    if result["after"] == "?":
+        return result | {"status": "failed", "log": [f"{tool} --version failed"]}
+    status = "updated" if result["after"] != result["before"] else "up to date"
+    return result | {"status": status}
+
+
+def main() -> int:
+    console = Console()
+    console.rule(datetime.now().astimezone().isoformat(timespec="minutes"))
+    with Progress(
+        SpinnerColumn(), TextColumn("{task.description}"), console=console
+    ) as progress:
+        tasks = {t: progress.add_task(f"[cyan]{t}[/] updating…") for t in UPDATERS}
+
+        def worker(tool: str) -> dict:
+            result = update(tool)
+            progress.update(
+                tasks[tool], description=f"[cyan]{tool}[/] {result['status']}"
+            )
+            progress.update(tasks[tool], completed=1, total=1)
+            return result
+
+        with ThreadPoolExecutor(len(UPDATERS)) as pool:
+            results = list(pool.map(worker, UPDATERS))
+
+    style = {"updated": "green", "up to date": "dim", "missing": "yellow"}
+    table = Table("tool", "before", "after", "status")
+    for r in results:
+        table.add_row(
+            r["tool"],
+            r.get("before", ""),
+            r.get("after", ""),
+            f"[{style.get(r['status'], 'red')}]{r['status']}[/]",
+        )
+    console.print(table)
+    for r in results:
+        for line in r.get("log", []):
+            console.print(f"[red]{r['tool']}:[/] {line}")
+    return 1 if any(r["status"] in ("failed", "timeout") for r in results) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

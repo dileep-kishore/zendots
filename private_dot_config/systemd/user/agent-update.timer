@@ -1,0 +1,9 @@
+[Unit]
+Description=Coding agent update, every 3h from 09:00 to 21:00
+
+[Timer]
+OnCalendar=*-*-* 09..21/3:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
