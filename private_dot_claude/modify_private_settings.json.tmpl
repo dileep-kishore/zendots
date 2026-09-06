@@ -5,7 +5,8 @@
 # chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
 # from .chezmoidata/claude_managed.json over the live file on stdin. Claude
 # Code (and Orca hook injection) rewrite this file at runtime; every
-# key absent from the fragment passes through untouched. A semantic no-op
+# key absent from the fragment passes through untouched, except our guard hook.
+# A semantic no-op
 # emits stdin byte-for-byte.
 import base64
 import copy
@@ -36,6 +37,8 @@ def enforce(node, desired, path=""):
             node[key] = value
 
 
+{{ template "agent-command-guard.py" . }}
+
 raw = sys.stdin.read()
 if raw.strip():
     try:
@@ -49,6 +52,7 @@ if not isinstance(doc, dict):
 
 before = copy.deepcopy(doc)
 enforce(doc, MANAGED)
+merge_command_guard(doc)
 if doc == before:
     sys.stdout.write(raw)
     sys.exit(0)

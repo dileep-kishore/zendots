@@ -1,0 +1,30 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# ///
+# Preserve live Orca/third-party registrations while adding our command guard.
+import copy
+import json
+import sys
+
+
+def die(msg):
+    print("modify hooks.json: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+{{ template "agent-command-guard.py" . }}
+
+raw = sys.stdin.read()
+try:
+    doc = json.loads(raw) if raw.strip() else {}
+except json.JSONDecodeError:
+    die("invalid JSON input")
+if not isinstance(doc, dict):
+    die("root is not a mapping")
+before = copy.deepcopy(doc)
+merge_command_guard(doc)
+if doc == before:
+    sys.stdout.write(raw)
+else:
+    sys.stdout.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
