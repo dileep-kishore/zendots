@@ -59,7 +59,12 @@ Rules that matter:
   workflow there; agents follow the description instead of reading the body.
 - Keep the body under about 150 lines. Move long templates, rubrics, and
   reference material to `references/<file>.md` and link them from the step that
-  needs them. Executable helpers go in `scripts/`.
+  needs them. Executable helpers go in `scripts/` and follow
+  [references/cli-for-agents.md](references/cli-for-agents.md).
+- Write the description and body by
+  [references/writing-for-agents.md](references/writing-for-agents.md): the
+  description is a pointer whose wording decides whether the skill fires;
+  manual-only skills cost no context but must be remembered.
 - Prefer exact commands over prose. Explain why a rule exists in one clause
   rather than shouting MUST.
 - Skills are harness-neutral. Do not reference Claude-only tools by name; say
