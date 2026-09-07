@@ -70,9 +70,13 @@ agent-skills.sh sync                    # after hand-authoring a skill in the st
 To author a skill, invoke the `create-skill` skill; it covers layout, the
 manual-only frontmatter for each harness, and recording the result.
 
-`unslop` is locally maintained and intentionally absent from
-`~/.agents/.skill-lock.json`. Do not reinstall it from upstream. Edit
-`~/.agents/skills/unslop/SKILL.md`, then run `agent-skills.sh sync`.
+`unslop`, `grill-with-docs`, and `to-spec` are locally maintained and
+intentionally absent from `~/.agents/.skill-lock.json`. Do not reinstall them
+from upstream. Edit `~/.agents/skills/<name>/SKILL.md`, then run
+`agent-skills.sh sync`. A broad `agent-skills.sh add mattpocock/skills` or
+`agent-skills.sh add cursor/plugins` reinstalls every skill in that repository,
+lock entry or not, and would overwrite these adaptations; when adding from
+those repositories, select only skills that do not already exist in the store.
 
 Always install through `agent-skills.sh`, never a bare `npx skills`: the wrapper
 runs the installer from `$HOME` (it installs project-locally when the cwd is a
