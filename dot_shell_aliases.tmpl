@@ -28,6 +28,21 @@ alias lla='eza -la'
 alias ls=eza
 alias lt='eza --tree'
 
+# Agent skills you must invoke by name (/name in Claude Code, $name in Codex).
+# Model-triggered skills are omitted: the agent picks those itself.
+skills() {
+    local f name desc
+    for f in "$HOME"/.agents/skills/*/SKILL.md; do
+        grep -q '^disable-model-invocation: true' "$f" || continue
+        name=${f%/SKILL.md}; name=${name##*/}
+        # A block-scalar description (| or >) starts on the next line.
+        desc=$(awk '/^description:/ { sub(/^description: */, "");
+            if ($0 == "|" || $0 == ">") { getline; sub(/^ +/, "") }
+            print; exit }' "$f")
+        printf '%-30s %s\n' "$name" "${desc:0:100}"
+    done
+}
+
 # Tmux
 alias ta="$HOME/.config/tmux/scripts/sesh-session-picker.py connect"
 alias tdetach="tmux detach"
