@@ -1,8 +1,10 @@
 # Transcript sources
 
-Verified on Tsuki (Linux) on 2026-09-06 by inspecting metadata only. macmini
-layouts are unverified until checked there; do not assume a mapping. All
-timestamps in both formats are UTC; cite them as UTC.
+Verified on Tsuki (Linux, home `/home/dileep`) and macmini (macOS, home
+`/Users/dkishore`) on 2026-09-06 by inspecting metadata only. Both hosts use
+the same layouts under `~`; only the home directory and the checkout paths
+inside the slugs differ (macmini projects live under `/Volumes/WorkSSD`).
+All timestamps in both formats are UTC; cite them as UTC.
 
 ## Claude Code
 
