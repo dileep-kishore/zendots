@@ -29,6 +29,11 @@ tools/
 # Makefile
 Makefile
 
+# Fetched-skill runtimes: cloned by `agent-skills.sh fetch`, deliberately not
+# vendored. Only the symlink in .agents/skills is managed. Without this a
+# `chezmoi add ~/.agents` would pull tens of MB of upstream trees into the repo.
+.agents/runtimes/
+
 # bin
 bin/
 # sketchybar helpers compile C sources into nested bin/ dirs. The pattern
