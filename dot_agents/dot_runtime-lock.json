@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "archify": {
+      "url": "https://github.com/tt-a1i/archify.git",
+      "ref": "main",
+      "revision": "10722002bb8777ecb639d93c49586fae4adf3ae4",
+      "path": "archify"
+    }
+  }
+}
