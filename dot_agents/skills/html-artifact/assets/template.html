@@ -7,11 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Faces: an installed copy wins; otherwise pinned files from the fonts' GitHub repos via jsDelivr; then the system stack.
-   Pins (fonts here, Mermaid and Vega in the script below) last checked 2026-09-06. */
-@font-face { font-family: "SN Pro"; src: local("SN Pro"), local("SNPro-Regular"), url("https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/webfonts/SNPro%5Bital,wght%5D.woff2") format("woff2"); font-weight: 200 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "iA Writer Duo V"; src: local("iA Writer Duo V"), local("iAWriterDuoV"), url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
-@font-face { font-family: "iA Writer Duo V"; src: local("iA Writer Duo V Italic"), local("iAWriterDuoV-Italic"), url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
+/* Faces: pinned files from the fonts' GitHub repos via jsDelivr, then the system stack. No local() -- an
+   installed copy would render differently per machine, and it is what hid the italic bug below.
+   SN Pro: webfonts/SNPro[ital,wght].woff2 is mislabelled upstream. It carries no ital axis and its OS/2 and
+   head bits say Italic, so CoreText renders every heading italic. variable/SNPro[wght].ttf is the upright one.
+   Pins (fonts here, Mermaid and Vega in the script below) last checked 2026-09-08. */
+@font-face { font-family: "SN Pro"; src: url("https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/variable/SNPro%5Bwght%5D.ttf") format("truetype"); font-weight: 200 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo V"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo V"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
 /* Tokens: Catppuccin Mocha (dark, primary on :root) and Latte (light); light applies on system preference or the toggle. Do not edit. */
 :root {
   --ground: #1e1e2e; --surface: #181825; --surface-2: #313244;
