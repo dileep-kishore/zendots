@@ -103,6 +103,41 @@ installing on both produces Syncthing conflict files.
 One-time cleanup for a machine whose home predates this layout:
 `docs/agent-skills-migration.md`.
 
+#### Fetched skills
+
+A skill that carries an upstream runtime -- a Node package, a binary -- is
+*fetched* rather than installed. None of the vendored skills does this today;
+`archify` is the first. The runtime is cloned to `~/.agents/runtimes/<name>`,
+which is never `chezmoi add`ed, and only a relative symlink enters the store, so
+the payload reaches neither this repository nor Syncthing.
+
+```bash
+agent-skills.sh fetch tt-a1i/archify --path archify   # --path: SKILL.md is not at the repo root
+agent-skills.sh fetch                                 # restore runtimes missing on this machine
+agent-skills.sh fetch --bump archify                  # move the pin to the ref's tip
+agent-skills.sh remove archify                        # works for either kind
+```
+
+- **Run `agent-skills.sh fetch` on a new machine.** `chezmoi apply` reproduces
+  the symlink but not its target. Until the runtime is cloned the link dangles,
+  `link-agent-skills.sh` skips it, and the skill is simply absent rather than
+  broken.
+- **Pinned to a commit, not a branch.** Both machines run the same revision;
+  `fetch --bump` is the deliberate upgrade. Never `git pull` in a runtime, or
+  the two machines silently diverge.
+- **Never `add` a fetched name.** `skills add` recursively removes the canonical
+  path before copying, so it would replace the symlink with the whole upstream
+  tree and the next `chezmoi add` would vendor it. The wrapper refuses to record
+  a store whose fetched link is missing; restore it with `agent-skills.sh fetch`.
+- **Never hand-create the store entry.** `fetch` refuses when
+  `~/.agents/skills/<name>` exists and is not its own link, because
+  `chezmoi apply --force ~/.agents` -- the command in
+  `docs/agent-skills-migration.md` -- replaces a real directory with the symlink
+  and deletes its contents without listing them.
+- `fetch` deletes `scripts/check-update.mjs` after every checkout. archify runs
+  it on each use to contact a remote manifest; its own SKILL.md says to continue
+  silently when the checker cannot run.
+
 ### Syncthing project folders
 
 `.stignore` is Syncthing's per-folder ignore file. Syncthing never synchronizes

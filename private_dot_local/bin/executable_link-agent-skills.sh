@@ -27,6 +27,10 @@ done
 
 for skill in "$src"/*/; do
     skill="${skill%/}"
+    # No match leaves the pattern literal, and a fetched skill whose runtime has
+    # not been cloned yet is a dangling link that `*/` does not match. Either way
+    # there is nothing to link; without this the loop would create `<dest>/*`.
+    [ -d "$skill" ] || continue
     target="$dest/$(basename "$skill")"
     if [ -L "$target" ]; then
         # `npx skills` writes these relative and this script writes them
