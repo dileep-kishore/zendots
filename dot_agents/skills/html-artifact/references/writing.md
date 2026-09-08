@@ -53,7 +53,7 @@ A comparison closes with the choice and one reason. A plan carries a
 
 - **Plan:** lead, decisions table, flow diagram, timeline, not doing.
 - **Workflow:** lead, flowchart, per-stage table, failure modes.
-- **Results:** lead, tiles, one chart per question, full table in `.wide`,
+- **Results:** lead, tiles, one chart per question, full table,
   findings, next.
 - **Comparison:** lead, criteria table, one chart if the criteria are numeric,
   recommendation.
