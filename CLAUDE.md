@@ -100,9 +100,6 @@ installing on both produces Syncthing conflict files.
   out of `~/.agents/skills` -- folding them in would duplicate ~15 skills into
   Claude.
 
-One-time cleanup for a machine whose home predates this layout:
-`docs/agent-skills-migration.md`.
-
 #### Fetched skills
 
 A skill that carries an upstream runtime -- a Node package, a binary -- is
@@ -131,8 +128,7 @@ agent-skills.sh remove archify                        # works for either kind
   a store whose fetched link is missing; restore it with `agent-skills.sh fetch`.
 - **Never hand-create the store entry.** `fetch` refuses when
   `~/.agents/skills/<name>` exists and is not its own link, because
-  `chezmoi apply --force ~/.agents` -- the command in
-  `docs/agent-skills-migration.md` -- replaces a real directory with the symlink
+  `chezmoi apply --force ~/.agents` replaces a real directory with the symlink
   and deletes its contents without listing them.
 - `fetch` deletes `scripts/check-update.mjs` after every checkout. archify runs
   it on each use to contact a remote manifest; its own SKILL.md says to continue
