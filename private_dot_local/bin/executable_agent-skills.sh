@@ -151,10 +151,12 @@ cmd_fetch() {
       fetch_one "$name"
       restored=1
     done
-    [ "$restored" = 1 ] || {
-      printf 'every fetched runtime is present\n'
-      return 0
-    }
+    [ "$restored" = 1 ] || printf 'every fetched runtime is present\n'
+    # Restoring reproduces what the source already records, so it must not
+    # `chezmoi add`: that copies home over the source and would discard an
+    # unapplied edit sitting in the source on this machine. Link and stop.
+    "$HOME/.local/bin/link-agent-skills.sh"
+    return 0
     ;;
   --bump)
     local name="${2:?usage: agent-skills.sh fetch --bump <name>}"
