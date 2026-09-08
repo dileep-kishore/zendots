@@ -12,9 +12,10 @@ shows its point, or none when a sentence says it faster.
 | When does each piece happen? | Mermaid `gantt`, or `.timeline` for a short list |
 | Which states and transitions exist? | Mermaid `stateDiagram-v2` |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
-| What are the exact values, or more than about seven classes? | Table in `.table-wrap`, `.wide` when it has more than four columns |
+| What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
 | What are the two to four headline numbers? | `.tiles` |
 | What mechanism do none of those express? | Inline SVG |
+| What exactly does the reader run or paste? | `<pre><code class="language-...">` |
 
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
@@ -38,6 +39,20 @@ full column. Write captions to the three-part shape in
 Mark the one value or node the reader must notice with `class="hot"` (cells,
 tile numbers) or the Mermaid `hot` class below; never more than one per
 figure.
+
+## Code
+
+```html
+<pre><code class="language-python">def batches(records, size=64):
+    for i in range(0, len(records), size):
+        yield records[i:i + size]</code></pre>
+```
+
+Name the language on the `<code>`; highlight.js loads only when a block does,
+and the colours come from the page tokens, so both themes work with no theme
+sheet. Without the class a block renders as plain monospace, which is right for
+console transcripts and output. Escape `<`, `>` and `&`, and keep the opening
+tag tight against the first character or the block gains a blank first line.
 
 ## Mermaid
 
