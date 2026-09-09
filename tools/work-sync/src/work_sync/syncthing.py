@@ -16,21 +16,23 @@ from .manifest import Folder, Host, UsageError
 from .system import Runner
 
 MAC_SYNCTHING = "/Applications/Syncthing.app/Contents/Resources/syncthing/syncthing"
+# (?d) lets Syncthing delete this leftover state when the containing directory
+# is removed on the other host; without it the pull fails on that directory.
 LOCAL_STATE_IGNORES = (
-    ".DS_Store",
-    "._*",
-    "__pycache__",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".uv-cache",
-    ".pixi",
-    ".venv",
-    "node_modules",
-    ".claude/settings.local.json",
-    ".claude/worktrees",
-    ".serena/cache",
-    ".serena/project.yml",
-    ".serena/project.local.yml",
+    "(?d).DS_Store",
+    "(?d)._*",
+    "(?d)__pycache__",
+    "(?d).pytest_cache",
+    "(?d).ruff_cache",
+    "(?d).uv-cache",
+    "(?d).pixi",
+    "(?d).venv",
+    "(?d)node_modules",
+    "(?d).claude/settings.local.json",
+    "(?d).claude/worktrees",
+    "(?d).serena/cache",
+    "(?d).serena/project.yml",
+    "(?d).serena/project.local.yml",
 )
 MACHINE_LOCAL_GIT_KEYS = (
     "core.filemode",
@@ -105,11 +107,16 @@ def managed_patterns(folder: Folder) -> tuple[str, ...]:
 
 
 def reconcile_ignore_text(current: str, folder: Folder) -> str:
-    """Replace the legacy whole-.git ignore while preserving local rules."""
-    lines = [line for line in current.splitlines() if line not in {".git", "/.git"}]
-    lines.extend(
-        pattern for pattern in managed_patterns(folder) if pattern not in lines
-    )
+    """Replace superseded managed rules while preserving local rules."""
+    patterns = managed_patterns(folder)
+    # An unprefixed copy earlier in the file would win over its (?d) form.
+    superseded = {".git", "/.git"} | {
+        pattern.removeprefix("(?d)")
+        for pattern in patterns
+        if pattern.startswith("(?d)")
+    }
+    lines = [line for line in current.splitlines() if line not in superseded]
+    lines.extend(pattern for pattern in patterns if pattern not in lines)
     return "\n".join(lines).rstrip() + "\n"
 
 

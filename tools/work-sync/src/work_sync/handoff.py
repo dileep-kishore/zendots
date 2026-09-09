@@ -18,7 +18,8 @@ TREE_EXCLUDES = (
     ".git",
     "/.stignore",
     "/.stfolder/",
-    *LOCAL_STATE_IGNORES,
+    # rsync has no equivalent of Syncthing's (?d) prefix.
+    *(pattern.removeprefix("(?d)") for pattern in LOCAL_STATE_IGNORES),
 )
 
 
