@@ -103,10 +103,11 @@ If browser automation is available, use it to verify no slide overflows and that
 
 At handoff:
 - delete temporary preview files unless the user wants to keep them
-- open the deck with the platform-appropriate opener when useful
+- open the deck when useful, preferring the harness's own browser
 - summarize file path, preset used, slide count, and easy theme customization points
 
-Use the correct opener for the current OS:
+In Orca, open it with `orca tab create --url file://<abs-path>`. Otherwise use
+the opener for the current OS:
 - macOS: `open file.html`
 - Linux: `xdg-open file.html`
 - Windows: `start "" file.html`
