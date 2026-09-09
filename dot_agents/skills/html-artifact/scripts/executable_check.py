@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """Validate an html-artifact page: single file, allowlisted hosts, pinned libraries and fonts, TOC-able headings.
 
-Usage: check.py FILE [--screenshot]
+Usage: check.py FILE
 Exit 0 when there are no errors, 1 otherwise. Warnings never fail the check.
 """
 import argparse
 import json
 import re
-import shutil
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 ALLOWED_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"}
@@ -18,7 +15,7 @@ WARN_BYTES, MAX_BYTES = 1_000_000, 2_000_000
 PINNED = re.compile(r"@(\d+\.\d+\.\d+|[0-9a-f]{7,40})/")
 
 
-def check(path: Path, screenshot: bool, window: str = "1400,2400") -> int:
+def check(path: Path) -> int:
     html = path.read_text(encoding="utf-8")
     errors, warns = [], []
 
@@ -69,24 +66,6 @@ def check(path: Path, screenshot: bool, window: str = "1400,2400") -> int:
         if "<b>" not in cap.group(1) and "<strong>" not in cap.group(1):
             warns.append("caption lacks a bold title sentence: " + text[:40])
 
-    if screenshot:
-        chrome = next(
-            (c for c in ("google-chrome-stable", "google-chrome", "chromium", "chromium-browser") if shutil.which(c)),
-            None,
-        )
-        if chrome:
-            out = Path(tempfile.mkdtemp()) / "artifact.png"
-            # virtual-time-budget lets Mermaid and Vega arrive from the CDN before the capture.
-            subprocess.run(
-                [chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars",
-                 f"--user-data-dir={out.parent / 'profile'}", "--virtual-time-budget=15000",
-                 f"--screenshot={out}", f"--window-size={window}", path.resolve().as_uri()],
-                check=False, capture_output=True, timeout=90,
-            )
-            print(f"screenshot: {out}" if out.exists() else "WARN: screenshot failed")
-        else:
-            print("WARN: no Chrome/Chromium found; visual check skipped")
-
     for w in warns:
         print("WARN:", w)
     for e in errors:
@@ -98,7 +77,5 @@ def check(path: Path, screenshot: bool, window: str = "1400,2400") -> int:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file", type=Path)
-    ap.add_argument("--screenshot", action="store_true", help="render with a local Chrome and print the PNG path")
-    ap.add_argument("--size", default="1400,2400", help="screenshot window as WIDTH,HEIGHT (default 1400,2400; use 1400,900 for a one-screen check)")
     a = ap.parse_args()
-    sys.exit(check(a.file, a.screenshot, a.size))
+    sys.exit(check(a.file))
