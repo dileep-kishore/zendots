@@ -61,8 +61,14 @@ gh pr view <number> --json reviews,comments
 Read the code each thread points at and decide whether the finding holds. Follow
 `receiving-code-review` for the standard of rigor: a review bot is a claim, not a
 verdict, and agreeing with a wrong one costs more than disagreeing with a right
-one. `chatgpt-codex-connector` prefixes its findings with a `P1`/`P2`/`P3` badge
-— work down that order.
+one.
+
+Order the work: threads from a human reviewer first, then bots. Among bot
+threads, `chatgpt-codex-connector` prefixes a `P1`/`P2`/`P3` badge — follow it.
+`copilot-pull-request-reviewer` gives no severity, so rank its findings yourself
+by blast radius. A finding that names a *companion PR* is the expensive kind:
+it is claiming this branch breaks once that one merges, so check that PR's
+current state before deciding.
 
 Present one table and wait for approval:
 
