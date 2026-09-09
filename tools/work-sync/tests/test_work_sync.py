@@ -317,7 +317,7 @@ def test_sensitive_project_files_are_not_default_ignores(tmp_path: Path) -> None
     assert ".claude/settings.json" not in patterns
     assert ".codex/config.toml" not in patterns
     assert ".pi/settings.json" not in patterns
-    assert ".pixi" in patterns
+    assert "(?d).pixi" in patterns
     assert ".git" not in patterns
     assert ".git/worktrees" in patterns
     assert ".git/config.worktree" in patterns
@@ -331,10 +331,12 @@ def test_ignore_reconciliation_replaces_legacy_git_rule_and_keeps_local_rules(
     write_manifest(path, [ENTRY])
     folder = load_manifest(path).select("qbio")
 
-    updated = reconcile_ignore_text(".git\n/local-only\n", folder)
+    updated = reconcile_ignore_text(".git\n__pycache__\n/local-only\n", folder)
 
     assert ".git\n" not in updated
     assert ".git/worktrees\n" in updated
+    assert "\n__pycache__\n" not in updated
+    assert "(?d)__pycache__\n" in updated
     assert "/local-only\n" in updated
 
 
