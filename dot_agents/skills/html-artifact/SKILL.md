@@ -53,12 +53,12 @@ for the current house style.
 ## 6. Check
 
 ```bash
-python3 <skill-dir>/scripts/check.py <file> --screenshot
+python3 <skill-dir>/scripts/check.py <file>
 ```
 
-Fix every `ERROR`; read the screenshot and fix what looks wrong. The capture
-waits for the CDN libraries; pass `--size 1400,900` when the ask was one
-screen. Done when the checker prints `OK`.
+Fix every `ERROR`. Done when the checker prints `OK`. The checker reads the
+file and never renders it, so it cannot see a Mermaid block that fails to
+parse or a chart that comes out empty; re-read those specs yourself.
 
 ## 7. Deliver
 
