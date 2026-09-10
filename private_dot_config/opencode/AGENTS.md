@@ -45,8 +45,13 @@
 
 ## Git
 
-- Keep commits atomic and use conventional commit messages. Explain what
-  changed and why. Aim for 50-character titles and wrap bodies at 72 characters.
+- Keep each commit self-contained: one complete logical change that builds and
+  passes on its own, so it can be reverted or bisected in isolation. Size is not
+  the measure. A commit that needs a follow-up fix to work was too small;
+  implementation, its tests, and its doc update belong together. Split by
+  logical change, not by file or by the order the work happened.
+- Use conventional commit messages. Explain what changed and why. Aim for
+  50-character titles and wrap bodies at 72 characters.
 - PR titles should name the main change. Descriptions should briefly explain
   the problem or motivation, then the solution and verification. Include risks,
   limitations, or related issues when relevant. Follow repository templates;
