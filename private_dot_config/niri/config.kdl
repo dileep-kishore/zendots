@@ -126,7 +126,8 @@ spawn-at-startup "helium-browser"
 spawn-at-startup "ghostty"
 spawn-sh-at-startup "sleep 2 && stably-orca"
 spawn-at-startup "bash" "-c" "helium-browser --app='https://app.superlist.com/'"
-spawn-at-startup "sleep 4 && notion-app"
+spawn-at-startup "bash" "-c" "helium-browser --app='https://linear.app/dkishore-lifecycles/inbox'"
+spawn-sh-at-startup "sleep 4 && notion-app"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "sleep 5 && morgen"
@@ -267,7 +268,7 @@ window-rule {
 }
 window-rule {
     match at-startup=true app-id="-app\\.superlist\\.com"
-    match at-startup=true app-id="^brave-linear\\.app"
+    match at-startup=true app-id="-linear\\.app"
     open-on-workspace "notes"
     default-column-width {
         proportion 0.2
