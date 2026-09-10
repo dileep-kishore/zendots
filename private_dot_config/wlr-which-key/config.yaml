@@ -51,9 +51,9 @@ menu:
       - key: g
         desc: Gemini
         cmd: helium-browser -app="https://gemini.google.com"
-      - key: t
-        desc: Todoist
-        cmd: helium-browser -app="https://app.todoist.com/app/today"
+      - key: s
+        desc: Superlist
+        cmd: helium-browser -app="https://app.superlist.com/"
       - key: l
         desc: Linear
         cmd: helium-browser -app="https://linear.app/dkishore-lifecycles/inbox"
