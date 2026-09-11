@@ -4,13 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><!-- SLOT: title --></title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400..700&display=swap">
 <style>
-/* Faces: Google Fonts only, so a page needs one stylesheet host and nothing is bundled.
-   Manrope stands in for SN Pro; IBM Plex Mono is what iA Writer Duo is derived from, and it
-   already carries the mono role, so body and code share one family at different sizes. */
+/* Faces: an installed copy first, a pinned webfont from jsDelivr second, the system stack last.
+   The @font-face families carry a "Web" suffix so they cannot shadow an installed copy -- a
+   same-name @font-face outranks a system family, which would force the download on a machine
+   that already has the font. An @font-face nobody uses is never fetched, so having the fonts
+   installed costs no bytes and works offline. Nothing is bundled.
+   SN Pro: webfonts/SNPro[ital,wght].woff2 is mislabelled upstream. It carries no ital axis while
+   its OS/2 and name records claim italic, so browsers synthesise a slant from it; the upright
+   variable under fonts/ is used instead and display italics fall back to the system face.
+   Pins (fonts here, Mermaid, Vega and highlight.js in the script below) last checked 2026-09-11. */
+@font-face { font-family: "SN Pro Web"; src: url("https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/variable/SNPro%5Bwght%5D.ttf") format("truetype"); font-weight: 200 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "iA Writer Mono Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Mono/Variable/iAWriterMonoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Mono Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Mono/Variable/iAWriterMonoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
 /* Tokens: Catppuccin Mocha (dark, primary on :root) and Latte (light); light applies on system preference or the toggle. Do not edit. */
 :root {
   --ground: #1e1e2e; --surface: #181825; --surface-2: #313244;
@@ -22,9 +30,9 @@
   --tint: #2c3150; --tint-line: #585b8c;
   --blue: #89b4fa; --peach: #fab387; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af; --teal: #94e2d5; --pink: #f5c2e7;
   --blue-soft: #89b4fa26; --peach-soft: #fab38726; --green-soft: #a6e3a126; --red-soft: #f38ba826; --teal-soft: #94e2d526;
-  --font-display: Manrope, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-text: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "SN Pro", "SN Pro Web", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "iA Writer Duo V", "iA Writer Duo S", "iA Writer Duo Web", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "iA Writer Mono V", "iA Writer Mono S", "iA Writer Mono Web", ui-monospace, SFMono-Regular, Menlo, monospace;
   --measure: 860px;
   color-scheme: dark;
 }
@@ -81,7 +89,8 @@ nav.toc a.active { color: var(--ink); border-bottom-color: var(--accent); }
 }
 main { min-width: 0; counter-reset: sec fig tbl; display: flex; flex-direction: column; gap: 22px; }
 main > * { margin: 0; }
-/* Running text only. 860px is ~80 characters of IBM Plex Mono at 0.9rem, measured on real prose.
+/* Running text only. 860px is ~93 characters of iA Writer Duo at 0.9rem, from the advance widths the face
+   actually carries over sample prose; Duo runs 1.2% wider than the IBM Plex Mono it is derived from.
    Figures, tables, tiles and headings stay full width -- they are looked at, not read line by line. */
 main > p:not(.meta), main > ul, main > ol, main > .callout, main > .timeline, main > .not-doing { max-width: var(--measure); }
 
