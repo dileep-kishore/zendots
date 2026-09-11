@@ -29,6 +29,7 @@ UPDATERS = {
     "pi": ["pi", "update"],
     "omp": ["omp", "update"],
     "opencode": ["opencode", "upgrade"],
+    "cursor-agent": ["cursor-agent", "update"],
 }
 VERSION_RE = re.compile(r"\d+\.\d+\.\d+")
 TIMEOUT = 600

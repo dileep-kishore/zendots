@@ -1,5 +1,5 @@
 [Unit]
-Description=Update coding agents (claude, codex, pi, omp, opencode)
+Description=Update coding agents (claude, codex, pi, omp, opencode, cursor-agent)
 
 [Service]
 Type=oneshot
