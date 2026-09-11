@@ -25,7 +25,7 @@ def check(path: Path) -> int:
     elif size > WARN_BYTES:
         warns.append(f"size {size} bytes above {WARN_BYTES}")
 
-    for url in re.findall(r'(?:src|href)="(https?://[^"]+)"', html):
+    for url in re.findall(r'(?:(?:src|href)=|url\()"(https?://[^"]+)"', html):
         host = re.match(r"https?://([^/]+)", url).group(1)
         if host not in ALLOWED_HOSTS:
             errors.append(f"external host not allowed: {host}")

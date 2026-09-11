@@ -69,8 +69,10 @@ finished prose before the checker.
 
 The Artifact tool wraps a page in its own document skeleton. Give it a copy
 with everything from `<!doctype html>` through `<body>` removed and the
-closing `</body></html>` removed, keeping `<title>`, the font `<link>`,
-`<style>`, the markup, and the `<script>`. Leave the file in the project
-unchanged. Report the path and the link. The Artifact host blocks font
-files from jsDelivr, so a published copy falls back to the system faces for
-SN Pro and iA Writer Duo; the local file keeps them.
+closing `</body></html>` removed, keeping `<title>`, `<style>` (the
+`@font-face` rules included), the markup, and the `<script>`. Leave the
+file in the project unchanged. Report the path and the link. The Artifact
+host allows fonts only from 'self', data: and gstatic, so a published copy
+drops the jsDelivr faces and falls back to the system stack. The local file
+keeps SN Pro and iA Writer Duo, from an installed copy when the machine has
+one and from jsDelivr otherwise.
