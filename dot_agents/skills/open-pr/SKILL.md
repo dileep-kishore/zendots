@@ -1,14 +1,18 @@
 ---
 name: open-pr
-description: Use when finished work on a branch should become a pull request — "open a PR", "create a PR", "make a PR", "put this up for review", "ship this". Commits pending work, regroups fixup commits when they will survive the merge, pushes, and writes the title and description from the session rather than the diff alone.
+description: Use when finished work on a branch should become a pull request — "open a PR", "create a PR", "make a PR", "put this up for review", "ship this". Not for answering review on a PR that already exists.
 ---
 
 # Open PR
 
 A description written from the diff states what changed. The session knows why:
-which approach this beat, what the user asked for, what was left out on
+what the user asked for, which constraint shaped the code, what was left out on
 purpose. This skill spends that context before it is lost, and stops for
 approval before anything reaches the remote.
+
+The description exists for one reader: a reviewer with the diff open, and later
+someone running `git blame`. It states the problem, the solution, and the
+context that reader needs to review the change. Nothing else.
 
 Answering review on an existing PR is a different job: use `babysit-pr`.
 
@@ -73,12 +77,22 @@ say so rather than rewriting shared history.
 
 ## 4. Harvest the description
 
-The commits give the what. Take from the session:
+The commits give the what. The session supplies the rest, and each fact earns
+its place by one test: it changes how the reviewer reads the diff, or what they
+check. What passes:
 
 - the problem or request that started the work
-- the approach chosen and what it beat, when a real alternative was rejected
-- constraints stated explicitly by the user
+- a constraint from the user that shaped the code
+- a rejected alternative, only when the reviewer would otherwise propose it:
+  name it and why it lost, in one sentence
 - what was deliberately left out, and why
+- a risk the diff does not show: a cache that will not invalidate, a manual
+  step after merge, a licence or trademark question
+
+Describe the result as it stands on the branch, in the present tense. How the
+work got there is the session's, and stays there: tools and mockups used,
+options considered along the way, drafts, bugs found and fixed before the final
+commit, counts of things that changed, opinions on taste.
 
 A verification claim needs a command that actually ran in this session with
 visible output. No run, no claim, and never "tests pass" from memory.
@@ -91,20 +105,29 @@ the commits support and ask one targeted question. Do not invent a motivation.
 A repository template at `.github/PULL_REQUEST_TEMPLATE.md` or
 `.github/pull_request_template.md` wins: fill it and skip the rest of this step.
 
-Title names the main change, in the style of the commits.
+Title names the main change, in the style of the commits, under 70 characters.
 
 Body, in order:
 
-1. **Problem or motivation** — why this exists.
-2. **Solution** — what it does, and the decisions worth knowing.
-3. **Verification** — what ran, and what it showed.
+1. **Problem** — one to three sentences on what was wrong or missing.
+2. **Solution** — one paragraph per logical change, in commit order: what it
+   does and the one decision the reviewer needs. Two or three sentences each.
+   The diff shows the detail; the paragraph says what it achieves.
+3. **Verification** — one line per command that ran: the command and its
+   result.
 
-Then risks, limitations, related issues, and follow-ups, each only when real.
-Under three paragraphs, write prose with no headings; past that, add headings.
-Never a file-by-file summary. Never an empty section.
+Then, only when real, one sentence each: what was left out and why, a risk the
+diff does not show, a related issue. Never an empty section. Never a
+file-by-file summary.
 
-Run the `unslop` skill over the body before posting: it is assistant-authored
-prose, and that skill owns the style rules.
+Budget: under 250 words. A PR with more logical changes gets more Solution
+paragraphs, not longer ones. Under three paragraphs, prose with no headings;
+past that, headings.
+
+Read the body once more as the reviewer and cut every sentence that does not
+change how they read the diff or what they check. Then run `unslop` for its
+pattern list only: a PR body is factual technical writing, so its voice rules
+(opinions, first person, added mess) do not apply.
 
 ## 6. Push and open
 
