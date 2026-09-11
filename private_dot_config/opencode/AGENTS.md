@@ -22,6 +22,9 @@
   only to raise coverage. Honor repository requirements and explicit requests.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. Be concise without dropping meaningful detail.
+  The first and last lines should stand alone: what happened, and what is
+  waiting on me.
+- Order lists by importance, most consequential first.
 - Explicit user requests take precedence over skill guidelines. If a skill
   blocks requested work, identify the conflicting instruction.
 - Do not add skill-branded comments such as `ponytail:`. Explain meaningful
