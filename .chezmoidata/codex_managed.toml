@@ -1,6 +1,9 @@
 [codex_managed]
 service_tier = "default"
 
+[codex_managed.agents]
+max_concurrent_threads_per_session = 8
+
 [codex_managed.tui]
 theme = "catppuccin-mocha"
 status_line = [
