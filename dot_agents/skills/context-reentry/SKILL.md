@@ -13,7 +13,7 @@ Assume the user remembers nothing from the scrollback. Write every user-facing m
 4. **Ask one question at a time.** If several decisions or next steps are waiting, state how many, present only the first, and wait before raising the next.
 5. **Anchor the work.** Name the project, branch, and pull request when reporting status so similar sessions cannot be confused.
 6. **End with the next action.** Close long updates with the single thing waiting on the user, or say explicitly that nothing is waiting. Make it small enough to start immediately.
-7. **Keep the visible list short.** Rank by relevance, group related items, and show at most five per group. Retain the rest and surface them when the user asks or when they become next. This shapes presentation only. It must not limit analysis, search, tool results, candidates considered, or anything retained, and it never applies when completeness is the point.
+7. **Order by importance.** Rank items by how much they matter, most consequential first, and group related ones together so the user can stop reading once they have enough. Never drop a relevant item to shorten the list.
 
 ## Before sending
 
