@@ -271,6 +271,18 @@ esac
 # it always resolves to the global store, whether or not -g was passed.
 if [ "${1:-}" != "sync" ]; then
   require_cmd npx
+  # `skills` treats any directory holding a skills-lock.json as a project and
+  # updates those entries in place, over the store's local edits. That is how a
+  # stray $HOME/skills-lock.json from a pre-wrapper install reinstalled unslop
+  # over its local version. $HOME must never carry one.
+  if [ -e "$HOME/skills-lock.json" ]; then
+    printf '%s/skills-lock.json exists; `skills` would treat $HOME as a project.\n' "$HOME" >&2
+    printf 'Inspect it, then delete it before running the installer.\n' >&2
+    exit 1
+  fi
+  # Without -g, `update` prompts for a scope and silently skips the global
+  # store when the answer is "project".
+  [ "$1" = update ] && set -- "$@" -g
   (cd "$HOME" && npx -y skills@latest "$@")
 fi
 
