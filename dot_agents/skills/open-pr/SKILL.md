@@ -110,9 +110,9 @@ Title names the main change, in the style of the commits, under 70 characters.
 Body, in order:
 
 1. **Problem** — one to three sentences on what was wrong or missing.
-2. **Solution** — one paragraph per logical change, in commit order: what it
-   does and the one decision the reviewer needs. Two or three sentences each.
-   The diff shows the detail; the paragraph says what it achieves.
+2. **Solution** — one short paragraph per logical change, in commit order: what
+   it does and the one decision the reviewer needs. The diff shows the detail;
+   the paragraph says what it achieves.
 3. **Verification** — one line per command that ran: the command and its
    result.
 
@@ -120,9 +120,9 @@ Then, only when real, one sentence each: what was left out and why, a risk the
 diff does not show, a related issue. Never an empty section. Never a
 file-by-file summary.
 
-Budget: under 250 words. A PR with more logical changes gets more Solution
-paragraphs, not longer ones. Under three paragraphs, prose with no headings;
-past that, headings.
+Keep it to what a reviewer can read before opening the diff. A PR with more
+logical changes gets more Solution paragraphs, not longer ones. Under three
+paragraphs, prose with no headings; past that, headings.
 
 Read the body once more as the reviewer and cut every sentence that does not
 change how they read the diff or what they check. Then run `unslop` for its

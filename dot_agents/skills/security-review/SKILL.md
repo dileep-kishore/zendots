@@ -492,4 +492,3 @@ Before ANY production deployment:
 
 ---
 
-**Remember**: Security is not optional. One vulnerability can compromise the entire platform. When in doubt, err on the side of caution.

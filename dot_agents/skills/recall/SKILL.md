@@ -57,11 +57,11 @@ services.
 
 ## Output
 
-- **Capsule**: at most 5 bullets on what the work is and where it stands.
+- **Capsule**: a few bullets on what the work is and where it stands.
 - **Threads**: one line each, tagged `[merged]`, `[open PR]`, `[in flight
   <branch>]`, `[verified, uncommitted]`, `[reverted]`, `[claimed, unverified]`,
   or `[planned, not started]`, with a session id and date as evidence.
-- **Problems**: recurring failures, corrections, and dead ends, at most 5.
+- **Problems**: recurring failures, corrections, and dead ends that still matter.
 - **Open work**: what remains and what still needs the user's approval.
 - **Next move**: one concrete suggested action.
 - **Not covered**: hosts, sessions, or sources that were out of scope or
