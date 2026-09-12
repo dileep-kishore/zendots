@@ -89,17 +89,23 @@ installing on both produces Syncthing conflict files.
 
 - **Only Claude Code needs symlinks.** Codex and OpenCode resolve
   `~/.agents/skills` natively -- `npx skills` classifies them as "universal" and
-  writes no link. Never link a skill into `~/.codex/skills` or
+  writes no link. Never link a store skill into `~/.codex/skills` or
   `~/.config/opencode/skills`; that makes those harnesses load it twice.
   `link-agent-skills.sh` handles `~/.claude/skills` and runs on every apply.
 - **Check for an existing Claude plugin before adding a skill to the store.**
   The store is visible to Claude Code through those symlinks, so adding a skill
   an enabled plugin already provides puts two copies in one session. Compare
   against `~/.claude/plugins` and `enabledPlugins` in `~/.claude/settings.json`.
-- `~/.agentskills/` and `~/.config/opencode/superpowers/skills` are separate,
-  unmanaged stores that give OpenCode what Claude gets from plugins. Leave them
-  out of `~/.agents/skills` -- folding them in would duplicate ~15 skills into
-  Claude.
+- `~/.config/opencode/superpowers/skills` is a separate, unmanaged store that
+  gives OpenCode what Claude gets from the superpowers plugin. Leave it out of
+  `~/.agents/skills` -- folding it in would duplicate ~14 skills into Claude.
+- **A plugin skill wanted in another harness is linked, not copied.**
+  `~/.config/opencode/skills/frontend-design` and
+  `~/.codex/skills/frontend-design` are chezmoi-managed relative symlinks into
+  `~/.claude/plugins/marketplaces/claude-plugins-official/`, the checkout the
+  plugin auto-updater pulls, so every harness tracks the plugin. Disabling that
+  plugin or removing the marketplace dangles the links. `~/.agentskills/` no
+  longer exists.
 
 #### Fetched skills
 
