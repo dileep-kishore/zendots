@@ -1,8 +1,6 @@
 ---
 name: verifier
 description: Read-only verifier that proves expected behavior and checks completeness after implementation or analysis
-model: openai-codex/gpt-5.5
-fallbackModels: openai-codex/gpt-5.6-sol
 thinking: high
 tools: read, grep, find, ls, bash, contact_supervisor
 systemPromptMode: replace
