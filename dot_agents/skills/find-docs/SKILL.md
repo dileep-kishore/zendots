@@ -48,9 +48,9 @@ npx ctx7@latest library <name> <query>
 npx ctx7@latest docs <libraryId> <query>
 ```
 
-You MUST call `npx ctx7@latest library` first to obtain a valid library ID UNLESS the user explicitly provides a library ID in the format `/org/project` or `/org/project/version`.
+Resolve the library ID with `npx ctx7@latest library` first unless the user already gave one in the form `/org/project` or `/org/project/version`; `docs` fails without a valid ID.
 
-IMPORTANT: Do not run these commands more than 3 times per question. If you cannot find what you need after 3 attempts, use the best result you have.
+Stay within three calls per question, since each call spends Context7 quota. If three attempts do not find it, use the best result you have and say so.
 
 ## Step 1: Resolve a Library
 

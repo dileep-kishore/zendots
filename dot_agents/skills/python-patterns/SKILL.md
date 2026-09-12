@@ -76,13 +76,13 @@ def get_value(dictionary: dict, key: str) -> Any:
 ### Basic Type Annotations
 
 ```python
-from typing import Optional, List, Dict, Any
+from typing import Any
 
 def process_user(
     user_id: str,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     active: bool = True
-) -> Optional[User]:
+) -> User | None:
     """Process a user and return the updated User or None."""
     if not active:
         return None
@@ -541,8 +541,7 @@ from fastapi import FastAPI
 from mypackage.models import User
 from mypackage.utils import format_name
 
-# Good: Use isort for automatic import sorting
-# pip install isort
+# Good: let `ruff check --select I --fix` sort imports
 ```
 
 ### __init__.py for Package Exports
@@ -620,16 +619,12 @@ result = buffer.getvalue()
 ### Essential Commands
 
 ```bash
-# Code formatting
-black .
-isort .
-
-# Linting
+# Formatting, import sorting, linting
+ruff format .
 ruff check .
-pylint mypackage/
 
 # Type checking
-mypy .
+ty check
 
 # Testing
 pytest --cov=mypackage --cov-report=html
@@ -638,8 +633,8 @@ pytest --cov=mypackage --cov-report=html
 bandit -r .
 
 # Dependency management
+uv sync
 pip-audit
-safety check
 ```
 
 ### pyproject.toml Configuration
@@ -658,24 +653,15 @@ dependencies = [
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "black>=23.0.0",
     "ruff>=0.1.0",
-    "mypy>=1.5.0",
+    "ty",
 ]
-
-[tool.black]
-line-length = 88
-target-version = ['py39']
 
 [tool.ruff]
 line-length = 88
-select = ["E", "F", "I", "N", "W"]
 
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -747,4 +733,3 @@ except SpecificError as e:
     logger.error(f"Operation failed: {e}")
 ```
 
-__Remember__: Python code should be readable, explicit, and follow the principle of least surprise. When in doubt, prioritize clarity over cleverness.

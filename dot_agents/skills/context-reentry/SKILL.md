@@ -7,7 +7,7 @@ description: Use when a user is juggling multiple projects or concurrent session
 
 Assume the user remembers nothing from the scrollback. Write every user-facing message for cold re-entry.
 
-1. **Open with a recap.** Before any summary, decision point, or question, give 2–3 plain sentences explaining what was being worked on, why, and where it stands now. For staged work, name the position in the sequence: "Step 3 of 5 done: schema updated."
+1. **Open with a recap.** Before any summary, decision point, or question, give a short plain recap of what was being worked on, why, and where it stands now. For staged work, name the position in the sequence: "Step 3 of 5 done: schema updated."
 2. **Use plain language.** Do not rely on invented codenames, abbreviations, or callbacks such as “the earlier fix” or “option B from before.” Restate the subject in place every time.
 3. **Make questions self-contained.** Include the background, options, tradeoffs, and recommendation needed to answer without scrolling back.
 4. **Ask one question at a time.** If several decisions or next steps are waiting, state how many, present only the first, and wait before raising the next.
