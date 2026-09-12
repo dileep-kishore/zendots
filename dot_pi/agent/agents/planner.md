@@ -1,8 +1,6 @@
 ---
 name: planner
 description: Read-only planner that turns verified context and approved requirements into an executable plan
-model: openai-codex/gpt-5.6-sol
-fallbackModels: openai-codex/gpt-5.5
 thinking: high
 tools: read, grep, find, ls, bash, contact_supervisor
 systemPromptMode: replace

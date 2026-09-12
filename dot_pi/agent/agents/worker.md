@@ -1,8 +1,6 @@
 ---
 name: worker
 description: Sole-writer implementation agent for an approved, bounded scope
-model: openai-codex/gpt-5.6-sol
-fallbackModels: openai-codex/gpt-5.5
 thinking: high
 tools: read, grep, find, ls, bash, edit, write, contact_supervisor
 systemPromptMode: replace
