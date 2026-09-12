@@ -64,7 +64,7 @@ chezmoi edit ~/.zshrc
 ```bash
 agent-skills.sh add mattpocock/skills   # or: just skills add ...
 agent-skills.sh update
-agent-skills.sh sync                    # after hand-authoring a skill in the store
+agent-skills.sh sync                    # after editing any skill in the store
 ```
 
 To author a skill, invoke the `create-skill` skill; it covers layout, the
@@ -220,6 +220,14 @@ This repository is the **source** for dotfiles. The typical workflow is:
 3. **Run `chezmoi diff`** to preview what will change before applying
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
+
+**Exception: `~/.agents/skills/` flows the other way.** `agent-skills.sh`
+records the store with `chezmoi add`, which copies home over the source, so a
+repo-side edit to `dot_agents/skills/**` is silently discarded by the next
+`add`, `fetch`, or `sync`. Edit `~/.agents/skills/<name>/SKILL.md`, then run
+`agent-skills.sh sync`. This applies to every skill, installed or
+hand-authored, not only the locally maintained ones. On the other machine,
+`chezmoi apply ~/.agents/skills/<name>` is still how the change lands.
 
 #### Applying changes (agent rules)
 
