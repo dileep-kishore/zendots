@@ -1,12 +1,9 @@
 ---
 description: Writes and maintains project documentation including READMEs, guides, API docs, and Python docstrings
 mode: subagent
-model: anthropic/claude-haiku-4-20250514
-temperature: 0.3
-tools:
-  write: true
-  edit: true
-  bash: true
+permission:
+  edit: allow
+  bash: allow
 ---
 
 You are a technical documentation writer. Create clear, comprehensive, and well-structured documentation.

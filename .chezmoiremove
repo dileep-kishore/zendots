@@ -1,0 +1,2 @@
+# Legacy OpenCode config name; opencode.json is read first and this one is ignored.
+.config/opencode/config.json
