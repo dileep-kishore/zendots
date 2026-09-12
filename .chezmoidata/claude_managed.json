@@ -31,7 +31,7 @@
       "ralph-loop@claude-plugins-official": false,
       "superpowers@claude-plugins-official": true,
       "productivity@knowledge-work-plugins": true,
-      "bio-research@knowledge-work-plugins": true,
+      "bio-research@knowledge-work-plugins": false,
       "claude-md-management@claude-plugins-official": true,
       "pr-review-toolkit@claude-plugins-official": true,
       "linear@claude-plugins-official": true,
