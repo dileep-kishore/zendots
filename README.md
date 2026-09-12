@@ -36,7 +36,7 @@ The agent setup is the part that moves fastest. All of these are configured here
 | [**Orca**](https://www.onorca.dev/) | Worktree-based agentic IDE — the primary driver ([docs](https://www.onorca.dev/docs)) |
 | [**Claude Code**](https://claude.com/claude-code) | `~/.claude` settings, plugins, statusline, MCP servers |
 | [**Codex**](https://github.com/openai/codex) | `~/.codex` config, plus [CodexBar](https://codexbar.app/) in the menu bar |
-| [**OpenCode**](https://opencode.ai/) | `~/.config/opencode`, incl. oh-my-opencode |
+| [**OpenCode**](https://opencode.ai/) | `~/.config/opencode` |
 | [**T3 Code**](https://t3.codes/) | Minimal desktop GUI for driving coding agents |
 | [**Pi**](https://pi.dev/) | `~/.pi` agent config — see [`docs/pi-workflow.md`](docs/pi-workflow.md) |
 | [**aichat**](https://github.com/sigoden/aichat) | Inline shell command generation (`Alt-e`) |

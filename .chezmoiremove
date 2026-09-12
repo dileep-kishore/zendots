@@ -1,2 +1,6 @@
 # Legacy OpenCode config name; opencode.json is read first and this one is ignored.
 .config/opencode/config.json
+
+# oh-my-opencode is no longer used.
+.config/opencode/oh-my-opencode.json
+.config/opencode/update_oh_my_opencode.sh
