@@ -70,10 +70,9 @@ agent-skills.sh sync                    # after editing any skill in the store
 To author a skill, invoke the `create-skill` skill; it covers layout, the
 manual-only frontmatter for each harness, and recording the result.
 
-`unslop`, `grill-with-docs`, `to-spec`, `verify-this`, `show-me-your-work`, and
-`open-pr`
-are locally maintained and intentionally absent from `~/.agents/.skill-lock.json`. Do not reinstall them
-from upstream. Edit `~/.agents/skills/<name>/SKILL.md`, then run
+Every skill absent from `~/.agents/.skill-lock.json` (`unslop`, `open-pr`,
+`create-skill`, `find-docs`, and the rest) is locally maintained. Do not
+reinstall them from upstream. Edit `~/.agents/skills/<name>/SKILL.md`, then run
 `agent-skills.sh sync`. A broad `agent-skills.sh add mattpocock/skills` or
 `agent-skills.sh add cursor/plugins` reinstalls every skill in that repository,
 lock entry or not, and would overwrite these adaptations; when adding from
@@ -110,8 +109,7 @@ installing on both produces Syncthing conflict files.
 #### Fetched skills
 
 A skill that carries an upstream runtime -- a Node package, a binary -- is
-*fetched* rather than installed. None of the vendored skills does this today;
-`archify` is the first. The runtime is cloned to `~/.agents/runtimes/<name>`,
+*fetched* rather than installed; `archify` is the only one. The runtime is cloned to `~/.agents/runtimes/<name>`,
 which is never `chezmoi add`ed, and only a relative symlink enters the store, so
 the payload reaches neither this repository nor Syncthing.
 
@@ -222,8 +220,8 @@ When modifying configurations:
 This repository is the **source** for dotfiles. The typical workflow is:
 
 1. **Modify files** in this repository (using `dot_` prefixes for dotfiles)
-2. **Run `chezmoi apply`** to sync changes to the actual home directory
-3. **Run `chezmoi diff`** to preview what will change before applying
+2. **Run `chezmoi diff <destination paths>`** to preview what will change
+3. **Run `chezmoi apply <destination paths>`** once the diff is approved (see the agent rules below)
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
 
@@ -264,7 +262,7 @@ When making changes to configurations, edit these files in the repository:
 - **Git**: `dot_gitconfig`, `dot_gitignore_global`
 - **Packages**: `pkgs/Brewfile`
 
-After editing, run `chezmoi apply` to sync changes to the home directory.
+After editing, show the scoped `chezmoi diff` and apply only the paths you changed, as described under "Applying changes".
 
 ## Chezmoi File Name Translation
 
