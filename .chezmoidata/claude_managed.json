@@ -5,7 +5,8 @@
       "CLAUDE_CODE_SHELL": "/bin/bash",
       "DISABLE_AUTOUPDATER": "1",
       "FORCE_AUTOUPDATE_PLUGINS": "1",
-      "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
+      "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
+      "CLAUDE_CODE_LANTERN_PRISM": "1"
     },
     "attribution": {
       "commit": "",
