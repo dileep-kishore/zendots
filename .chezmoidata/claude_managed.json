@@ -4,7 +4,8 @@
       "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
       "CLAUDE_CODE_SHELL": "/bin/bash",
       "DISABLE_AUTOUPDATER": "1",
-      "FORCE_AUTOUPDATE_PLUGINS": "1"
+      "FORCE_AUTOUPDATE_PLUGINS": "1",
+      "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
     },
     "attribution": {
       "commit": "",
@@ -75,6 +76,15 @@
     "skipWorkflowUsageWarning": true,
     "theme": "custom:catppuccin-mocha",
     "editorMode": "vim",
-    "agentPushNotifEnabled": true
+    "agentPushNotifEnabled": true,
+    "modelSettings": {
+      "claude-fable-5-1": {
+        "effortLevel": "high"
+      },
+      "claude-opus-5": {
+        "effortLevel": "high"
+      }
+    },
+    "bashEditDiffEnabled": true
   }
 }
