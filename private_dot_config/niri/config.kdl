@@ -125,6 +125,7 @@ spawn-at-startup "awww-daemon"
 spawn-at-startup "helium-browser"
 spawn-at-startup "ghostty"
 spawn-sh-at-startup "sleep 2 && stably-orca"
+spawn-sh-at-startup "sleep 4 && grok-bot"
 // Stagger these behind the main browser above. Launched in parallel they race
 // for Chromium's profile singleton, and the loser deletes SingletonLock on
 // exit, leaving the survivor with no singleton. Every later launch then starts
@@ -291,6 +292,13 @@ window-rule {
     open-on-workspace "terminal"
     default-column-width {
         proportion 0.5
+    }
+}
+window-rule {
+    match at-startup=true app-id="^grok-bot$"
+    open-on-workspace "terminal"
+    default-column-width {
+        proportion 0.25
     }
 }
 window-rule {
