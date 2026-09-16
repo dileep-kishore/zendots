@@ -2,7 +2,9 @@ sourceDir = "~/zendots"
 
 [diff]
   format = "git"
-  pager = "delta"
+  # Empty so `chezmoi diff` emits plain git-format text: delta writes
+  # side-by-side ANSI even into a pipe, which agents cannot read.
+  pager = ""
 
 [merge]
   command = "nvim"

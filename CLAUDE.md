@@ -241,6 +241,12 @@ hand-authored, not only the locally maintained ones. On the other machine,
 - **Ask for confirmation before applying.** Show the scoped `chezmoi diff <paths>`
   first and wait for the user to approve. Do not apply as part of a larger action.
 - Use the **destination** paths (`~/.config/...`), not the source names (`private_dot_config/...`).
+- **Always pass `-r` to `chezmoi diff`.** Unlike `chezmoi status`, `diff` is not
+  recursive by default, so `chezmoi diff ~/.agents/skills/open-pr` prints nothing
+  for a directory that has pending changes. Silence from `diff` is not proof of a
+  clean path; `chezmoi status <path>` is the reliable check.
+- `[diff] pager` is empty so the output is plain git-format text that survives a
+  pipe. For a prettier read by hand, pipe it: `chezmoi diff -r ~/.zshrc | delta`.
 
 ### Theme Consistency
 
