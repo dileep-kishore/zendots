@@ -29,3 +29,6 @@ x-scheme-handler/webcal=helium.desktop
 x-scheme-handler/t3code=t3code-url-handler.desktop
 x-scheme-handler/grokbot=grok-bot.desktop
 x-scheme-handler/sand=grok-bot.desktop
+
+[Added Associations]
+x-scheme-handler/t3code=t3code.desktop;
