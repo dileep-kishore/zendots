@@ -26,17 +26,51 @@ Tell the user it is on the clipboard, then offer to copy the archive script next
 
 ## T3 Code
 
-Variables: `$T3CODE_PROJECT_ROOT` (main checkout), `$T3CODE_WORKTREE_PATH`.
-There is no workspace-name variable — derive one from `basename "$TREE"`.
+Variables: `$T3CODE_PROJECT_ROOT` (main checkout), `$T3CODE_WORKTREE_PATH` (set
+only for worktree threads). There is no workspace-name variable — derive one
+from `basename "$TREE"`. The command runs in a terminal whose cwd is
+`worktreePath ?? project.cwd`, which makes a multi-line script a bad fit: put
+the script in a file and point the action at it.
 
-Setup is an **Action** with *Run automatically on worktree creation* toggled on.
-Only the first action carrying that flag runs, so a project gets exactly one
-setup script. The command is typed into a terminal whose cwd is the worktree,
-which makes a multi-line script a bad fit. Check the script into the repo and
-point the action at it.
+Setup is an **Action** with *Run automatically on worktree creation* on. Only
+the first action carrying the flag runs; a second is ignored with no warning.
 
-Preferred delivery — write `scripts/worktree-setup.sh`, then a repo-root
-`t3.json` so teammates get the same action:
+### t3.json is an import catalog, not configuration
+
+A repo-root `t3.json` does **not** register anything by itself. Its `scripts`
+are offered for import in the Actions settings and the scripts menu under a
+"From t3.json" group, filtered against actions the project already has. The
+setup runner resolves its script only from registered project scripts
+(`resolveProjectScripts` → `projectSettingsOverrides` → `projectScriptOverrides`
+→ the project aggregate → environment defaults) and never reads `t3.json`. So
+always tell the user to import it once per machine — writing the file is not
+enough, and an unimported `t3.json` silently runs nothing.
+
+The one key that *does* apply automatically is `defaultThreadEnvMode`, honoured
+as a repository default when the project has no override.
+
+### Default delivery: keep it out of git, ask before committing
+
+A worktree contains only committed files, so where the script lives decides the
+command:
+
+- **Personal hook (default).** The user's own setup, carried between machines by
+  a sync tool rather than git. Add `/t3.json` and `/scripts/worktree-setup.sh`
+  to `.gitignore`, and reference the script through the main checkout, which
+  always has it:
+  `bash "$T3CODE_PROJECT_ROOT/scripts/worktree-setup.sh"`.
+  `t3.json` is only ever read from the workspace root, so gitignoring it still
+  leaves the one-click import working on every machine.
+- **Team hook.** Commit both and use the plain relative
+  `bash scripts/worktree-setup.sh`.
+
+Ask which one before writing, and default to personal. A gitignored script with
+a relative command is the failure this pairing exists to prevent: the action
+resolves to nothing in a fresh worktree.
+
+**Ask before committing anything.** The `.gitignore` edit is a repo change, and
+a hook that needs repo support — an env-driven port, a `just` target — means
+more. Name those files and ask; never commit on your own initiative.
 
 ```json
 {
@@ -44,35 +78,40 @@ Preferred delivery — write `scripts/worktree-setup.sh`, then a repo-root
   "scripts": [
     {
       "name": "Setup",
-      "command": "bash scripts/worktree-setup.sh",
-      "runOnWorktreeCreate": true
+      "command": "bash \"$T3CODE_PROJECT_ROOT/scripts/worktree-setup.sh\"",
+      "runOnWorktreeCreate": true,
+      "async": false
     }
   ]
 }
 ```
 
-`t3.json` also takes `defaultThreadEnvMode: "worktree"`, which is worth setting
-if the project should always start threads in a worktree. If the command must
-not be checked in, have the user paste it into the project's Actions instead.
+### Derived values need somewhere to land
 
-Three things T3 Code does not do, all of which land on the script:
+A port or database name the script derives is inert unless something reads it.
+Check that the project's run commands actually consult the variable the script
+writes, and offer the (committable) change when they do not.
+
+### What T3 Code does not do
 
 - **No teardown hook.** Archiving a thread offers to remove the worktree and
   runs nothing first. Anything the setup grabs outside the worktree — ports,
-  databases, containers, named volumes — is released by hand. Still write
-  `scripts/worktree-teardown.sh` when there is something to release, and tell
-  the user plainly that they have to run it themselves before archiving.
+  databases, containers, named volumes — is released by hand. Prefer a design
+  with nothing to release: state kept *inside* the worktree dies with it.
+  Otherwise write `scripts/worktree-teardown.sh` and say plainly that they must
+  run it themselves before archiving.
 - **No gitignored-file carryover.** No `.env` copy, no `.worktreeinclude`
   support. Every file in the copy bucket is the script's job.
-- **No wait for completion.** T3 writes the command to the terminal and starts
-  the first agent turn immediately, so a long `uv sync` is still running while
-  the agent reads files. Keep setup short, do the copy/link steps before the
-  slow install so the agent at least has config and data, and warn the user that
-  an agent may report a missing dependency that is merely still installing.
+- **Starts the agent mid-setup, unless you say otherwise.** Setup scripts are
+  async by default: the agent begins while `uv sync` is still running. Set
+  `"async": false` in `t3.json` (or "Wait for it to finish before the agent
+  starts" in the action editor) to hold the agent until the script exits.
+  Prefer that for any setup with a slow install.
 
-Verified against the T3 Code nightly build in September 2026; a teardown hook
-was an open upstream request at that time, so re-check before assuming it is
-still absent.
+Verified against the T3 Code nightly and the `pingdotgg/t3code` sources in
+September 2026 (`T3ProjectFileLoader.ts`, `useT3ProjectFileScripts.ts`,
+`shared/projectScripts.ts`). A teardown hook was an open upstream request then,
+so re-check before assuming it is still absent.
 
 ## Any other host
 
