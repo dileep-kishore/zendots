@@ -130,8 +130,10 @@ change how they read the diff or what they check. Before creating or updating
 the PR, read and apply [humanizer](../humanizer/SKILL.md) to both the title and
 description in embedded mode, returning only the final text. Keep the tone
 natural and technical. Preserve facts, verification results, uncertainty,
-code, commands, links, and required template structure; keep the title under
-70 characters. Do not invent claims or add personality that does not fit.
+code, commands, links, and structure: the section order, headings, and title
+style set above, or the repository template's. Humanizer rewrites sentences,
+not the skeleton. Keep the title under 70 characters. Do not invent claims or
+add personality that does not fit.
 
 ## 6. Push and open
 
