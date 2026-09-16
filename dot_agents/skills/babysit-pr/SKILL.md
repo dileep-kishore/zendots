@@ -108,6 +108,12 @@ git rev-parse --short HEAD
 Two separate operations. Doing only the second leaves the reviewer guessing;
 doing only the first leaves the PR looking unaddressed.
 
+Before posting any PR comment or thread reply, read and apply
+[humanizer](../humanizer/SKILL.md) to the draft in embedded mode, returning only
+the final text. Keep it concise, natural, and respectful. Preserve the finding,
+decision, evidence, uncertainty, commit SHAs, file references, commands, and
+verification results. Do not invent claims or turn a rebuttal into agreement.
+
 ```bash
 gh api graphql -f threadId=<thread-id> -f body='<reply>' -f query='
 mutation($threadId:ID!,$body:String!){

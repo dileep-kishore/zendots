@@ -103,7 +103,8 @@ the commits support and ask one targeted question. Do not invent a motivation.
 ## 5. Compose
 
 A repository template at `.github/PULL_REQUEST_TEMPLATE.md` or
-`.github/pull_request_template.md` wins: fill it and skip the rest of this step.
+`.github/pull_request_template.md` wins: fill it instead of using the body
+structure below, then apply the final writing pass in this step.
 
 Title names the main change, in the style of the commits, under 70 characters.
 
@@ -125,9 +126,12 @@ logical changes gets more Solution paragraphs, not longer ones. Under three
 paragraphs, prose with no headings; past that, headings.
 
 Read the body once more as the reviewer and cut every sentence that does not
-change how they read the diff or what they check. Then run `unslop` for its
-pattern list only: a PR body is factual technical writing, so its voice rules
-(opinions, first person, added mess) do not apply.
+change how they read the diff or what they check. Before creating or updating
+the PR, read and apply [humanizer](../humanizer/SKILL.md) to both the title and
+description in embedded mode, returning only the final text. Keep the tone
+natural and technical. Preserve facts, verification results, uncertainty,
+code, commands, links, and required template structure; keep the title under
+70 characters. Do not invent claims or add personality that does not fit.
 
 ## 6. Push and open
 
