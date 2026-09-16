@@ -83,9 +83,21 @@ without stopping.
 
 ## 4. Fix and push
 
-Make the smallest change that answers the finding, run the project's checks, and
-commit. One commit per thread keeps the reply auditable; group only findings that
-share a root cause. Push, then capture the new head:
+Make the smallest change that answers each finding that held, run the project's
+checks, then commit the round as one commit, subject naming its dominant change.
+Every reply in the round cites that one SHA. The reply says what changed and the
+commit says where, which is the whole of the audit trail; a commit per thread
+only makes the branch grow a commit per finding per round.
+
+Split the round when the fixes are separate logical changes that do not belong
+in one revert — a behavior fix and an unrelated doc correction. Two commits, not
+five.
+
+Do not fold the round into earlier commits to keep the count down. Rewriting
+what is already pushed costs the reviewer their "changes since I last looked"
+diff and marks open threads outdated, which is worse than the extra commit.
+
+Push, then capture the new head:
 
 ```bash
 git rev-parse --short HEAD
