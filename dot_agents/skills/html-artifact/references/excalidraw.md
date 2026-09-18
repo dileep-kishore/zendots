@@ -58,11 +58,25 @@ The skill contains only our exporter, this guide, an example input, the small
 package manifest, and its dependency lockfile. The official library, fonts,
 and browser binaries are downloaded, not vendored.
 
-Each invocation installs with `bun install --frozen-lockfile --ignore-scripts`
-in an isolated system temporary directory, reusing Bun's package cache.
-Playwright reuses its normal browser cache. Successful runs remove the temporary
-workspace; failed runs retain it and print its path for diagnosis. Neither
-`node_modules` nor generated bundles belong in the skill or chezmoi source.
+All projects reuse one persistent runtime per bundled revision under
+`~/.cache/html-artifact/excalidraw/<key>/`, or
+`$XDG_CACHE_HOME/html-artifact/excalidraw/<key>/` when set. The key includes the
+manifest, lockfile, exporter sources, Bun version, OS, and architecture.
+
+Only the first run for that key installs with
+`bun install --frozen-lockfile --ignore-scripts`. Chromium binaries live in
+the shared `html-artifact/excalidraw/browsers/` directory. Once setup succeeds,
+subsequent runs skip both install commands and reuse the same `node_modules`.
+Concurrent first runs wait for setup; exports then run independently with
+their own browser, local port, and output prefix. Use distinct output prefixes
+for simultaneous exports. Nothing is installed in a project or the skill.
+
+A failed setup can be retried. If a process is forcibly killed during setup,
+the next run may report a stale lock; check its recorded PID has stopped before
+removing that lock directory. Runtime revisions remain cached after upgrades;
+remove old revisions only when no export is using them. A missing or damaged
+cache can be rebuilt by removing that revision's `.ready` marker while idle
+and rerunning the command.
 
 The manifest pins Excalidraw 0.18.0, React/React DOM 18.3.1, and Playwright
 1.63.0; `bun.lock` pins their transitive dependencies. Update dependencies
