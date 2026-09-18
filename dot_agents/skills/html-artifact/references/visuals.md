@@ -28,12 +28,12 @@ diagrams. An unanswered question leaves Excalidraw selected.
 
 Every visual lives in a `<figure>`; the template frames it, stamps it, and
 numbers the caption. Tables use `<figure class="table">` so the caption goes
-above and the counter reads "Table". Add `wide` to either when it needs the
-full column. Write captions to the three-part shape in
+above and the counter reads "Table". Figures already fill the content column.
+Write captions to the three-part shape in
 [writing.md](writing.md).
 
 ```html
-<figure class="table wide">
+<figure class="table">
   <figcaption><b>Per-stage latency over 30 runs.</b> Minutes; p50 and p95 over 30 nightly runs.</figcaption>
   <div class="table-wrap"><table>...</table></div>
   <p class="fn"><sup>a</sup> Footnote for a cell marked with the same letter.</p>
@@ -41,7 +41,7 @@ full column. Write captions to the three-part shape in
 ```
 
 Mark the one value or node the reader must notice with `class="hot"` (cells,
-tile numbers) or the palette's mauve accent in a diagram; never more than one
+tile numbers) or `$accent` in an Excalidraw diagram; never more than one
 per figure.
 
 ## Code
@@ -63,8 +63,8 @@ tag tight against the first character or the block gains a blank first line.
 Generate an editable Excalidraw scene and export SVG for the figure. Local
 generation uses the [bundled exporter](excalidraw.md); MCP is optional. Paste its
 `.images.html` fragment inside the figure; the template selects the matching
-light/dark SVG. Keep the `.excalidraw`
-source alongside the artifact or provide it as an embedded download.
+light/dark SVG. Keep the authored `.json` and editable `.excalidraw`
+source alongside the artifact.
 Use the house palette, preserve legible labels, and check arrow bindings,
 spacing, and the rendered result in both themes. Load fonts before measuring
 text and embed them in SVG exports. For exported SVGs with embedded font
@@ -166,6 +166,9 @@ Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
 
 ## Inline SVG
 
+These rules apply when incorporating an existing SVG asset. Author new
+diagrams with Excalidraw by default.
+
 ```html
 <figure>
   <svg viewBox="0 0 640 120" role="img" aria-label="Requests fan out to three workers and merge">
@@ -193,3 +196,10 @@ Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
 Prefer SVG exported from the source tool. PNG only when unavoidable, at most
 300 KB each, as `<img src="data:image/png;base64,..." alt="..." width="...">`.
 Never a screenshot of text.
+
+## Printing
+
+Excalidraw prints its light export automatically. For Mermaid and Vega, switch
+the page to light mode and wait for rendering before opening the print dialog.
+Their marks retain their rendered palette in print. Print CSS keeps Vega labels
+legible but cannot await asynchronous rerendering during the browser's print event.

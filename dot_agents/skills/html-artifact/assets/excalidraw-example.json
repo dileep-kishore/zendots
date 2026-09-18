@@ -1,11 +1,16 @@
 {
-  "alt": "A brief leads to a sketch, which can be revised before publication.",
+  "alt": "Fetch, parse, embed and publish take 8, 3, 31 and 5 minutes. Embedding is the bottleneck.",
   "elements": [
-    { "type": "rectangle", "id": "brief", "x": 20, "y": 60, "width": 160, "height": 90, "label": { "text": "Brief" } },
-    { "type": "rectangle", "id": "sketch", "x": 280, "y": 60, "width": 180, "height": 90, "strokeColor": "$accent", "label": { "text": "Sketch" } },
-    { "type": "rectangle", "id": "publish", "x": 560, "y": 60, "width": 180, "height": 90, "strokeColor": "$green", "label": { "text": "Publish" } },
-    { "type": "arrow", "x": 185, "y": 105, "points": [[0, 0], [90, 0]], "start": { "id": "brief" }, "end": { "id": "sketch" }, "label": { "text": "scope", "fontSize": 18 } },
-    { "type": "arrow", "x": 465, "y": 105, "points": [[0, 0], [90, 0]], "start": { "id": "sketch" }, "end": { "id": "publish" }, "label": { "text": "ready", "fontSize": 18 } },
-    { "type": "text", "x": 290, "y": 200, "text": "Revise the sketch first", "fontSize": 20, "strokeColor": "$accent" }
+    {"type": "rectangle", "id": "fetch", "x": 0, "y": 60, "width": 170, "height": 90, "label": {"text": "Fetch"}},
+    {"type": "rectangle", "id": "parse", "x": 290, "y": 60, "width": 170, "height": 90, "label": {"text": "Parse"}},
+    {"type": "rectangle", "id": "embed", "x": 580, "y": 60, "width": 170, "height": 90, "label": {"text": "Embed"}, "strokeColor": "$accent"},
+    {"type": "rectangle", "id": "publish", "x": 870, "y": 60, "width": 170, "height": 90, "label": {"text": "Publish"}},
+    {"type": "arrow", "x": 175, "y": 105, "points": [[0, 0], [110, 0]], "start": {"id": "fetch"}, "end": {"id": "parse"}, "label": {"text": "raw pages", "fontSize": 18}},
+    {"type": "arrow", "x": 465, "y": 105, "points": [[0, 0], [110, 0]], "start": {"id": "parse"}, "end": {"id": "embed"}, "label": {"text": "records", "fontSize": 18}},
+    {"type": "arrow", "x": 755, "y": 105, "points": [[0, 0], [110, 0]], "start": {"id": "embed"}, "end": {"id": "publish"}, "label": {"text": "vectors", "fontSize": 18}},
+    {"type": "text", "x": 42, "y": 178, "text": "8 min", "fontSize": 20},
+    {"type": "text", "x": 332, "y": 178, "text": "3 min", "fontSize": 20},
+    {"type": "text", "x": 622, "y": 178, "text": "31 min", "fontSize": 20},
+    {"type": "text", "x": 912, "y": 178, "text": "5 min", "fontSize": 20}
   ]
 }

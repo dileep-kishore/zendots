@@ -53,8 +53,8 @@ caption (tables in `<figure class="table">`, caption first); the template
 numbers them. Embed Excalidraw SVG exports as described in `references/visuals.md`.
 User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
 `<div class="vega"><script type="application/json">`. `assets/example.html`
-shows every component once; it is a catalogue, not a model for length.
-Its Mermaid example demonstrates an opt-in component, not the diagram default.
+is a component catalogue, not a model for length. It includes an Excalidraw
+figure and a hand-drawn Mermaid example explicitly labelled as opt-in.
 
 To update an existing page, edit its `<main>` in place and leave its copied
 CSS and script alone; regenerate from the template only when the user asks
@@ -69,6 +69,9 @@ python3 <skill-dir>/scripts/check.py <file>
 Fix every `ERROR`. Done when the checker prints `OK`. The checker reads the
 file and never renders it, so it cannot see a Mermaid block that fails to
 parse or a chart that comes out empty; re-read those specs yourself.
+Open the final page in T3's built-in browser when available and check both
+themes, labels, arrow bindings, and narrow-screen scrolling. If browser review
+is unavailable, report that limit rather than treating the checker as visual proof.
 
 ## 7. Deliver
 

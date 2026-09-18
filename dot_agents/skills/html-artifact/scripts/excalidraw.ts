@@ -25,7 +25,7 @@ const options = {
 };
 try {
   mkdirSync(cache, { recursive: true });
-  const deadline = Date.now() + 300_000;
+  const deadline = Date.now() + 610_000;
   while (!existsSync(ready)) {
     try {
       mkdirSync(lock);

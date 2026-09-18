@@ -176,7 +176,8 @@ td.num, th.num { text-align: right; }
 pre.mermaid { background: none; border: 0; padding: 0; overflow-x: auto; font-size: 1rem; }
 .mermaid svg { max-width: 100%; height: auto; }
 .excalidraw-images { overflow-x: auto; }
-.excalidraw-images img { display: block; width: 100%; min-width: 640px; height: auto; }
+.excalidraw-images img { display: block; max-width: 100%; min-width: 640px; height: auto; }
+.excalidraw-images:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .excalidraw-images .excalidraw-light { display: none; }
 :root[data-theme="light"] .excalidraw-dark { display: none; }
 :root[data-theme="light"] .excalidraw-light { display: block; }
@@ -205,6 +206,7 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   .page { grid-template-columns: 1fr; }
   h2 { break-after: avoid; }
   figure, .tile, table { break-inside: avoid; }
+  .vega-view text { fill: var(--ink) !important; }
   .excalidraw-images .excalidraw-dark { display: none !important; }
   .excalidraw-images .excalidraw-light { display: block !important; min-width: 0; }
 }
@@ -234,6 +236,10 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
     root.dataset.theme = next;
     try { localStorage.setItem('theme', next); } catch (e) {}
     document.dispatchEvent(new CustomEvent('themechange'));
+  });
+
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', function () {
+    if (!root.dataset.theme) document.dispatchEvent(new CustomEvent('themechange'));
   });
 
   // Index from h2/h3: h2 entries numbered, the entry in view highlighted.
@@ -277,32 +283,36 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
       var mermaid = m.default;
       var nodes = document.querySelectorAll('.mermaid');
       nodes.forEach(function (el) { el.dataset.src = el.textContent; });
+      var rendering = Promise.resolve();
       function render() {
-        css = getComputedStyle(root);
-        mermaid.initialize({
-          startOnLoad: false, securityLevel: 'strict', theme: 'base', fontFamily: tok('--font-display'),
-          gantt: { fontSize: 14, barHeight: 26, barGap: 8, topPadding: 44, leftPadding: 110, sectionFontSize: 14, numberSectionStyles: 2 },
-          sequence: { actorFontFamily: tok('--font-display'), messageFontFamily: tok('--font-display'), noteFontFamily: tok('--font-display'), actorFontSize: 15, messageFontSize: 14, noteFontSize: 14 },
-          themeVariables: {
-            background: tok('--surface'), primaryColor: tok('--tint'), primaryTextColor: tok('--ink'),
-            primaryBorderColor: tok('--tint-line'), lineColor: tok('--ink-2'), secondaryColor: tok('--surface'),
-            tertiaryColor: tok('--ground'), edgeLabelBackground: tok('--surface'), fontSize: '15px',
-            noteBkgColor: tok('--surface-2'), noteTextColor: tok('--ink'), noteBorderColor: tok('--line-strong'),
-            actorBkg: tok('--surface-2'), actorBorder: tok('--ink-2'), actorTextColor: tok('--ink'),
-            signalColor: tok('--ink-2'), signalTextColor: tok('--ink'), labelBoxBkgColor: tok('--surface-2'),
-            labelTextColor: tok('--ink'), loopTextColor: tok('--ink'),
-            taskBkgColor: tok('--tint'), taskBorderColor: tok('--tint-line'), taskTextColor: tok('--ink'), taskTextOutsideColor: tok('--ink'),
-            taskTextLightColor: tok('--ink'), taskTextDarkColor: tok('--ink'),
-            activeTaskBkgColor: tok('--accent-soft'), activeTaskBorderColor: tok('--accent'),
-            doneTaskBkgColor: tok('--surface-2'), doneTaskBorderColor: tok('--line-strong'),
-            critBkgColor: tok('--red-soft'), critBorderColor: tok('--red'),
-            sectionBkgColor: 'transparent', sectionBkgColor2: 'transparent', altSectionBkgColor: 'transparent',
-            gridColor: tok('--line'), todayLineColor: tok('--peach'), titleColor: tok('--ink'),
-            transitionColor: tok('--ink-2'), transitionLabelColor: tok('--ink'), stateLabelColor: tok('--ink'), stateBkg: tok('--tint')
-          }
-        });
-        nodes.forEach(function (el) { el.textContent = el.dataset.src; el.removeAttribute('data-processed'); });
-        mermaid.run({ nodes: nodes });
+        rendering = rendering.then(async function () {
+          css = getComputedStyle(root);
+          mermaid.initialize({
+            startOnLoad: false, securityLevel: 'strict', theme: 'base', fontFamily: tok('--font-display'),
+            gantt: { fontSize: 14, barHeight: 26, barGap: 8, topPadding: 44, leftPadding: 110, sectionFontSize: 14, numberSectionStyles: 2 },
+            sequence: { actorFontFamily: tok('--font-display'), messageFontFamily: tok('--font-display'), noteFontFamily: tok('--font-display'), actorFontSize: 15, messageFontSize: 14, noteFontSize: 14 },
+            themeVariables: {
+              background: tok('--surface'), primaryColor: tok('--tint'), primaryTextColor: tok('--ink'),
+              primaryBorderColor: tok('--tint-line'), lineColor: tok('--ink-2'), secondaryColor: tok('--surface'),
+              tertiaryColor: tok('--ground'), edgeLabelBackground: tok('--surface'), fontSize: '15px',
+              noteBkgColor: tok('--surface-2'), noteTextColor: tok('--ink'), noteBorderColor: tok('--line-strong'),
+              actorBkg: tok('--surface-2'), actorBorder: tok('--ink-2'), actorTextColor: tok('--ink'),
+              signalColor: tok('--ink-2'), signalTextColor: tok('--ink'), labelBoxBkgColor: tok('--surface-2'),
+              labelTextColor: tok('--ink'), loopTextColor: tok('--ink'),
+              taskBkgColor: tok('--tint'), taskBorderColor: tok('--tint-line'), taskTextColor: tok('--ink'), taskTextOutsideColor: tok('--ink'),
+              taskTextLightColor: tok('--ink'), taskTextDarkColor: tok('--ink'),
+              activeTaskBkgColor: tok('--accent-soft'), activeTaskBorderColor: tok('--accent'),
+              doneTaskBkgColor: tok('--surface-2'), doneTaskBorderColor: tok('--line-strong'),
+              critBkgColor: tok('--red-soft'), critBorderColor: tok('--red'),
+              sectionBkgColor: 'transparent', sectionBkgColor2: 'transparent', altSectionBkgColor: 'transparent',
+              gridColor: tok('--line'), todayLineColor: tok('--peach'), titleColor: tok('--ink'),
+              transitionColor: tok('--ink-2'), transitionLabelColor: tok('--ink'), stateLabelColor: tok('--ink'), stateBkg: tok('--tint')
+            }
+          });
+          nodes.forEach(function (el) { el.textContent = el.dataset.src; el.removeAttribute('data-processed'); });
+          await mermaid.run({ nodes: nodes });
+        }).catch(function (error) { console.error('Mermaid render failed:', error); });
+        return rendering;
       }
       render();
       document.addEventListener('themechange', render);

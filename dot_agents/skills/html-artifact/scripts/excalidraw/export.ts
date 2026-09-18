@@ -9,10 +9,12 @@ const diagram = await file.json();
 if (!diagram || typeof diagram.alt !== 'string' || !diagram.alt.trim() || !Array.isArray(diagram.elements) || !diagram.elements.length) {
   throw new Error('Expected { alt: "description", elements: [Excalidraw element skeletons] }');
 }
-const types = new Set(['rectangle', 'ellipse', 'diamond', 'text', 'arrow', 'line', 'freedraw']);
+const types = new Set(['rectangle', 'ellipse', 'diamond', 'text', 'arrow', 'line']);
 const ids = new Set<string>();
 for (const [index, el] of diagram.elements.entries()) {
   if (!el || !types.has(el.type) || !Number.isFinite(el.x) || !Number.isFinite(el.y)) throw new Error('Every element needs a supported type and finite x/y');
+  if (el.type === 'text' && typeof el.text !== 'string') throw new Error('Text elements need a string text field');
+  if (el.label != null && typeof el.label.text !== 'string') throw new Error('Element labels need a string text field');
   for (const key of ['width', 'height', 'fontSize']) {
     if (el[key] !== undefined && (!Number.isFinite(el[key]) || el[key] < 0)) throw new Error(`Invalid ${key}`);
   }
@@ -38,7 +40,8 @@ const server = Bun.serve({ hostname: '127.0.0.1', port: 0, fetch(request) {
   return new Response('Not found', { status: 404 });
 } });
 let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
-const deadline = setTimeout(() => { void browser?.close(); server.stop(true); }, 60_000);
+let timedOut = false;
+const deadline = setTimeout(() => { timedOut = true; void browser?.close(); server.stop(true); }, 60_000);
 try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -49,7 +52,7 @@ try {
   await page.waitForFunction(() => typeof window.exportDiagram === 'function');
   const result = await page.evaluate(data => window.exportDiagram(data), diagram);
   for (const svg of [result.light, result.dark]) {
-    if (!svg.startsWith('<svg') || !svg.includes('data:font/')) throw new Error('Export is missing SVG or embedded fonts');
+    if (!svg.startsWith('<svg') || (svg.includes('<text') && !svg.includes('data:font/'))) throw new Error('Export is missing SVG or embedded fonts');
   }
   const escape = (value: string) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   const images = ['<div class="excalidraw-images" tabindex="0" role="group" aria-label="Scrollable diagram">'];
@@ -59,9 +62,14 @@ try {
     images.push(`<img class="excalidraw-${mode}" src="data:image/svg+xml;base64,${Buffer.from(result[mode]).toString('base64')}" alt="${escape(diagram.alt)}">`);
   }
   images.push('</div>');
-  await writeFile(`${prefix}.images.html`, images.join('\n') + '\n');
+  const fragment = images.join('\n') + '\n';
+  await writeFile(`${prefix}.images.html`, fragment);
   await writeFile(`${prefix}.excalidraw`, result.scene + '\n');
   console.log(`Exported ${prefix}.{light.svg,dark.svg,images.html,excalidraw}`);
+  console.log(`Embedded diagram: ${Buffer.byteLength(fragment)} bytes (page limit: 2,000,000 bytes)`);
+} catch (error) {
+  if (timedOut) throw new Error('Excalidraw export timed out after 60 seconds', { cause: error });
+  throw error;
 } finally {
   clearTimeout(deadline);
   await browser?.close();

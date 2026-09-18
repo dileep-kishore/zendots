@@ -7,8 +7,8 @@ Use T3's built-in browser for visual review when working in T3.
 
 ## Run
 
-Requires Bun, tested with 1.4.2. The first run needs network access to download
-the locked packages and Playwright's matching Chromium headless shell. On
+Requires Bun 1.4.2 or newer, tested with 1.4.2. The first run needs network
+access to download the locked packages and Playwright's matching Chromium headless shell. On
 Linux, Chromium also needs its usual system libraries; if launch reports a
 missing library, resolve that host dependency rather than changing renderers.
 
@@ -29,16 +29,26 @@ The command creates:
   `<figure>` in the current template and add a caption. Do not link to the SVG
   files from the page; the fragment already embeds both images.
 
+Keep the authored `docs/<slug>.<name>.json` and editable `.excalidraw` source.
+After pasting the fragment, remove the generated `.light.svg`, `.dark.svg`,
+and `.images.html` intermediates unless they are wanted as separate exports.
+The command prints the embedded fragment's byte count. The complete HTML page
+warns above 1 MB and fails validation above 2 MB, so check the assembled page.
+
 The authored JSON remains the input for regeneration. Manual changes to the
 `.excalidraw` output do not update that JSON; preserve those edits and export
 them from Excalidraw rather than overwriting them with a regeneration.
+Regeneration may change generated text-element IDs in the editable scene;
+compare the drawing rather than expecting byte-identical scene JSON.
 
 ## Author the diagram
 
 Start from `assets/excalidraw-example.json`. The input has a nonempty `alt`
 description and an `elements` array of Excalidraw element skeletons. Each
 element needs `type`, `x`, and `y`. Supported types are rectangle, ellipse,
-diamond, text, arrow, line, and freedraw. Use `label: { "text": "..." }` for
+diamond, text, arrow, and line. For a sketched stroke, use `line` with a
+`points` array; incomplete `freedraw` elements are not supported by the skeleton
+converter. Use `label: { "text": "..." }` for
 text inside shapes; use `start: { "id": "..." }` and `end: { "id": "..." }`
 to attach arrows. Element IDs must be unique.
 
