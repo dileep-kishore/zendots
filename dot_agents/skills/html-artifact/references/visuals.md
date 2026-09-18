@@ -7,18 +7,22 @@ shows its point, or none when a sentence says it faster.
 
 | The section answers | Use |
 |---|---|
-| How does the process or decision flow? | Mermaid `flowchart` |
-| Who calls whom, in what order? | Mermaid `sequenceDiagram` |
-| When does each piece happen? | Mermaid `gantt`, or `.timeline` for a short list |
-| Which states and transitions exist? | Mermaid `stateDiagram-v2` |
+| How does the process or decision flow? | Excalidraw flow diagram |
+| Who calls whom, in what order? | Excalidraw sequence diagram |
+| When does each piece happen? | Excalidraw schedule, or `.timeline` for a short list |
+| Which states and transitions exist? | Excalidraw state diagram |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
 | What are the two to four headline numbers? | `.tiles` |
-| What mechanism do none of those express? | Inline SVG |
+| What mechanism do none of those express? | Excalidraw explanatory diagram |
 | What exactly does the reader run or paste? | `<pre><code class="language-...">` |
 
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
+
+Diagram tool selection follows `../SKILL.md`: Excalidraw is the default;
+hand-drawn Mermaid requires the user's explicit choice, including for huge
+diagrams. An unanswered question leaves Excalidraw selected.
 
 ## Figure and table markup
 
@@ -37,8 +41,8 @@ full column. Write captions to the three-part shape in
 ```
 
 Mark the one value or node the reader must notice with `class="hot"` (cells,
-tile numbers) or the Mermaid `hot` class below; never more than one per
-figure.
+tile numbers) or the palette's mauve accent in a diagram; never more than one
+per figure.
 
 ## Code
 
@@ -54,11 +58,33 @@ sheet. Without the class a block renders as plain monospace, which is right for
 console transcripts and output. Escape `<`, `>` and `&`, and keep the opening
 tag tight against the first character or the block gains a blank first line.
 
-## Mermaid
+## Excalidraw
+
+Generate an editable Excalidraw scene and export SVG for the figure. Local
+generation uses the [bundled exporter](excalidraw.md); MCP is optional. Paste its
+`.images.html` fragment inside the figure; the template selects the matching
+light/dark SVG. Keep the `.excalidraw`
+source alongside the artifact or provide it as an embedded download.
+Use the house palette, preserve legible labels, and check arrow bindings,
+spacing, and the rendered result in both themes. Load fonts before measuring
+text and embed them in SVG exports. For exported SVGs with embedded font
+styles, use an `<img src="data:image/svg+xml;base64,..." alt="...">`; the
+inline-SVG restrictions below apply to markup inserted directly into the page.
+
+## Mermaid, only when chosen by the user
+
+For the hand-drawn alternative, set `look: handDrawn` and a fixed
+`handDrawnSeed` in the diagram's frontmatter. Do not silently substitute a
+classic Mermaid diagram if its diagram type does not support this look.
 
 ```html
 <figure>
   <pre class="mermaid">
+---
+config:
+  look: handDrawn
+  handDrawnSeed: 42
+---
 flowchart LR
   A[Fetch] -->|raw pages| B[Parse]
   B -->|records| C[Embed]

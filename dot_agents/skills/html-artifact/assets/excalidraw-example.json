@@ -1,0 +1,11 @@
+{
+  "alt": "A brief leads to a sketch, which can be revised before publication.",
+  "elements": [
+    { "type": "rectangle", "id": "brief", "x": 20, "y": 60, "width": 160, "height": 90, "label": { "text": "Brief" } },
+    { "type": "rectangle", "id": "sketch", "x": 280, "y": 60, "width": 180, "height": 90, "strokeColor": "$accent", "label": { "text": "Sketch" } },
+    { "type": "rectangle", "id": "publish", "x": 560, "y": 60, "width": 180, "height": 90, "strokeColor": "$green", "label": { "text": "Publish" } },
+    { "type": "arrow", "x": 185, "y": 105, "points": [[0, 0], [90, 0]], "start": { "id": "brief" }, "end": { "id": "sketch" }, "label": { "text": "scope", "fontSize": 18 } },
+    { "type": "arrow", "x": 465, "y": 105, "points": [[0, 0], [90, 0]], "start": { "id": "sketch" }, "end": { "id": "publish" }, "label": { "text": "ready", "fontSize": 18 } },
+    { "type": "text", "x": 290, "y": 200, "text": "Revise the sketch first", "fontSize": 20, "strokeColor": "$accent" }
+  ]
+}

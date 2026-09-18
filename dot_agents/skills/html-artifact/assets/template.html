@@ -175,6 +175,15 @@ td.num, th.num { text-align: right; }
 .not-doing { border: 1px dashed var(--line-strong); padding: 10px 14px 10px 32px; }
 pre.mermaid { background: none; border: 0; padding: 0; overflow-x: auto; font-size: 1rem; }
 .mermaid svg { max-width: 100%; height: auto; }
+.excalidraw-images { overflow-x: auto; }
+.excalidraw-images img { display: block; width: 100%; min-width: 640px; height: auto; }
+.excalidraw-images .excalidraw-light { display: none; }
+:root[data-theme="light"] .excalidraw-dark { display: none; }
+:root[data-theme="light"] .excalidraw-light { display: block; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .excalidraw-dark { display: none; }
+  :root:not([data-theme="dark"]) .excalidraw-light { display: block; }
+}
 .status { display: inline-flex; gap: 6px; align-items: center; }
 .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .status.good { color: var(--green); } .status.warn { color: var(--yellow); } .status.bad { color: var(--red); }
@@ -196,6 +205,8 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   .page { grid-template-columns: 1fr; }
   h2 { break-after: avoid; }
   figure, .tile, table { break-inside: avoid; }
+  .excalidraw-images .excalidraw-dark { display: none !important; }
+  .excalidraw-images .excalidraw-light { display: block !important; min-width: 0; }
 }
 </style>
 </head>

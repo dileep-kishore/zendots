@@ -28,6 +28,14 @@ For each section pick the one visual that shows the point, using the table in
 [references/visuals.md](references/visuals.md), or none when a sentence is
 faster. Done when every section has a visual decision written down.
 
+Use Excalidraw for diagrams by default. For a huge diagram, you may ask whether
+the user wants hand-drawn Mermaid instead. Switch only when the user explicitly
+chooses it; no response or no clear decision means continue with Excalidraw.
+Size, complexity, and convenience never trigger an automatic switch.
+Generate diagrams with the bundled Bun command in
+[references/excalidraw.md](references/excalidraw.md). It installs locked packages
+outside the skill and repository; do not reconstruct the setup or vendor dependencies.
+
 ## 4. Write concisely
 
 Follow `references/writing.md`. Prose covers only what the visual cannot.
@@ -42,9 +50,11 @@ Copy `assets/template.html` to the destination, replace every
 `<!-- SLOT: ... -->`, and leave the tokens, layout CSS, and scripts untouched.
 Give each h2 an id. Every visual sits in a `<figure>` with a manuscript-style
 caption (tables in `<figure class="table">`, caption first); the template
-numbers them. Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
+numbers them. Embed Excalidraw SVG exports as described in `references/visuals.md`.
+User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
 `<div class="vega"><script type="application/json">`. `assets/example.html`
 shows every component once; it is a catalogue, not a model for length.
+Its Mermaid example demonstrates an opt-in component, not the diagram default.
 
 To update an existing page, edit its `<main>` in place and leave its copied
 CSS and script alone; regenerate from the template only when the user asks
