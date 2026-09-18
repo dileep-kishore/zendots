@@ -7,8 +7,9 @@ Use T3's built-in browser for visual review when working in T3.
 
 ## Run
 
-Requires Bun 1.4.2 or newer, tested with 1.4.2. The first run needs network
-access to download the locked packages and Playwright's matching Chromium headless shell. On
+Requires Bun 1.4.0 or newer. Tested with 1.4.0 on Linux x64 and 1.4.2 on
+macOS arm64. The first run needs network access to download the locked packages
+and Playwright's matching Chromium headless shell. On
 Linux, Chromium also needs its usual system libraries; if launch reports a
 missing library, resolve that host dependency rather than changing renderers.
 
