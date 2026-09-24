@@ -1,15 +1,6 @@
 {
   "version": 3,
   "skills": {
-    "find-skills": {
-      "source": "vercel-labs/skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/vercel-labs/skills.git",
-      "skillPath": "skills/find-skills/SKILL.md",
-      "skillFolderHash": "76a98a285cb0434f3d39e1a873823556330e398b",
-      "installedAt": "2026-03-19T23:13:05.878Z",
-      "updatedAt": "2026-08-01T04:31:16.878Z"
-    },
     "orca-cli": {
       "source": "stablyai/orca",
       "sourceType": "github",

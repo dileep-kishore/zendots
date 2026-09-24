@@ -25,8 +25,13 @@ The Skills CLI (`npx skills`) is the package manager for the open agent skills e
 **Key commands:**
 
 - `npx skills find [query] [--owner <owner>]` - Search for skills interactively or by keyword, optionally scoped to a GitHub owner
-- `npx skills add <package>` - Install a skill from GitHub or other sources
-- `npx skills update` - Update all installed skills
+- `agent-skills.sh add <package>` - Install a skill from GitHub or other sources
+- `agent-skills.sh update` - Update all installed skills
+
+Install and update only through `agent-skills.sh`, never a bare `npx skills
+add`: the wrapper runs the CLI from `$HOME` so the install lands in the global
+store, then records the store in chezmoi. `npx skills find` only searches and
+is safe to run directly.
 
 **Browse skills at:** https://skills.sh/
 
@@ -87,7 +92,7 @@ React and Next.js performance optimization guidelines from Vercel Engineering.
 (185K installs)
 
 To install it:
-npx skills add vercel-labs/agent-skills@react-best-practices
+agent-skills.sh add vercel-labs/agent-skills@react-best-practices
 
 Learn more: https://skills.sh/vercel-labs/agent-skills/react-best-practices
 ```
@@ -97,10 +102,12 @@ Learn more: https://skills.sh/vercel-labs/agent-skills/react-best-practices
 If the user wants to proceed, you can install the skill for them:
 
 ```bash
-npx skills add <owner/repo@skill> -g -y
+agent-skills.sh add <owner/repo@skill> -g -y
 ```
 
 The `-g` flag installs globally (user-level) and `-y` skips confirmation prompts.
+Before installing, check `~/.agents/skills` and the enabled Claude Code plugins
+for a skill that already does the same job; a duplicate loads twice.
 
 ## Common Skill Categories
 
@@ -128,7 +135,7 @@ If no relevant skills exist:
 
 1. Acknowledge that no existing skill was found
 2. Offer to help with the task directly using your general capabilities
-3. Suggest the user could create their own skill with `npx skills init`
+3. Suggest the user could create their own skill with the `create-skill` skill
 
 Example:
 
@@ -136,6 +143,5 @@ Example:
 I searched for skills related to "xyz" but didn't find any matches.
 I can still help you with this task directly! Would you like me to proceed?
 
-If this is something you do often, you could create your own skill:
-npx skills init my-xyz-skill
+If this is something you do often, I can write a skill for it with create-skill.
 ```
