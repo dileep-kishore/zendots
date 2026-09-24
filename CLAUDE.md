@@ -42,15 +42,12 @@ The repository follows chezmoi's naming conventions where files/directories are 
 ### Chezmoi Operations
 
 ```bash
-# Apply dotfiles from repository to home directory
-just apply
-# or
-chezmoi apply
+# Preview what a changed path would do (diff is not recursive without -r)
+chezmoi diff -r ~/.zshrc
 
-# Show diff between repository and current home directory
-just diff
-# or
-chezmoi diff
+# Apply only the paths you changed, once the diff is approved
+chezmoi apply ~/.zshrc
+# `just apply` / `just diff` run the unscoped forms; see "Applying changes"
 
 # Edit a file in the repository (chezmoi will handle the dot_ prefix translation)
 chezmoi edit ~/.zshrc
@@ -103,8 +100,7 @@ installing on both produces Syncthing conflict files.
   `~/.codex/skills/frontend-design` are chezmoi-managed relative symlinks into
   `~/.claude/plugins/marketplaces/claude-plugins-official/`, the checkout the
   plugin auto-updater pulls, so every harness tracks the plugin. Disabling that
-  plugin or removing the marketplace dangles the links. `~/.agentskills/` no
-  longer exists.
+  plugin or removing the marketplace dangles the links.
 
 #### Fetched skills
 
