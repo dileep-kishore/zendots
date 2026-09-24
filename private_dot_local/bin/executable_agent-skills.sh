@@ -4,7 +4,7 @@
 #
 #   agent-skills.sh add mattpocock/skills
 #   agent-skills.sh update
-#   agent-skills.sh remove wayfinder
+#   agent-skills.sh remove <name>
 #   agent-skills.sh sync            # record a hand-authored skill, no installer
 #
 # A skill that carries an upstream runtime (a Node package, a binary) is
