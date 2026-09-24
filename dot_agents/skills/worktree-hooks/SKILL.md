@@ -15,8 +15,9 @@ script the host runs on worktree creation.
 
 ## 1. Ask which host
 
-Use the host the user named. If they did not name one, ask — do not guess, and
-do not try to detect it.
+Use the host the user named. If they did not name one, ask. Do not guess or
+try to detect it: hosts leave no reliable trace in the repository, and a
+script written for the wrong host reads variables that host never sets.
 
 | Host | Root var | Worktree var | Teardown hook | Where the script lives |
 |---|---|---|---|---|

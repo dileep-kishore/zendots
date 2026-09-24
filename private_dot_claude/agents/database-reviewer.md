@@ -47,7 +47,7 @@ psql -c "SELECT indexrelname, idx_scan, idx_tup_read FROM pg_stat_user_indexes O
 
 ## Key Principles
 
-- **Index foreign keys** — Always, no exceptions
+- **Index foreign keys** — Postgres does not index them automatically, so joins and cascading deletes on an unindexed FK scan the whole table
 - **Use partial indexes** — `WHERE deleted_at IS NULL` for soft deletes
 - **Covering indexes** — `INCLUDE (col)` to avoid table lookups
 - **SKIP LOCKED for queues** — 10x throughput for worker patterns
