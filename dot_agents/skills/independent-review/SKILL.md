@@ -105,8 +105,7 @@ subagents and harness-tracked background tasks notify on completion; do not poll
 them. Start external CLIs in the background or with a timeout well under the
 shell tool's cap, since a killed shell call kills the reviewer mid-run. Then
 poll: wait a bounded interval, check the report for the token, repeat until it
-appears or the deadline passes, with a brief progress update every few cycles.
-At the deadline, report incomplete work and its handles. Do not silently
+appears or the deadline passes. At the deadline, report incomplete work and its handles. Do not silently
 abandon owned processes; stop them when cancellation is authorized, or
 explicitly hand them off. Preserve reports for inspection.
 

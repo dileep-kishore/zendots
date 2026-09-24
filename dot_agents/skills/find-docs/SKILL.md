@@ -76,19 +76,13 @@ Each result includes:
 - **Benchmark Score** — Quality indicator (100 is the highest score)
 - **Versions** — List of versions if available. Use one of those versions if the user provides a version in their query. The format is `/org/project/version`.
 
-### Selection process
+### Choosing a match
 
-1. Analyze the query to understand what library/package the user is looking for.
-   Use the official name and punctuation, such as "Next.js" or "Three.js".
-2. Select the most relevant match based on:
-   - Name similarity to the query (exact matches prioritized)
-   - Description relevance to the query's intent
-   - Documentation coverage (prioritize libraries with higher Code Snippet counts)
-   - Source reputation (consider libraries with High or Medium reputation more authoritative)
-   - Benchmark score (higher is better, 100 is the maximum)
-3. If multiple good matches exist, acknowledge this but proceed with the most relevant one
-4. If no good matches exist, try an alternate name or query within the three-call limit; disclose if results remain insufficient
-5. For ambiguous queries, request clarification before proceeding with a best-guess match
+Search by the official name and punctuation ("Next.js", "Three.js"). Prefer an
+exact name match, then description fit, snippet count, reputation, and
+benchmark score. When several fit, say so and proceed with the best; ask only
+when the request itself is ambiguous. When nothing fits, retry with an
+alternate name within the three-call limit and disclose thin results.
 
 ### Version-specific IDs
 
@@ -116,7 +110,7 @@ npx ctx7@latest docs /prisma/prisma "How to define one-to-many relations with ca
 
 ### Writing good queries
 
-The query directly affects the quality of results. Be specific and include relevant details. Do not include any sensitive or confidential information such as API keys, passwords, credentials, personal data, or proprietary code in your query.
+The query directly affects the quality of results. Be specific and include relevant details.
 
 | Quality | Example |
 |---------|---------|
@@ -149,10 +143,3 @@ If a command fails with a quota error ("Monthly quota reached" or "quota exceede
 3. If they cannot or choose not to authenticate, answer from training knowledge and clearly note it may be outdated
 
 Do not silently fall back to training data — always tell the user why Context7 was not used.
-
-## Common Mistakes
-
-- Library IDs require a `/` prefix — `/facebook/react` not `facebook/react`
-- Always run `npx ctx7@latest library` first — `npx ctx7@latest docs react "hooks"` will fail without a valid ID
-- Use descriptive queries, not single words — `"React useEffect cleanup function"` not `"hooks"`
-- Do not include sensitive information (API keys, passwords, credentials) in queries

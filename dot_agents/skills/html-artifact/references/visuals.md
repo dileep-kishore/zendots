@@ -20,10 +20,6 @@ shows its point, or none when a sentence says it faster.
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
 
-Diagram tool selection follows `../SKILL.md`: Excalidraw is the default;
-hand-drawn Mermaid requires the user's explicit choice, including for huge
-diagrams. An unanswered question leaves Excalidraw selected.
-
 ## Figure and table markup
 
 Every visual lives in a `<figure>`; the template frames it, stamps it, and

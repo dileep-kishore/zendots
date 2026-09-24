@@ -41,22 +41,17 @@ Then extract:
 
 If no voice references are given, default to a direct, operator-style voice: concrete, practical, and low on hype.
 
-## Banned Patterns
+## Register
 
-Delete and rewrite any of these:
-- generic openings like "In today's rapidly evolving landscape"
-- filler transitions such as "Moreover" and "Furthermore"
-- hype phrases like "game-changer", "cutting-edge", or "revolutionary"
-- vague claims without evidence
-- biography or credibility claims not backed by provided context
+Open on the concrete thing rather than a scene-setting generality, join
+paragraphs with plain connectives, and let evidence carry the claim instead of
+intensifiers. Every claim needs support from the supplied material.
 
 ## Writing Process
 
-1. Clarify the audience and purpose.
-2. Build a skeletal outline with one purpose per section.
-3. Start each section with evidence, example, or scene.
-4. Expand only where the next sentence earns its place.
-5. Remove anything that sounds templated or self-congratulatory.
+Know the audience and purpose before drafting; ask when the brief leaves them
+open. Give each section one purpose, and cut anything templated or
+self-congratulatory.
 
 ## Structure Guidance
 

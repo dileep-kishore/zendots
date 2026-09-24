@@ -60,11 +60,6 @@ A comparison closes with the choice and one reason. A plan carries a
 
 Drop any part the ask does not need.
 
-## Voice check
-
-Apply the `unslop` rules while drafting. Run the `humanizer` skill over the
-finished prose before the checker.
-
 ## Publishing from Claude Code, on request only
 
 The Artifact tool wraps a page in its own document skeleton. Give it a copy

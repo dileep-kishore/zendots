@@ -69,8 +69,12 @@ Propose the exact fold, then wait:
 Rebase? [y / n]
 ```
 
-On approval, `git commit --fixup <sha>` then `git rebase -i --autosquash
-"origin/$base"`.
+On approval, fold with a scripted todo; the harness cannot open the rebase
+editor, and `git commit --fixup` has nothing to commit once step 2 is done:
+
+```bash
+GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
+```
 
 Rewrite only commits absent from the remote. A pushed commit stays as it is;
 say so rather than rewriting shared history.
@@ -132,8 +136,7 @@ description in embedded mode, returning only the final text. Keep the tone
 natural and technical. Preserve facts, verification results, uncertainty,
 code, commands, links, and structure: the section order, headings, and title
 style set above, or the repository template's. Humanizer rewrites sentences,
-not the skeleton. Keep the title under 70 characters. Do not invent claims or
-add personality that does not fit.
+not the skeleton. Do not invent claims or add personality that does not fit.
 
 ## 6. Push and open
 

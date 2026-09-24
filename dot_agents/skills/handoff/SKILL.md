@@ -58,7 +58,7 @@ does not need.
 ## 3. Save privately, then show it
 
 ```bash
-dir=$(mktemp -d) && chmod 700 "$dir" && stat -c '%a' "$dir"   # expect 700
+dir=$(mktemp -d) && chmod 700 "$dir" && ls -ld "$dir"   # expect drwx------
 ```
 
 Write `"$dir"/handoff-<slug>.md`, report the absolute path, and print the

@@ -22,7 +22,7 @@ Inspired by the visual exploration approach showcased in work by [zarazhangrui](
 1. **Zero dependencies**: default to one self-contained HTML file with inline CSS and JS.
 2. **Viewport fit is mandatory**: every slide must fit inside one viewport with no internal scrolling.
 3. **Show, don't tell**: use visual previews instead of abstract style questionnaires.
-4. **Distinctive design**: avoid generic purple-gradient, Inter-on-white, template-looking decks.
+4. **Distinctive design**: avoid the default deck look: purple or blue gradient on white, Inter or a system font as the only typographic voice, centered title over three equal icon cards, pill-shaped buttons, numbered "01/02/03" section labels, and italic accent words in headlines.
 5. **Production quality**: keep code commented, accessible, responsive, and performant.
 
 Before generating, read `STYLE_PRESETS.md` for the viewport-safe CSS base, density limits, preset catalog, and CSS gotchas.
@@ -53,7 +53,7 @@ If the user already knows the desired preset, skip previews and use it directly.
 
 Otherwise:
 1. Ask what feeling the deck should create: impressed, energized, focused, inspired.
-2. Generate **3 single-slide preview files** in `.ecc-design/slide-previews/`.
+2. Generate **3 single-slide preview files** in a temporary directory (the harness scratchpad if one is provided, otherwise a fresh `mktemp -d` directory).
 3. Each preview must be self-contained, show typography/color/motion clearly, and stay under roughly 100 lines of slide content.
 4. Ask the user which preview to keep or what elements to mix.
 
@@ -90,12 +90,7 @@ Use the density limits and mandatory CSS block in `STYLE_PRESETS.md`.
 
 ### 6. Validate
 
-Check the finished deck at these sizes:
-- 1920x1080
-- 1280x720
-- 768x1024
-- 375x667
-- 667x375
+Check the finished deck at the validation sizes listed in `STYLE_PRESETS.md`.
 
 If browser automation is available, use it to verify no slide overflows and that keyboard navigation works.
 
@@ -168,12 +163,6 @@ Use these maxima unless the user explicitly asks for denser slides and readabili
 - code blocks that need scrolling
 - fixed-height content boxes that break on short screens
 - invalid negated CSS functions like `-clamp(...)`
-
-## Related ECC Skills
-
-- `frontend-patterns` for component and interaction patterns around the deck
-- `liquid-glass-design` when a presentation intentionally borrows Apple glass aesthetics
-- `e2e-testing` if you need automated browser verification for the final deck
 
 ## Deliverable Checklist
 

@@ -28,11 +28,8 @@ For each section pick the one visual that shows the point, using the table in
 [references/visuals.md](references/visuals.md), or none when a sentence is
 faster. Done when every section has a visual decision written down.
 
-Use Excalidraw for diagrams by default. For a huge diagram, you may ask whether
-the user wants hand-drawn Mermaid instead. Switch only when the user explicitly
-chooses it; no response or no clear decision means continue with Excalidraw.
-Size, complexity, and convenience never trigger an automatic switch.
-Generate diagrams with the bundled Bun command in
+Diagrams are Excalidraw. For a huge diagram you may offer hand-drawn Mermaid,
+and use it only when the user explicitly chooses it. Generate diagrams with the bundled Bun command in
 [references/excalidraw.md](references/excalidraw.md). It installs locked packages
 outside the skill and repository; do not reconstruct the setup or vendor dependencies.
 

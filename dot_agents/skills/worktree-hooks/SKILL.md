@@ -1,6 +1,6 @@
 ---
 name: worktree-hooks
-description: Generate the setup (and where supported, teardown) shell script that makes a newly created git worktree usable, for Orca, T3 Code, or any host that runs a script on worktree creation. Explores the repo to decide which gitignored files to copy, which large data to symlink, and which dependencies to reinstall, then delivers the script in the form that host expects. Use when the user says "worktree setup script", "orca worktree hooks", "t3 code setup script", "setup action", "t3.json", "archive script", or asks how to make new worktrees usable without manual setup.
+description: Use when a new git worktree needs the setup (and where supported, teardown) shell script that makes it usable without manual steps — Orca worktree hooks, a T3 Code setup action or `t3.json`, an archive script, or any host that runs a script on worktree creation.
 ---
 
 # Worktree Hooks

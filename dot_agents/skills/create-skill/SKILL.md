@@ -65,8 +65,10 @@ Rules that matter:
   [references/writing-for-agents.md](references/writing-for-agents.md): the
   description is a pointer whose wording decides whether the skill fires;
   manual-only skills cost no context but must be remembered.
-- Prefer exact commands over prose. Explain why a rule exists in one clause
-  rather than shouting MUST.
+- Exact commands in fenced blocks for fragile operations (git, destructive
+  commands, precise CLI invocations); prose that states the outcome and how to
+  check it for judgment calls. Explain why a rule exists in one clause rather
+  than shouting MUST.
 - Skills are harness-neutral. Do not reference Claude-only tools by name; say
   "spawn a subagent" or give a shell command.
 

@@ -23,7 +23,7 @@ All timestamps in both formats are UTC; cite them as UTC.
 
 ```bash
 slug=$(pwd | tr / -)
-find ~/.claude/projects/"$slug" -maxdepth 1 -name '*.jsonl' -mtime -7 -printf '%TY-%Tm-%Td %TH:%TM %p\n' | sort -r
+find ~/.claude/projects/"$slug" -maxdepth 1 -name '*.jsonl' -mtime -7 -exec ls -lt {} +
 grep -l -i '<topic>' ~/.claude/projects/"$slug"/*.jsonl
 grep -n -i '<topic>' <file> | head -40        # then sed -n 'A,Bp' the spans
 ```
@@ -45,7 +45,7 @@ grep -n -i '<topic>' <file> | head -40        # then sed -n 'A,Bp' the spans
 - `~/.codex/archived_sessions/` exists; not inspected.
 
 ```bash
-find ~/.codex/sessions -name '*.jsonl' -mtime -7 -printf '%TY-%Tm-%Td %TH:%TM %p\n' | sort -r
+find ~/.codex/sessions -name '*.jsonl' -mtime -7 -exec ls -lt {} +
 for f in $(find ~/.codex/sessions -name '*.jsonl' -mtime -7); do
   head -1 "$f" | grep -q "\"cwd\":\"$PWD\"" && head -1 "$f" | grep -q '"thread_source":"user"' && echo "$f"
 done

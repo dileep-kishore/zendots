@@ -32,9 +32,8 @@ or start another coordinator. It requires the sibling `independent-review` skill
    for `tui-idle` with a timeout of at most 60 seconds, check the report for
    the brief's completion token as its last line, read the terminal for a
    blocking prompt or error, then repeat until the token appears or the shared
-   deadline passes. Give a brief progress update every few cycles. Never
-   return after a single wait, and never treat idle or a nonempty report as
-   done.
+   deadline passes. Never return after a single wait, and never treat idle or
+   a nonempty report as done.
 
 For a requested handoff, return terminal handles, report paths, and the current
 CLI command to inspect each terminal. Otherwise wait, read completed reports,
