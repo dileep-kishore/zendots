@@ -22,13 +22,13 @@ This skill ensures all code follows security best practices and identifies poten
 
 ### 1. Secrets Management
 
-#### ❌ NEVER Do This
+#### Bad
 ```typescript
 const apiKey = "sk-proj-xxxxx"  // Hardcoded secret
 const dbPassword = "password123" // In source code
 ```
 
-#### ✅ ALWAYS Do This
+#### Good
 ```typescript
 const apiKey = process.env.OPENAI_API_KEY
 const dbUrl = process.env.DATABASE_URL
@@ -44,7 +44,7 @@ if (!apiKey) {
 - [ ] All secrets in environment variables
 - [ ] `.env.local` in .gitignore
 - [ ] No secrets in git history
-- [ ] Production secrets in hosting platform (Vercel, Railway)
+- [ ] Production secrets injected by the hosting platform or a secrets manager
 
 ### 2. Input Validation
 
@@ -108,22 +108,16 @@ function validateFileUpload(file: File) {
 
 ### 3. SQL Injection Prevention
 
-#### ❌ NEVER Concatenate SQL
+#### Bad: concatenated SQL
 ```typescript
 // DANGEROUS - SQL Injection vulnerability
 const query = `SELECT * FROM users WHERE email = '${userEmail}'`
 await db.query(query)
 ```
 
-#### ✅ ALWAYS Use Parameterized Queries
+#### Good: parameterized queries
 ```typescript
 // Safe - parameterized query
-const { data } = await supabase
-  .from('users')
-  .select('*')
-  .eq('email', userEmail)
-
-// Or with raw SQL
 await db.query(
   'SELECT * FROM users WHERE email = $1',
   [userEmail]
@@ -134,7 +128,6 @@ await db.query(
 - [ ] All database queries use parameterized queries
 - [ ] No string concatenation in SQL
 - [ ] ORM/query builder used correctly
-- [ ] Supabase queries properly sanitized
 
 ### 4. Authentication & Authorization
 
@@ -168,26 +161,9 @@ export async function deleteUser(userId: string, requesterId: string) {
 }
 ```
 
-#### Row Level Security (Supabase)
-```sql
--- Enable RLS on all tables
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-
--- Users can only view their own data
-CREATE POLICY "Users view own data"
-  ON users FOR SELECT
-  USING (auth.uid() = id);
-
--- Users can only update their own data
-CREATE POLICY "Users update own data"
-  ON users FOR UPDATE
-  USING (auth.uid() = id);
-```
-
 #### Verification Steps
 - [ ] Tokens stored in httpOnly cookies (not localStorage)
 - [ ] Authorization checks before sensitive operations
-- [ ] Row Level Security enabled in Supabase
 - [ ] Role-based access control implemented
 - [ ] Session management secure
 
@@ -208,15 +184,22 @@ function renderUserContent(html: string) {
 ```
 
 #### Content Security Policy
+
+A static header like the one below suits apps that ship no inline scripts or
+styles. Frameworks that inject inline scripts (Next.js App Router, for one)
+need a per-request nonce generated in middleware and added to `script-src`;
+follow the framework's CSP guide. Do not fall back to `'unsafe-inline'` or
+`'unsafe-eval'` for scripts.
+
 ```typescript
-// next.config.js
+// next.config.js -- static policy for an app with no inline scripts
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
     value: `
       default-src 'self';
-      script-src 'self' 'unsafe-eval' 'unsafe-inline';
-      style-src 'self' 'unsafe-inline';
+      script-src 'self';
+      style-src 'self';
       img-src 'self' data: https:;
       font-src 'self';
       connect-src 'self' https://api.example.com;
@@ -335,88 +318,27 @@ catch (error) {
 - [ ] Detailed errors only in server logs
 - [ ] No stack traces exposed to users
 
-### 9. Blockchain Security (Solana)
-
-#### Wallet Verification
-```typescript
-import { verify } from '@solana/web3.js'
-
-async function verifyWalletOwnership(
-  publicKey: string,
-  signature: string,
-  message: string
-) {
-  try {
-    const isValid = verify(
-      Buffer.from(message),
-      Buffer.from(signature, 'base64'),
-      Buffer.from(publicKey, 'base64')
-    )
-    return isValid
-  } catch (error) {
-    return false
-  }
-}
-```
-
-#### Transaction Verification
-```typescript
-async function verifyTransaction(transaction: Transaction) {
-  // Verify recipient
-  if (transaction.to !== expectedRecipient) {
-    throw new Error('Invalid recipient')
-  }
-
-  // Verify amount
-  if (transaction.amount > maxAmount) {
-    throw new Error('Amount exceeds limit')
-  }
-
-  // Verify user has sufficient balance
-  const balance = await getBalance(transaction.from)
-  if (balance < transaction.amount) {
-    throw new Error('Insufficient balance')
-  }
-
-  return true
-}
-```
-
-#### Verification Steps
-- [ ] Wallet signatures verified
-- [ ] Transaction details validated
-- [ ] Balance checks before transactions
-- [ ] No blind transaction signing
-
 ### 10. Dependency Security
+
+Use the project's own package manager and lockfile. Bun is shown; the npm,
+pnpm, yarn, and uv equivalents work the same way.
 
 #### Regular Updates
 ```bash
-# Check for vulnerabilities
-npm audit
-
-# Fix automatically fixable issues
-npm audit fix
-
-# Update dependencies
-npm update
-
-# Check for outdated packages
-npm outdated
+bun audit          # known vulnerabilities
+bun outdated       # stale packages
+bun update
 ```
 
 #### Lock Files
 ```bash
-# ALWAYS commit lock files
-git add package-lock.json
-
-# Use in CI/CD for reproducible builds
-npm ci  # Instead of npm install
+# Commit the lockfile and install from it in CI for reproducible builds
+bun install --frozen-lockfile    # npm ci, pnpm install --frozen-lockfile, uv sync --locked
 ```
 
 #### Verification Steps
 - [ ] Dependencies up to date
-- [ ] No known vulnerabilities (npm audit clean)
+- [ ] No known vulnerabilities (audit clean)
 - [ ] Lock files committed
 - [ ] Dependabot enabled on GitHub
 - [ ] Regular security updates
@@ -478,16 +400,13 @@ Before ANY production deployment:
 - [ ] **Error Handling**: No sensitive data in errors
 - [ ] **Logging**: No sensitive data logged
 - [ ] **Dependencies**: Up to date, no vulnerabilities
-- [ ] **Row Level Security**: Enabled in Supabase
 - [ ] **CORS**: Properly configured
 - [ ] **File Uploads**: Validated (size, type)
-- [ ] **Wallet Signatures**: Verified (if blockchain)
 
 ## Resources
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Next.js Security](https://nextjs.org/docs/security)
-- [Supabase Security](https://supabase.com/docs/guides/auth)
 - [Web Security Academy](https://portswigger.net/web-security)
 
 ---
