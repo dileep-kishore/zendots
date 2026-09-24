@@ -43,8 +43,9 @@
 - Python: uv preferred, pixi where appropriate; Ruff, ty, type hints,
   NumPy-style docstrings, and Pydantic for validation.
 - JavaScript/TypeScript: Bun, strict TypeScript; interfaces for object shapes.
-- System packages: Paru or Homebrew. Do not use pip, conda, apt, npm, or yarn
-  unless explicitly asked.
+- System and global installs: Paru or Homebrew, not pip, conda, apt, npm, or
+  yarn, unless explicitly asked. Inside a project, use the package manager it
+  already uses.
 
 ## Git
 
