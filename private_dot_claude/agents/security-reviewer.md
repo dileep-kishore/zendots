@@ -19,6 +19,8 @@ You are an expert security specialist focused on identifying and remediating vul
 
 ## Analysis Commands
 
+Use the project's package manager for these (`npm`/`npx`, `bun`/`bunx`, `pnpm`).
+
 ```bash
 npm audit --audit-level=high
 npx eslint . --plugin security
@@ -75,14 +77,9 @@ Flag these patterns immediately:
 
 **Always verify context before flagging.**
 
-## Emergency Response
+## Critical Findings
 
-If you find a CRITICAL vulnerability:
-1. Document with detailed report
-2. Alert project owner immediately
-3. Provide secure code example
-4. Verify remediation works
-5. Rotate secrets if credentials exposed
+Put CRITICAL findings first in the report with a secure replacement. If credentials are exposed, say the secret must be rotated; do not rotate it yourself.
 
 ## Reference
 

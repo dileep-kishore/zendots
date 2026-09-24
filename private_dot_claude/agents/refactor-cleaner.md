@@ -17,6 +17,8 @@ You are an expert refactoring specialist focused on code cleanup and consolidati
 
 ## Detection Commands
 
+Run these through the project's package runner (`npx`, `bunx`, `pnpm exec`).
+
 ```bash
 npx knip                                    # Unused files, exports, dependencies
 npx depcheck                                # Unused npm dependencies
@@ -67,11 +69,4 @@ After each batch:
 2. **Test often** -- after every batch
 3. **Be conservative** -- when in doubt, don't remove
 4. **Document** -- descriptive commit messages per batch
-5. **Never remove** during active feature development or before deploys
-
-## When NOT to Use
-
-- During active feature development
-- Right before production deployment
-- Without proper test coverage
-- On code you don't understand
+5. **Never remove** during active feature development, right before a deploy, without test coverage, or in code you don't understand

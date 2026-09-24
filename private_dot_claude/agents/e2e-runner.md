@@ -38,6 +38,8 @@ agent-browser screenshot result.png
 
 When Agent Browser isn't available, use Playwright directly.
 
+Run these through the project's package runner (`npx`, `bunx`, `pnpm exec`).
+
 ```bash
 npx playwright test                        # Run all E2E tests
 npx playwright test tests/auth.spec.ts     # Run specific file
