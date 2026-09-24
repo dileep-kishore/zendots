@@ -17,12 +17,15 @@ cat > /tmp/worktree-setup.sh <<'HOOK_EOF'
 ...script...
 HOOK_EOF
 bash -n /tmp/worktree-setup.sh
-command -v pbcopy >/dev/null && pbcopy < /tmp/worktree-setup.sh \
-  || command -v wl-copy >/dev/null && wl-copy < /tmp/worktree-setup.sh \
-  || xclip -selection clipboard < /tmp/worktree-setup.sh
+if command -v pbcopy >/dev/null; then pbcopy < /tmp/worktree-setup.sh
+elif command -v wl-copy >/dev/null; then wl-copy < /tmp/worktree-setup.sh
+elif command -v xclip >/dev/null; then xclip -selection clipboard < /tmp/worktree-setup.sh
+else echo "no clipboard tool found" >&2; false
+fi
 ```
 
-Tell the user it is on the clipboard, then offer to copy the archive script next.
+If the copy succeeded, tell the user it is on the clipboard and offer to copy
+the archive script next; otherwise point them to `/tmp/worktree-setup.sh`.
 
 ## T3 Code
 
