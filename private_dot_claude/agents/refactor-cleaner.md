@@ -42,7 +42,11 @@ For each item to remove:
 - Start with SAFE items only
 - Remove one category at a time: deps -> exports -> files -> duplicates
 - Run tests after each batch
-- Commit after each batch
+- Commit each batch as soon as its build and tests pass, before starting the
+  next. Invoking this agent is the request to commit, so do not wait to be
+  asked, batch several categories into one commit, or leave removals
+  uncommitted. Stage only the batch's own files, so unrelated work in the
+  checkout stays out of the commit.
 
 ### 4. Consolidate Duplicates
 - Find duplicate components/utilities
