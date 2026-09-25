@@ -29,7 +29,7 @@ menu:
     submenu:
       - key: b
         desc: Browser
-        cmd: helium-browser
+        cmd: google-chrome-stable
       - key: t
         desc: Terminal
         cmd: ghostty
@@ -44,22 +44,22 @@ menu:
     submenu:
       - key: h
         desc: GitHub Home
-        cmd: helium-browser -app="https://github.com/dileep-kishore"
+        cmd: google-chrome-stable --app="https://github.com/dileep-kishore"
       - key: p
         desc: Perplexity
-        cmd: helium-browser -app="https://www.perplexity.ai"
+        cmd: google-chrome-stable --app="https://www.perplexity.ai"
       - key: g
         desc: Gemini
-        cmd: helium-browser -app="https://gemini.google.com"
+        cmd: google-chrome-stable --app="https://gemini.google.com"
       - key: s
         desc: Superlist
-        cmd: helium-browser -app="https://app.superlist.com/"
+        cmd: google-chrome-stable --app="https://app.superlist.com/"
       - key: l
         desc: Linear
-        cmd: helium-browser -app="https://linear.app/dkishore-lifecycles/inbox"
+        cmd: google-chrome-stable --app="https://linear.app/dkishore-lifecycles/inbox"
       - key: e
         desc: Excalidraw
-        cmd: helium-browser -app="https://app.excalidraw.com/dashboard"
+        cmd: google-chrome-stable --app="https://app.excalidraw.com/dashboard"
   - key: w
     desc: Workspaces
     submenu:
@@ -98,7 +98,7 @@ menu:
         cmd: ~/.config/niri/scripts/window-switcher.sh obsidian
       - key: b
         desc: Browser
-        cmd: ~/.config/niri/scripts/window-switcher.sh helium
+        cmd: ~/.config/niri/scripts/window-switcher.sh google-chrome
       - key: s
         desc: Slack
         cmd: ~/.config/niri/scripts/window-switcher.sh Slack
