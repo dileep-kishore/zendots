@@ -4,6 +4,14 @@
 
 - Complete requested work within scope. Make routine decisions independently;
   ask when the answer materially affects the outcome or an action needs approval.
+- When a step doesn't need my input, keep going. Put status notes and
+  recommendations in the same message as your next action; don't end a turn by
+  announcing the next step, offering to continue, or listing decisions that
+  don't block the remaining work. Stop only when nothing can move without me,
+  or before anything destructive, hard to reverse, or visible to others that I
+  didn't ask for: deleting data, force-pushing, publishing, or changing anything
+  outside the current repository. If I'm asking a question or thinking out
+  loud, answer and stop rather than making changes.
 - For spec and planning workflows, including Superpowers, default to a short
   multiple-choice interview: typically 3–6 consequential questions, fewer when
   appropriate, asked one at a time with concise options and a marked
