@@ -111,7 +111,7 @@ the payload reaches neither this repository nor Syncthing.
 
 ```bash
 agent-skills.sh fetch tt-a1i/archify --path archify   # --path: SKILL.md is not at the repo root
-agent-skills.sh fetch                                 # restore runtimes missing on this machine
+agent-skills.sh fetch                                 # restore missing runtimes, follow new pins
 agent-skills.sh fetch --bump archify                  # move the pin to the ref's tip
 agent-skills.sh remove archify                        # works for either kind
 ```
@@ -121,8 +121,9 @@ agent-skills.sh remove archify                        # works for either kind
   `link-agent-skills.sh` skips it, and the skill is simply absent rather than
   broken.
 - **Pinned to a commit, not a branch.** Both machines run the same revision;
-  `fetch --bump` is the deliberate upgrade. Never `git pull` in a runtime, or
-  the two machines silently diverge.
+  `fetch --bump` is the deliberate upgrade; on the other machine, a plain
+  `fetch` after `chezmoi apply ~/.agents` moves the runtime to the new pin.
+  Never `git pull` in a runtime, or the two machines silently diverge.
 - **Never `add` a fetched name.** `skills add` recursively removes the canonical
   path before copying, so it would replace the symlink with the whole upstream
   tree and the next `chezmoi add` would vendor it. The wrapper refuses to record

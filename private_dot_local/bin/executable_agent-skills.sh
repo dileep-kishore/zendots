@@ -13,7 +13,7 @@
 # this repository or Syncthing.
 #
 #   agent-skills.sh fetch tt-a1i/archify --path archify
-#   agent-skills.sh fetch                 # restore every runtime missing here
+#   agent-skills.sh fetch                 # restore missing runtimes, follow new pins
 #   agent-skills.sh fetch --bump archify  # move the pin to the ref's tip
 #   agent-skills.sh remove archify        # works for either kind
 set -euo pipefail
@@ -134,15 +134,17 @@ cmd_fetch() {
 
   case "${1:-}" in
   "")
-    # Restore every runtime this machine is missing. The store symlink is
-    # already there from `chezmoi apply`; only the target is absent.
+    # Restore every runtime this machine is missing or has at an older pin. The
+    # store symlink is already there from `chezmoi apply`; only the target is
+    # absent or stale.
     local restored=0 path link
     for name in $(lock_names); do
       path="$(lock_get "$name" path || true)"
       link="../runtimes/$name${path:+/$path}"
-      # Repair a missing runtime *or* a missing/incorrect store link; either one
-      # leaves the skill undiscoverable.
+      # Repair a missing runtime, a missing/incorrect store link, or a checkout
+      # left behind by a `--bump` on the other machine.
       if [ -d "$runtimes/$name/.git" ] &&
+        [ "$(git -C "$runtimes/$name" rev-parse HEAD 2>/dev/null)" = "$(lock_get "$name" revision)" ] &&
         [ "$(readlink "$store/$name" 2>/dev/null)" = "$link" ]; then
         continue
       fi
