@@ -59,6 +59,7 @@ bin/
 {{- if eq .chezmoi.os "linux" }}
 Library
 .aerospace.toml
+.config/omniwm
 .config/sketchybar
 .zprofile
 {{- end }}
