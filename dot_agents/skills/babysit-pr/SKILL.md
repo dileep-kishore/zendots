@@ -78,7 +78,7 @@ Present one table and wait for approval:
 | `PRRT_…` | `api/db.py:88` | P3 unbounded query | no — `limit` is applied by the caller | rebut |
 
 Every unresolved thread appears in the table, including ones you plan only to
-rebut. That is the checkpoint the user approves; after it, steps 4–6 run through
+rebut. That is the checkpoint the user approves; after it, steps 4–7 run through
 without stopping.
 
 ## 4. Fix and push
@@ -142,16 +142,43 @@ Resolve after replying, in both cases. A rebutted finding is answered, not
 pending. Leave a thread open only when it needs the user's decision, and say
 which ones in the report.
 
-## 6. Report and exit
+## 6. Watch the new head
 
-One pass, then stop. Report:
+A round is not finished at the push; it is finished when CI has run against
+the new head. Wait for it, in the background or with a timeout well under the
+shell tool's cap:
+
+```bash
+timeout 1200 gh pr checks <number> --watch --interval 30
+```
+
+Right after a push, checks may not be registered yet: `gh pr checks` then
+errors with no checks reported, or `--watch` returns on the previous head's
+results. Retry for a few minutes until checks for the pushed SHA appear. If
+they never appear or the watch times out, report CI as unverified rather than
+passed.
+
+A check that fails because of this round's commit belongs to this round: read
+the failing log, fix it, push, and wait again. Report a failure that predates
+the round or is plainly infrastructure (a runner outage, a flaky job that
+passes on rerun) instead of patching around it.
+
+## 7. Report, or go another round
+
+Report:
 
 - threads answered, split into fixed and rebutted
 - threads deliberately left open, and what each is waiting on
 - the pushed commit SHAs
-- CI and re-review state at exit — `statusCheckRollup` conclusions, and whether
-  the reviewer has run against the new head yet
+- CI conclusions on the final head, and whether each reviewer bot has
+  reviewed it yet
 
-Fixes push a new commit, so the review bot re-runs and may open new threads. For
-unattended rounds until the PR is clean, the user composes this with `loop`:
-`/loop /babysit-pr 15`.
+Fixes can prompt the review bots to open new threads. If the user asked to see
+the PR through ("until it's clean", "keep going"), first wait, with a deadline of
+about 20 minutes, for each reviewer bot that reviewed earlier heads to review
+the final head, then list unresolved threads again. New threads start the next
+round at step 2 with a fresh triage checkpoint. Stop when a completed review
+of the final head opens no new threads, after three rounds, or when what
+remains needs the user's decision. A bot still pending at the deadline means
+the PR is not yet known to be clean; report it that way. Otherwise stop after
+one round.

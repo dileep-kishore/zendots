@@ -7,8 +7,8 @@ description: Use when finished work on a branch should become a pull request —
 
 A description written from the diff states what changed. The session knows why:
 what the user asked for, which constraint shaped the code, what was left out on
-purpose. This skill spends that context before it is lost, and stops for
-approval before anything reaches the remote.
+purpose. This skill spends that context before it is lost, and stops once for
+approval, before anything is committed or reaches the remote.
 
 The description exists for one reader: a reviewer with the diff open, and later
 someone running `git blame`. It states the problem, the solution, and the
@@ -31,21 +31,16 @@ creating a second one.
 
 On the default branch, branch before committing: `git switch -c <type>/<name>`.
 
-## 2. Commit pending work
+Steps 2–5 only plan and draft; nothing is committed or rewritten until the
+single checkpoint in step 6.
+
+## 2. Plan commits for pending work
 
 Group pending changes into self-contained commits: one complete logical change
-each, carrying its own tests and docs. Do not split by file or by the order the
-work happened.
+each, carrying its own tests and docs, not split by file or by the order the
+work happened. Draft the subjects.
 
-Show the proposed subjects and wait:
-
-```
-1. feat(pr): add open-pr skill
-2. docs(agents): define self-contained commits
-Commit these? [y / n / edit]
-```
-
-## 3. Regroup only when it persists
+## 3. Plan a regroup only when it persists
 
 ```bash
 gh repo view --json squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed
@@ -59,25 +54,17 @@ typo`, `oops`, `address feedback`, lint-only changes, or several commits
 touching the same files for one purpose. Ten commits that each do one complete
 thing need no regrouping. Three where two repair the first do.
 
-Propose the exact fold, then wait:
+Draft the exact fold for the checkpoint:
 
 ```
 3 commits → 2
   a1b2c3  feat(auth): add token refresh
   d4e5f6  fix typo               fold into a1b2c3
   g7h8i9  fix(auth): expiry      keep
-Rebase? [y / n]
 ```
 
-On approval, fold with a scripted todo; the harness cannot open the rebase
-editor, and `git commit --fixup` has nothing to commit once step 2 is done:
-
-```bash
-GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
-```
-
-Rewrite only commits absent from the remote. A pushed commit stays as it is;
-say so rather than rewriting shared history.
+Plan to rewrite only commits absent from the remote. A pushed commit stays as
+it is; say so rather than rewriting shared history.
 
 ## 4. Harvest the description
 
@@ -99,7 +86,10 @@ options considered along the way, drafts, bugs found and fixed before the final
 commit, counts of things that changed, opinions on taste.
 
 A verification claim needs a command that actually ran in this session with
-visible output. No run, no claim, and never "tests pass" from memory.
+visible output. No run, no claim, and never "tests pass" from memory. When
+nothing ran this session, run the project's checks against the working tree
+now, rather than leaving Verification empty; a failure is a finding to fix or
+report, not something to omit.
 
 When the session lacks the why (resumed, handed off, invoked cold), build what
 the commits support and ask one targeted question. Do not invent a motivation.
@@ -138,11 +128,32 @@ code, commands, links, and structure: the section order, headings, and title
 style set above, or the repository template's. Humanizer rewrites sentences,
 not the skeleton. Do not invent claims or add personality that does not fit.
 
-## 6. Push and open
+## 6. One checkpoint
+
+Show everything the user is approving in one message, then wait:
+
+```
+Commits: 1. feat(pr): add open-pr skill
+         2. docs(agents): define self-contained commits
+Fold:    d4e5f6 "fix typo" into a1b2c3        (or: none / squash-merge repo)
+Title:   <title>
+Body:    <body>
+Proceed? [y / n / edit]
+```
+
+One approval covers committing, folding, pushing, and opening. An edit to one
+part needs re-approval of that part only.
+
+## 7. Commit, fold, push, open
+
+Make the planned commits. If a hook rejects or rewrites one, fix it and
+commit again; do not skip hooks. Then fold with a scripted todo, since the
+harness cannot open the rebase editor:
 
 ```bash
+GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
 git push -u origin HEAD
-gh pr create --title "<title>" --body "<body>"
+gh pr create --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
 
 Report the URL, then anything skipped: regrouping declined, verification

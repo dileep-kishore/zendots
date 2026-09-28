@@ -48,6 +48,29 @@ accounted for" forces work that "produce a change list" does not. Sharpen a
 fuzzy bound before hiding later steps; hiding only works across a real
 context boundary such as a subagent dispatch.
 
+## Goals, loops, and stops
+
+Current models plan well and run long; the prompt's job is the target, not
+the choreography.
+
+- **Goal over script.** State what done looks like and how to check it,
+  then let the agent choose the steps. Script exact commands only where a
+  wrong step is costly or hard to undo.
+- **Loop to the check.** Tell the agent to iterate until the check passes
+  and to fix incidental failures (a busy port, a stale cache) itself. Bound
+  the loop by rounds or time, and name the exit: after repeated failure for
+  the same reason, change approach or report the blocker with evidence.
+- **Checkpoint once, where it matters.** Each approval stop costs a turn.
+  Batch everything the user needs to approve into one checkpoint placed
+  before the first outward-facing or irreversible action, not one per step.
+- **Name the failure you want gone.** "Do not end the turn by announcing the
+  next step" works; "be thorough" swaps one default for another. Name the
+  stops you do want, too: nothing can move without the user.
+- **Point at hidden context.** When what the task depends on sits somewhere
+  the request does not mention, tell the agent to look around before acting.
+- **Leave thinking to effort.** "Think carefully" and "reason step by step"
+  add latency, not quality; the harness's effort setting controls thinking.
+
 ## Words
 
 - Prefer a **leading word** the model already knows (*tight*, *red*, *tracer
