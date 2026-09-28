@@ -19,7 +19,9 @@
 		"external_directory": "ask",
 		"skill": {
 			"create-skill": "ask",
+			"create-verification-skill": "ask",
 			"humanizer": "ask",
+			"maintain-verification-skill": "ask",
 			"orca-independent-review": "ask"
 		},
 		"playwright_*": "deny",
