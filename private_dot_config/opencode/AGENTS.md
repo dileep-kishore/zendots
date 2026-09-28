@@ -4,6 +4,10 @@
 
 - Complete requested work within scope. Make routine decisions independently;
   ask when the answer materially affects the outcome or an action needs approval.
+  Before substantial work, read around it, including code, docs, and project
+  instructions the request doesn't name, and settle what observable result
+  means done and how to check it. Iterate until that check passes; name what
+  stayed unverified instead of treating the edit itself as the result.
 - When a step doesn't need my input, keep going. Put status notes and
   recommendations in the same message as your next action; don't end a turn by
   announcing the next step, offering to continue, or listing decisions that
@@ -22,12 +26,25 @@
   reasonable assumptions, record them, and continue within the authorized scope.
 - Keep changes focused and complexity proportionate. Preserve unrelated and
   in-progress work in the checkout.
-- Scale verification to the change and check affected behavior. Prefer TDD when
-  it helps clarify behavior, especially for bug fixes, but treat tests as
-  lasting maintenance: add or update them only when they meaningfully protect
-  behavior or a likely regression. For reversible, low-impact changes, prefer
-  a targeted smoke check over tests that mirror the implementation or exist
-  only to raise coverage. Honor repository requirements and explicit requests.
+  Hand independent or context-heavy parts of complex work to subagents, each
+  with a bounded task, the files it may edit, and the evidence to return; one
+  agent drives any shared app session, and you verify the combined result.
+- Scale verification to the change. Prefer TDD when it clarifies behavior,
+  especially for bug fixes, but tests are lasting maintenance: add them only
+  when they protect behavior or a likely regression, and prefer a targeted
+  smoke check for reversible, low-impact changes. Honor repository
+  requirements and explicit requests. Reuse the project's verification recipes;
+  use `verify-this` to settle a disputed claim, not as a second completion gate.
+  Suggest `create-verification-skill` when the same manual check keeps
+  recurring, and `maintain-verification-skill` when an existing recipe drifts.
+- Finishing substantial work: once its check passes, run one
+  `independent-review` of the whole working change, untracked files included.
+  Fix every defect that holds, or report it as unresolved; skip only optional
+  suggestions that add more complexity than they remove. Rerun affected checks.
+  A second review needs a concrete new concern; this replaces other skills'
+  review rounds, Superpowers' included. When behavior, APIs, or setup changed,
+  use `doc-updater` to bring the docs along in the same change. Trivial changes
+  need only a self-check.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. Be concise without dropping meaningful detail.
   The first and last lines should stand alone: what happened, and what is
@@ -72,6 +89,14 @@
 
 ## Host safety
 
-- Bound writer loops and stress jobs by iterations, runtime, and output size.
-  Before deleting a background job's output, terminate its process group
-  and verify with `ps` or `lsof` that no owned child remains.
+- Bound fix-and-verify loops, writer loops, and stress jobs by iterations,
+  runtime, and output size. When an approach keeps failing, change it or report
+  the blocker with evidence rather than retrying it. Keep a `show-me-your-work`
+  log for long or unattended runs; scheduled jobs and automatic wake-ups need an
+  explicit request.
+- Work is not done while a command or subagent you started is still running.
+  When finished, stop the dev servers and browser sessions you started, keeping
+  evidence and the user's own sessions. Before deleting a background job's
+  output, terminate its process group and verify with `ps` or `lsof` that no
+  owned child remains. Remove a worktree you created only after its work is
+  merged and deletion is approved. Report any cleanup left pending.
