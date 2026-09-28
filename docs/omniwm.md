@@ -37,7 +37,8 @@ position. The Niri config is unchanged.
 | H / J / K / L | Focus left / down / up / right |
 | Arrow keys | Move in that direction |
 | Tab | Previous workspace |
-| Space | Command palette for commands without shortcuts |
+| Space | Raycast, configured separately in Raycast |
+| P | OmniWM command palette |
 | Return | Toggle OmniWM fullscreen, within the workspace |
 | O | Overview |
 | Period / Comma | Cycle column width forward / backward |
@@ -49,6 +50,11 @@ Hyper excludes Shift, so Hyper+Shift+number is distinct from Hyper+number.
 All other keyboard bindings are Unassigned, preserving ordinary Option
 shortcuts for apps. The remapper must keep the additional physical Shift
 modifier when the WM key is held.
+
+Reserve Hyper+Space for Raycast by setting its hotkey to
+Control+Option+Command+Space. On the Go60, press Right Command+Space.
+OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
+keeping Hyper+Space free for Raycast.
 
 The config uses Niri scrolling, nine workspaces on the main monitor, 25/50/75/100%
 column widths, a 4-point gap with no outer gaps, and a Catppuccin Mocha mauve

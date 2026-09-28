@@ -1074,7 +1074,7 @@ binding = "Unassigned"
 id = "preselectClear"
 
 [[hotkeys]]
-binding = "Hyper+Space"
+binding = "Hyper+P"
 id = "openCommandPalette"
 
 [[hotkeys]]
