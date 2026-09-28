@@ -1,5 +1,3 @@
-# A separate macOS remapper supplies Control+Option+Command; OmniWM does not remap keys.
-# Generated from OmniWM 0.7.2 defaults. Keep every hotkey ID, even when Unassigned.
 monitorBarOverrides = []
 monitorDwindleOverrides = []
 monitorGapOverrides = []
@@ -21,8 +19,30 @@ blue = 0.9686274509803922
 green = 0.6509803921568628
 red = 0.796078431372549
 
+[borders.glow]
+enabled = true
+opacity = 0.6
+radius = 8.0
+
+[borders.gradient]
+direction = "topLeftToBottomRight"
+enabled = true
+
+[borders.gradient.end]
+alpha = 1.0
+blue = 0.6771935224533081
+green = 0.4504726529121399
+red = 0.5456218719482422
+
+[borders.gradient.start]
+alpha = 1.0
+blue = 0.6771935224533081
+green = 0.4504726529121399
+red = 0.5456218719482422
+
 [clipboard]
 historyEnabled = false
+ignoredTypes = []
 maxItemBytes = 8388608
 maxItems = 200
 maxTotalBytes = 67108864
@@ -37,16 +57,16 @@ useGlobalGaps = true
 
 [focus]
 crossesMonitorAtEdge = false
-followsMouse = false
+followsMouse = true
 followsWindowToMonitor = false
 lockModifier = "off"
 moveCrossesMonitorAtEdge = false
-moveMouseToFocusedWindow = false
+moveMouseToFocusedWindow = true
 raiseOnMouseFocus = false
 
 [gaps]
 fullscreenUsesOuterGaps = false
-size = 8.0
+size = 4.0
 
 [gaps.outer]
 bottom = 0.0
@@ -156,8 +176,8 @@ mode = "macOS"
 [scratchpads.labels]
 
 [statusBar]
-showAppNames = false
-showWorkspaceName = false
+showAppNames = true
+showWorkspaceName = true
 useWorkspaceId = false
 
 [workspaceBar]
@@ -165,13 +185,13 @@ backgroundOpacity = 0.1
 deduplicateAppIcons = false
 enabled = true
 excludedBundleIDs = []
-height = 24.0
+height = 28.0
 hideEmptyWorkspaces = false
 hideInNativeFullscreen = false
 notchActiveZoneWidth = 180.0
-notchMode = "moveBelowMenuBar"
-position = "belowMenuBar"
-reserveLayoutSpace = true
+notchMode = "off"
+position = "overlappingMenuBar"
+reserveLayoutSpace = false
 revealHoldMilliseconds = 200.0
 revealModifier = "off"
 showAccentHighlights = true
@@ -264,6 +284,90 @@ bundleId = "com.apple.MobileSMS"
 id = "552FB77D-BF0E-4737-90A6-B5BC6986C579"
 minHeight = 320.0
 minWidth = 660.0
+
+[[appRules]]
+assignToWorkspace = "1"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.google.Chrome"
+id = "302FFF68-B9B7-47CA-AA3F-B9B53C04ED7A"
+
+[[appRules]]
+assignToWorkspace = "2"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.t3tools.t3code"
+id = "E030322E-6FB7-40E2-9880-38ED0B826E4A"
+
+[[appRules]]
+assignToWorkspace = "2"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.stablyai.orca"
+id = "656F808E-78B3-4FFF-B6FD-B2635D3CF3E6"
+
+[[appRules]]
+assignToWorkspace = "3"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.anysphere.sand"
+id = "4E0D08A9-1C30-4FEB-84A4-E4DB94AA7565"
+
+[[appRules]]
+assignToWorkspace = "3"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.openai.codex"
+id = "4A3B1BD9-CC55-456E-8F25-69B6552F296C"
+
+[[appRules]]
+assignToWorkspace = "4"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.todesktop.210203cqcj00tw1"
+id = "E2AC10F1-22E3-4FC1-8FDF-A280A599999D"
+
+[[appRules]]
+assignToWorkspace = "5"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.linear"
+id = "8A278426-7CF7-4A43-B189-5EB7B69DE47B"
+
+[[appRules]]
+assignToWorkspace = "5"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.superlist.superlist"
+id = "786D57CB-6C32-4A55-9A47-0DD8F22A0CC9"
+
+[[appRules]]
+assignToWorkspace = "4"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "me.superfocus.desktop"
+id = "B090A1E7-33FA-4450-B48F-4A452C4530D4"
+
+[[appRules]]
+assignToWorkspace = "6"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "notion.id"
+id = "775B7E99-4981-4108-80AA-AD66D37EEAA9"
+
+[[appRules]]
+assignToWorkspace = "7"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.tinyspeck.slackmacgap"
+id = "ACB6AAD3-912B-4C7B-A08E-4A80D72D1452"
+
+[[appRules]]
+assignToWorkspace = "8"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "org.zotero.zotero"
+id = "65F23017-8B06-47C1-85FE-486F86F5A247"
 
 [[hotkeys]]
 binding = "Unassigned"
