@@ -57,7 +57,7 @@ useGlobalGaps = true
 
 [focus]
 crossesMonitorAtEdge = false
-followsMouse = true
+followsMouse = false
 followsWindowToMonitor = false
 lockModifier = "off"
 moveCrossesMonitorAtEdge = false
@@ -66,7 +66,7 @@ raiseOnMouseFocus = false
 
 [gaps]
 fullscreenUsesOuterGaps = false
-size = 4.0
+size = 6.0
 
 [gaps.outer]
 bottom = 0.0
@@ -368,6 +368,13 @@ axRole = "AXWindow"
 axSubrole = "AXStandardWindow"
 bundleId = "org.zotero.zotero"
 id = "65F23017-8B06-47C1-85FE-486F86F5A247"
+
+[[appRules]]
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "us.zoom.xos"
+id = "6473E50C-1C2A-47E1-A0EC-11EC8264DE41"
+layout = "float"
 
 [[hotkeys]]
 binding = "Unassigned"

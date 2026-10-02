@@ -57,15 +57,16 @@ OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
 keeping Hyper+Space free for Raycast.
 
 The config uses Niri scrolling, nine workspaces on the main monitor, 25/50/75/100%
-column widths, a 4-point gap with no outer gaps, and a Catppuccin Mocha mauve
+column widths, a 6-point gap with no outer gaps, and a Catppuccin Mocha mauve
 focus border with an 8-point glow at 60% opacity. A lone column stays centered
-at its configured width. Focus follows the mouse, and keyboard focus moves the
-pointer to the focused window. The 28-point workspace bar overlaps the macOS
-menu bar without reserving layout space; SketchyBar is unnecessary.
+at its configured width. Focus does not follow the mouse; keyboard focus still
+moves the pointer to the focused window. The 28-point workspace bar overlaps
+the macOS menu bar without reserving layout space; SketchyBar is unnecessary.
 
 Twelve app rules set initial workspace placement for standard windows, including Chrome to 1,
 T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8. The complete
-assignments are in the file's `[[appRules]]` entries.
+assignments are in the file's `[[appRules]]` entries. A separate rule makes
+Zoom's standard windows float by default.
 
 ## Maintaining the config
 
