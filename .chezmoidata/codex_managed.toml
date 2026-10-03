@@ -38,18 +38,6 @@ args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 [codex_managed.mcp_servers.sequential-thinking.env]
 DISABLE_THOUGHT_LOGGING = "true"
 
-[codex_managed.plugins."google-calendar@openai-curated"]
-enabled = true
-
-[codex_managed.plugins."github@openai-curated"]
-enabled = true
-
-[codex_managed.plugins."linear@openai-curated"]
-enabled = true
-
-[codex_managed.plugins."superpowers@openai-curated"]
-enabled = true
-
 [codex_managed.plugins."ponytail@ponytail"]
 enabled = true
 
