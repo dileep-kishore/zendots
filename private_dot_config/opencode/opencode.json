@@ -3,7 +3,18 @@
 	"share": "manual",
 	"autoupdate": false,
 	"default_agent": "plan",
-	"model": "openai/gpt-5.6-sol",
+	"model": "openai/gpt-6.1-sol",
+	"providers": {
+		"openai": {
+			"models": {
+				"gpt-6.1-sol": {
+					"settings": {
+						"reasoningEffort": "high"
+					}
+				}
+			}
+		}
+	},
 	"plugin": [
 		"opencode-pty",
 		"@franlol/opencode-md-table-formatter@latest",
