@@ -16,8 +16,9 @@ the checkout, PR, or spec and state the assumptions. Ask only when ambiguity
 would materially change the review.
 
 - **Single**, the default: one fresh reviewer. Honor a named provider/model;
-  otherwise prefer a reviewer from a different model family than the one that
-  wrote the change, then any available reviewer with a separate context.
+  otherwise prefer the other vendor: Codex when Claude wrote the change,
+  Claude when GPT did. Another tier from the same vendor (Opus and Sonnet)
+  does not count. Fall back to any reviewer with a separate context.
 - **Dual / total review**, when requested: Claude and Codex independently review
   the same scope, preferably in parallel. Honor another requested pair. Use
   configured model defaults unless the user specifies models or effort.
@@ -77,7 +78,9 @@ Choose a supported launcher in the current environment:
   provider instructions. Use a fresh noninteractive invocation, explicit cwd,
   and read-only controls where available. Pass the brief through a file/stdin,
   not shell-interpolated user text. Do not resume an implementation session or
-  disable permission checks to get a review running.
+  disable permission checks to get a review running. Launch Claude as
+  `env -u ANTHROPIC_API_KEY claude -p ...`: with that variable set, the CLI
+  bills the API key instead of the claude.ai subscription.
 - **Installed provider helpers:** use their documented public entrypoints only
   when their scope, context isolation, and output contract fit this request.
   In Claude Code, the Codex plugin's review commands are possible single-review
