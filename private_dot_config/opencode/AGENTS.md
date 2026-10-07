@@ -40,11 +40,11 @@
 - After substantial work passes its check, run one `independent-review` of
   the whole working change, untracked files included, with a reviewer from
   the other vendor when available: Codex if you are Claude, Claude if you are
-  GPT. Fix each defect that holds or report it unresolved, then rerun
-  affected checks. A second review needs a concrete new concern; this
-  replaces other skills' review rounds. When behavior, APIs, or setup
-  changed, update the docs in the same change with `doc-updater`. Trivial
-  changes need only a self-check.
+  GPT. Fix each finding its verifier confirms, fix or explain each
+  plausible one, then rerun affected checks. A second review needs a
+  concrete new concern; this replaces other skills' review rounds. When
+  behavior, APIs, or setup changed, update the docs in the same change with
+  `doc-updater`. Trivial changes need only a self-check.
 - In research answers, mark what you couldn't confirm and say where you looked.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. The first and last lines stand alone: what
