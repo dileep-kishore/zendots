@@ -143,6 +143,38 @@ Only Claude Code needs symlinks (`link-agent-skills.sh`, run on every apply) —
 Codex and OpenCode resolve `~/.agents/skills` natively. Install a given skill on
 one machine only; the source syncs over Syncthing.
 
+### OpenCode V2
+
+`~/.config/opencode/opencode.json` uses native V2 configuration for providers,
+ordered permissions, MCP servers, and plugins. The default agent is `plan`,
+and the default model is GPT 6.1 Sol with high reasoning. Terminal settings
+live in `~/.config/opencode/cli.json`, with Catppuccin Mocha selected explicitly.
+Custom agents live in `~/.config/opencode/agents/`.
+The CLI template also retains Orca's local status plugin on machines where
+its entrypoint exists. After installing Orca on another machine, preview and
+apply `~/.config/opencode/cli.json` again to include it.
+
+Notifier and Ponytail are pinned to V2-compatible versions. Superpowers loads
+from one pinned Git package, which registers its own skills and bootstrap.
+After approving and applying this migration on each machine, run
+`~/.config/opencode/sync_skill_collections.sh` once to remove the old helper's
+plugin and skills symlinks. It refuses to remove real files or unfamiliar
+links and leaves the old checkout untouched. Future Superpowers upgrades
+change the full commit hash in `opencode.json`, not that checkout.
+
+V2's native background shell and subagents replace `opencode-pty` and
+`opencode-background-agents`. The plugin-specific interactive PTY tools,
+delegation history commands, and automatic Markdown table rewriting are no
+longer installed. V2 has no replacement for the notifier's V1 `plan_exit` event.
+The old `tui.json` and `agent/docs-writer.md` are retired through
+`.chezmoiremove`; review their deletions along with the new files before applying.
+
+Check the setup after applying with `opencode plugin list`, `/models`, and
+`/themes`. Notifications and the Superpowers/Ponytail workflows still need an
+interactive check. OpenCode's published editor schema URL remains in the
+server config, but use the [V2 guides](https://opencode.ai/v2/docs/) as the
+reference for config fields.
+
 ### Key Bindings
 
 **Tmux** — prefix is `Ctrl-a`

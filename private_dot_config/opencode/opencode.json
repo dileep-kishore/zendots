@@ -1,7 +1,7 @@
 {
 	"$schema": "https://opencode.ai/config.json",
 	"share": "manual",
-	"autoupdate": false,
+	"update": "disable",
 	"default_agent": "plan",
 	"model": "openai/gpt-6.1-sol",
 	"providers": {
@@ -13,135 +13,138 @@
 					}
 				}
 			}
-		}
-	},
-	"plugin": [
-		"opencode-pty",
-		"@franlol/opencode-md-table-formatter@latest",
-		"@mohak34/opencode-notifier@latest",
-		"opencode-background-agents",
-		"superpowers@git+https://github.com/obra/superpowers.git",
-		"@dietrichgebert/ponytail"
-	],
-	"permission": {
-		"edit": "allow",
-		"bash": "allow",
-		"webfetch": "allow",
-		"external_directory": "ask",
-		"skill": {
-			"create-skill": "ask",
-			"create-verification-skill": "ask",
-			"humanizer": "ask",
-			"maintain-verification-skill": "ask",
-			"orca-independent-review": "ask"
 		},
-		"playwright_*": "deny",
-		"serena_*": "deny"
-	},
-	"mcp": {
-		"sequential-thinking": {
-			"type": "local",
-			"command": [
-				"npx",
-				"-y",
-				"@modelcontextprotocol/server-sequential-thinking"
-			],
-			"environment": {
-				"DISABLE_THOUGHT_LOGGING": "true"
-			},
-			"enabled": true
-		},
-		"gh_grep": {
-			"type": "remote",
-			"url": "https://mcp.grep.app"
-		},
-		"playwright": {
-			"type": "local",
-			"command": [
-				"npx",
-				"-y",
-				"@playwright/mcp@latest"
-			],
-			"enabled": true
-		},
-		"serena": {
-			"type": "local",
-			"command": [
-				"uvx",
-				"--from",
-				"git+https://github.com/oraios/serena",
-				"serena",
-				"start-mcp-server"
-			],
-			"enabled": true,
-			"timeout": 15000
-		}
-	},
-	"agent": {
-		"build": {
-			"permission": {
-				"playwright_*": "allow",
-				"serena_*": "allow"
-			}
-		},
-		"plan": {
-			"permission": {
-				"serena_*": "allow"
-			}
-		}
-	},
-	"provider": {
 		"cborg": {
-			"npm": "@ai-sdk/openai-compatible",
+			"package": "aisdk:@ai-sdk/openai-compatible",
 			"name": "CBorg API",
-			"options": {
+			"settings": {
 				"baseURL": "https://api.cborg.lbl.gov",
 				"apiKey": "{env:CBORG_API_KEY}"
 			},
 			"models": {
 				"lbl/cborg-coder": {
-					"id": "lbl/cborg-coder",
+					"modelID": "lbl/cborg-coder",
 					"name": "CBorg Coder",
-					"reasoning": true,
-					"tool_call": true,
+					"capabilities": {
+						"tools": true
+					},
 					"limit": {
 						"context": 131072,
 						"output": 131072
 					}
 				},
 				"lbl/claude-sonnet-5": {
-					"id": "claude-sonnet-5",
+					"modelID": "claude-sonnet-5",
 					"name": "Claude Sonnet 5",
-					"reasoning": true,
-					"tool_call": true
+					"capabilities": {
+						"tools": true
+					}
 				},
 				"lbl/claude-opus-5": {
-					"id": "claude-opus-5",
+					"modelID": "claude-opus-5",
 					"name": "Claude Opus 5",
-					"reasoning": true,
-					"tool_call": true,
-					"options": {
+					"capabilities": {
+						"tools": true
+					},
+					"settings": {
 						"reasoningEffort": "high",
 						"textVerbosity": "low"
 					}
 				},
 				"lbl/gpt-5.3-codex": {
-					"id": "gpt-5.3-codex",
+					"modelID": "gpt-5.3-codex",
 					"name": "GPT 5.3 codex",
-					"reasoning": true,
-					"tool_call": true
+					"capabilities": {
+						"tools": true
+					}
 				},
 				"lbl/gemini-3.1-pro": {
-					"id": "gemini-3.1-pro",
+					"modelID": "gemini-3.1-pro",
 					"name": "Gemini 3.1 Pro",
-					"reasoning": true,
-					"tool_call": true,
-					"options": {
+					"capabilities": {
+						"tools": true
+					},
+					"settings": {
 						"reasoningEffort": "high",
 						"textVerbosity": "low"
 					}
 				}
 			}
+		}
+	},
+	"plugins": [
+		"@mohak34/opencode-notifier@0.8.0",
+		"git+https://github.com/obra/superpowers.git#8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+		"@dietrichgebert/ponytail@4.13.0"
+	],
+	"permissions": [
+		{ "action": "edit", "resource": "*", "effect": "allow" },
+		{ "action": "shell", "resource": "*", "effect": "allow" },
+		{ "action": "webfetch", "resource": "*", "effect": "allow" },
+		{ "action": "external_directory", "resource": "*", "effect": "ask" },
+		{ "action": "skill", "resource": "create-skill", "effect": "ask" },
+		{ "action": "skill", "resource": "create-verification-skill", "effect": "ask" },
+		{ "action": "skill", "resource": "humanizer", "effect": "ask" },
+		{ "action": "skill", "resource": "maintain-verification-skill", "effect": "ask" },
+		{ "action": "skill", "resource": "orca-independent-review", "effect": "ask" },
+		{ "action": "playwright_*", "resource": "*", "effect": "deny" },
+		{ "action": "serena_*", "resource": "*", "effect": "deny" }
+	],
+	"mcp": {
+		"servers": {
+			"sequential-thinking": {
+				"type": "local",
+				"command": [
+					"npx",
+					"-y",
+					"@modelcontextprotocol/server-sequential-thinking"
+				],
+				"environment": {
+					"DISABLE_THOUGHT_LOGGING": "true"
+				},
+				"disabled": false
+			},
+			"gh_grep": {
+				"type": "remote",
+				"url": "https://mcp.grep.app"
+			},
+			"playwright": {
+				"type": "local",
+				"command": [
+					"npx",
+					"-y",
+					"@playwright/mcp@latest"
+				],
+				"disabled": false
+			},
+			"serena": {
+				"type": "local",
+				"command": [
+					"uvx",
+					"--from",
+					"git+https://github.com/oraios/serena",
+					"serena",
+					"start-mcp-server"
+				],
+				"disabled": false,
+				"timeout": {
+					"catalog": 15000,
+					"execution": 15000
+				}
+			}
+		}
+	},
+	"agents": {
+		"build": {
+			"permissions": [
+				{ "action": "playwright_*", "resource": "*", "effect": "allow" },
+				{ "action": "serena_*", "resource": "*", "effect": "allow" }
+			]
+		},
+		"plan": {
+			"permissions": [
+				{ "action": "serena_*", "resource": "*", "effect": "allow" }
+			]
 		}
 	}
 }

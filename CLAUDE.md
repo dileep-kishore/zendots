@@ -92,9 +92,11 @@ installing on both produces Syncthing conflict files.
   The store is visible to Claude Code through those symlinks, so adding a skill
   an enabled plugin already provides puts two copies in one session. Compare
   against `~/.claude/plugins` and `enabledPlugins` in `~/.claude/settings.json`.
-- `~/.config/opencode/superpowers/skills` is a separate, unmanaged store that
-  gives OpenCode what Claude gets from the superpowers plugin. Leave it out of
-  `~/.agents/skills` -- folding it in would duplicate ~14 skills into Claude.
+- OpenCode V2 loads Superpowers from a pinned Git package in `opencode.json`;
+  its plugin registers the skills and bootstrap. Do not add its skills to
+  `~/.agents/skills` or link its plugin separately, which would duplicate them.
+  `~/.config/opencode/sync_skill_collections.sh` now removes only the legacy
+  helper's known symlinks and leaves the old unmanaged checkout untouched.
 - **A plugin skill wanted in another harness is linked, not copied.**
   `~/.config/opencode/skills/frontend-design` and
   `~/.codex/skills/frontend-design` are chezmoi-managed relative symlinks into

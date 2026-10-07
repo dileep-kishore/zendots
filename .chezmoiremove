@@ -4,3 +4,7 @@
 # oh-my-opencode is no longer used.
 .config/opencode/oh-my-opencode.json
 .config/opencode/update_oh_my_opencode.sh
+
+# V2 uses global cli.json and the native agents directory.
+.config/opencode/tui.json
+.config/opencode/agent/docs-writer.md

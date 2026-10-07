@@ -1,0 +1,14 @@
+{
+	"$schema": "https://opencode.ai/v2/cli.json",
+	"theme": {
+		"name": "catppuccin",
+		"mode": "dark"
+	},
+	"plugins": [
+		"*",
+		"-opencode.notifications"
+		{{- if stat (joinPath .chezmoi.homeDir ".config/opencode/plugins/orca-opencode-status-tui/tui.js") }},
+		"./plugins/orca-opencode-status-tui/tui.js"
+		{{- end }}
+	]
+}

@@ -2,26 +2,41 @@
 
 set -euo pipefail
 
-CACHE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/opencode/skill-collections"
 OPENCODE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
-OPENCODE_SKILLS_DIR="${OPENCODE_CONFIG_DIR}/skills"
-OPENCODE_PLUGINS_DIR="${OPENCODE_CONFIG_DIR}/plugins"
 SUPERPOWERS_DIR="${OPENCODE_CONFIG_DIR}/superpowers"
+PLUGIN_LINK="${OPENCODE_CONFIG_DIR}/plugins/superpowers.js"
+SKILLS_LINK="${OPENCODE_CONFIG_DIR}/skills/superpowers"
 
-echo "Syncing OpenCode skill collections into ${OPENCODE_CONFIG_DIR}"
-mkdir -p "${CACHE_ROOT}" "${OPENCODE_SKILLS_DIR}" "${OPENCODE_PLUGINS_DIR}"
+# Superpowers is now loaded once from the pinned package in opencode.json.
+# Retire only links created by the old helper, never their targets or real files.
+for link in "${PLUGIN_LINK}" "${SKILLS_LINK}"; do
+  if [[ ! -e "${link}" && ! -L "${link}" ]]; then
+    continue
+  fi
+  if [[ ! -L "${link}" ]]; then
+    echo "Refusing to remove non-symlink: ${link}" >&2
+    exit 1
+  fi
 
-if [[ ! -d "${SUPERPOWERS_DIR}/.git" ]]; then
-  git clone --depth 1 https://github.com/obra/superpowers.git "${SUPERPOWERS_DIR}"
-else
-  git -C "${SUPERPOWERS_DIR}" fetch --depth 1 origin main
-  git -C "${SUPERPOWERS_DIR}" checkout --force FETCH_HEAD
-fi
+  target="$(readlink "${link}")"
+  if [[ "${link}" == "${PLUGIN_LINK}" ]]; then
+    expected="${SUPERPOWERS_DIR}/.opencode/plugins/superpowers.js"
+    relative="../superpowers/.opencode/plugins/superpowers.js"
+  else
+    expected="${SUPERPOWERS_DIR}/skills"
+    relative="../superpowers/skills"
+  fi
+  if [[ "${target}" != "${expected}" && "${target}" != "${relative}" ]]; then
+    echo "Refusing to remove unfamiliar symlink: ${link} -> ${target}" >&2
+    exit 1
+  fi
+done
 
-rm -f "${OPENCODE_PLUGINS_DIR}/superpowers.js"
-ln -s "${SUPERPOWERS_DIR}/.opencode/plugins/superpowers.js" "${OPENCODE_PLUGINS_DIR}/superpowers.js"
+for link in "${PLUGIN_LINK}" "${SKILLS_LINK}"; do
+  if [[ -L "${link}" ]]; then
+    rm -- "${link}"
+    echo "Removed legacy link: ${link}"
+  fi
+done
 
-rm -rf "${OPENCODE_SKILLS_DIR}/superpowers"
-ln -s "${SUPERPOWERS_DIR}/skills" "${OPENCODE_SKILLS_DIR}/superpowers"
-
-echo "Skill collection sync complete"
+echo "Superpowers is managed by the pinned V2 package; the local checkout is untouched."
