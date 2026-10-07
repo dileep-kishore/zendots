@@ -141,8 +141,8 @@ Body:    <body>
 Proceed? [y / n / edit]
 ```
 
-One approval covers committing, folding, pushing, and opening. An edit to one
-part needs re-approval of that part only.
+One approval covers committing, folding, pushing, opening, and waiting for
+review. An edit to one part needs re-approval of that part only.
 
 ## 7. Commit, fold, push, open
 
@@ -152,9 +152,17 @@ harness cannot open the rebase editor:
 
 ```bash
 GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
+date -u +%Y-%m-%dT%H:%M:%SZ   # note it: the push time for step 8
 git push -u origin HEAD
 gh pr create --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
 
 Report the URL, then anything skipped: regrouping declined, verification
 missing, a question left unanswered.
+
+## 8. Hand over to review
+
+Unless the user asked only to open the PR, continue with `babysit-pr` from its
+step 1, passing that push time as `--since`. It waits for the review bots this
+push triggered, and stops about three minutes after the push when none
+appear. Its triage checkpoint still comes before any reply is posted.

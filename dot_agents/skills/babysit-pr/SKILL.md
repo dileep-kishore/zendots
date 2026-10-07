@@ -1,6 +1,6 @@
 ---
 name: babysit-pr
-description: Use when review comments on a pull request need answering — "address the comments on the PR", "look at what the review bot found", "babysit PR 15", "respond to the review feedback". Closes every unresolved review thread by fixing or rebutting it, replying in the thread, and resolving it.
+description: Use when review comments on a pull request need answering — "address the comments on the PR", "look at what the review bot found", "babysit PR 15", "respond to the review feedback". Waits for the review bots, then closes every unresolved review thread by fixing or rebutting it, replying in the thread, and resolving it.
 ---
 
 # Babysit PR
@@ -13,7 +13,7 @@ pass, with a triage checkpoint before anything is posted publicly.
 Generating a fresh review is a different job: use `independent-review` or
 `/code-review` for that. This skill only answers review that already exists.
 
-## 1. Locate the PR
+## 1. Locate the PR and wait for the bots
 
 ```bash
 gh pr view <number> --json number,url,state,isDraft,mergeable,mergeStateStatus,headRefOid,statusCheckRollup
@@ -22,6 +22,28 @@ eval "$(gh repo view --json owner,name -q '"owner=\(.owner.login) repo=\(.name)"
 
 Without a number, use the PR for the current branch. If the branch has none,
 say so and stop — there is nothing to babysit.
+
+Then wait for any review bot already running on the head. Never ask a bot to
+review (`@codex review`, `@cursor review`); whether one runs is the user's or
+the repository's choice:
+
+```bash
+python3 ~/.agents/skills/babysit-pr/scripts/wait-for-reviews.py --pr <number> [--since <push time>]
+```
+
+Pass `--since` with the time noted just before your own push (`open-pr`'s, or
+this skill's step 4); omit it when babysitting a PR you did not just push.
+
+Any bot counts (Codex, Bugbot, Copilot, CodeRabbit, others) except known CI
+and dependency bots; `--ignore <bot>` drops another. It waits only for bots
+that show activity on this head, and exits on its own with `result done` once
+they finish, `result none` when no review bot appears within three minutes of
+the push, or `result timeout` 20 minutes after it, listing the pending ones.
+Run it in the background where the harness reports when it exits; otherwise
+in the foreground under a shell timeout, rerunning with the same `--since`
+until it prints a result, since that resumes the same deadline. Then continue to
+step 2 whatever the result; with no unresolved threads, report the result
+and stop.
 
 ## 2. Enumerate every unresolved thread
 
@@ -104,9 +126,11 @@ Do not fold the round into earlier commits to keep the count down. Rewriting
 what is already pushed costs the reviewer their "changes since I last looked"
 diff and marks open threads outdated, which is worse than the extra commit.
 
-Push, then capture the new head:
+Note the push time for step 7's wait, push, then capture the new head:
 
 ```bash
+date -u +%Y-%m-%dT%H:%M:%SZ
+git push
 git rev-parse --short HEAD
 ```
 
@@ -182,11 +206,10 @@ Report:
   reviewed it yet
 
 Fixes can prompt the review bots to open new threads. If the user asked to see
-the PR through ("until it's clean", "keep going"), first wait, with a deadline of
-about 20 minutes, for each reviewer bot that reviewed earlier heads to review
-the final head, then list unresolved threads again. New threads start the next
-round at step 2 with a fresh triage checkpoint. Stop when a completed review
-of the final head opens no new threads, after three rounds, or when what
-remains needs the user's decision. A bot still pending at the deadline means
+the PR through ("until it's clean", "keep going"), rerun step 1's wait for the
+final head, then list unresolved threads again. New threads start
+the next round at step 2 with a fresh triage checkpoint. Stop when a completed
+review of the final head opens no new threads, after three rounds, or when
+what remains needs the user's decision. A bot still pending at the deadline means
 the PR is not yet known to be clean; report it that way. Otherwise stop after
 one round.
