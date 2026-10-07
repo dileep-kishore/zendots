@@ -54,6 +54,23 @@ and what an attacker controls. Where it is safe and local, prove it with a
 request, a test, or a repro. Drop what you cannot connect to a reachable path,
 or list it separately as unconfirmed with what would settle it.
 
+Models over-report security issues in predictable places. Unless the code or
+the repository's `REVIEW.md` says otherwise, these are not findings:
+
+- Values from environment variables, CLI flags, or deployment config: the
+  operator controls them, not an attacker.
+- Missing authorization in client-side code; the server is the boundary.
+- XSS in React, Vue, or Angular templates without a raw-HTML sink
+  (`dangerouslySetInnerHTML`, `v-html`, `bypassSecurityTrust*`).
+- Guessing attacks on UUIDs or other unguessable random identifiers.
+- User content placed in an LLM prompt, unless the model's output reaches a
+  privileged action without checks.
+- Memory-safety classes in memory-safe languages outside `unsafe` or FFI code.
+- Path or SSRF findings where the path or URL comes only from code or config.
+
+A rule like these never covers a confirmed path: if you traced attacker input
+to the sink, report it.
+
 ## Output
 
 Findings ordered by impact, each with location, the path from entry to sink,

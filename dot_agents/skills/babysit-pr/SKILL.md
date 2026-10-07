@@ -61,7 +61,11 @@ gh pr view <number> --json reviews,comments
 Read the code each thread points at and decide whether the finding holds. Follow
 `receiving-code-review` for the standard of rigor: a review bot is a claim, not a
 verdict, and agreeing with a wrong one costs more than disagreeing with a right
-one.
+one. Settle each finding with the gates and verdicts in
+[independent-review's verify brief](../independent-review/references/verify-brief.md).
+You are the author here, so before rebutting a P0/P1 finding, or one you cannot
+settle by reading, run that brief in a fresh subagent and use its verdict. A
+PLAUSIBLE finding is fixed or put to the user, not rebutted.
 
 Order the work: threads from a human reviewer first, then bots. Among bot
 threads, `chatgpt-codex-connector` prefixes a `P1`/`P2`/`P3` badge — follow it.
@@ -74,12 +78,15 @@ Present one table and wait for approval:
 
 | Thread | File:line | Finding | Holds? | Plan |
 |---|---|---|---|---|
-| `PRRT_…` | `justfile:37` | P2 re-sources .env after Hub defaults | yes | drop the nested `just run` |
-| `PRRT_…` | `api/db.py:88` | P3 unbounded query | no — `limit` is applied by the caller | rebut |
+| `PRRT_…` | `justfile:37` | P2 re-sources .env after Hub defaults | CONFIRMED | drop the nested `just run` |
+| `PRRT_…` | `api/db.py:88` | P3 unbounded query | REFUTED — `limit` applied at `api/routes.py:142` | rebut |
 
 Every unresolved thread appears in the table, including ones you plan only to
-rebut. That is the checkpoint the user approves; after it, steps 4–7 run through
-without stopping.
+rebut. When a rebuttal rests on a reason that will recur in this repository,
+propose a `REVIEW.md` precedent below the table, as
+[review-rules](../independent-review/references/review-rules.md) describes.
+That is the checkpoint the user approves; after it, steps 4–7 run through
+without stopping, and an approved precedent joins the round's commit.
 
 ## 4. Fix and push
 
@@ -170,6 +177,7 @@ Report:
 - threads answered, split into fixed and rebutted
 - threads deliberately left open, and what each is waiting on
 - the pushed commit SHAs
+- any `REVIEW.md` precedent added
 - CI conclusions on the final head, and whether each reviewer bot has
   reviewed it yet
 

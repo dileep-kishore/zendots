@@ -1,6 +1,6 @@
 ---
 name: orca-independent-review
-description: Launch independent review through fresh Orca terminals. Use when the user requests Orca for a single reviewer or a dual Claude and Codex review.
+description: Launch independent review through fresh Orca terminals. Use when the user requests Orca for any independent-review mode.
 disable-model-invocation: true
 ---
 
@@ -19,8 +19,9 @@ or start another coordinator. It requires the sibling `independent-review` skill
    Do not assume `active` means the requested checkout.
 2. Create a fresh terminal there for each selected reviewer. Use the requested
    provider or its configured default, without resuming an earlier session.
-   For dual review, create both terminals and send both briefs before waiting
-   for either report.
+   For dual or deep review, create every finder terminal and send every brief
+   before waiting for any report. Verifiers may run as fresh Orca terminals or
+   as the host's native subagents; either way they start fresh.
 3. Read each terminal before sending input. Handle routine presentation prompts
    as needed, but do not accept new trust, authentication, or permission grants
    on the user's behalf. Report a blocking prompt and the terminal handle.
