@@ -64,7 +64,8 @@ Rules that matter:
 - Write the description and body by
   [references/writing-for-agents.md](references/writing-for-agents.md): the
   description is a pointer whose wording decides whether the skill fires;
-  manual-only skills cost no context but must be remembered.
+  manual-only skills cost no context where the harness honors the switch,
+  but must be remembered.
 - Exact commands in fenced blocks for fragile operations (git, destructive
   commands, precise CLI invocations); prose that states the outcome and how to
   check it for judgment calls. Explain why a rule exists in one clause rather
@@ -97,7 +98,7 @@ OpenCode ask before loading it:
 ```bash
 agent-skills.sh sync          # chezmoi add + relink ~/.claude/skills
 ls -l ~/.claude/skills/<name> # symlink into ~/.agents/skills
-chezmoi diff ~/.agents/skills/<name>   # expect no diff
+chezmoi status ~/.agents/skills/<name> # expect no output; diff needs -r
 ```
 
 Invocation per harness: `/<name>` in Claude Code, `$<name>` in Codex,

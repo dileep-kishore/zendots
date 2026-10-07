@@ -13,8 +13,8 @@ correctness rather than trusting any summary.
 - Review execution against the stated intent. Flag a flawed assumption when
   evidence shows it prevents the intended outcome; do not substitute your own
   product preferences.
-- Report only actionable, evidence-backed findings. If the change is clean,
-  say so plainly.
+- Report every actionable, evidence-backed finding at its honest severity;
+  the coordinator filters. If the change is clean, say so plainly.
 
 ## Intent
 
@@ -83,7 +83,7 @@ Ready to merge: Yes | No | With fixes
 <wrong or missing behaviour against intent, error handling, test gaps, design problems that will cause pain>
 
 ## Minor
-<only if genuinely useful>
+<real but non-blocking>
 
 ## Coverage
 <what you read beyond the diff; anything you could not verify>
@@ -96,6 +96,7 @@ Each finding:
 - Location: <file:line or function>
 - Finding: <what is wrong>
 - Evidence: <why it is a problem; the reachable path or the spec line>
+- Repro: <how to show it fails: a command, input, or test; or why none exists>
 - Fix: <smallest safe change>
 ```
 

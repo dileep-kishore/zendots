@@ -1,145 +1,57 @@
 ---
 name: find-docs
 description: >-
-  Retrieves up-to-date documentation, API references, and code examples for any
-  developer technology. Use this skill whenever the user asks about a specific
-  library, framework, SDK, CLI tool, or cloud service -- even for well-known ones
-  like React, Next.js, Prisma, Express, Tailwind, Django, or Spring Boot. Your
-  training data may not reflect recent API changes or version updates.
-
-  Always use for: API syntax questions, configuration options, version migration
-  issues, "how do I" questions mentioning a library name, debugging that involves
-  library-specific behavior, setup instructions, and CLI tool usage.
-
-  Use even when you think you know the answer -- do not rely on training data
-  for API details, signatures, or configuration options as they are frequently
-  outdated. Always verify against current docs. Prefer this over web search for
-  library documentation and API details.
+  Looks up current documentation for a named library, framework, SDK, CLI, or
+  cloud service through the Context7 CLI. Use for API signatures, configuration
+  options, version migrations, setup, and library-specific debugging, where
+  training data may be stale, including inside refactoring or debugging work.
+  Not for tasks that need no library-specific docs, such as general
+  programming concepts.
 ---
 
-# Documentation Lookup
+# Documentation lookup
 
-Retrieve current documentation and code examples for any library using the Context7 CLI.
+Retrieve current documentation and code examples with the Context7 CLI, run
+through `npx ctx7@latest` with no global install or upgrade step.
 
-This skill is locally maintained in zendots and is not tracked in the skills
-installer lockfile. Preserve these local changes when refreshing it; rerunning
-Context7 setup may overwrite generated skill files.
-
-Use `npx ctx7@latest` without a global installation. Node and npx must be
-available; npx downloads and caches the CLI as needed. Do not run a separate
-global install or upgrade before a lookup:
-
-```bash
-npx ctx7@latest <command>
-```
-
-General programming concepts, refactoring, scripts, and business-logic reviews
-alone do not need a lookup. Library-specific questions within those tasks do.
+Locally maintained in zendots and absent from the skills lockfile; rerunning
+Context7 setup may overwrite it, so preserve these changes.
 
 ## Workflow
 
-Two-step process: resolve the library name to an ID, then query docs with that ID.
+Resolve the library name to an ID, then query docs with that ID. Skip the
+first step when the user already gave an ID such as `/org/project` or
+`/org/project/version`; `docs` fails without a valid one.
 
 ```bash
-# Step 1: Resolve library ID
-npx ctx7@latest library <name> <query>
-
-# Step 2: Query documentation
-npx ctx7@latest docs <libraryId> <query>
+npx ctx7@latest library <name> "<what the user is trying to do>"
+npx ctx7@latest docs <libraryId> "<what the user is trying to do>"
 ```
 
-Resolve the library ID with `npx ctx7@latest library` first unless the user already gave one in the form `/org/project` or `/org/project/version`; `docs` fails without a valid ID.
+Pass a query to both (`docs` requires it); it drives ranking. Use the user's actual
+question ("React useEffect cleanup with async operations"), not a keyword
+("hooks"). Keep secrets, credentials, personal data, and proprietary code out
+of queries.
 
-Stay within three calls per question, since each call spends Context7 quota. If three attempts do not find it, use the best result you have and say so.
+Stay within three calls per question; each spends Context7 quota. If three
+attempts do not find it, use the best result and say so.
 
-## Step 1: Resolve a Library
+## Choosing a match
 
-Resolves a package/product name to a Context7-compatible library ID and returns matching libraries.
+Search by the official name and punctuation ("Next.js", "Three.js"). Prefer
+an exact name match, then description fit, snippet count, source reputation,
+and benchmark score. When several fit, say so and proceed with the best; ask
+only when the request itself is ambiguous.
 
-```bash
-npx ctx7@latest library react "How to clean up useEffect with async operations"
-npx ctx7@latest library "Next.js" "How to set up app router with middleware"
-npx ctx7@latest library prisma "How to define one-to-many relations with cascade delete"
-```
+When the user names a version, use the matching `/org/project/version` ID
+from the `library` output, and disclose any mismatch when that version is not
+indexed.
 
-Always pass a `query` argument — it is required and directly affects result ranking. Use the user's intent to form the query, which helps disambiguate when multiple libraries share a similar name. Do not include any sensitive or confidential information such as API keys, passwords, credentials, personal data, or proprietary code in your query.
+## Failures
 
-### Result fields
-
-Each result includes:
-
-- **Library ID** — Context7-compatible identifier (format: `/org/project`)
-- **Name** — Library or package name
-- **Description** — Short summary
-- **Code Snippets** — Number of available code examples
-- **Source Reputation** — Authority indicator (High, Medium, Low, or Unknown)
-- **Benchmark Score** — Quality indicator (100 is the highest score)
-- **Versions** — List of versions if available. Use one of those versions if the user provides a version in their query. The format is `/org/project/version`.
-
-### Choosing a match
-
-Search by the official name and punctuation ("Next.js", "Three.js"). Prefer an
-exact name match, then description fit, snippet count, reputation, and
-benchmark score. When several fit, say so and proceed with the best; ask only
-when the request itself is ambiguous. When nothing fits, retry with an
-alternate name within the three-call limit and disclose thin results.
-
-### Version-specific IDs
-
-If the user mentions a specific version, use a version-specific library ID:
-
-```bash
-# General (latest indexed)
-npx ctx7@latest docs /vercel/next.js "How to set up app router"
-
-# Version-specific
-npx ctx7@latest docs /vercel/next.js/v14.3.0-canary.87 "How to set up app router"
-```
-
-The available versions are listed in the `npx ctx7@latest library` output. Prefer an exact version match. If unavailable, disclose any version mismatch.
-
-## Step 2: Query Documentation
-
-Retrieves up-to-date documentation and code examples for the resolved library.
-
-```bash
-npx ctx7@latest docs /facebook/react "How to clean up useEffect with async operations"
-npx ctx7@latest docs /vercel/next.js "How to add authentication middleware to app router"
-npx ctx7@latest docs /prisma/prisma "How to define one-to-many relations with cascade delete"
-```
-
-### Writing good queries
-
-The query directly affects the quality of results. Be specific and include relevant details.
-
-| Quality | Example |
-|---------|---------|
-| Good | `"How to set up authentication with JWT in Express.js"` |
-| Good | `"React useEffect cleanup function with async operations"` |
-| Bad | `"auth"` |
-| Bad | `"hooks"` |
-
-Use the user's full question as the query when possible, vague one-word queries return generic results.
-
-The output contains two types of content: **code snippets** (titled, with language-tagged blocks) and **info snippets** (prose explanations with breadcrumb context).
-
-## Authentication
-
-Works without authentication. For higher rate limits:
-
-```bash
-# Option A: environment variable
-export CONTEXT7_API_KEY=your_key
-
-# Option B: OAuth login
-npx ctx7@latest login
-```
-
-## Error Handling
-
-If a command fails with a quota error ("Monthly quota reached" or "quota exceeded"):
-1. Inform the user their Context7 quota is exhausted
-2. Suggest they authenticate for higher limits: `npx ctx7@latest login`
-3. If they cannot or choose not to authenticate, answer from training knowledge and clearly note it may be outdated
-
-Do not silently fall back to training data — always tell the user why Context7 was not used.
+Works without authentication; `CONTEXT7_API_KEY` or `npx ctx7@latest login`
+raises rate limits. On a quota error, tell the user the quota is exhausted
+and suggest `npx ctx7@latest login`. When Context7 is unavailable or three
+calls find nothing relevant, read the official documentation site directly
+and say so. Answer from training knowledge only when no current docs are
+reachable, and mark that answer as possibly outdated.

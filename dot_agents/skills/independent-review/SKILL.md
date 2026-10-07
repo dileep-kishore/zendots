@@ -1,6 +1,6 @@
 ---
 name: independent-review
-description: Run a fresh-context second opinion on a PR, branch, or working changes using available subagents or external reviewer processes. Use when the user requests independent review, or total review with both Claude and Codex.
+description: Fresh-context review of a PR, branch, or working changes by one reviewer or a Claude/Codex pair. Use when the user asks for independent or total review, or instructions require one after substantial work.
 ---
 
 # Independent review
@@ -16,7 +16,8 @@ the checkout, PR, or spec and state the assumptions. Ask only when ambiguity
 would materially change the review.
 
 - **Single**, the default: one fresh reviewer. Honor a named provider/model;
-  otherwise use an available reviewer with a separate context.
+  otherwise prefer a reviewer from a different model family than the one that
+  wrote the change, then any available reviewer with a separate context.
 - **Dual / total review**, when requested: Claude and Codex independently review
   the same scope, preferably in parallel. Honor another requested pair. Use
   configured model defaults unless the user specifies models or effort.
@@ -117,9 +118,10 @@ deduplicate by underlying issue. Agreement is not proof; a finding from only one
 reviewer may be the most serious. Retain uncertainty when evidence is missing.
 
 Present a concise verdict and prioritized findings with location, evidence,
-smallest fix, and reviewer attribution. Briefly explain dismissed findings and
-list coverage limits. Link the unchanged raw reports; show them verbatim if
-requested. Do not impose a finding quota or manufacture findings for balance.
+repro, smallest fix, and reviewer attribution. Briefly explain dismissed
+findings and list coverage limits. Link the unchanged raw reports; show them
+verbatim if requested. Do not impose a finding quota or manufacture findings
+for balance.
 
 A review request does not authorize fixes, commits, or pushes. If fixes were
 already requested, follow that scope; otherwise present the findings for decision.

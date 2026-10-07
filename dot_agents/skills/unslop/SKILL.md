@@ -1,8 +1,8 @@
 ---
 name: unslop
 description: |
-  Cut AI tells from assistant-authored natural-language prose. Must always apply
-  to prose, but never to code, identifiers, commands, structured data, quoted
+  Cut AI tells from assistant-authored natural-language prose. Applies to every
+  prose reply; never to code, identifiers, commands, structured data, quoted
   text, or exact strings.
 ---
 
@@ -63,9 +63,9 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 
 ### Language
 
-7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, landscape (abstract), pivotal, showcase, tapestry (abstract), testament, underscore, vibrant. Replace with plain words.
+7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, fostering, garner, genuinely, interplay, intricate, landscape (abstract), pivotal, showcase, tapestry (abstract), testament, underscore, vibrant. Replace with plain words.
 8. **Fancy ways to say "is".** "serves as", "stands as", "boasts", "features". Just say "is" or "has".
-9. **"Not just X, but Y."** State the point directly instead.
+9. **"Not just X, but Y" and "X, not Y."** Contrast framing against a claim nobody made. State the point directly instead.
 10. **Rule of three.** Forcing ideas into groups of three. Use the natural number.
 11. **Synonym cycling.** Protagonist, main character, central figure, hero all in one paragraph. Pick one, repeat it.
 12. **False ranges.** "from X to Y" where X and Y aren't on a meaningful scale. List topics directly.
@@ -82,13 +82,13 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 
 ### Communication artifacts
 
-20. **Chatbot phrases.** "I hope this helps!", "Let me know if...", "Of course!", "Certainly!", "Found the smoking gun!" Remove.
+20. **Chatbot phrases.** "I hope this helps!", "Let me know if...", "Of course!", "Certainly!", "Found the smoking gun!", and summary labels like "Bottom line:" or "In short:". Remove.
 21. **Cutoff disclaimers.** "While specific details are limited..." Find sources or remove.
 22. **Sycophantic tone.** "Great question! You're absolutely right!" Respond directly.
 
 ### Filler
 
-23. **Filler phrases.** "In order to" becomes "To". "Due to the fact that" becomes "Because". "It is important to note that" gets deleted.
+23. **Filler phrases.** "In order to" becomes "To". "Due to the fact that" becomes "Because". "It is important to note that", "It's worth noting that", and a leading "Importantly," get deleted.
 24. **Excessive hedging.** "could potentially possibly be argued that it might" becomes "may".
 25. **Generic conclusions.** "The future looks bright." State specific plans or facts.
 
@@ -104,3 +104,4 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 30. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number. "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
 31. **Prefer the plain word.** "utilize" becomes "use", "leverage" becomes "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
 32. **Mannered metaphor for a plain statement.** "a dial worth turning" for "a parameter worth varying", "earns its keep" for "still matters", "pulls its weight", "the juice is worth the squeeze". The figure displays the writer instead of carrying the idea, and drags in connotations you did not choose. When a literal phrase exists, use it.
+33. **Coined labels.** Invented compound names for ordinary things ("the trust-boundary layer", "a drift-safe pass"). Name the thing the reader already knows, or describe what it does.
