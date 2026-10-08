@@ -617,11 +617,11 @@ binding = "Hyper+H"
 id = "focus.left"
 
 [[hotkeys]]
-binding = "Hyper+J"
+binding = "Unassigned"
 id = "focus.down"
 
 [[hotkeys]]
-binding = "Hyper+K"
+binding = "Unassigned"
 id = "focus.up"
 
 [[hotkeys]]
@@ -657,11 +657,11 @@ binding = "Unassigned"
 id = "focusWindowUpOrBottom"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+J"
 id = "focusWindowOrWorkspaceDown"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+K"
 id = "focusWindowOrWorkspaceUp"
 
 [[hotkeys]]

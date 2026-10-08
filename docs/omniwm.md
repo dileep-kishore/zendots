@@ -34,9 +34,10 @@ position. The Niri config is unchanged.
 | --- | --- |
 | 1–9 | Switch to workspace 1–9 |
 | Shift+1–9 | Move the focused window to workspace 1–9 |
-| H / J / K / L | Focus left / down / up / right |
+| H / L | Focus left / right |
+| J / K | Focus down / up; switch to next / previous workspace at the edge |
 | Arrow keys | Move in that direction |
-| Tab | Previous workspace |
+| Tab | Toggle between current and last-used workspace |
 | Space | Raycast, configured separately in Raycast |
 | P | OmniWM command palette |
 | Return | Toggle OmniWM fullscreen, within the workspace |
@@ -47,6 +48,8 @@ position. The Niri config is unchanged.
 | T | Toggle tabbed column |
 
 Hyper excludes Shift, so Hyper+Shift+number is distinct from Hyper+number.
+J/K use `focusWindowOrWorkspaceDown` / `focusWindowOrWorkspaceUp`, matching
+Niri's Mod+J/K behavior. Workspace switching at the edge does not wrap.
 All other keyboard bindings are Unassigned, preserving ordinary Option
 shortcuts for apps. The remapper must keep the additional physical Shift
 modifier when the WM key is held.
