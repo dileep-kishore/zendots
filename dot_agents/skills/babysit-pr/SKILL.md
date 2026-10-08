@@ -7,8 +7,9 @@ description: Use when review comments on a pull request need answering — "addr
 
 Pushing a fix does not answer a review thread. The thread stays open, the
 reviewer cannot tell what happened, and the PR stalls. This skill takes a PR
-from "has unresolved threads" to "every thread replied to and resolved" in one
-pass, with a triage checkpoint before anything is posted publicly.
+from "has unresolved threads" to "every thread replied to and resolved"
+without stopping for approval: asking for it authorizes the fixes, pushes, and
+replies.
 
 Generating a fresh review is a different job: use `independent-review` or
 `/code-review` for that. This skill only answers review that already exists.
@@ -41,9 +42,9 @@ they finish, `result none` when no review bot appears within three minutes of
 the push, or `result timeout` 20 minutes after it, listing the pending ones.
 Run it in the background where the harness reports when it exits; otherwise
 in the foreground under a shell timeout, rerunning with the same `--since`
-until it prints a result, since that resumes the same deadline. Then continue to
-step 2 whatever the result; with no unresolved threads, report the result
-and stop.
+until it prints a result, since that resumes the same deadline. Then continue
+to step 2 whatever the result. With no unresolved threads, skip to step 6 so CI
+on the head is still watched, then report.
 
 ## 2. Enumerate every unresolved thread
 
@@ -78,7 +79,7 @@ read them separately and treat them as context, not as items to resolve:
 gh pr view <number> --json reviews,comments
 ```
 
-## 3. Verify each finding, then check in
+## 3. Verify and triage each finding
 
 Read the code each thread points at and decide whether the finding holds. Follow
 `receiving-code-review` for the standard of rigor: a review bot is a claim, not a
@@ -87,7 +88,7 @@ one. Settle each finding with the gates and verdicts in
 [independent-review's verify brief](../independent-review/references/verify-brief.md).
 You are the author here, so before rebutting a P0/P1 finding, or one you cannot
 settle by reading, run that brief in a fresh subagent and use its verdict. A
-PLAUSIBLE finding is fixed or put to the user, not rebutted.
+PLAUSIBLE finding is fixed, or left open for the user, never rebutted.
 
 Order the work: threads from a human reviewer first, then bots. Among bot
 threads, `chatgpt-codex-connector` prefixes a `P1`/`P2`/`P3` badge — follow it.
@@ -96,7 +97,7 @@ by blast radius. A finding that names a *companion PR* is the expensive kind:
 it is claiming this branch breaks once that one merges, so check that PR's
 current state before deciding.
 
-Present one table and wait for approval:
+Keep one triage table for the report:
 
 | Thread | File:line | Finding | Holds? | Plan |
 |---|---|---|---|---|
@@ -104,11 +105,13 @@ Present one table and wait for approval:
 | `PRRT_…` | `api/db.py:88` | P3 unbounded query | REFUTED — `limit` applied at `api/routes.py:142` | rebut |
 
 Every unresolved thread appears in the table, including ones you plan only to
-rebut. When a rebuttal rests on a reason that will recur in this repository,
-propose a `REVIEW.md` precedent below the table, as
-[review-rules](../independent-review/references/review-rules.md) describes.
-That is the checkpoint the user approves; after it, steps 4–7 run through
-without stopping, and an approved precedent joins the round's commit.
+rebut. Then carry on through steps 4–7 without asking. Leave a thread open,
+and say why in the report, when it needs the user: a product or design call,
+a human reviewer's request you would decline, or a fix outside the PR's
+scope. When a rebuttal rests on a reason that will recur in this repository,
+propose a `REVIEW.md` precedent in the report, as
+[review-rules](../independent-review/references/review-rules.md) describes,
+rather than writing it.
 
 ## 4. Fix and push
 
@@ -201,15 +204,14 @@ Report:
 - threads answered, split into fixed and rebutted
 - threads deliberately left open, and what each is waiting on
 - the pushed commit SHAs
-- any `REVIEW.md` precedent added
+- the triage table, and any `REVIEW.md` precedent proposed
 - CI conclusions on the final head, and whether each reviewer bot has
   reviewed it yet
 
-Fixes can prompt the review bots to open new threads. If the user asked to see
-the PR through ("until it's clean", "keep going"), rerun step 1's wait for the
-final head, then list unresolved threads again. New threads start
-the next round at step 2 with a fresh triage checkpoint. Stop when a completed
-review of the final head opens no new threads, after three rounds, or when
-what remains needs the user's decision. A bot still pending at the deadline means
-the PR is not yet known to be clean; report it that way. Otherwise stop after
-one round.
+Fixes can prompt the review bots to open new threads. After a round that
+pushed, rerun step 1's wait for the new head, then list unresolved threads
+again; any thread that does not need the user starts the next round at step
+2. Stop when that listing leaves nothing to answer (the wait reported no bot,
+or a completed review opened no new threads), after three rounds, or when
+everything left needs the user. A bot still pending at the deadline means the
+PR is not yet known to be clean; report it that way.

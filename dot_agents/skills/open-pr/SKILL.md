@@ -7,8 +7,9 @@ description: Use when finished work on a branch should become a pull request —
 
 A description written from the diff states what changed. The session knows why:
 what the user asked for, which constraint shaped the code, what was left out on
-purpose. This skill spends that context before it is lost, and stops once for
-approval, before anything is committed or reaches the remote.
+purpose. This skill spends that context before it is lost, then commits,
+pushes, and opens the PR without stopping: asking for a PR authorizes those
+steps.
 
 The description exists for one reader: a reviewer with the diff open, and later
 someone running `git blame`. It states the problem, the solution, and the
@@ -29,10 +30,17 @@ gh pr view --json number,url,state 2>/dev/null
 A PR already open for this branch means updating its title and description, not
 creating a second one.
 
-On the default branch, branch before committing: `git switch -c <type>/<name>`.
+`base` is the branch this work forked from, not always the default: an open
+PR's base, or the base a calling workflow already settled (Superpowers'
+finishing step does), wins over the default above. Use it for every
+`origin/$base`, the survey's `git log` included, and pass it to
+`gh pr create --base`.
 
-Steps 2–5 only plan and draft; nothing is committed or rewritten until the
-single checkpoint in step 6.
+On the default branch or a detached HEAD, branch before committing:
+`git switch -c <type>/<name>`.
+
+Steps 2–5 plan and draft; step 6 checks for the few reasons to stop, and
+step 7 carries the plan out.
 
 ## 2. Plan commits for pending work
 
@@ -54,7 +62,7 @@ typo`, `oops`, `address feedback`, lint-only changes, or several commits
 touching the same files for one purpose. Ten commits that each do one complete
 thing need no regrouping. Three where two repair the first do.
 
-Draft the exact fold for the checkpoint:
+Draft the exact fold:
 
 ```
 3 commits → 2
@@ -92,7 +100,8 @@ now, rather than leaving Verification empty; a failure is a finding to fix or
 report, not something to omit.
 
 When the session lacks the why (resumed, handed off, invoked cold), build what
-the commits support and ask one targeted question. Do not invent a motivation.
+the commits support, leave the motivation out rather than invent one, and say
+in the report that it is missing.
 
 ## 5. Compose
 
@@ -128,21 +137,16 @@ code, commands, links, and structure: the section order, headings, and title
 style set above, or the repository template's. Humanizer rewrites sentences,
 not the skeleton. Do not invent claims or add personality that does not fit.
 
-## 6. One checkpoint
+## 6. Stop only for these
 
-Show everything the user is approving in one message, then wait:
+Proceed without asking unless one of these holds; then show the plan and the
+reason, and wait:
 
-```
-Commits: 1. feat(pr): add open-pr skill
-         2. docs(agents): define self-contained commits
-Fold:    d4e5f6 "fix typo" into a1b2c3        (or: none / squash-merge repo)
-Title:   <title>
-Body:    <body>
-Proceed? [y / n / edit]
-```
-
-One approval covers committing, folding, pushing, opening, and waiting for
-review. An edit to one part needs re-approval of that part only.
+- the user asked to see it first ("draft it", "let me check before you push")
+- a pending file looks like a secret, credential, or large generated artifact
+- a change you cannot place in any planned commit, which may be someone
+  else's in-progress work
+- the fold would rewrite a commit that is already on the remote
 
 ## 7. Commit, fold, push, open
 
@@ -154,15 +158,15 @@ harness cannot open the rebase editor:
 GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
 date -u +%Y-%m-%dT%H:%M:%SZ   # note it: the push time for step 8
 git push -u origin HEAD
-gh pr create --title "<title>" --body "<body>"   # existing PR: gh pr edit
+gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
 
-Report the URL, then anything skipped: regrouping declined, verification
-missing, a question left unanswered.
+Report the URL, the commits and any fold made, then anything skipped:
+regrouping declined, verification missing, motivation the session lacked.
 
 ## 8. Hand over to review
 
 Unless the user asked only to open the PR, continue with `babysit-pr` from its
 step 1, passing that push time as `--since`. It waits for the review bots this
 push triggered, and stops about three minutes after the push when none
-appear. Its triage checkpoint still comes before any reply is posted.
+appear.

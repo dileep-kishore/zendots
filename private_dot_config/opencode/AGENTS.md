@@ -18,6 +18,12 @@
   to reverse, or visible to others that I didn't ask for: deleting data,
   force-pushing, publishing, or changing anything outside the current
   repository.
+- A request that names an outcome authorizes its routine steps: asking for a
+  PR covers committing, pushing, and opening it; asking to address review
+  covers fixes, pushes, and thread replies. Skip skill checkpoints that ask me
+  to approve such steps and report what you did instead. When Superpowers'
+  finishing menu would ask, open a PR with `open-pr` if I asked to ship;
+  otherwise keep the branch as it is and say so.
 - Spec and planning workflows, Superpowers included: interview me first with
   multiple-choice questions on the unresolved consequential decisions,
   typically 3 to 6 and fewer when appropriate, one at a time, each with a
