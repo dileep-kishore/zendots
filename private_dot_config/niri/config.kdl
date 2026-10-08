@@ -120,7 +120,7 @@ layout {
 }
 spawn-at-startup "hypridle"
 // spawn-at-startup "espanso" "daemon"  // Autostarts via systemd
-spawn-at-startup "bash" "-c" "qs -c noctalia-shell"
+spawn-at-startup "noctalia"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "google-chrome-stable"
 spawn-at-startup "ghostty"
@@ -482,7 +482,7 @@ binds {
         spawn "handy" "--cancel"
     }
     Mod+Alt+W {
-        spawn-sh "qs -c noctalia-shell ipc call bar toggle"
+        spawn-sh "noctalia msg bar-toggle"
     }
     Mod+Alt+L {
         spawn "bash" "-c" "sleep 3 && niri msg action power-off-monitors && hyprlock"

@@ -45,6 +45,7 @@ bin/
 {{- if eq .chezmoi.os "darwin" }}
 .config/systemd
 .config/niri
+.config/noctalia
 .config/hypr
 .config/waybar
 .config/swaync
