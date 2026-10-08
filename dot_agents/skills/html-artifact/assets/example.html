@@ -13,6 +13,8 @@
    SN Pro: webfonts/SNPro[ital,wght].woff2 is mislabelled upstream. It carries no ital axis while
    its OS/2 and name records claim italic, so browsers synthesise a slant from it; the upright
    variable under fonts/ is used instead and display italics fall back to the system face.
+   iA Writer: the static S families come before the variable V ones. On Linux, Chrome draws an
+   installed V italic at a lighter weight than the text around it; S matches macOS.
    Pins (fonts here, Mermaid, Vega and highlight.js in the script below) last checked 2026-09-11. */
 @font-face { font-family: "SN Pro Web"; src: url("https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/variable/SNPro%5Bwght%5D.ttf") format("truetype"); font-weight: 200 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "iA Writer Duo Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
@@ -31,8 +33,8 @@
   --blue: #89b4fa; --peach: #fab387; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af; --teal: #94e2d5; --pink: #f5c2e7;
   --blue-soft: #89b4fa26; --peach-soft: #fab38726; --green-soft: #a6e3a126; --red-soft: #f38ba826; --teal-soft: #94e2d526;
   --font-display: "SN Pro", "SN Pro Web", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-text: "iA Writer Duo V", "iA Writer Duo S", "iA Writer Duo Web", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-mono: "iA Writer Mono V", "iA Writer Mono S", "iA Writer Mono Web", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-text: "iA Writer Duo S", "iA Writer Duo V", "iA Writer Duo Web", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "iA Writer Mono S", "iA Writer Mono V", "iA Writer Mono Web", ui-monospace, SFMono-Regular, Menlo, monospace;
   --measure: 860px;
   color-scheme: dark;
 }
