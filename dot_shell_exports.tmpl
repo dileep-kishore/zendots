@@ -32,6 +32,9 @@ if [ -f "$HOME/.config/secrets.env" ]; then
     . "$HOME/.config/secrets.env"
     set +a
 fi
+# Keep pay-per-token keys out of the environment: headless claude/codex
+# (Orca chats, `claude -p`) bill an env key over the subscription login.
+unset ANTHROPIC_API_KEY OPENAI_API_KEY
 
 # Codex (CBORG)
 ## export OPENAI_API_KEY=$CBORG_API_KEY
