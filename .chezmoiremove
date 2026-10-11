@@ -11,3 +11,8 @@
 
 # Subagents are pinned to Opus 5.5; the Fable escalation rule is retired.
 .claude/rules/subagents.md
+
+# Folded into the writing rules in the global AGENTS.md.
+.agents/skills/unslop
+.claude/skills/unslop
+.pi/agent/skills/unslop

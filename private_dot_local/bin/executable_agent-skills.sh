@@ -121,6 +121,15 @@ record() {
     printf 'Refusing to record. Restore it with `agent-skills.sh fetch`.\n' >&2
     exit 1
   done
+  # A skill retired in .chezmoiremove but still in this store has not had its
+  # removal applied here yet. Adding it back gives chezmoi a source entry and a
+  # removal for the same path, and then every chezmoi command fails.
+  for name in $(sed -n 's#^\.agents/skills/\([^/]*\)$#\1#p' "$(chezmoi source-path)/.chezmoiremove" 2>/dev/null); do
+    [ -e "$store/$name" ] || [ -L "$store/$name" ] || continue
+    printf '%s is retired in .chezmoiremove but still in %s.\n' "$name" "$store" >&2
+    printf 'Refusing to record. Apply the removal first: chezmoi apply %s\n' "$store/$name" >&2
+    exit 1
+  done
   chezmoi add "$store" "$skill_lock"
   [ -f "$runtime_lock" ] && chezmoi add "$runtime_lock"
   "$HOME/.local/bin/link-agent-skills.sh"

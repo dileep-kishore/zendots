@@ -56,6 +56,20 @@
   has not followed the session. The first and last lines stand alone: what
   happened, and what is waiting on me. End a long or multi-step run with three
   headings: Blocked on me, Changed, Found. Order lists by importance.
+- Write prose a reader can act on: name the mechanism, number, or instruction
+  instead of how something feels, and cut a sentence that would fit unchanged
+  in another project's docs. One idea per sentence, active voice with a named
+  actor, the plain word (use, help, many), a stronger verb instead of an
+  adverb, and the literal phrase instead of a metaphor or a coined label
+  ("drift-safe pass", "north star").
+- Use a list only for parallel items, written as sentences rather than bold
+  labels with colons. Separate clauses with periods, commas, or colons, never
+  em dashes. State a point directly rather than against one nobody raised
+  ("X, not Y", "not just X"). These writing rules cover prose you write:
+  replies and new text in documents, commits, and PRs. Leave existing prose,
+  quotations, code, identifiers, and exact strings as they are unless I ask
+  you to edit them, and follow a file's established conventions where they
+  differ.
 - My explicit requests outrank skill guidelines. When a skill instruction
   blocks or diverges from what I asked, name the skill file, quote the line,
   and say whether it is an explicit requirement or your reading of it.

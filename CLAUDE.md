@@ -67,7 +67,7 @@ agent-skills.sh sync                    # after editing any skill in the store
 To author a skill, invoke the `create-skill` skill; it covers layout, the
 manual-only frontmatter for each harness, and recording the result.
 
-Every skill absent from `~/.agents/.skill-lock.json` (`unslop`, `open-pr`,
+Every skill absent from `~/.agents/.skill-lock.json` (`humanizer`, `open-pr`,
 `create-skill`, `find-docs`, and the rest) is locally maintained. Do not
 reinstall them from upstream. Edit `~/.agents/skills/<name>/SKILL.md`, then run
 `agent-skills.sh sync`. A broad `agent-skills.sh add mattpocock/skills` or
@@ -82,6 +82,13 @@ unrecorded. Commit afterwards; the source reaches the other machine over
 Syncthing, where `chezmoi apply ~/.agents ~/.claude/skills` picks it up. Install
 a given skill on one machine only -- both write to the same synced source, so
 installing on both produces Syncthing conflict files.
+
+To retire a locally maintained skill, `chezmoi forget --force` and delete its
+store directory, then list the store path and its `~/.claude/skills` and
+`~/.pi/agent/skills` links in `.chezmoiremove`. On the other machine, apply
+those paths before any `agent-skills.sh` command; the wrapper refuses to record
+a retired skill that is still in the store, because adding it back leaves
+chezmoi with a source entry and a removal for the same path.
 
 - **Only Claude Code needs symlinks.** Codex and OpenCode resolve
   `~/.agents/skills` natively -- `npx skills` classifies them as "universal" and

@@ -36,10 +36,9 @@ outside the skill and repository; do not reconstruct the setup or vendor depende
 ## 4. Write concisely
 
 Follow `references/writing.md`. Prose covers only what the visual cannot.
-Apply the `unslop` rules as you draft. Then read the sibling skill
-`../humanizer/SKILL.md` (it is manual-only, so read the file rather than
-invoking it) and apply its rules to the finished text. Done when no paragraph
-restates its neighbouring figure.
+Read the sibling skill `../humanizer/SKILL.md` (it is manual-only, so read the
+file rather than invoking it) and apply its rules to the finished text. Done
+when no paragraph restates its neighbouring figure.
 
 ## 5. Fill the template
 
