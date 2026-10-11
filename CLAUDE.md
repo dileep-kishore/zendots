@@ -114,15 +114,16 @@ chezmoi with a source entry and a removal for the same path.
 #### Fetched skills
 
 A skill that carries an upstream runtime -- a Node package, a binary -- is
-*fetched* rather than installed; `archify` is the only one. The runtime is cloned to `~/.agents/runtimes/<name>`,
+*fetched* rather than installed. None is fetched now; `archify` was the only one
+until it was retired in October 2026. The runtime is cloned to `~/.agents/runtimes/<name>`,
 which is never `chezmoi add`ed, and only a relative symlink enters the store, so
 the payload reaches neither this repository nor Syncthing.
 
 ```bash
-agent-skills.sh fetch tt-a1i/archify --path archify   # --path: SKILL.md is not at the repo root
-agent-skills.sh fetch                                 # restore missing runtimes, follow new pins
-agent-skills.sh fetch --bump archify                  # move the pin to the ref's tip
-agent-skills.sh remove archify                        # works for either kind
+agent-skills.sh fetch <owner>/<repo> --path <name>   # --path: SKILL.md is not at the repo root
+agent-skills.sh fetch                                # restore missing runtimes, follow new pins
+agent-skills.sh fetch --bump <name>                  # move the pin to the ref's tip
+agent-skills.sh remove <name>                        # works for either kind
 ```
 
 - **Run `agent-skills.sh fetch` on a new machine.** `chezmoi apply` reproduces
@@ -141,9 +142,9 @@ agent-skills.sh remove archify                        # works for either kind
   `~/.agents/skills/<name>` exists and is not its own link, because
   `chezmoi apply --force ~/.agents` replaces a real directory with the symlink
   and deletes its contents without listing them.
-- `fetch` deletes `scripts/check-update.mjs` after every checkout. archify runs
-  it on each use to contact a remote manifest; its own SKILL.md says to continue
-  silently when the checker cannot run.
+- `fetch` deletes `scripts/check-update.mjs` after every checkout. archify ran
+  it on each use to contact a remote manifest, and its SKILL.md said to continue
+  silently when the checker could not run.
 
 ### Syncthing project folders
 

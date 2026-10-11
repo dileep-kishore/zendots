@@ -16,3 +16,9 @@
 .agents/skills/unslop
 .claude/skills/unslop
 .pi/agent/skills/unslop
+
+# Retired: unused. Its runtime is a fetched clone that chezmoi never managed,
+# so it is listed too.
+.agents/skills/archify
+.claude/skills/archify
+.agents/runtimes/archify
