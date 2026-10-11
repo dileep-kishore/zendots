@@ -60,6 +60,11 @@
   blocks or diverges from what I asked, name the skill file, quote the line,
   and say whether it is an explicit requirement or your reading of it.
 - Don't add skill-branded comments such as `ponytail:`.
+- Code comments carry what the code cannot show: a reason, constraint, edge
+  case, or trap, in one line, two only when the second is a new fact. No
+  banners, step narration, restated lines or signatures, end-of-block
+  markers, emoji, or TODOs that name no task. `clean-comments` removes these
+  from existing code.
 
 ## Tools and preferences
 

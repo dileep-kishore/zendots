@@ -15,4 +15,4 @@ the choices that differ from generic defaults.
   narrow.
 - Declare object shapes with `interface`; reserve `type` for unions,
   intersections, and mapped types.
-- Comments explain why, not what. JSDoc on exported functions.
+- JSDoc on exported functions.
