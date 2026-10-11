@@ -65,6 +65,7 @@
   banners, step narration, restated lines or signatures, end-of-block
   markers, emoji, or TODOs that name no task. `clean-comments` removes these
   from existing code.
+- Use `check-web-ui` when you build, test, or review a web UI.
 
 ## Tools and preferences
 
