@@ -116,7 +116,7 @@ margin = 1
 
 [niri]
 alwaysCenterSingleColumn = true
-centerFocusedColumn = "onOverflow"
+centerFocusedColumn = "never"
 containerPrimarySpanPresets = [0.25, 0.5, 0.75, 1.0]
 defaultContainerPrimarySpan = 0.5
 infiniteLoop = false
@@ -374,6 +374,13 @@ axRole = "AXWindow"
 axSubrole = "AXStandardWindow"
 bundleId = "us.zoom.xos"
 id = "6473E50C-1C2A-47E1-A0EC-11EC8264DE41"
+layout = "float"
+
+[[appRules]]
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.granola.app"
+id = "EFBC9FE8-21B6-4B6E-8DC2-FCF3B5BAF933"
 layout = "float"
 
 [[hotkeys]]
