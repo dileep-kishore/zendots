@@ -57,6 +57,11 @@ A comparison closes with the choice and one reason. A plan carries a
   findings, next.
 - **Comparison:** lead, criteria table, one chart if the criteria are numeric,
   recommendation.
+- **Work summary** (what was done): lead stating what is now true, tiles with
+  deltas, what changed (diff view), status ledger against the plan, how the
+  new thing works (stepper) when it has a mechanism, evidence disclosures,
+  duration lanes when measured times exist, decision form for what waits on
+  the reader. Components are described in [components.md](components.md).
 
 Drop any part the ask does not need.
 

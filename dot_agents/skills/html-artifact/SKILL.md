@@ -1,6 +1,6 @@
 ---
 name: html-artifact
-description: Use when the user asks for an HTML artifact or HTML page of a plan, workflow, analysis, comparison, or results, or to visualise one as a web page. Produces one concise, visual, house-styled HTML file from the template; not for Markdown documents.
+description: Use when the user asks for an HTML artifact or HTML page of a plan, workflow, analysis, comparison, or results, to visualise one as a web page, or for an interactive figure or explorer, in a page or inline in a T3 thread. Produces one concise, visual, house-styled HTML file from the template; not for Markdown documents.
 ---
 
 # HTML artifact
@@ -8,7 +8,8 @@ description: Use when the user asks for an HTML artifact or HTML page of a plan,
 One self-contained page in the house style: a sticky table of contents on the
 left, a lead paragraph, and sections that show their point with a diagram,
 chart, table, or tiles before they say it in prose. The template is fixed; you
-supply content and visuals only.
+supply content and visuals only. A figure may be interactive: sliders, toggles
+and hover readouts drawn by the template's own runtime.
 
 ## 1. Collect
 
@@ -27,6 +28,14 @@ ask with no section you could cut.
 For each section pick the one visual that shows the point, using the table in
 [references/visuals.md](references/visuals.md), or none when a sentence is
 faster. Done when every section has a visual decision written down.
+
+When the point is how a result responds to an input, or the reader needs exact
+values across series, make the figure interactive following
+[references/interactive.md](references/interactive.md). For what changed, what
+became of each planned item, the evidence behind a claim, how a mechanism
+works step by step, when work ran, or what the reader must decide, use the
+components in [references/components.md](references/components.md); it is a
+guide, not a checklist.
 
 Diagrams are Excalidraw. For a huge diagram you may offer hand-drawn Mermaid,
 and use it only when the user explicitly chooses it. Generate diagrams with the bundled Bun command in
@@ -48,7 +57,9 @@ Give each h2 an id. Every visual sits in a `<figure>` with a manuscript-style
 caption (tables in `<figure class="table">`, caption first); the template
 numbers them. Embed Excalidraw SVG exports as described in `references/visuals.md`.
 User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
-`<div class="vega"><script type="application/json">`. `assets/example.html`
+`<div class="vega"><script type="application/json">`, an interactive figure's
+`<div class="viz" id="...">` fragment before its `<figcaption>`. A diff view
+is the output of `scripts/diff.py`, pasted as it stands. `assets/example.html`
 is a component catalogue, not a model for length. It includes an Excalidraw
 figure and a hand-drawn Mermaid example explicitly labelled as opt-in.
 
@@ -66,13 +77,16 @@ Fix every `ERROR`. Done when the checker prints `OK`. The checker reads the
 file and never renders it, so it cannot see a Mermaid block that fails to
 parse or a chart that comes out empty; re-read those specs yourself.
 Open the final page in T3's built-in browser when available and check both
-themes, labels, arrow bindings, and narrow-screen scrolling. If browser review
+themes, labels, arrow bindings, and narrow-screen scrolling. Drive every
+interactive figure as `references/interactive.md` describes. If browser review
 is unavailable, report that limit rather than treating the checker as visual proof.
 
 ## 7. Deliver
 
 Write to the project's docs directory as `docs/<slug>.html`, or the location
-the project already uses for artifacts. Report the absolute path. Publish only
+the project already uses for artifacts. Report the absolute path. For a visual the user wants in the conversation, wrap
+the fragment with `scripts/render.py` and show it with T3's `html_render`, as
+`references/interactive.md` describes. Publish only
 when the user asks for a link and the harness has an artifact tool, following
 the publishing note in `references/writing.md`.
 

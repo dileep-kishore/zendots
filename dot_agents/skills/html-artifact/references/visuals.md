@@ -12,6 +12,8 @@ shows its point, or none when a sentence says it faster.
 | When does each piece happen? | Excalidraw schedule, or `.timeline` for a short list |
 | Which states and transitions exist? | Excalidraw state diagram |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
+| How does the result respond to an input the reader can change? | Interactive figure, per [interactive.md](interactive.md) |
+| Which exact values do several series take at a point the reader picks? | `viz.lineChart` interactive figure |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
 | What are the two to four headline numbers? | `.tiles` |
 | What mechanism do none of those express? | Excalidraw explanatory diagram |
@@ -19,6 +21,10 @@ shows its point, or none when a sentence says it faster.
 
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
+
+Beyond figures, [components.md](components.md) covers tile deltas and
+sparklines, status ledgers, evidence disclosures, diff views, steppers,
+duration lanes and decision forms, with a guide to when each helps.
 
 ## Figure and table markup
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Validate an html-artifact page: single file, allowlisted hosts, pinned libraries and fonts, TOC-able headings.
+"""Validate an html-artifact page: single file, allowlisted hosts, pinned libraries and fonts, TOC-able headings,
+and well-formed interactive figures.
 
 Usage: check.py FILE
 Exit 0 when there are no errors, 1 otherwise. Warnings never fail the check.
@@ -15,16 +16,32 @@ from urllib.parse import urlsplit
 ALLOWED_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"}
 WARN_BYTES, MAX_BYTES = 1_000_000, 2_000_000
 PINNED = re.compile(r"@(\d+\.\d+\.\d+|[0-9a-f]{7,40})/")
+def substitutions(m: re.Match) -> str:
+    """Drop a literal or comment but keep a template literal's ${...} parts, which execute."""
+    text = m.group(0)
+    return " ".join(re.findall(r"\$\{(.*?)\}", text, re.DOTALL)) if text.startswith("`") else ""
+
+
+JS_TYPES = {"text/javascript", "application/javascript", "module"}
+# String literals and comments, so a mention of fetch( in text is not taken for a call.
+LITERALS = re.compile(r"'(?:\\.|[^'\\\n])*'|\"(?:\\.|[^\"\\\n])*\"|`(?:\\.|[^`\\])*`|/\*.*?\*/|//[^\n]*", re.DOTALL)
 
 
 class Page(HTMLParser):
     def __init__(self):
         super().__init__()
         self.resources, self.headings, self.css, self.scripts = [], [], [], []
+        self.ids, self.viz_roots, self.code = [], [], []
+        self.runtime, self.raw_js = set(), False
+        self.lanes, self.last_div, self.raw_lanes = [], [], False
         self.raw_tag = None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if attrs.get("id"):
+            self.ids.append(attrs["id"])
+        if "viz" in (attrs.get("class") or "").split():
+            self.viz_roots.append(attrs.get("id"))
         if tag == "h2":
             self.headings.append(attrs.get("id"))
         for key in ("src", "poster"):
@@ -36,8 +53,16 @@ class Page(HTMLParser):
                     self.resources.append(attrs[key])
         if attrs.get("style"):
             self.css.append(attrs["style"])
+        if tag == "div":
+            self.last_div = (attrs.get("class") or "").split()
         if tag in {"style", "script"}:
             self.raw_tag = tag
+            self.raw_lanes = tag == "script" and attrs.get("type") == "application/json" and "lanes" in self.last_div
+            if self.raw_lanes:
+                self.lanes.append("")
+            if attrs.get("id") in {"viz-css", "viz-js"}:
+                self.runtime.add((tag, attrs["id"]))
+            self.raw_js = tag == "script" and (attrs.get("type") or "text/javascript") in JS_TYPES
 
     def handle_endtag(self, tag):
         if tag == self.raw_tag:
@@ -48,6 +73,10 @@ class Page(HTMLParser):
             self.css.append(data)
         elif self.raw_tag == "script":
             self.scripts.append(data)
+            if self.raw_js:
+                self.code.append(data)
+            if self.raw_lanes:
+                self.lanes[-1] += data
 
 
 def check(path: Path) -> int:
@@ -101,6 +130,27 @@ def check(path: Path) -> int:
             json.loads(spec)
         except json.JSONDecodeError as e:
             errors.append(f"vega spec is not valid JSON: {e}")
+
+    dupes = sorted({i for i in page.ids if page.ids.count(i) > 1})
+    if dupes:
+        errors.append("duplicate id: " + ", ".join(dupes))
+    if page.viz_roots:
+        if page.runtime != {("style", "viz-css"), ("script", "viz-js")}:
+            errors.append("interactive figure but no viz runtime; copy viz-css and viz-js from the template")
+        if not all(page.viz_roots):
+            errors.append('interactive figure root without an id: <div class="viz" id="...">')
+    if re.search(r"\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(", LITERALS.sub(substitutions, "\n".join(page.code))):
+        errors.append("script makes a network request; inline the data instead")
+
+    for spec in page.lanes:
+        try:
+            data = json.loads(spec)
+            for lane in data["lanes"]:
+                lane["name"]
+                for span in lane["spans"]:
+                    span["start"], span["end"]
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            errors.append(f"lanes data needs lanes[].name and spans[].start/end: {e!r}")
 
     if "<!-- SLOT:" in html:
         errors.append("unfilled SLOT comment remains")

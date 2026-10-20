@@ -64,6 +64,15 @@
   --blue-soft: #1e66f51a; --peach-soft: #fe640b1f; --green-soft: #40a02b1f; --red-soft: #d20f391a; --teal-soft: #1792991f;
   color-scheme: light;
 }
+/* The T3 / shadcn token names the interactive runtime reads, mapped onto the house tokens so they follow the theme. */
+:root {
+  --background: var(--ground); --foreground: var(--ink); --muted: var(--surface-2); --muted-foreground: var(--ink-3);
+  --card: var(--surface); --popover: var(--ground); --popover-foreground: var(--ink); --border: var(--line-strong);
+  --primary: var(--accent); --primary-foreground: var(--ground); --ring: var(--accent); --radius: 4px;
+  --chart-1: var(--blue); --chart-2: var(--peach); --chart-3: var(--green); --chart-4: var(--pink); --chart-5: var(--teal); --chart-6: var(--yellow);
+  --font-sans: var(--font-display);
+  --success: var(--good); --warning: var(--peach); --destructive: var(--bad);
+}
 
 /* Layout */
 * { box-sizing: border-box; }
@@ -203,7 +212,9 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
 @media print {
   :root { --ground: #ffffff; --surface: #ffffff; --surface-2: #e6e9ef; --line: #ccd0da; --line-strong: #6c6f85;
     --ink: #4c4f69; --ink-2: #5c5f77; --ink-3: #6c6f85; --accent: #8839ef; --accent-ink: #8839ef; --accent-soft: #8839ef1a;
-    --chart-cat: #1e66f5 #fe640b #40a02b #df8e1d #ea76cb #179299 #8839ef #d20f39; color-scheme: light; }
+    --chart-cat: #1e66f5 #fe640b #40a02b #df8e1d #ea76cb #179299 #8839ef #d20f39; color-scheme: light;
+    --blue: #1e66f5; --peach: #fe640b; --green: #40a02b; --red: #d20f39; --yellow: #df8e1d; --teal: #179299; --pink: #ea76cb;
+    --good: #40a02b; --warn: #df8e1d; --bad: #d20f39; }
   nav.toc, button.theme { display: none; }
   .page { grid-template-columns: 1fr; }
   h2 { break-after: avoid; }
@@ -213,6 +224,584 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   .excalidraw-images .excalidraw-light { display: block !important; min-width: 0; }
 }
 </style>
+<style id="viz-css">
+/* Interactive figures. Reads T3/shadcn token names: a host (T3 html_render) or the page supplies them; the
+   :where() fallbacks (specificity 0) apply only in a bare standalone file, following the OS theme. */
+:where(:root) {
+  color-scheme: light dark;
+  --background: light-dark(#eff1f5, #1e1e2e); --foreground: light-dark(#4c4f69, #cdd6f4);
+  --muted: light-dark(#ccd0da, #313244); --muted-foreground: light-dark(#5c5f77, #a6adc8);
+  --card: light-dark(#e6e9ef, #181825); --popover: light-dark(#e6e9ef, #181825); --popover-foreground: light-dark(#4c4f69, #cdd6f4);
+  --border: light-dark(#9ca0b0, #585b70); --primary: light-dark(#8839ef, #cba6f7); --primary-foreground: light-dark(#eff1f5, #1e1e2e);
+  --ring: light-dark(#8839ef, #cba6f7); --radius: 6px;
+  --chart-1: light-dark(#1e66f5, #89b4fa); --chart-2: light-dark(#fe640b, #fab387); --chart-3: light-dark(#40a02b, #a6e3a1);
+  --chart-4: light-dark(#ea76cb, #f5c2e7); --chart-5: light-dark(#179299, #94e2d5); --chart-6: light-dark(#df8e1d, #f9e2af);
+  --success: light-dark(#40a02b, #a6e3a1); --warning: light-dark(#fe640b, #fab387); --destructive: light-dark(#d20f39, #f38ba8);
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.viz { display: flex; flex-direction: column; gap: 14px; min-width: 0; color: var(--foreground); font: 400 14px/1.45 var(--font-sans);
+  --viz-grid: color-mix(in srgb, var(--border) 45%, transparent); }
+.viz-controls { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: flex-end; }
+.viz-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; max-width: 320px; font-size: 13px; color: var(--muted-foreground); }
+.viz-field > span { display: flex; justify-content: space-between; gap: 8px; }
+.viz-field output { color: var(--foreground); font-variant-numeric: tabular-nums; }
+.viz input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; cursor: pointer; }
+.viz input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+  background: linear-gradient(var(--primary), var(--primary)) 0 / var(--fill, 50%) 100% no-repeat, var(--muted); }
+.viz input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--background); box-shadow: 0 0 0 1px var(--primary); transition: transform .12s; }
+.viz input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+.viz input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--muted); }
+.viz input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--primary); }
+.viz input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--background); }
+.viz :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.viz select { font: inherit; color: var(--foreground); background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; }
+.viz-seg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 2px; border-radius: calc(var(--radius) + 2px); background: var(--muted); }
+.viz-seg button { font: inherit; font-size: 13px; border: 0; border-radius: var(--radius); padding: 4px 12px; cursor: pointer;
+  background: transparent; color: var(--muted-foreground); transition: background .15s, color .15s; }
+.viz-seg button[aria-pressed="true"] { background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .15); }
+.viz-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 24px; }
+.viz-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.viz-stat .k { font-size: 12px; color: var(--muted-foreground); }
+.viz-stat .v { font-size: 22px; font-weight: 500; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.viz-stat .d { font-size: 12px; color: var(--muted-foreground); }
+.viz-chart { position: relative; min-width: 0; }
+.viz-chart svg { display: block; width: 100%; overflow: visible; touch-action: pan-y; }
+.viz-chart svg:focus-visible { outline-offset: 4px; }
+.viz-chart .grid line { stroke: var(--viz-grid); }
+.viz-chart .axis text, .viz-chart .axis-title, .viz-chart .ref text { fill: var(--muted-foreground); font: 12px var(--font-sans); font-variant-numeric: tabular-nums; }
+.viz-chart .axis .domain, .viz-chart .axis line { stroke: var(--border); }
+.viz-chart .axis.y .domain { display: none; }
+.viz-chart .ref line { stroke: var(--muted-foreground); stroke-dasharray: 2 4; }
+.viz-chart .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.viz-chart .guide { stroke: var(--muted-foreground); stroke-width: 1; }
+.viz-chart .dots circle { stroke: var(--card); stroke-width: 2; }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-bottom: 6px; font-size: 13px; }
+.viz-legend button, .viz-legend span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: none; font: inherit; color: var(--foreground); cursor: pointer; }
+.viz-legend button::before, .viz-legend span::before { content: ""; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.viz-legend button.dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px); }
+.viz-legend button[aria-pressed="false"] { color: var(--muted-foreground); text-decoration: line-through; }
+.viz-legend button[aria-pressed="false"]::before { opacity: .3; }
+.viz-tip { position: absolute; z-index: 5; pointer-events: none; opacity: 0; transition: opacity .12s; white-space: nowrap;
+  background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 7px 10px; font: 12px/1.45 var(--font-sans); font-variant-numeric: tabular-nums; box-shadow: 0 6px 20px rgb(0 0 0 / .18); }
+.viz-tip[data-show] { opacity: 1; }
+.viz-tip.float { white-space: normal; max-width: 260px; }
+.viz-tip .h { color: var(--muted-foreground); margin-bottom: 3px; }
+.viz-tip .r { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; }
+.viz-tip .r i { height: 3px; border-radius: 2px; background: var(--c); }
+.viz-tip .r b { font-weight: 500; text-align: right; }
+.viz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.viz-error { color: var(--muted-foreground); font-size: 13px; padding: 24px 0; }
+:where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes), :where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes) * { box-sizing: border-box; }
+/* Summary components: tile deltas and sparklines, status ledger, evidence, decision form, diff, stepper, lanes. */
+.tile .d { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+svg.spark { display: block; width: 100%; height: 24px; overflow: visible; }
+svg.spark path { fill: none; stroke: var(--chart-1); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.ledger { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+/* The label is positioned, not a grid cell: a grid would make every text run and inline element its own cell. */
+.ledger li { position: relative; padding-left: 100px; margin: 0; }
+.ledger li::before { content: attr(data-status); position: absolute; left: 0; top: .2em; width: 88px; text-align: center; border-radius: 3px; padding: 0 6px;
+  font: 500 11px/1.7 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--foreground); background: color-mix(in srgb, var(--s, var(--muted-foreground)) 22%, transparent); box-shadow: inset 3px 0 0 var(--s, var(--muted-foreground)); }
+@media (max-width: 520px) { .ledger li { padding: 22px 0 0; } .ledger li::before { top: 0; } }
+.ledger [data-status="done"], .ledger-sum .done { --s: var(--success); }
+.ledger [data-status="changed"], .ledger-sum .changed { --s: var(--warning); }
+.ledger [data-status="dropped"], .ledger-sum .dropped { --s: var(--destructive); }
+.ledger [data-status="deferred"], .ledger-sum .deferred { --s: var(--muted-foreground); }
+.ledger-sum { display: flex; flex-direction: column; gap: 6px; font: 12px var(--font-sans); color: var(--muted-foreground); }
+.ledger-sum .bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.ledger-sum .bar i { background: var(--s); }
+details.evidence { border: 1px solid var(--border); border-radius: var(--radius); }
+details.evidence > summary { cursor: pointer; list-style: none; display: flex; gap: 12px; justify-content: space-between; align-items: baseline; padding: 8px 12px; }
+details.evidence > summary::-webkit-details-marker { display: none; }
+details.evidence > summary::before { content: "\25B8"; color: var(--muted-foreground); transition: transform .15s; }
+details.evidence[open] > summary::before { transform: rotate(90deg); }
+details.evidence > summary > :first-child { flex: 1; }
+details.evidence > summary span { font: 12px var(--font-sans); color: var(--muted-foreground); }
+details.evidence > :not(summary) { margin: 0 12px 12px; }
+form.decide { display: flex; flex-direction: column; gap: 14px; }
+form.decide fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+form.decide legend { padding: 0; margin-bottom: 6px; font-weight: 500; }
+form.decide label { position: relative; border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; cursor: pointer; font: 13px var(--font-sans); }
+form.decide label input { position: absolute; opacity: 0; pointer-events: none; }
+form.decide label:has(input:checked) { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+form.decide label:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
+form.decide label:has(input[data-rec])::after { content: " \00B7 recommended"; opacity: .75; font-size: 11px; }
+form.decide textarea { width: 100%; font: 13px var(--font-sans); color: var(--foreground); background: transparent; border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; }
+.decide-out { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.decide-out code { flex: 1 1 260px; font: 12px var(--font-mono); background: var(--muted); padding: 4px 8px; border-radius: 4px; white-space: pre-wrap; }
+.decide-out button, .step-nav button { font: 13px var(--font-sans); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px 12px; cursor: pointer; background: transparent; color: var(--foreground); }
+.decide-out button { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+.step-nav button[aria-pressed="true"] { background: var(--muted); }
+figure.diff { gap: 10px; }
+.diff-sum, .diff-file > summary { font: 12px var(--font-sans); color: var(--muted-foreground); }
+.diff-file { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.diff-file > summary { cursor: pointer; padding: 6px 10px; background: color-mix(in srgb, var(--muted) 50%, transparent); display: flex; justify-content: space-between; gap: 12px; }
+.diff-file > summary code { color: var(--foreground); background: none; padding: 0; font-size: 12px; }
+/* Status hues mixed toward the text colour, so small coloured text keeps 4.5:1 in both themes. */
+.diff .add, .tile .d.good { color: color-mix(in srgb, var(--success) 40%, var(--foreground)); }
+.diff .del, .tile .d.bad { color: color-mix(in srgb, var(--destructive) 40%, var(--foreground)); }
+.diff-lines { overflow-x: auto; font: 12px/1.6 var(--font-mono); }
+.diff-lines > div { display: grid; grid-template-columns: 3.2em 3.2em max-content; white-space: pre; min-width: 100%; width: max-content; }
+.diff-lines > div > span { color: var(--muted-foreground); text-align: right; padding-right: 8px; user-select: none; }
+.diff-lines code { background: none; padding: 0; font: inherit; color: inherit; }
+.diff-lines .h { display: block; color: var(--muted-foreground); background: color-mix(in srgb, var(--muted) 50%, transparent); padding: 0 8px; }
+.diff-lines .a { background: color-mix(in srgb, var(--success) 14%, transparent); }
+.diff-lines .r { background: color-mix(in srgb, var(--destructive) 14%, transparent); }
+.diff-lines .gap { display: block; color: var(--muted-foreground); padding: 0 8px; font-style: italic; }
+.diff-lines b.pin { display: inline-block; min-width: 1.5em; margin-left: 10px; text-align: center; border-radius: 999px; font: 500 11px/1.5 var(--font-sans); background: var(--primary); color: var(--primary-foreground); }
+.diff-notes { margin: 0; padding: 8px 12px 8px 32px; font: 13px/1.45 var(--font-sans); border-top: 1px solid var(--border); }
+.stepper .dim { opacity: .25; transition: opacity .2s; }
+.stepper svg text { font-family: var(--font-sans); }
+.stepper [data-step] { transition: opacity .2s; }
+.step-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font: 13px var(--font-sans); color: var(--muted-foreground); }
+.step-captions { margin: 0; }
+.step-captions li.off { display: none; }
+.lanes { display: grid; grid-template-columns: minmax(64px, max-content) minmax(0, 1fr); gap: 6px 10px; align-items: center; font: 12px var(--font-sans); }
+.lanes .track { position: relative; height: 20px; border-radius: 3px; background: color-mix(in srgb, var(--muted) 45%, transparent); }
+.lanes .track i { position: absolute; top: 0; bottom: 0; min-width: 2px; border-radius: 3px; font-style: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  padding: 0 6px; line-height: 20px; color: var(--foreground); background: color-mix(in srgb, var(--c) 20%, transparent); box-shadow: inset 3px 0 0 var(--c); }
+.lanes .track i.wait { color: transparent; background: repeating-linear-gradient(45deg, var(--border) 0 3px, transparent 3px 7px); }
+.lanes .ticks { grid-column: 2; position: relative; height: 16px; color: var(--muted-foreground); }
+.lanes .ticks span { position: absolute; white-space: nowrap; }
+.lanes:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+@media print {
+  .stepper .dim { opacity: 1; } .step-captions li.off { display: list-item; } .step-nav, .decide-out button { display: none; }
+  .diff-file, .diff-lines { overflow: visible; }
+  .diff-lines > div { width: auto; grid-template-columns: 3.2em 3.2em minmax(0, 1fr); }
+  .diff-lines code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+@media (pointer: coarse) {
+  .viz input[type="range"] { height: 44px; }
+  .viz-seg button, .viz-legend button, .decide-out button, .step-nav button { min-height: 44px; }
+  form.decide label { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .viz *, .viz-tip { transition: none !important; } }
+@media print { :where(:root) { color-scheme: light; } }
+</style>
+<script id="viz-js">
+(function () {
+  'use strict';
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  var d3Loaded, clipSeq = 0;
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function domReady() {
+    return document.readyState === 'loading'
+      ? new Promise(function (r) { document.addEventListener('DOMContentLoaded', r, { once: true }); })
+      : Promise.resolve();
+  }
+  function fail(scope, message) {
+    scope = scope || document;
+    var roots = scope.matches && scope.matches('.viz') ? [scope] : scope.querySelectorAll('.viz');
+    Array.prototype.forEach.call(roots, function (root) {
+      if (root.querySelector('svg, .viz-error')) return;
+      var p = document.createElement('p'); p.className = 'viz-error'; p.textContent = message; root.appendChild(p);
+    });
+  }
+  // Runs fn(d3) once the DOM and D3 are ready. A failure leaves a visible message in the figure, so a
+  // screenshot shows it; ready() runs inside the figure's own <script>, so currentScript names that figure.
+  function ready(fn) {
+    var root = document.currentScript && document.currentScript.closest('.viz');
+    if (!d3Loaded) d3Loaded = window.d3 ? Promise.resolve() : loadScript('https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js');
+    return Promise.all([domReady(), d3Loaded]).then(function () {
+      try { return fn(window.d3); } catch (err) { fail(root || document, 'This figure failed to draw: ' + err.message); throw err; }
+    }, function (err) {
+      fail(document, 'This chart loads D3 from cdn.jsdelivr.net, which did not respond.');
+      throw err;
+    });
+  }
+
+  function normalise(spec) {
+    var xs = spec.x && spec.x.values;
+    if (!Array.isArray(xs) || xs.length < 2) throw new Error('viz.lineChart: x.values needs at least two numbers');
+    xs.forEach(function (v, i) {
+      if (!Number.isFinite(v) || (i && v <= xs[i - 1])) throw new Error('viz.lineChart: x.values must be finite and strictly increasing (index ' + i + ')');
+    });
+    if (spec.x.scale === 'log' && xs[0] <= 0) throw new Error('viz.lineChart: a log x scale needs positive x.values');
+    var series = (spec.series || []).map(function (s, i) {
+      if (!s.values || s.values.length !== xs.length) throw new Error('viz.lineChart: series "' + s.name + '" needs ' + xs.length + ' values');
+      if (!s.values.every(Number.isFinite)) throw new Error('viz.lineChart: series "' + s.name + '" has a non-finite value');
+      return Object.assign({ color: 'var(--chart-' + (i % 6 + 1) + ')' }, s);
+    });
+    return Object.assign({ height: 300, label: '', refs: [] }, spec, { y: spec.y || {}, series: series });
+  }
+
+  // Multi-series line chart on a shared x grid: responsive, cross-series hover readout, legend toggles,
+  // animated updates, touch pinning and keyboard stepping. Returns { update(partialSpec) }.
+  function lineChart(el, spec) {
+    if (typeof el === 'string') el = document.getElementById(el);
+    var d3 = window.d3, raw = spec, cur = normalise(spec), hidden = new Set();
+    var M = { t: 10, r: 18, b: 46, l: 64 }, W = 0, x, y, at = null, pinned = false;
+    el.classList.add('viz-chart');
+    var host = d3.select(el);
+    var legend = host.append('div').attr('class', 'viz-legend');
+    var svg = host.append('svg').attr('tabindex', 0).attr('role', 'img');
+    var gGrid = svg.append('g').attr('class', 'grid'), gRef = svg.append('g').attr('class', 'ref');
+    var gX = svg.append('g').attr('class', 'axis x'), gY = svg.append('g').attr('class', 'axis y');
+    var xTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'x').attr('text-anchor', 'middle');
+    var yTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'y').attr('text-anchor', 'middle');
+    var clipId = 'viz-clip-' + (++clipSeq), clip = svg.append('clipPath').attr('id', clipId).append('rect');
+    var gLines = svg.append('g').attr('clip-path', 'url(#' + clipId + ')');
+    var guide = svg.append('line').attr('class', 'guide').attr('visibility', 'hidden');
+    var gDots = svg.append('g').attr('class', 'dots').attr('visibility', 'hidden').attr('clip-path', 'url(#' + clipId + ')');
+    var tip = host.append('div').attr('class', 'viz-tip').attr('aria-hidden', 'true');
+    var live = host.append('p').attr('class', 'viz-sr').attr('aria-live', 'polite');
+
+    function buildLegend() {
+      legend.style('display', cur.series.length > 1 ? null : 'none')
+        .selectAll('button').data(cur.series, function (s) { return s.name; })
+        .join(function (enter) {
+          return enter.append('button').attr('type', 'button').on('click', function (ev, s) {
+            if (hidden.has(s.name)) hidden.delete(s.name); else hidden.add(s.name);
+            buildLegend(); draw(true);
+          });
+        })
+        .attr('aria-pressed', function (s) { return !hidden.has(s.name); })
+        .classed('dash', function (s) { return !!s.dash; })
+        .style('--c', function (s) { return s.color; })
+        .text(function (s) { return s.name; });
+    }
+
+    function draw(animate) {
+      W = el.clientWidth;
+      if (!W) { lastW = 0; return; }  // hidden: let the observer redraw at any width once shown
+      var H = cur.height, narrow = W < 480, xs = cur.x.values;
+      x = (cur.x.scale === 'log' ? d3.scaleLog().base(cur.x.base || 10) : d3.scaleLinear())
+        .domain([xs[0], xs[xs.length - 1]]).range([M.l, W - M.r]);
+      var vis = cur.series.filter(function (s) { return !hidden.has(s.name); });
+      var ext = d3.extent([].concat.apply([], vis.map(function (s) { return s.values; })));
+      var lo = ext[0] === undefined ? 0 : ext[0], hi = ext[0] === undefined ? 1 : ext[1];
+      var span = hi - lo || Math.abs(hi) || 1;
+      var y0 = cur.y.min != null ? cur.y.min : cur.y.zero ? Math.min(0, lo) : lo - span * 0.06;
+      if (cur.y.min == null && lo >= 0) y0 = Math.max(0, y0);
+      var y1 = cur.y.max != null ? cur.y.max : hi + span * 0.06;
+      var ny = narrow ? 4 : 6;
+      y = d3.scaleLinear().domain([y0, y1]).range([H - M.b, M.t]);
+      if (cur.y.min == null || cur.y.max == null) {
+        y.nice(ny);
+        y.domain([cur.y.min != null ? cur.y.min : y.domain()[0], cur.y.max != null ? cur.y.max : y.domain()[1]]);
+      }
+      var nx = narrow ? 4 : Math.max(2, Math.min(8, Math.floor((W - M.l - M.r) / 80)));
+      var tx = x.ticks(nx);
+      if (cur.x.scale === 'log') tx = tx.filter(function (t) { var e = Math.log(t) / Math.log(cur.x.base || 10); return Math.abs(e - Math.round(e)) < 1e-9; });
+      if (tx.length > nx) { var k = Math.ceil(tx.length / nx); tx = tx.filter(function (_, i) { return i % k === 0; }); }
+      var fx = cur.x.format || d3.format('~g'), fy = cur.y.format || d3.format('~g');
+      // Static draws set attributes at once: transitions wait for animation frames, which hidden tabs and headless capture never run.
+      var t = animate && !reduced.matches ? svg.transition().duration(450).ease(d3.easeCubicOut) : null;
+      function T(sel) {
+        if (t) return sel.transition(t);
+        sel.interrupt().selectAll('*').interrupt();  // axes animate their ticks, not the group
+        return sel;
+      }
+
+      svg.attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', W).attr('height', H).attr('aria-label', cur.label);
+      clip.attr('x', M.l - 6).attr('y', M.t - 6).attr('width', W - M.l - M.r + 12).attr('height', H - M.t - M.b + 12);
+      T(gX.attr('transform', 'translate(0,' + (H - M.b) + ')'))
+        .call(d3.axisBottom(x).tickValues(tx).tickFormat(fx).tickSizeOuter(0).tickSize(4).tickPadding(6));
+      gX.selectAll('.tick text').attr('text-anchor', function (d) { return x(d) > W - M.r - 16 ? 'end' : 'middle'; });
+      T(gY.attr('transform', 'translate(' + M.l + ',0)'))
+        .call(d3.axisLeft(y).ticks(ny).tickFormat(fy).tickSize(0).tickPadding(8));
+      T(gGrid.selectAll('line').data(y.ticks(ny)).join('line').attr('x1', M.l).attr('x2', W - M.r))
+        .attr('y1', function (d) { return y(d); }).attr('y2', function (d) { return y(d); });
+      xTitle.attr('x', (M.l + W - M.r) / 2).attr('y', H - 6).text(cur.x.label || '');
+      yTitle.attr('transform', 'translate(14,' + (M.t + H - M.b) / 2 + ') rotate(-90)').text(cur.y.label || '');
+
+      var line = d3.line().x(function (_, i) { return x(xs[i]); }).y(function (v) { return y(v); });
+      T(gLines.selectAll('path').data(cur.series, function (s) { return s.name; }).join('path')
+        .attr('class', 'line').style('stroke', function (s) { return s.color; })
+        .attr('stroke-dasharray', function (s) { return s.dash ? '5 4' : null; }))
+        .attr('d', function (s) { return line(s.values); })
+        .style('opacity', function (s) { return hidden.has(s.name) ? 0 : 1; });
+
+      var yd = y.domain(), xd = x.domain();
+      var refs = cur.refs.filter(function (r) { return r.y != null ? r.y >= yd[0] && r.y <= yd[1] : r.x >= xd[0] && r.x <= xd[1]; });
+      gRef.selectAll('g').data(refs, function (r) { return r.label; })
+        .join(function (enter) { var g = enter.append('g'); g.append('line'); g.append('text'); return g; })
+        .each(function (r) {
+          var g = d3.select(this), horiz = r.y != null;
+          T(g.select('line'))
+            .attr('x1', horiz ? M.l : x(r.x)).attr('x2', horiz ? W - M.r : x(r.x))
+            .attr('y1', horiz ? y(r.y) : M.t).attr('y2', horiz ? y(r.y) : H - M.b);
+          T(g.select('text').text(r.label).attr('text-anchor', 'start'))
+            .attr('x', horiz ? M.l + 6 : x(r.x) + 4).attr('y', horiz ? y(r.y) - 5 : M.t + 10);
+        });
+
+      if (pinned && at != null) inspect(at); else hide();
+    }
+
+    function inspect(xv, py, announce) {
+      var xs = cur.x.values, H = cur.height;
+      xv = Math.max(xs[0], Math.min(xs[xs.length - 1], xv));
+      var j = Math.max(1, Math.min(xs.length - 1, d3.bisectLeft(xs, xv)));
+      if (cur.x.snap) xv = x(xv) - x(xs[j - 1]) < x(xs[j]) - x(xv) ? xs[j - 1] : xs[j];
+      var f = (x(xv) - x(xs[j - 1])) / (x(xs[j]) - x(xs[j - 1]));
+      var rows = cur.series.filter(function (s) { return !hidden.has(s.name); }).map(function (s) {
+        return { s: s, v: s.values[j - 1] + (s.values[j] - s.values[j - 1]) * f };
+      }).sort(function (a, b) { return b.v - a.v; });
+      at = xv;
+      var px = x(xv), fx = cur.x.format || d3.format('~g'), fy = cur.tipFormat || cur.y.format || d3.format('~g');
+      guide.attr('visibility', 'visible').attr('x1', px).attr('x2', px).attr('y1', M.t).attr('y2', H - M.b);
+      gDots.attr('visibility', 'visible').selectAll('circle').data(rows, function (r) { return r.s.name; }).join('circle')
+        .attr('r', 4).attr('cx', px).attr('cy', function (r) { return y(r.v); }).style('fill', function (r) { return r.s.color; });
+      var node = tip.node(); node.textContent = '';
+      var head = document.createElement('div'); head.className = 'h'; head.textContent = (cur.x.label ? cur.x.label + ': ' : '') + fx(xv);
+      node.appendChild(head);
+      rows.forEach(function (r) {
+        var row = document.createElement('div'); row.className = 'r'; row.style.setProperty('--c', r.s.color);
+        var sw = document.createElement('i'), name = document.createElement('span'), val = document.createElement('b');
+        name.textContent = r.s.name; val.textContent = fy(r.v);
+        row.append(sw, name, val); node.appendChild(row);
+      });
+      var tw = node.offsetWidth, th = node.offsetHeight, left = px + 14;
+      if (left + tw > W) left = Math.max(0, px - 14 - tw);
+      var top = Math.max(0, Math.min(H - th, (py == null ? M.t + 20 : py) - th / 2));
+      var oy = svg.node().getBoundingClientRect().top - el.getBoundingClientRect().top;
+      node.style.left = left + 'px'; node.style.top = top + oy + 'px';
+      node.setAttribute('data-show', '');
+      if (announce) live.text(head.textContent + '. ' + rows.map(function (r) { return r.s.name + ' ' + fy(r.v); }).join(', '));
+    }
+    function hide() {
+      guide.attr('visibility', 'hidden'); gDots.attr('visibility', 'hidden'); tip.attr('data-show', null);
+    }
+    function pointerX(ev) { var p = d3.pointer(ev); return [Math.max(M.l, Math.min(W - M.r, p[0])), p[1]]; }
+
+    svg.on('pointermove', function (ev) { var p = pointerX(ev); inspect(x.invert(p[0]), p[1]); })
+      .on('pointerleave', function () { if (!pinned) hide(); })
+      .on('pointerdown', function (ev) { if (ev.pointerType !== 'mouse') { pinned = true; var p = pointerX(ev); inspect(x.invert(p[0]), p[1]); } })
+      .on('focus', function () { inspect(at == null ? cur.x.values[cur.x.values.length - 1] : at, null, true); })
+      .on('blur', function () { if (!pinned) hide(); })
+      .on('keydown', function (ev) {
+        var xs = cur.x.values, step = Math.max(1, Math.round(xs.length / 40));
+        var j = at == null ? xs.length - 1 : Math.min(xs.length - 1, d3.bisectLeft(xs, at));
+        if (ev.key === 'ArrowRight') j = Math.min(xs.length - 1, j + step);
+        else if (ev.key === 'ArrowLeft') j = Math.max(0, j - step);
+        else if (ev.key === 'Home') j = 0;
+        else if (ev.key === 'End') j = xs.length - 1;
+        else if (ev.key === 'Escape') { pinned = false; hide(); return; }
+        else return;
+        ev.preventDefault(); inspect(xs[j], null, true);
+      });
+    document.addEventListener('pointerdown', function (ev) { if (!el.contains(ev.target)) { pinned = false; hide(); } });
+
+    var lastW = 0;
+    new ResizeObserver(function () { var w = el.clientWidth; if (w && w !== lastW) { lastW = w; draw(false); } }).observe(el);
+    buildLegend(); draw(false); lastW = W;
+    return {
+      update: function (next) { raw = Object.assign({}, raw, next); cur = normalise(raw); buildLegend(); draw(true); }
+    };
+  }
+
+  // [data-tooltip] on any element: hover, focus or tap shows it, Escape hides it.
+  var floatTip;
+  function showTip(target) {
+    if (!floatTip) { floatTip = document.createElement('div'); floatTip.className = 'viz-tip float'; floatTip.setAttribute('role', 'tooltip'); document.body.appendChild(floatTip); }
+    floatTip.textContent = target.getAttribute('data-tooltip');
+    floatTip.setAttribute('data-show', '');
+    var r = target.getBoundingClientRect(), w = floatTip.offsetWidth, h = floatTip.offsetHeight;
+    var left = Math.max(4, Math.min(r.left + r.width / 2 - w / 2, document.documentElement.clientWidth - w - 4));
+    var top = r.top - h - 8 < 0 ? r.bottom + 8 : r.top - h - 8;
+    floatTip.style.left = left + scrollX + 'px'; floatTip.style.top = top + scrollY + 'px';
+  }
+  function hideTip() { if (floatTip) floatTip.removeAttribute('data-show'); }
+  function onTarget(ev) {
+    var t = ev.target.closest && ev.target.closest('[data-tooltip]');
+    if (t) showTip(t); else hideTip();
+  }
+  document.addEventListener('pointerover', onTarget);
+  document.addEventListener('focusin', onTarget);
+  document.addEventListener('focusout', hideTip);
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') hideTip(); });
+
+  // A chart <svg tabindex="0"> or a .lanes timeline steps through its [data-tooltip] marks with the arrow keys and announces each,
+  // so a value shown on hover is also reachable by keyboard and screen reader without a tab stop per mark.
+  var announcer;
+  document.addEventListener('keydown', function (ev) {
+    var svg = ev.target.closest && ev.target.closest('svg[tabindex], .lanes');
+    var marks = svg ? svg.querySelectorAll('[data-tooltip]') : [], n = marks.length;
+    if (!n) return;
+    var i = svg.vizMark == null ? -1 : Math.min(svg.vizMark, n - 1);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') i = Math.min(n - 1, i + 1);
+    else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') i = Math.max(0, i - 1);
+    else if (ev.key === 'Home') i = 0;
+    else if (ev.key === 'End') i = n - 1;
+    else return;
+    ev.preventDefault(); svg.vizMark = i; showTip(marks[i]);
+    if (!announcer) { announcer = document.createElement('p'); announcer.className = 'viz-sr'; announcer.setAttribute('aria-live', 'polite'); document.body.appendChild(announcer); }
+    announcer.textContent = marks[i].getAttribute('data-tooltip');
+  });
+
+  // .viz-seg: single-select button group. Toggles aria-pressed, shows the panel named by aria-controls,
+  // and fires a 'change' event with detail.value on the group.
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('.viz-seg button');
+    if (!b || b.getAttribute('aria-pressed') === 'true') return;
+    var group = b.closest('.viz-seg');
+    group.querySelectorAll('button').forEach(function (o) {
+      o.setAttribute('aria-pressed', String(o === b));
+      var panel = o.getAttribute('aria-controls');
+      if (panel) document.getElementById(panel).hidden = o !== b;
+    });
+    group.dispatchEvent(new CustomEvent('change', { detail: { value: b.value } }));
+  });
+
+  // Range inputs paint their filled track from --fill (WebKit has no progress pseudo-element).
+  function fill(r) {
+    var min = r.min === '' ? 0 : +r.min, max = r.max === '' ? 100 : +r.max;
+    r.style.setProperty('--fill', (r.value - min) / (max - min) * 100 + '%');
+  }
+  document.addEventListener('input', function (ev) { if (ev.target.matches && ev.target.matches('.viz input[type="range"]')) fill(ev.target); });
+  domReady().then(function () { document.querySelectorAll('.viz input[type="range"]').forEach(fill); });
+
+  // Summary components. Each enhances plain markup, so the page still reads without scripts and in print.
+  function sparks() {
+    document.querySelectorAll('svg.spark[data-values]').forEach(function (svg) {
+      var v = svg.getAttribute('data-values').trim().split(/[\s,]+/).map(Number).filter(Number.isFinite);
+      if (v.length < 2) return;
+      var lo = Math.min.apply(null, v), span = Math.max.apply(null, v) - lo || 1;
+      var d = v.map(function (y, i) { return (i ? 'L' : 'M') + (i / (v.length - 1) * 100).toFixed(2) + ',' + (22 - (y - lo) / span * 20).toFixed(2); }).join('');
+      svg.setAttribute('viewBox', '0 0 100 24'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('role', 'img');
+      if (!svg.getAttribute('aria-label')) svg.setAttribute('aria-label', 'Trend from ' + v[0] + ' to ' + v[v.length - 1]);
+      svg.innerHTML = '<path d="' + d + '"/>';
+    });
+  }
+
+  function ledgers() {
+    document.querySelectorAll('ul.ledger').forEach(function (ul) {
+      var counts = {}, parts = [], bar = document.createElement('div'), text = document.createElement('span'), sum = document.createElement('div');
+      ul.querySelectorAll(':scope > li[data-status]').forEach(function (li) { counts[li.dataset.status] = (counts[li.dataset.status] || 0) + 1; });
+      ['done', 'changed', 'dropped', 'deferred'].forEach(function (k) {
+        if (!counts[k]) return;
+        var seg = document.createElement('i'); seg.className = k; seg.style.flex = counts[k]; bar.appendChild(seg);
+        parts.push(counts[k] + ' ' + k);
+      });
+      if (!parts.length) return;
+      bar.className = 'bar'; bar.setAttribute('aria-hidden', 'true'); text.textContent = parts.join(' · ');
+      sum.className = 'ledger-sum'; sum.append(bar, text); ul.before(sum);
+    });
+  }
+
+  function decides() {
+    document.querySelectorAll('form.decide').forEach(function (form) {
+      var out = document.createElement('div'), code = document.createElement('code'), btn = document.createElement('button');
+      out.className = 'decide-out'; btn.type = 'button'; btn.textContent = 'Copy as prompt';
+      out.append(code, btn); form.appendChild(out);
+      function compose() {
+        var parts = [].map.call(form.querySelectorAll('fieldset'), function (fs) {
+          var c = fs.querySelector('input:checked'), legend = fs.querySelector('legend');
+          return c && (legend ? legend.textContent.trim() + ' → ' : '') + c.value;
+        }).filter(Boolean);
+        var note = form.querySelector('textarea');
+        if (note && note.value.trim()) parts.push(note.value.trim());
+        code.textContent = (form.dataset.prompt ? form.dataset.prompt + ': ' : '') + parts.join('; ');
+      }
+      function select() { var r = document.createRange(); r.selectNodeContents(code); getSelection().removeAllRanges(); getSelection().addRange(r); }
+      function said(ok) { btn.textContent = ok ? 'Copied' : 'Press ⌘C to copy'; setTimeout(function () { btn.textContent = 'Copy as prompt'; }, 1800); }
+      form.addEventListener('input', compose);
+      form.addEventListener('submit', function (ev) { ev.preventDefault(); });
+      // The clipboard API is refused inside some sandboxed frames; selecting the text keeps a manual copy possible.
+      btn.addEventListener('click', function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(code.textContent).then(function () { said(true); }, function () { select(); said(false); });
+        else { select(); said(false); }
+      });
+      compose();
+    });
+  }
+
+  function steppers() {
+    document.querySelectorAll('figure.stepper').forEach(function (fig) {
+      var parts = fig.querySelectorAll('[data-step]'), list = fig.querySelector('.step-captions');
+      var caps = list ? list.querySelectorAll(':scope > li') : [], n = caps.length;
+      if (!n) return;
+      var nav = document.createElement('div'), status = document.createElement('span'), cur = 0;
+      function button(label, go) { var b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.addEventListener('click', go); nav.appendChild(b); return b; }
+      nav.className = 'step-nav';
+      var all = button('All steps', function () { show(0); }), prev = button('Previous', function () { show(cur - 1); }), next = button('Next', function () { show(cur + 1); });
+      status.setAttribute('aria-live', 'polite'); nav.appendChild(status); list.before(nav);
+      caps.forEach(function (li, i) { li.value = i + 1; });  // hidden items would otherwise renumber the visible one as 1
+      function show(k) {
+        cur = Math.max(0, Math.min(n, k));
+        parts.forEach(function (el) { el.classList.toggle('dim', cur > 0 && el.getAttribute('data-step').split(/\s+/).indexOf(String(cur)) < 0); });
+        caps.forEach(function (li, i) { li.classList.toggle('off', cur > 0 && i !== cur - 1); });
+        all.setAttribute('aria-pressed', String(cur === 0)); prev.disabled = cur <= 1; next.disabled = cur === n;
+        status.textContent = cur ? 'Step ' + cur + ' of ' + n : 'All ' + n + ' steps';
+      }
+      show(0);
+    });
+  }
+
+  function niceStep(raw) {
+    var p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+  }
+  function lanes() {
+    document.querySelectorAll('.lanes').forEach(function (el) {
+      var src = el.querySelector('script[type="application/json"]'), spec;
+      if (!src) return;
+      try { spec = JSON.parse(src.textContent); } catch (err) { el.textContent = 'Timeline data is not valid JSON: ' + err.message; return; }
+      var at = function (v) { return typeof v === 'number' ? v : Date.parse(v); }, spans = [];
+      spec.lanes.forEach(function (lane) { lane.spans.forEach(function (s) { spans.push(s); }); });
+      var t0 = Math.min.apply(null, spans.map(function (s) { return at(s.start); }));
+      var range = Math.max.apply(null, spans.map(function (s) { return at(s.end); })) - t0 || 1;
+      var iso = spans.some(function (s) { return typeof s.start === 'string'; }), f = 1, unit = spec.unit || '';
+      if (iso) { f = range < 7.2e6 ? 6e4 : range < 1.728e8 ? 3.6e6 : 8.64e7; unit = f === 6e4 ? 'min' : f === 3.6e6 ? 'h' : 'd'; }
+      var amount = function (ms) { return +(ms / f).toFixed(ms / f < 100 ? 1 : 0) + (unit ? ' ' + unit : ''); };
+      // A span's own length reads best in its own unit: a 9-minute span as "9 min", not "0.2 h".
+      var length = function (ms) {
+        if (!iso) return amount(ms);
+        return ms < 6e4 ? Math.round(ms / 1e3) + ' s' : ms < 3.6e6 ? Math.round(ms / 6e4) + ' min' : ms < 1.728e8 ? +(ms / 3.6e6).toFixed(1) + ' h' : +(ms / 8.64e7).toFixed(1) + ' d';
+      };
+      var clock = function (v, fine) { return iso ? new Date(v).toTimeString().slice(0, fine ? 8 : 5) : amount(v - t0); };
+      spec.lanes.forEach(function (lane, li) {
+        var name = document.createElement('span'), track = document.createElement('div');
+        name.textContent = lane.name; track.className = 'track';
+        lane.spans.forEach(function (s) {
+          var a = at(s.start), b = at(s.end), mark = document.createElement('i');
+          if (!(b >= a)) { console.warn('lanes: span ends before it starts', s); return; }
+          mark.style.left = (a - t0) / range * 100 + '%'; mark.style.width = (b - a) / range * 100 + '%';
+          if (s.wait) mark.className = 'wait'; else mark.style.setProperty('--c', s.color || 'var(--chart-' + (li % 6 + 1) + ')');
+          mark.textContent = s.label || '';
+          mark.setAttribute('data-tooltip', lane.name + ': ' + (s.label ? s.label + ', ' : '') + clock(a, b - a < 1.2e5) + '–' + clock(b, b - a < 1.2e5) + ' (' + length(b - a) + ')');
+          track.appendChild(mark);
+        });
+        el.append(name, track);
+      });
+      var ticks = document.createElement('div'), step = niceStep(range / f / 4);
+      ticks.className = 'ticks'; ticks.setAttribute('aria-hidden', 'true');
+      for (var v = 0; v <= range / f + 1e-9; v += step) {
+        var pos = v * f / range * 100, tick = document.createElement('span');
+        tick.style.left = pos + '%'; tick.style.transform = pos > 92 ? 'translateX(-100%)' : pos < 8 ? 'none' : 'translateX(-50%)';
+        tick.textContent = +v.toFixed(6) + (unit ? ' ' + unit : ''); ticks.appendChild(tick);
+      }
+      el.appendChild(ticks); el.tabIndex = 0; el.setAttribute('role', 'group');
+    });
+  }
+
+  // Print shows every collapsed section, then restores what the reader had closed.
+  var reopened = [];
+  addEventListener('beforeprint', function () {
+    reopened = [].filter.call(document.querySelectorAll('details:not([open])'), function (d) { d.open = true; return true; });
+  });
+  addEventListener('afterprint', function () { reopened.forEach(function (d) { d.open = false; }); reopened = []; });
+  // Gives each tooltip owner outside an SVG a hidden description, so focusing it reads the text too.
+  function describe() {
+    document.querySelectorAll('[data-tooltip]').forEach(function (el, i) {
+      if (el.closest('svg, .lanes') || el.dataset.vizDescribed) return;
+      var d = document.createElement('span'); d.id = 'viz-desc-' + i; d.className = 'viz-sr'; d.textContent = el.getAttribute('data-tooltip');
+      document.body.appendChild(d); el.dataset.vizDescribed = '1';
+      el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '') + ' ' + d.id).trim());
+    });
+  }
+  domReady().then(function () { sparks(); ledgers(); decides(); steppers(); lanes(); describe(); });
+
+  window.viz = { ready: ready, lineChart: lineChart, fail: fail };
+})();
+</script>
 </head>
 <body>
 <button class="theme" type="button" aria-label="Toggle colour theme">Theme</button>
@@ -237,9 +826,10 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
 <h2 id="embedding-takes-two-thirds-of-the-run">Embedding takes two thirds of the run</h2>
 <div class="tiles">
   <div class="tile"><div class="n">47</div><div class="k">minutes per run</div></div>
-  <div class="tile"><div class="n hot">31</div><div class="k">minutes embedding</div></div>
+  <div class="tile"><div class="n hot">31</div><div class="k">minutes embedding</div>
+    <svg class="spark" data-values="29.4 30.8 31.2 30.1 44.7 31.0" aria-label="Embed minutes over the last six nights"></svg></div>
   <div class="tile"><div class="n">66%</div><div class="k">share of the run</div></div>
-  <div class="tile"><div class="n good">9</div><div class="k">minutes after batching</div></div>
+  <div class="tile"><div class="n good">9</div><div class="k">minutes after batching</div><div class="d good">−22 from 31</div></div>
 </div>
 <figure>
   <div class="vega"><script type="application/json">
@@ -277,6 +867,49 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   <p class="fn"><sup>a</sup> Requests are sequential; the dry run in the recommendation batches them at 64 records.</p>
 </figure>
 
+<h2 id="faster-embedding-alone">Faster embedding alone cannot beat 16 minutes</h2>
+<figure>
+  <div class="viz" id="whatif">
+    <div class="viz-controls">
+      <label class="viz-field"><span>Embed speedup <output id="whatif-k-out"></output></span>
+        <input id="whatif-k" type="range" min="1" max="8" step="0.1" value="3.4"></label>
+    </div>
+    <div class="viz-stats" aria-live="polite">
+      <div class="viz-stat"><span class="k">Run, sum of stage p50s</span><span class="v" id="whatif-run"></span><span class="d">minutes</span></div>
+      <div class="viz-stat"><span class="k">Embed share of the run</span><span class="v" id="whatif-share"></span><span class="d">66% today</span></div>
+    </div>
+    <div id="whatif-chart"></div>
+    <script>
+    viz.ready(function (d3) {
+      var other = 8.1 + 3.2 + 4.8, embed = 31.0, kIn = document.getElementById('whatif-k');
+      var K = d3.range(10, 81).map(function (k) { return k / 10; });
+      function run(k) { return other + embed / k; }
+      function spec() {
+        return {
+          label: 'Run minutes against embed speedup, from the per-stage p50s', height: 260,
+          x: { values: K, label: 'Embed speedup', format: function (d) { return d + '×'; }, snap: true },
+          y: { label: 'Run (minutes)', min: 0, format: d3.format('d') },
+          tipFormat: function (d) { return d.toFixed(1) + ' min'; },
+          series: [{ name: 'Run', values: K.map(run) }],
+          refs: [{ x: +kIn.value, label: 'Slider' }, { y: other, label: 'Other stages' }]
+        };
+      }
+      var chart = viz.lineChart('whatif-chart', spec());
+      function refresh() {
+        var k = +kIn.value;
+        chart.update(spec());
+        document.getElementById('whatif-k-out').textContent = k.toFixed(1) + '×';
+        document.getElementById('whatif-run').textContent = run(k).toFixed(1);
+        document.getElementById('whatif-share').textContent = d3.format('.0%')(embed / k / run(k));
+      }
+      kIn.addEventListener('input', refresh);
+      refresh();
+    });
+    </script>
+  </div>
+  <figcaption><b>Run minutes against embedding speedup.</b> The line sums the p50 stage minutes from Table 1 with embedding divided by the speedup on the slider, marked by the dotted vertical line; the dotted horizontal line is the 16.1 minutes the other three stages take. Drag the slider or hover the line: the batching dry run's 3.4× brings the run to about 25 minutes.</figcaption>
+</figure>
+
 <h2 id="latency-grows-with-record-length">Latency grows with record length</h2>
 <figure>
   <div class="vega"><script type="application/json">
@@ -295,6 +928,92 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   </script></div>
   <figcaption><b>Per-record latency against record length.</b> Points are single embed calls sampled from one night, coloured by source type; x is logarithmic. Latency is close to linear in tokens, so PDFs dominate the stage.</figcaption>
 </figure>
+
+<h2 id="dry-run-shipped" data-toc="Dry run">The dry run shipped batching behind a flag</h2>
+<ul class="ledger">
+  <li data-status="done"><b>Batching at 64 records</b> behind the <code>batch_embed</code> flag.</li>
+  <li data-status="done"><b>Comparison report</b> prints per-stage p50 and p95 side by side.</li>
+  <li data-status="changed"><b>Workers</b> stay at four, the model API's per-key limit, instead of the eight first planned.</li>
+  <li data-status="dropped"><b>Embedding cache</b>: records change too often to pay back.</li>
+  <li data-status="deferred"><b>Per-record token cap</b> waits for the week 2 rollout.</li>
+</ul>
+<figure class="diff">
+  <div class="diff-sum">1 file changed · <span class="add">+8</span> <span class="del">−3</span></div>
+  <details class="diff-file" open><summary><code>ingest/embed.py</code><span><span class="add">+8</span> <span class="del">−3</span></span></summary>
+    <div class="diff-lines">
+      <div class="h">@@ -1,5 +1,10 @@</div>
+      <div class="r"><span>1</span><span></span><code>-def embed_all(records, client):</code></div>
+      <div class="a"><span></span><span>1</span><code>+from ingest.flags import enabled</code></div>
+      <div class="a"><span></span><span>2</span><code>+</code></div>
+      <div class="a"><span></span><span>3</span><code>+</code></div>
+      <div class="a"><span></span><span>4</span><code>+def embed_all(records, client, size=64):</code></div>
+      <div class="a"><span></span><span>5</span><code>+    if not enabled(&quot;batch_embed&quot;):</code></div>
+      <div class="a"><span></span><span>6</span><code>+        return [client.embed(r.text) for r in records]<b class="pin">1</b></code></div>
+      <div><span>2</span><span>7</span><code>     vectors = []</code></div>
+      <div class="r"><span>3</span><span></span><code>-    for record in records:</code></div>
+      <div class="r"><span>4</span><span></span><code>-        vectors.append(client.embed(record.text))</code></div>
+      <div class="a"><span></span><span>8</span><code>+    for i in range(0, len(records), size):</code></div>
+      <div class="a"><span></span><span>9</span><code>+        vectors.extend(client.embed_batch([r.text for r in records[i:i + size]]))<b class="pin">2</b></code></div>
+      <div><span>5</span><span>10</span><code>     return vectors</code></div>
+    </div>
+    <ol class="diff-notes" start="1"><li>The sequential path stays until two clean weeks are logged.</li><li>One request per 64 records instead of one per record.</li></ol>
+  </details>
+  <figcaption><b>The batching change.</b> Unified diff of the embed stage, with pins on the two lines the rollout depends on. Batching sits behind a flag, so the old path still runs by default.</figcaption>
+</figure>
+<details class="evidence"><summary><b>Only the embed stage changed speed.</b> <span>dry run against the sequential path, one night</span></summary>
+  <figure class="table">
+    <figcaption><b>Stage minutes, sequential against batched.</b> p50 wall-clock minutes from Table 1 and the dry run. Fetch, parse and publish are untouched by batching.</figcaption>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Stage</th><th class="num">Sequential</th><th class="num">Batched</th></tr></thead>
+      <tbody>
+        <tr><td>Fetch</td><td class="num">8.1</td><td class="num">8.1</td></tr>
+        <tr><td>Parse</td><td class="num">3.2</td><td class="num">3.2</td></tr>
+        <tr><td>Embed</td><td class="num">31.0</td><td class="num good">9.0</td></tr>
+        <tr><td>Publish</td><td class="num">4.8</td><td class="num">4.8</td></tr>
+      </tbody>
+    </table></div>
+  </figure>
+</details>
+
+<h2 id="batched-run" data-toc="Batched run">A batched run finishes in 25 minutes</h2>
+<figure class="stepper">
+  <svg viewBox="0 0 640 80" role="img" aria-label="Fetch, parse, embed and publish in sequence">
+    <defs><marker id="ex-step" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <g data-step="1"><rect x="8" y="16" width="130" height="48" rx="8" fill="none" stroke="currentColor"/><text x="73" y="45" text-anchor="middle" font-size="13" fill="currentColor">Fetch</text></g>
+    <g data-step="2"><path d="M140,40 H170" stroke="currentColor" marker-end="url(#ex-step)"/><rect x="172" y="16" width="130" height="48" rx="8" fill="none" stroke="currentColor"/><text x="237" y="45" text-anchor="middle" font-size="13" fill="currentColor">Parse</text></g>
+    <g data-step="3"><path d="M304,40 H334" stroke="currentColor" marker-end="url(#ex-step)"/><rect x="336" y="16" width="130" height="48" rx="8" fill="none" stroke="currentColor"/><text x="401" y="45" text-anchor="middle" font-size="13" fill="currentColor">Embed, batched</text></g>
+    <g data-step="4"><path d="M468,40 H498" stroke="currentColor" marker-end="url(#ex-step)"/><rect x="500" y="16" width="130" height="48" rx="8" fill="none" stroke="currentColor"/><text x="565" y="45" text-anchor="middle" font-size="13" fill="currentColor">Publish</text></g>
+  </svg>
+  <ol class="step-captions">
+    <li>Fetch pulls the raw pages; the source sites bound it at about 8 minutes.</li>
+    <li>Parse turns pages into records in about 3 minutes.</li>
+    <li>Embed sends batches of 64 records to the model API, four workers at a time.</li>
+    <li>Publish rebuilds the index in place from the new vectors.</li>
+  </ol>
+  <figcaption><b>The four stages of a batched run.</b> Boxes are stages in run order; step through with Next to read one stage at a time. Only the embed stage changed.</figcaption>
+</figure>
+<figure>
+  <div class="lanes" aria-label="Sequential and batched runs by stage"><script type="application/json">
+  {"unit": "min", "lanes": [
+    {"name": "Sequential", "spans": [{"start": 0, "end": 8.1, "label": "Fetch"}, {"start": 8.1, "end": 11.3, "label": "Parse"}, {"start": 11.3, "end": 42.3, "label": "Embed"}, {"start": 42.3, "end": 47.1, "label": "Publish"}]},
+    {"name": "Batched", "spans": [{"start": 0, "end": 8.1, "label": "Fetch"}, {"start": 8.1, "end": 11.3, "label": "Parse"}, {"start": 11.3, "end": 20.3, "label": "Embed"}, {"start": 20.3, "end": 25.1, "label": "Publish"}]}
+  ]}
+  </script></div>
+  <figcaption><b>One run, sequential against batched.</b> Each lane lays the four stages end to end at their measured p50 minutes from Table 1 and the dry run; hover a span for its times. Batching removes 22 minutes, all of them from embed.</figcaption>
+</figure>
+
+<h2 id="rollout-decisions" data-toc="Decisions">Two decisions gate the full rollout</h2>
+<form class="decide" data-prompt="Rollout decisions for batched embedding">
+  <fieldset><legend>Turn the flag on for all nights after week 1?</legend>
+    <label><input type="radio" name="flag" value="yes, if the p95 stays under 15 minutes" checked data-rec>Yes, if the p95 stays under 15 minutes</label>
+    <label><input type="radio" name="flag" value="compare for another week">Compare for another week</label>
+  </fieldset>
+  <fieldset><legend>Records over 8,000 tokens</legend>
+    <label><input type="radio" name="cap" value="skip and log them" checked data-rec>Skip and log them</label>
+    <label><input type="radio" name="cap" value="split them into chunks">Split into chunks</label>
+  </fieldset>
+  <textarea name="note" rows="2" aria-label="Anything else" placeholder="Anything else"></textarea>
+</form>
 
 <h2 id="opt-in-mermaid">Hand-drawn Mermaid is an optional alternative</h2>
 <p>Use this component only when the user explicitly chooses Mermaid.</p>
@@ -342,7 +1061,7 @@ ingest report --compare 2026-09-05 --against sequential</code></pre>
   <li>Parallelising fetch: the sources rate-limit us already.</li>
   <li>Swapping the embedding model: a separate quality question.</li>
 </ul>
-</main>
+  </main>
 </div>
 <script>
 (function () {
