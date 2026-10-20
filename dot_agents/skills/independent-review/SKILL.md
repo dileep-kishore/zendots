@@ -38,6 +38,11 @@ using the same model are independent contexts, not a cross-model review.
 
 ## Pin the scope
 
+First run the missing-file check in
+[references/review-rules.md](references/review-rules.md). It can add a
+`REVIEW.md` commit, so run it before recording HEAD. A PR checkout whose only
+commit past the PR head is that approval-marker commit still matches the head.
+
 Record the absolute checkout path, HEAD, target, and relevant project standards.
 Respect explicit file or staged-only scopes rather than widening them.
 
@@ -158,8 +163,9 @@ Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
 UNVERIFIED ones labeled with the step left unproven, most severe first. Give
 each its location, trigger, evidence, repro, smallest fix, and finder and
 verifier attribution. List REFUTED findings one line each with the refuting
-file:line. Then coverage: the concern map, lenses run or skipped, and what no
-one could verify. Link the unchanged raw reports; show them verbatim if
+file:line. Then coverage: the concern map, lenses run or skipped, what no one
+could verify, whether the approved `REVIEW.md` override applied, and each
+Human review path the change touches. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
 
 When a refuted or user-dismissed finding would recur in this repository,

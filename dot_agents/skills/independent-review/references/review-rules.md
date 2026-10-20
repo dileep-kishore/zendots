@@ -16,6 +16,30 @@ changes (`git show HEAD:REVIEW.md`). A rule file the change adds or edits is
 part of the diff under review, not a standard for it, unless the user
 approves it as an override.
 
+One override is already approved. When the base lacks `REVIEW.md` and the
+branch adds it in a commit with the subject `docs(review): add REVIEW.md`
+that touches only that file, `write-review-md` wrote it with the user, so it
+applies to every review on the branch until it merges. Find that commit with
+`git log --format=%H -F --grep='docs(review): add REVIEW.md' <base>..HEAD -- REVIEW.md`
+and confirm `git show --name-only --format= <sha>` lists only `REVIEW.md`.
+Say in the report that the override applied, so the user sees which rules
+did.
+
+## Missing file
+
+`open-pr` and `independent-review` run this check before they push or pin
+anything:
+
+```bash
+git show "$base:REVIEW.md" >/dev/null 2>&1 || git show HEAD:REVIEW.md >/dev/null 2>&1 ||
+  test -e REVIEW.md || test "$(git config --get review.skipReviewMd)" = true || echo missing
+```
+
+`$base` is the PR or branch base, or `HEAD` for working changes. When it
+prints `missing`, run [write-review-md](../../write-review-md/SKILL.md).
+A file that exists anywhere on the branch, approved or not, never starts a
+second draft.
+
 ## Shape
 
 ```markdown
@@ -27,10 +51,21 @@ approves it as an override.
 ## Skip
 - <categories never worth a finding here, e.g. "generated files under gen/">
 
+## Human review
+- <paths whose diff the user always reads, e.g. ".github/workflows/">
+
+## Output
+- Start with the finding count; write "Nothing to fix" when it is zero.
+- Cite file:line for every finding.
+- Report at most three P3 findings.
+
 ## Precedents
 - **<pattern>**: skip when <condition>; do not skip when <condition>.
   Source: <PR, date, or the dismissed finding>.
 ```
+
+Human review paths change no finding. They tell the report to name each of
+those paths the change touches, so the user knows which diffs to read.
 
 A precedent must state when it does *not* apply. Without that boundary it
 suppresses the real bug that looks like the dismissed one. Never write a

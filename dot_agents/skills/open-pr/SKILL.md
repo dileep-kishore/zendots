@@ -148,6 +148,12 @@ reason, and wait:
   else's in-progress work
 - the fold would rewrite a commit that is already on the remote
 
+One more stop runs a skill instead. When the missing-file check in
+[review-rules](../independent-review/references/review-rules.md) prints
+`missing`, switch to the work branch (step 1) and run `write-review-md`
+before step 7. Its commit joins the PR, so the review bots read the file on
+their first round; add one Solution sentence for it.
+
 ## 7. Commit, fold, push, open
 
 Make the planned commits. If a hook rejects or rewrites one, fix it and
@@ -161,8 +167,10 @@ git push -u origin HEAD
 gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
 
-Report the URL, the commits and any fold made, then anything skipped:
-regrouping declined, verification missing, motivation the session lacked.
+Report the URL, the commits and any fold made, each `REVIEW.md` Human review
+path the PR touches, then anything skipped: regrouping declined, verification
+missing, motivation the session lacked, a `REVIEW.md` interview skipped or
+declined.
 
 ## 8. Hand over to review
 
