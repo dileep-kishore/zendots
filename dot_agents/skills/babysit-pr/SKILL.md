@@ -108,10 +108,10 @@ Every unresolved thread appears in the table, including ones you plan only to
 rebut. Then carry on through steps 4–7 without asking. Leave a thread open,
 and say why in the report, when it needs the user: a product or design call,
 a human reviewer's request you would decline, or a fix outside the PR's
-scope. When a rebuttal rests on a reason that will recur in this repository,
-propose a `REVIEW.md` precedent in the report, as
-[review-rules](../independent-review/references/review-rules.md) describes,
-rather than writing it.
+scope. When a rebuttal's reason, or a fixed finding's mistake, has come up
+before in this repository, propose a `REVIEW.md` precedent or a source fix in
+the report, as [review-rules](../independent-review/references/review-rules.md)
+describes, rather than writing it.
 
 ## 4. Fix and push
 

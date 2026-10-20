@@ -74,11 +74,34 @@ precedent that skips data loss, security, or crash findings as a class.
 ## Proposing a precedent
 
 Propose one when a finding was REFUTED, or dismissed by the user, for a
-reason that will recur in this repository: a framework guarantee, an input
-that is always internal, a deliberate convention, a contract enforced
-elsewhere. Do not propose one for a reason specific to a single diff.
+reason that has already come up before in this repository: an earlier
+refuted finding, a rebutted PR thread, or a near miss of an existing
+precedent. The reason must be general: a framework guarantee, an input that
+is always internal, a deliberate convention, a contract enforced elsewhere.
+A first-time false alarm gets its rebuttal and nothing recorded, because a
+precedent per false alarm would bury the rules that matter.
 
-Put the proposed line, and the file it would go in, in the report. Write it
-only after the user approves, as its own small commit or alongside the
-change under review if the user prefers. A review run never edits
-`REVIEW.md` on its own.
+## Proposing a source fix
+
+When a CONFIRMED finding repeats a mistake, propose a rule that stops the
+author agent making it again. Propose one only when both hold:
+
+1. The mistake happened before: the same class appears in an earlier review
+   thread or `fix:` commit (search `gh` and `git log`), or three or more
+   instances of the pattern already exist in the code. One occurrence never
+   qualifies.
+2. A written rule would have prevented it: the cause is something the author
+   could not see in the code, such as a repository convention, a replaced
+   helper, or an unstated constraint. Logic slips, typos and misread
+   conditions get fixed and nothing is recorded.
+
+Choose the cheapest place that enforces it: a lint rule, then a `CLAUDE.md`
+line, then a `REVIEW.md` Focus line. Cite the earlier occurrence.
+
+## Writing a proposal
+
+Propose at most one precedent or source fix per run. Put the proposed line,
+the file it would go in, and the earlier occurrence it rests on in the
+report. Write it only after the user approves, as its own small commit or
+alongside the change under review if the user prefers. A review run never
+edits `REVIEW.md`, `CLAUDE.md` or lint configuration on its own.

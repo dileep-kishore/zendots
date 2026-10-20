@@ -168,8 +168,9 @@ could verify, whether the approved `REVIEW.md` override applied, and each
 Human review path the change touches. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
 
-When a refuted or user-dismissed finding would recur in this repository,
-propose a precedent as [references/review-rules.md](references/review-rules.md)
+When a refuted or user-dismissed finding's reason, or a confirmed finding's
+mistake, has come up before in this repository, propose a precedent or a
+source fix as [references/review-rules.md](references/review-rules.md)
 describes. Write it only after the user approves.
 
 A review request does not authorize fixes, commits, or pushes. If fixes were
