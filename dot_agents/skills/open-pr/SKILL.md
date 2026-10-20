@@ -121,7 +121,9 @@ Body, in order:
    result.
 
 Then, only when real, one sentence each: what was left out and why, a risk the
-diff does not show, a related issue. Never an empty section. Never a
+diff does not show, a related issue, and how to undo the change when
+`git revert` alone would not (state applied on another host, deleted files, a
+migration, external state). Never an empty section. Never a
 file-by-file summary.
 
 Keep it to what a reviewer can read before opening the diff. A PR with more
