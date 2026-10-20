@@ -128,11 +128,14 @@ Ready to merge: Yes | No | With fixes
 ```
 
 Each finding is atomic: one trigger, one faulty mechanism, one consequence,
-one fix. Two failures with separate fixes are two findings.
+one fix. Two failures with separate fixes are two findings. One faulty
+mechanism repeated in several places is one finding: search the change for
+every instance and list each under Location, so one fix round covers them
+all.
 
 ```markdown
 ### [P1] <short title>
-- Location: <file:line-range, at most about 10 lines, inside the change>
+- Location: <file:line-range, at most about 10 lines, inside the change; one per instance>
 - Trigger: <the input, state, caller, or environment that makes it fail>
 - Mechanism: <what the code does wrong, citing file:line for each step>
 - Consequence: <what the user or caller observes>

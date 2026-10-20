@@ -58,6 +58,12 @@ Respect explicit file or staged-only scopes rather than widening them.
   authorized or ask; never switch the user's checkout without authorization.
   Resolve the PR base from its repository, accounting for forked PRs.
 
+A repeat review of a branch or PR target already reviewed in this session
+covers only the commits since the previously pinned HEAD, unless the user
+asks for a full review. Working-change targets always get a full review:
+their fixes are usually uncommitted, so a commit range from an unchanged HEAD
+would be empty.
+
 For committed branch/PR reviews, check for pre-existing dirty files even when
 HEAD matches. Use a clean isolated checkout or read all surrounding context
 from the pinned commits; do not mix local edits into a committed review.

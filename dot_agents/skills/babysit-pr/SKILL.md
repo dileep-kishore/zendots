@@ -215,3 +215,7 @@ again; any thread that does not need the user starts the next round at step
 or a completed review opened no new threads), after three rounds, or when
 everything left needs the user. A bot still pending at the deadline means the
 PR is not yet known to be clean; report it that way.
+
+Stopping at the three-round cap, say whether the remaining findings point at
+the approach itself and what a different approach would change. More rounds
+on a flawed approach keep finding more of the same class.
