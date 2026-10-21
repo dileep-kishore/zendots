@@ -110,8 +110,10 @@ Invocation per harness: `/<name>` in Claude Code, `$<name>` in Codex,
 cd "$(chezmoi source-path)" && git add dot_agents/skills/<name> && git commit
 ```
 
-Skills reach the other machine through Syncthing plus `chezmoi apply
-~/.agents ~/.claude/skills`. Author on one machine only.
+Skills reach the other machine through Syncthing plus
+`chezmoi apply ~/.agents/skills/<name>`. A scoped apply skips `run_after`
+scripts, so then run `~/.local/bin/link-agent-skills.sh` there to create the
+Claude link. Author on one machine only.
 
 For prompt-based evals of a finished skill, Claude Code's `skill-creator`
 plugin has the tooling; nothing here depends on it.

@@ -86,7 +86,9 @@ Always install through `agent-skills.sh`, never a bare `npx skills`: the wrapper
 runs the installer from `$HOME` (it installs project-locally when the cwd is a
 git repo) and then `chezmoi add`s the store, so the install is never left
 unrecorded. Commit afterwards; the source reaches the other machine over
-Syncthing, where `chezmoi apply ~/.agents ~/.claude/skills` picks it up. Install
+Syncthing, where `chezmoi apply ~/.agents` lands it. A scoped apply skips
+`run_after` scripts, so for a new skill also run
+`~/.local/bin/link-agent-skills.sh` there to create its Claude link. Install
 a given skill on one machine only -- both write to the same synced source, so
 installing on both produces Syncthing conflict files.
 
@@ -101,7 +103,8 @@ chezmoi with a source entry and a removal for the same path.
   `~/.agents/skills` natively -- `npx skills` classifies them as "universal" and
   writes no link. Never link a store skill into `~/.codex/skills` or
   `~/.config/opencode/skills`; that makes those harnesses load it twice.
-  `link-agent-skills.sh` handles `~/.claude/skills` and runs on every apply.
+  `link-agent-skills.sh` handles `~/.claude/skills`. `agent-skills.sh` and a
+  bare `chezmoi apply` run it; a scoped apply does not.
 - **Check for an existing Claude plugin before adding a skill to the store.**
   The store is visible to Claude Code through those symlinks, so adding a skill
   an enabled plugin already provides puts two copies in one session. Compare
@@ -246,7 +249,8 @@ repo-side edit to `dot_agents/skills/**` is silently discarded by the next
 `add`, `fetch`, or `sync`. Edit `~/.agents/skills/<name>/SKILL.md`, then run
 `agent-skills.sh sync`. This applies to every skill, installed or
 hand-authored, not only the locally maintained ones. On the other machine,
-`chezmoi apply ~/.agents/skills/<name>` is still how the change lands.
+`chezmoi apply ~/.agents/skills/<name>` is still how the change lands; for a
+new skill, then run `~/.local/bin/link-agent-skills.sh`.
 
 #### Applying changes (agent rules)
 
