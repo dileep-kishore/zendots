@@ -1,6 +1,6 @@
 ---
 name: independent-review
-description: Fresh-context review of a PR, branch, or working changes by one reviewer or a Claude/Codex pair. Use when the user asks for independent, total, or deep review, or instructions require one after substantial work.
+description: Use when independently reviewing a PR, branch, or working changes, auditing a repository or folder, or when the user asks for total or deep review or project instructions require an independent review.
 ---
 
 # Independent review
@@ -38,6 +38,11 @@ using the same model are independent contexts, not a cross-model review.
 
 ## Pin the scope
 
+Distinguish a change review from an explicitly requested repository or folder
+audit. Record that kind in the intent supplied to finders and verifiers. For an
+audit, use [references/repository-audit.md](references/repository-audit.md).
+An audit can report existing defects in its named scope, even on a clean tree.
+
 Settle the target's checkout first, as the bullets below describe. Then run
 the missing-file check in [references/review-rules.md](references/review-rules.md)
 in that checkout, before recording HEAD, since it can add a `REVIEW.md`
@@ -58,6 +63,9 @@ Respect explicit file or staged-only scopes rather than widening them.
   head before reviewing. If it does not, prepare an isolated checkout when
   authorized or ask; never switch the user's checkout without authorization.
   Resolve the PR base from its repository, accounting for forked PRs.
+- **Repository or folder audit:** pin the current tree and named scope as
+  [references/repository-audit.md](references/repository-audit.md) describes.
+  A diff or last commit does not define this target.
 
 A repeat review of a branch or PR target already reviewed in this session
 covers only the commits since the previously pinned HEAD, unless the user
@@ -69,9 +77,10 @@ For committed branch/PR reviews, check for pre-existing dirty files even when
 HEAD matches. Use a clean isolated checkout or read all surrounding context
 from the pinned commits; do not mix local edits into a committed review.
 
-For unspecified "current work", use dirty changes if present, otherwise the
-current PR or branch comparison. Stop for an empty scope only after checking
-untracked files where applicable.
+For unspecified "current work" in a change review, use dirty changes if present,
+otherwise the current PR or branch comparison. Stop for an empty scope only
+after checking untracked files where applicable. Repeat audits cover the full
+named scope unless the user limits them.
 
 Collect standards and review rules as
 [references/review-rules.md](references/review-rules.md) describes, including
@@ -172,7 +181,7 @@ each its location, trigger, evidence, repro, smallest fix, and finder and
 verifier attribution. List REFUTED findings one line each with the refuting
 file:line. Then coverage: the concern map, lenses run or skipped, what no one
 could verify, whether the approved `REVIEW.md` override applied, and each
-Human review path the change touches. Link the unchanged raw reports; show them verbatim if
+Human review path the change touches or the audit includes. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
 
 When a refuted or user-dismissed finding's reason, or a confirmed finding's

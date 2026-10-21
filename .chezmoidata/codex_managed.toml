@@ -38,9 +38,6 @@ args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 [codex_managed.mcp_servers.sequential-thinking.env]
 DISABLE_THOUGHT_LOGGING = "true"
 
-[codex_managed.plugins."ponytail@ponytail"]
-enabled = true
-
 [codex_managed.features]
 js_repl = false
 memories = true

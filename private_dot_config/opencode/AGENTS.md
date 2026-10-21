@@ -30,8 +30,13 @@
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
   without questions, record your assumptions and continue.
-- Keep changes focused and complexity proportionate. Preserve unrelated and
-  in-progress work in the checkout.
+- Keep changes focused and complexity proportionate. Before fixing a bug,
+  trace the failing path and search for callers of the operation causing it,
+  including affected sibling paths. Before deleting or renaming code, config,
+  or files, search for string and dynamic references too. Include required
+  tests, fixtures, config, and exports when behavior changes. Preserve required
+  validation, error handling, and compatibility during moves or simplification.
+  Preserve unrelated and in-progress work in the checkout.
 - Delegate to subagents when work splits into large independent parts
   (audits, migrations, broad research) or would flood your context, not for
   what a few tool calls finish. Give each a bounded task, the files it may
@@ -83,7 +88,8 @@
 
 ## Tools and preferences
 
-- Reuse the project's existing tools and conventions first.
+- Reuse suitable helpers, components, dependencies, and tools already in the
+  project, following its conventions.
 - Current docs for a library, framework, SDK, API, CLI, or cloud service:
   `find-docs`. Real-world usage examples: `gh_grep` when available. Keep
   private information out of all external queries.

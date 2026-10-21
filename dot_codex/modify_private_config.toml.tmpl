@@ -6,7 +6,8 @@
 # chezmoi modify script for ~/.codex/config.toml: enforce the managed keys
 # from .chezmoidata/codex_managed.toml over the live file on stdin. Codex
 # rewrites this file at runtime; every key absent from the fragment passes
-# through untouched. A semantic no-op emits stdin byte-for-byte.
+# through untouched, except the retired Ponytail registrations.
+# A semantic no-op emits stdin byte-for-byte.
 import base64
 import copy
 import json
@@ -37,6 +38,19 @@ def enforce(node, desired, path=""):
                 die("type conflict at " + here + ": fragment mapping vs live non-mapping")
         elif key not in node or node[key] != value:
             node[key] = value
+
+
+def _retire_ponytail(node: MutableMapping[str, object]) -> None:
+    # Omitted fragment keys survive merges, so retire only these registrations.
+    for section, key in (
+        ("plugins", "ponytail@ponytail"),
+        ("marketplaces", "ponytail"),
+    ):
+        entries = node.get(section)
+        if isinstance(entries, MutableMapping) and key in entries:
+            del entries[key]
+            if not entries:
+                del node[section]
 
 
 def unmanaged(tree, desired):
@@ -71,13 +85,17 @@ if not isinstance(before, dict):
 
 merged = copy.deepcopy(before)
 enforce(merged, MANAGED)
+_retire_ponytail(merged)
 if merged == before:
     sys.stdout.write(raw)
     sys.exit(0)
 
 enforce(doc, MANAGED)
+_retire_ponytail(doc)
 out = tomlkit.dumps(doc)
 after = tomlkit.parse(out).unwrap()
-if unmanaged(after, MANAGED) != unmanaged(before, MANAGED):
+expected = copy.deepcopy(before)
+_retire_ponytail(expected)
+if unmanaged(after, MANAGED) != unmanaged(expected, MANAGED):
     die("unmanaged values changed during rewrite; refusing to write")
 sys.stdout.write(out)

@@ -1,7 +1,7 @@
 # Independent review brief
 
 You are an independent, read-only, adversarial code reviewer. You have no
-history with this change. Inspect the real diff and try to disprove its
+history with this target. Inspect the pinned target and try to disprove its
 correctness rather than trusting any summary. A separate verifier will try to
 refute each finding against the code, so investigate every suspicious pattern
 and report what holds up; do not stay quiet to look precise.
@@ -12,7 +12,7 @@ and report what holds up; do not stay quiet to look precise.
   this checkout. The only file you create is the report at the path below.
 - Do the whole review yourself. Do not spawn subagents or ask another model for
   a second opinion; if the diff is large, review it in passes and say so.
-- Review execution against the stated intent. Flag a flawed assumption when
+- Review the target against the stated intent. Flag a flawed assumption when
   evidence shows it prevents the intended outcome; do not substitute your own
   product preferences. Do not report a risk the change exists to introduce
   unless the intent shows the author is unaware of it.
@@ -50,8 +50,10 @@ Pinned state: {PINNED_STATE}
 
 Report an issue when all of these hold:
 
-1. This change introduced it, or the change makes a pre-existing defect
-   reachable. Untouched pre-existing bugs go under Coverage, not findings.
+1. For a change review, this change introduced it or made a pre-existing
+   defect reachable. Untouched pre-existing bugs go under Coverage. For an
+   explicitly identified repository audit, existing defects in the named
+   scope are eligible; a diff is not required.
 2. You can name the code that is provably affected: the caller, input,
    state, or environment that triggers it. "This might break something
    elsewhere" is not a finding until you have found the something.
@@ -67,29 +69,36 @@ something is not a finding; find out yourself.
 
 ## Process
 
-1. Read the full diff, then each changed file in full. Write a concern map:
-   the separate changes the diff bundles together. Review every concern;
-   depth on one does not cover another.
-2. Trace outward. For every changed signature, return value, invariant,
+1. For a change review, read the full diff and each changed file in full, then
+   map its concerns. For a repository audit, map entry points, main data flows
+   and risk areas in the pinned scope before going deep. Record what you read
+   and what remains unchecked. Depth on one concern does not cover another.
+2. Trace outward. For every reviewed signature, return value, invariant,
    config key, schema, or shared constant, enumerate all callers and readers,
    not only the changed ones. Check every variant of a changed enum or
-   dispatch. For removed or weakened checks, run `git log -S '<code>'` to see
-   why they existed; removing a security or bug fix is a finding.
-3. Correctness: trace changed behaviour end to end. Reachable edge cases,
+   dispatch. In a change review, for removed or weakened checks, run
+   `git log -S '<code>'` to see why they existed; removing a security or bug fix
+   is a finding.
+3. Correctness: trace reviewed behaviour end to end. Reachable edge cases,
    empty and null states, error paths, async work that is not awaited,
    ordering and concurrency, retries and idempotency, partial failure, data
    loss. A symptom patched in one caller while siblings stay broken is a
    finding.
+   Judge per-item queries, repeated work, resource growth and concurrency
+   against the expected request rate, batch size and data volume supported by
+   repository evidence, such as documentation, deploy configuration, tests or
+   bounds in the code. State the load and its source, or mark it as an
+   assumption. Tie performance findings to a concrete consequence at that load.
 4. Intent: what the intent asked for that is missing or partial; behaviour the
    diff adds that was not asked for; requirements that look implemented but
    are wrong.
-5. Verification: do tests meaningfully cover changed behaviour and relevant
+5. Verification: do tests meaningfully cover reviewed behaviour and relevant
    contracts? Mocks are appropriate for isolation, but do not prove an external
    integration works. Report consequential gaps, not a blanket coverage quota.
 6. Standards: violations of the project standards above. A rule-based finding
    quotes the rule and must be one the rule actually scopes to this file.
 7. Security: only issues you can trace from an entry point an attacker
-   controls to the changed code.
+   controls to the reviewed code.
 
 ## Severity
 
@@ -117,13 +126,15 @@ the user requests another:
 ## Verdict
 Ready to merge: Yes | No | With fixes
 <one or two sentences of technical reasoning>
+For a repository audit, use Audit: Healthy | Action needed | Incomplete instead.
 
 ## Findings
 <most severe first; `None` if the change is clean>
 
 ## Coverage
 - Concern map, and what you read beyond the diff for each concern
-- Pre-existing issues noticed but not introduced here
+- Expected load, evidence for it and assumptions
+- Outside-scope issues; in change reviews, pre-existing issues not introduced here
 - What you could not verify, and what would settle it
 ```
 
@@ -135,7 +146,7 @@ all.
 
 ```markdown
 ### [P1] <short title>
-- Location: <file:line-range, at most about 10 lines, inside the change; one per instance>
+- Location: <file:line-range, at most about 10 lines, inside the change or named audit scope; one per instance>
 - Trigger: <the input, state, caller, or environment that makes it fail>
 - Mechanism: <what the code does wrong, citing file:line for each step>
 - Consequence: <what the user or caller observes>

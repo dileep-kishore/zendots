@@ -5,9 +5,9 @@
 # chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
 # from .chezmoidata/claude_managed.json over the live file on stdin. Claude
 # Code (and Orca hook injection) rewrite this file at runtime; every
-# key absent from the fragment passes through untouched, except our guard hook.
-# A semantic no-op
-# emits stdin byte-for-byte.
+# key absent from the fragment passes through untouched, except our guard hook
+# and the retired Ponytail registrations.
+# A semantic no-op emits stdin byte-for-byte.
 import base64
 import copy
 import json
@@ -52,6 +52,14 @@ if not isinstance(doc, dict):
 
 before = copy.deepcopy(doc)
 enforce(doc, MANAGED)
+# Omitted fragment keys survive merges, so retire these registrations explicitly.
+for section, key in (
+    ("enabledPlugins", "ponytail@ponytail"),
+    ("extraKnownMarketplaces", "ponytail"),
+):
+    entries = doc.get(section)
+    if isinstance(entries, dict):
+        entries.pop(key, None)
 merge_command_guard(doc)
 if doc == before:
     sys.stdout.write(raw)

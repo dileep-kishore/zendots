@@ -129,8 +129,10 @@ config, capture intentional GUI changes before applying over them. For example,
 see the [OmniWM capture workflow](docs/omniwm.md#maintaining-the-config).
 
 Claude, Codex, and Serena use modify templates: the fragments in
-`.chezmoidata/` own selected keys, while other live keys are preserved. Capture
-changes to those managed keys with:
+`.chezmoidata/` own selected keys, while other live keys are preserved except
+explicitly retired plugin registrations. See the
+[Ponytail retirement record](docs/maintenance/2026-10-20-ponytail-retirement.md).
+Capture changes to those managed keys with:
 
 ```bash
 just capture codex # also accepts claude or serena; writes the source fragment
@@ -180,6 +182,16 @@ checkout rather than copying it. Install on one machine only, wait for Syncthing
 then preview and approve the relevant skill destinations on the other machine.
 Fetched runtimes use `agent-skills.sh fetch`; none is currently pinned.
 
+The existing [independent-review skill](dot_agents/skills/independent-review/SKILL.md)
+handles change reviews and repository or folder audits. Ask to "audit this
+repository" or "audit this folder"; no extra activation command is needed.
+Audits inspect the named current working tree, including existing defects and
+non-ignored untracked files, and work on a clean tree. Change reviews retain
+their introduced-defect requirement. Both use fresh finders and independent
+verifiers. Performance findings must connect a concrete consequence to expected
+load supported by repository evidence, including tests or code bounds, with
+assumptions stated.
+
 ### OpenCode V2 and Pi
 
 OpenCode's server configuration is `~/.config/opencode/opencode.json`; terminal
@@ -188,7 +200,7 @@ default is `plan` with `openai/gpt-6.1-sol` and high reasoning. The CLI theme is
 Catppuccin dark. Its template includes Orca's status plugin only when the local
 entrypoint exists; preview/apply `cli.json` again after installing Orca.
 
-Notifier and Ponytail use pinned package versions. Superpowers is pinned to a
+Notifier uses a pinned package version. Superpowers is pinned to a
 full Git commit and registers its own skills. Update that pin in `opencode.json`,
 not a separate checkout. `sync_skill_collections.sh` only removes known legacy
 Superpowers symlinks and leaves the old checkout alone. Refer to the
@@ -270,6 +282,7 @@ apply only after approval. Do not chain a pull with a broad apply.
 - [Noctalia v5 configuration and maintenance](docs/noctalia-v5.md)
 - [Pi workflows and session handoff](docs/pi-workflow.md)
 - [Dated cross-host maintenance record](docs/maintenance/2026-10-20-agent-updates.md)
+- [Ponytail retirement and pending deployment](docs/maintenance/2026-10-20-ponytail-retirement.md)
 - [Repository agent guidance](CLAUDE.md) and [review rules](REVIEW.md)
 
 `docs/plans/` and `docs/superpowers/` are ignored local planning directories,

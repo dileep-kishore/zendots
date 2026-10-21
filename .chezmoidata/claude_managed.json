@@ -37,21 +37,13 @@
       "pr-review-toolkit@claude-plugins-official": true,
       "linear@claude-plugins-official": true,
       "skill-creator@claude-plugins-official": true,
-      "codex@openai-codex": true,
-      "ponytail@ponytail": true
+      "codex@openai-codex": true
     },
     "extraKnownMarketplaces": {
       "openai-codex": {
         "source": {
           "source": "github",
           "repo": "openai/codex-plugin-cc"
-        },
-        "autoUpdate": true
-      },
-      "ponytail": {
-        "source": {
-          "source": "github",
-          "repo": "DietrichGebert/ponytail"
         },
         "autoUpdate": true
       },

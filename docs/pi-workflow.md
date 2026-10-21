@@ -12,8 +12,10 @@ is available to the signed-in provider. Use `pi --list-models` to inspect the
 current catalog; unavailable entries in `enabledModels` can produce warnings.
 
 Package pins are defined in `dot_pi/agent/modify_settings.json`: pi-subagents,
-pi-lens, pi-web-search, the question/todo extensions, and Ponytail. These are
-independent of the Claude, Codex, and OpenCode plugin versions.
+pi-lens, pi-web-search, and the question/todo extensions. These are independent
+of the Claude, Codex, and OpenCode plugin versions. Ponytail was removed from
+the source package list; live removal still requires the scoped deployment in
+the [retirement record](maintenance/2026-10-20-ponytail-retirement.md).
 
 After editing the source, preview the selected destinations, for example:
 
