@@ -1,17 +1,35 @@
 # Noctalia v5 on Niri
 
-Native Noctalia v5 reads TOML, so it does not import the old QML shell's
-`~/.config/noctalia/settings.json`. That JSON, its colors, and its plugin
-settings remain available for reference or rollback.
+The managed config is `private_dot_config/noctalia/config.toml`, deployed to
+`~/.config/noctalia/config.toml` on Linux only. It uses the built-in Catppuccin
+palette in dark mode and leaves unspecified settings at Noctalia's defaults.
 
-The port lives in `private_dot_config/noctalia/config.toml` and deploys to
-`~/.config/noctalia/config.toml`. It carries the supported preferences and bar
-layout, using the built-in Catppuccin palette in dark mode. Defaults stay in
-Noctalia rather than being copied into this file.
+Niri starts `noctalia` from `private_dot_config/niri/config.kdl`.
+Mod+Alt+W runs `noctalia msg bar-toggle`. The Arch package scripts do not
+install Noctalia itself; install native v5 separately using the
+[upstream installation guide](https://docs.noctalia.dev/noctalia/getting-started/installation/).
+The old `qs -c noctalia-shell` command starts the separate v4 QML shell, not
+this configuration. QML plugins and `settings.json` are not native v5 config;
+this repository no longer ships those files.
 
-Niri starts `noctalia`. Mod+Alt+W runs `noctalia msg bar-toggle`.
-These commands belong to native v5; the old `qs -c noctalia-shell` commands
-start the separate v4 shell.
+## Current desktop behavior
+
+- A 37-pixel top bar reserves space and does not auto-hide. App icons, the
+  active window, and media are on the left; workspace-grouped apps and the
+  clock are centered; notifications, updates, tray, system status, session,
+  and Caffeine are on the right.
+- Noctalia's polkit agent is enabled. Its dock, desktop widgets, wallpaper
+  management, idle lock/screen-off/suspend actions, and scheduled night light
+  are disabled.
+- Niri starts `hypridle` instead. The managed
+  `private_dot_config/hypr/hypridle.conf` turns displays off after 15 minutes
+  and requests a session lock after 60 minutes, using Hyprlock. Mod+Alt+L also
+  powers off monitors and starts Hyprlock after a three-second delay.
+- Niri's `change-wallpaper.py` cycles images from `~/Pictures/swww/` every
+  15 minutes using `awww`; Noctalia's configured wallpaper directory is inactive.
+- Control Center has Wi-Fi, Bluetooth, notifications, power profile, Caffeine,
+  and night light shortcuts. Weather is enabled with imperial units, but its
+  address stays local.
 
 ## Applying and maintaining
 
@@ -44,38 +62,35 @@ applied, remove that setting's local override so future source changes can take
 effect. Preserve unrelated local state, including the weather address and
 monitor-specific lockscreen layout; do not sync the whole state directory.
 
-## Plugin replacements
+## Native plugins
 
-The old QML plugins cannot run in native v5. The port enables these native
-equivalents from the catalog:
+The config enables these catalog plugins and sets automatic updates to all
+enabled git sources:
 
-| v4 plugin | Native v5 plugin |
+| Purpose | Plugin |
 | --- | --- |
-| Catwalk | `dotnetrob/cat` |
-| Update count | `yuuto/arch-updater` |
+| Cat widget | `dotnetrob/cat` |
+| Arch update count | `yuuto/arch-updater` |
 | Syncthing status | `rylos/syncthing` |
-| Tailscale | `rylos/tailnet` |
+| Tailscale status | `rylos/tailnet` |
 | Timer | `noctalia/timer` |
 
-Timer remains available without adding a timer widget to the bar. The native
-polkit agent replaces the old authentication plugin.
+Timer is enabled without a timer widget on the bar. The update plugin uses
+`paru` and `ghostty`, checks hourly, and disables Flatpak checks and update
+notifications. Status plugins still need their corresponding services;
+enabling a plugin does not install Syncthing or Tailscale.
 
-## Differences from v4
+For a running shell, inspect plugin availability or update a source with:
 
-- Assistant and AI usage widgets have no ready replacement with the currently
-  installed tools, so their bar entries are omitted.
-- Native Caffeine replaces Keep Awake, but does not preserve its duration
-  countdown or inhibition scopes.
-- VPN status is shown inside Network. Workspace app groups use a native grouped
-  taskbar; media progress and visualization use a fill and spectrum instead of
-  the old ring and wave.
-- Panel opacity does not reproduce the old `0.9` setting exactly. Per-urgency
-  notification timeouts of 3/8/15 seconds and low-urgency notification history
-  do not have equivalent native settings in this port.
-- Control Center supports six shortcuts. The wallpaper shortcut is omitted
-  because wallpaper management was disabled; the other six are retained.
-- Tailnet provides the migrated status display and receive settings, without
-  preserving the old plugin's Taildrop send or account-switching controls.
+```bash
+noctalia msg plugins list
+noctalia msg plugins update official
+noctalia msg plugins update community
+```
 
-Keep the old shell packages and JSON until the native layout and plugin
-behavior have been checked on the desktop.
+Native plugins are fetched from the official and community catalogs without a
+custom Noctalia build. GUI plugin toggles can override the managed enabled
+list in the local `settings.toml`, just like other settings.
+
+References: [configuration and precedence](https://docs.noctalia.dev/noctalia/configuration/)
+and [native plugins](https://docs.noctalia.dev/noctalia/plugins/).

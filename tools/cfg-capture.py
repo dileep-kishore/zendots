@@ -7,10 +7,10 @@
 
 Usage: cfg-capture.py claude|codex|serena
 
-The fragment defines the managed paths (see the design doc in
-docs/superpowers/specs/). For each leaf path in the fragment, the live value
-is read and written into the fragment. Fails without touching the fragment if
-any managed path is missing from the live file.
+The fragment in .chezmoidata/ defines the managed paths (see README.md,
+"Source and live configuration"). For each leaf path in the fragment, the
+live value is read and written into the fragment. Fails without touching the
+fragment if any managed path is missing from the live file.
 """
 import json
 import os

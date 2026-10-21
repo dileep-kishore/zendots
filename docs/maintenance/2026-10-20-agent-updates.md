@@ -1,8 +1,14 @@
 # Agent maintenance on 2026-10-20
 
-Ponytail 5.3.2 is installed and enabled in Claude and Codex on Tsuki and
-macmini. Each installation's six skill files match the upstream marketplace
-files. Existing sessions need a restart to load refreshed packages.
+This is a historical record of checks performed on 2026-10-20, not a package
+lock or a statement of current host health. Subsequent client/plugin updates
+and remote authentication can change the state described below. For ongoing
+configuration and maintenance workflows, see the [README](../../README.md).
+
+At that maintenance checkpoint, Ponytail 5.3.2 was installed and enabled in
+Claude and Codex on Tsuki and macmini. Each installation's six skill files
+matched the upstream marketplace files. Existing sessions needed a restart
+to load refreshed packages.
 
 ## Skills, clients, and plugins
 

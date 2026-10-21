@@ -1,16 +1,20 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Repository guidance shared by coding agents. `AGENTS.md` is a symlink to this file.
 
 ## Overview
 
 This is a **dotfiles repository** (zendots) managed by [chezmoi](https://www.chezmoi.io/), a dotfile manager that uses templates to maintain configuration files across different machines. The repository contains comprehensive configurations for a modern terminal-based development environment built around Neovim, Zsh, Tmux, and various CLI tools.
 
+The managed hosts are tsuki (CachyOS Linux, Niri + native Noctalia v5) and
+macmini (macOS, OmniWM). AeroSpace/SketchyBar and Hyprland/Waybar configs
+remain available. See `README.md` and the operational guides in `docs/`.
+
 ## Repository Structure
 
 The repository follows chezmoi's naming conventions where files/directories are prefixed with special markers:
 
-- `dot_` → Files that become `.filename` in the home directory (e.g., `dot_zshrc` → `~/.zshrc`)
+- `dot_` → Files that become `.filename` in the home directory (e.g., `dot_gitconfig` → `~/.gitconfig`)
 - `private_dot_` → Private files (e.g., `private_dot_config/` → `~/.config/`)
 - `executable_` → Scripts that should be executable
 - `.chezmoiignore` → Files to exclude from chezmoi management (includes justfile, temp.py, bin/, etc.)
@@ -26,10 +30,10 @@ The repository follows chezmoi's naming conventions where files/directories are 
   - `starship.toml`, `ohmyposh/` → Shell prompt configurations
 
 - **`pkgs/`** → Package management scripts
-  - `Brewfile` → Homebrew bundle file listing all packages
+  - `Brewfile` → Homebrew package inventory for macOS; Linux scripts live in `arch/` and `fedora/`
   - `download_yazi_plugins.sh` → Installs yazi plugins via `ya pkg`
   - `pipx_packages.sh` → Python packages to install with pipx
-  - `misc_setup.sh` → Post-setup tasks (rebuild bat cache, clone tpm)
+  - `misc_setup.sh` → Older post-setup helper; its bat invocation is broken, so use `bat cache --build` directly
 
 - **`private_dot_local/bin/`** → Custom executable scripts
 
@@ -55,14 +59,17 @@ chezmoi edit ~/.zshrc
 
 ### Agent Skills
 
-`~/.agents/skills/` is the single store, vendored as `dot_agents/skills/` so
-`chezmoi apply` reproduces every skill on a new machine with no network.
+`~/.agents/skills/` is the single store, vendored as `dot_agents/skills/`.
+Chezmoi reproduces the vendored skill files without a network fetch.
 
 ```bash
-agent-skills.sh add mattpocock/skills   # or: just skills add ...
 agent-skills.sh update
-agent-skills.sh sync                    # after editing any skill in the store
+agent-skills.sh sync # after editing any skill in the home store
 ```
+
+Install new skills with `agent-skills.sh add <owner>/<repo>` (or `just skills
+add …`). Check for existing local adaptations and plugin duplicates first;
+do not reinstall an entire collection over existing locally maintained skills.
 
 To author a skill, invoke the `create-skill` skill; it covers layout, the
 manual-only frontmatter for each harness, and recording the result.
@@ -120,10 +127,11 @@ which is never `chezmoi add`ed, and only a relative symlink enters the store, so
 the payload reaches neither this repository nor Syncthing.
 
 ```bash
-agent-skills.sh fetch <owner>/<repo> --path <name>   # --path: SKILL.md is not at the repo root
-agent-skills.sh fetch                                # restore missing runtimes, follow new pins
-agent-skills.sh fetch --bump <name>                  # move the pin to the ref's tip
-agent-skills.sh remove <name>                        # works for either kind
+# Replace the quoted placeholders with a repository and skill name.
+agent-skills.sh fetch "owner/repo" --path "skill-name" # SKILL.md is not at repo root
+agent-skills.sh fetch                                 # restore missing runtimes, follow pins
+agent-skills.sh fetch --bump "skill-name"              # move the pin to the ref's tip
+agent-skills.sh remove "skill-name"                   # works for either kind
 ```
 
 - **Run `agent-skills.sh fetch` on a new machine.** `chezmoi apply` reproduces
@@ -189,20 +197,20 @@ external worktrees; it does not change the main folder's Syncthing ignores.
 ```bash
 # Install all packages from Brewfile
 just install
-# or
-cd pkgs && brew bundle install
 
 # Update Brewfile with currently installed packages
 just dump
-# or
-cd pkgs && rm Brewfile && brew bundle dump
 
 # Install Yazi plugins
-cd pkgs && ./download_yazi_plugins.sh
+bash pkgs/download_yazi_plugins.sh
 
-# Post-installation setup (bat cache rebuild, TPM clone)
-./pkgs/misc_setup.sh
+# Rebuild the bat cache
+bat cache --build
 ```
+
+Run those commands from the repository root.
+For TPM, clone `https://github.com/tmux-plugins/tpm` into `~/.tmux/plugins/tpm`
+only if missing, then use the plugin-install shortcut below.
 
 ### Tmux Plugin Installation
 
@@ -227,7 +235,7 @@ When modifying configurations:
 This repository is the **source** for dotfiles. The typical workflow is:
 
 1. **Modify files** in this repository (using `dot_` prefixes for dotfiles)
-2. **Run `chezmoi diff <destination paths>`** to preview what will change
+2. **Run `chezmoi diff -r <destination paths>`** to preview what will change
 3. **Run `chezmoi apply <destination paths>`** once the diff is approved (see the agent rules below)
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
@@ -245,7 +253,7 @@ hand-authored, not only the locally maintained ones. On the other machine,
 - **Never run a bare `chezmoi apply`.** Always scope it to the target paths you
   actually modified: `chezmoi apply ~/.config/niri/config.kdl ~/.config/mimeapps.list`.
   A bare apply sweeps in unrelated pending changes (e.g. `.agents/.skill-lock.json` churn).
-- **Ask for confirmation before applying.** Show the scoped `chezmoi diff <paths>`
+- **Ask for confirmation before applying.** Show the scoped `chezmoi diff -r <paths>`
   first and wait for the user to approve. Do not apply as part of a larger action.
 - Use the **destination** paths (`~/.config/...`), not the source names (`private_dot_config/...`).
 - **Always pass `-r` to `chezmoi diff`.** Unlike `chezmoi status`, `diff` is not
@@ -269,20 +277,22 @@ The entire environment uses **Catppuccin Mocha** color scheme:
 
 When making changes to configurations, edit these files in the repository:
 
-- **Shell**: `dot_zshrc`
+- **Shell**: `dot_zshrc.tmpl`, `dot_shell_exports.tmpl`, `dot_shell_aliases.tmpl`
 - **Neovim**: Files in `private_dot_config/nvim/lua/`
 - **Tmux**: `private_dot_config/tmux/tmux.conf`
 - **Git**: `dot_gitconfig`, `dot_gitignore_global`
 - **Packages**: `pkgs/Brewfile`
 
-After editing, show the scoped `chezmoi diff` and apply only the paths you changed, as described under "Applying changes".
+After editing managed configuration, show the scoped `chezmoi diff -r` and
+apply only the approved paths, as described under "Applying changes".
+Repository-only docs are ignored by chezmoi and need no apply.
 
 ## Chezmoi File Name Translation
 
 When working with this repository, remember chezmoi naming:
 
-- `dot_zshrc` → `~/.zshrc`
+- `dot_zshrc.tmpl` → `~/.zshrc` (rendered per host)
 - `private_dot_config/nvim/init.lua` → `~/.config/nvim/init.lua`
 - `private_dot_local/bin/executable_script.sh` → `~/.local/bin/script.sh` (executable)
 
-When suggesting file paths to the user, use the actual paths (`~/.zshrc`), but when making changes in this repository, use the chezmoi names (`dot_zshrc`).
+When suggesting file paths to the user, use the actual paths (`~/.zshrc`), but when making changes in this repository, use the chezmoi names (`dot_zshrc.tmpl`).

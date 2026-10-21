@@ -4,17 +4,18 @@ OmniWM's Hyper chord is Control+Option+Command, leaving Shift available for
 moving windows to workspaces. `systemHyperTrigger = "None"` keeps key remapping
 independent of the window manager.
 
-The Go60's existing Hyper key sends Right GUI. On macOS Karabiner translates
-Right Command into Control+Option+Command for every app. On Linux Right GUI
-remains Super. The firmware and Karabiner configuration are managed separately
-from this OmniWM file. A four-modifier firmware Hyper key will not match these
-three-modifier bindings.
-Keep the existing physical positions, layer behaviors, arrow keys, and Option
-position. The Niri config is unchanged.
+The Go60 setup expects its existing Hyper key to send Right GUI, which macOS
+sees as Right Command. Configure Karabiner separately to translate that key
+into Control+Option+Command for every app, preserving an additional physical
+Shift. This repo installs Karabiner through the Brewfile but does not ship the
+remapping or keyboard firmware. A four-modifier firmware Hyper key will not
+match these three-modifier bindings. Linux's Right GUI/Super behavior is
+independent of this macOS configuration.
 
 ## Setup
 
-1. Install with `brew install --cask omniwm` if missing.
+1. Install with `brew install --cask omniwm` if missing; it is also listed in
+   `pkgs/Brewfile`. Upstream currently requires macOS 26+ on Apple Silicon.
 2. Turn off Stage Manager in System Settings > Desktop & Dock. Keep
    Displays have separate Spaces enabled under Mission Control. If you change
    that setting, log out and back in. Start with one native macOS Space.
@@ -60,22 +61,27 @@ OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
 keeping Hyper+Space free for Raycast.
 
 The config uses Niri scrolling, nine workspaces on the main monitor, 25/50/75/100%
-column widths, a 6-point gap with no outer gaps, and a Catppuccin Mocha mauve
-focus border with an 8-point glow at 60% opacity. A lone column stays centered
-at its configured width. Focus does not follow the mouse; keyboard focus still
-moves the pointer to the focused window. The 28-point workspace bar overlaps
-the macOS menu bar without reserving layout space; SketchyBar is unnecessary.
+column widths (50% by default), and a 6-point gap with no outer gaps. Borders
+are enabled at 2 points, with a mauve base color, an enabled gradient, and an
+8-point glow at 60% opacity. A lone column stays centered at its configured
+width. Focus does not follow the mouse; keyboard focus still moves the pointer
+to the focused window. The 28-point workspace bar overlaps the macOS menu bar
+without reserving layout space. SketchyBar is not required by this layout,
+although it remains in the Brewfile.
 
-Twelve app rules set initial workspace placement for standard windows, including Chrome to 1,
-T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8. The complete
-assignments are in the file's `[[appRules]]` entries. A separate rule makes
-Zoom's standard windows float by default.
+Twelve app rules set initial workspace placement for standard windows, including
+Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.
+The complete assignments are in the file's `[[appRules]]` entries, alongside
+app-specific minimum window sizes. Separate rules make Zoom and Granola's
+standard windows float by default.
 
 ## Maintaining the config
 
 Edit `private_dot_config/omniwm/settings.toml` in this repo, then preview and
-apply the destination path above. Keep every hotkey ID, including Unassigned
-entries, when editing the generated file. IPC is enabled for `omniwmctl` checks.
+apply the destination path above on macOS. Chezmoi ignores this config on
+Linux. Preserve workspace IDs and every hotkey ID, including Unassigned
+entries, when editing the generated file. IPC is enabled for `omniwmctl` checks
+on the Mac; it does not make those checks available on Linux.
 
 After changing settings in OmniWM's GUI, capture the live file back into the
 repo before applying dotfiles again:

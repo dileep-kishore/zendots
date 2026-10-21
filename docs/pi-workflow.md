@@ -1,6 +1,31 @@
 # Pi Workflow Guide
 
-Pi's workflow setup is global, managed by chezmoi under `dot_pi/agent/`, and deployed to `~/.pi/agent/`.
+Pi's workflow setup is managed by chezmoi under `dot_pi/agent/` and deployed to
+`~/.pi/agent/`. Its settings modify template preserves unrelated live settings
+while managing packages, model selection, thinking level, and theme.
+
+## Settings and deployment
+
+The configured default is `openai-codex/gpt-5.6-sol` with high thinking and
+Catppuccin Mocha. This is a configured preference, not a guarantee that a model
+is available to the signed-in provider. Use `pi --list-models` to inspect the
+current catalog; unavailable entries in `enabledModels` can produce warnings.
+
+Package pins are defined in `dot_pi/agent/modify_settings.json`: pi-subagents,
+pi-lens, pi-web-search, the question/todo extensions, and Ponytail. These are
+independent of the Claude, Codex, and OpenCode plugin versions.
+
+After editing the source, preview the selected destinations, for example:
+
+```bash
+chezmoi diff -r ~/.pi/agent/settings.json ~/.pi/agent/presets.json
+```
+
+Apply those paths only after approving the diff, then restart Pi. Extension,
+workflow, and agent-definition edits must include their own destination paths
+in the same preview/approval process. Applying settings does not prove package
+compatibility or provider access; `pi --help` confirms the `--preset` extension
+flag is loaded.
 
 ## Main workflows
 
@@ -54,7 +79,11 @@ Mode differences:
 - `investigate`: no edit, write, or subagent tools.
 - `audit`: subagents are available, but editing is disabled.
 - `ship` and `deadline`: editing and subagents are available.
-- `/preset off`: restores the tools and thinking level from session startup.
+- `/preset off`: restores the tools and thinking level captured at session startup.
+
+Read-only modes retain `bash`; their instructions prohibit writes, but they are
+not an operating-system sandbox. Missing extension tools are omitted from a
+preset's active tools and reported when the mode is selected interactively.
 
 ## Subagents
 
@@ -69,13 +98,18 @@ Mode differences:
 
 ### Custom agents
 
-| Agent | Role | Default context and model |
+| Agent | Role | Context and model selection |
 | --- | --- | --- |
-| `scout` | Fast read-only reconnaissance | Fresh context, GPT-5.3 Codex Spark, low thinking |
-| `planner` | Evidence-backed implementation planning | Forked context, GPT-5.6, high thinking |
-| `worker` | Sole-writer implementation | Forked context, GPT-5.6, high thinking |
-| `reviewer` | Adversarial diff or plan review | Fresh context, GPT-5.5, high thinking |
-| `verifier` | Prove acceptance criteria | Fresh context, GPT-5.5, high thinking |
+| `scout` | Fast read-only reconnaissance | Fresh; GPT-5.3 Codex Spark, low thinking; fallback models declared in its agent file |
+| `planner` | Evidence-backed implementation planning | Forked; no model override, high thinking |
+| `worker` | Sole-writer implementation | Forked; no model override, high thinking |
+| `reviewer` | Adversarial diff or plan review | Fresh; no model override, high thinking |
+| `verifier` | Prove acceptance criteria | Fresh; no model override, high thinking |
+
+Only `scout` pins a model in the local agent definitions. The others use the
+runtime-selected model rather than fixed GPT-5.6/GPT-5.5 assignments. All five
+inherit project context but disable skill inheritance; `worker` may not launch
+subagents.
 
 Built-in `oracle`, `researcher`, `context-builder`, and `delegate` agents are also available.
 
@@ -106,21 +140,16 @@ Monitor and control them with:
 /subagents-doctor
 ```
 
-## Packaged workflow shortcuts
+## Workflow orchestration
 
-`pi-subagents` also provides:
+The local workflow prompts use `pi-subagents` dynamic `workflowScript`
+orchestration rather than checked-in chains. Audit work uses distinct
+read-only lanes; implementation uses one writer per working directory, then
+focused validation and fresh-context review for non-trivial changes.
 
-```text
-/gather-context-and-clarify
-/parallel-review
-/review-loop
-/parallel-research
-/parallel-context-build
-/parallel-handoff-plan
-/parallel-cleanup
-```
-
-For normal work, the custom `/investigate`, `/ship`, `/audit`, `/deadline`, and `/finish` commands are the primary entry points.
+The custom `/investigate`, `/ship`, `/audit`, `/deadline`, and `/finish` commands
+are the local entry points. Package-provided shortcuts depend on the pinned
+runtime; they are not defined by this repository's preset extension.
 
 ## Session handoff
 

@@ -1,263 +1,283 @@
 <div align="center">
   <img src="assets/logo.svg" width="120" alt="zendots logo">
   <h1>zendots</h1>
-  <p><strong>Zen dotfiles — a modern, minimal, keyboard-centric terminal environment</strong></p>
+  <p><strong>Personal, keyboard-centric dotfiles for macOS and Linux</strong></p>
 </div>
 
-A [chezmoi](https://www.chezmoi.io/)-managed dotfiles repository covering Neovim,
-Zsh, Tmux, a fleet of AI coding agents, and the CLI tools that hold it all
-together. Templated for both macOS (AeroSpace + SketchyBar) and Linux (niri /
-Hyprland + Waybar), with Catppuccin Mocha theming throughout.
+[chezmoi](https://www.chezmoi.io/) source for **macmini** (macOS) and **tsuki**
+(CachyOS Linux): shells, Neovim, tmux, desktop configuration, and coding agents.
+Catppuccin Mocha is the shared theme. The current desktops are **OmniWM** on
+macOS and **Niri + native Noctalia v5** on Linux; AeroSpace/SketchyBar and
+Hyprland/Waybar configurations are also retained.
 
-**Be sure to ⭐️ or 🔱 this repo if you find it useful! 😃**
+This is not a portable, unattended installer. Review personal paths, app rules,
+package lists, encrypted secrets, and apply hooks before using it on another host.
 
-## The Stack
+## Stack
 
-### Core
+| Area | Configuration |
+| --- | --- |
+| Shell | Zsh + Zinit, carapace, atuin, zoxide, television, Oh-My-Posh; Bash and Fish configs also included |
+| Terminals | Ghostty, Kitty, Warp |
+| Editor | Neovim + lazy.nvim, Snacks pickers, sidekick.nvim, avante.nvim, Copilot |
+| Sessions | tmux + TPM, sesh, tmuxp; Zellij config also included |
+| Files and Git | Yazi, Lazygit, delta |
+| macOS desktop | OmniWM; Karabiner/Raycast hotkeys configured separately — [guide](docs/omniwm.md) |
+| Linux desktop | Niri + Noctalia v5 — [guide](docs/noctalia-v5.md) |
+| Coding agents | Claude Code, Codex, OpenCode V2, Pi, omp; Orca and T3 Code integrations |
+| Shell AI | aichat command generation with `Alt-e` |
+| Project sync | Syncthing + `work-sync` for macmini/tsuki project folders and external Orca worktrees |
 
-| | |
-|---|---|
-| **Dotfile manager** | [chezmoi](https://www.chezmoi.io/) |
-| **Shell** | Zsh + [Zinit](https://github.com/zdharma-continuum/zinit), [carapace](https://carapace.sh/) completions |
-| **Prompt** | [Oh-My-Posh](https://ohmyposh.dev/) (with a custom transient prompt) |
-| **Terminal** | [Ghostty](https://ghostty.org/), [Kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) |
-| **Editor** | [Neovim](https://neovim.io/) + [lazy.nvim](https://github.com/folke/lazy.nvim) |
-| **Multiplexer** | [Tmux](https://github.com/tmux/tmux) + [TPM](https://github.com/tmux-plugins/tpm), [sesh](https://github.com/joshmedeski/sesh), [tmuxp](https://tmuxp.git-pull.com/) |
-| **File manager** | [Yazi](https://yazi-rs.github.io/) |
-| **Git UI** | [Lazygit](https://github.com/jesseduffield/lazygit) + [delta](https://github.com/dandavison/delta) |
-| **Theme** | [Catppuccin Mocha](https://catppuccin.com/), everywhere |
+Package inventories: [Homebrew](pkgs/Brewfile), [Arch/CachyOS scripts](pkgs/arch/),
+[Fedora scripts](pkgs/fedora/). These lists are platform-specific, not an
+exhaustive installer for every configured app or agent.
 
-### AI Agents
+## Repository layout
 
-The agent setup is the part that moves fastest. All of these are configured here:
+| Source | Destination or purpose |
+| --- | --- |
+| `dot_zshrc.tmpl`, `dot_shell_exports.tmpl`, `dot_shell_aliases.tmpl` | `~/.zshrc`, shared environment and aliases |
+| `private_dot_config/` | `~/.config/`: editor, terminals, desktops, tools |
+| `private_dot_local/bin/` | `~/.local/bin/`: skills, agent updates, sync helpers |
+| `dot_agents/` | `~/.agents/`: shared skills, locks, hooks |
+| `private_dot_claude/`, `dot_codex/`, `dot_pi/`, `private_dot_omp/` | Per-agent configuration |
+| `.chezmoidata/` | Managed Claude, Codex, and Serena configuration fragments |
+| `.chezmoiscripts/`, `private_Library/`, `private_dot_config/systemd/` | Apply hooks and platform scheduling |
+| `pkgs/`, `tools/` | Package setup and source-only helper projects |
+| `docs/` | Operational guides and dated maintenance records; not deployed to home |
 
-| | |
-|---|---|
-| [**Orca**](https://www.onorca.dev/) | Worktree-based agentic IDE — the primary driver ([docs](https://www.onorca.dev/docs)) |
-| [**Claude Code**](https://claude.com/claude-code) | `~/.claude` settings, plugins, statusline, MCP servers |
-| [**Codex**](https://github.com/openai/codex) | `~/.codex` config, plus [CodexBar](https://codexbar.app/) in the menu bar |
-| [**OpenCode**](https://opencode.ai/) | `~/.config/opencode` |
-| [**T3 Code**](https://t3.codes/) | Minimal desktop GUI for driving coding agents |
-| [**Pi**](https://pi.dev/) | `~/.pi` agent config — see [`docs/pi-workflow.md`](docs/pi-workflow.md) |
-| [**aichat**](https://github.com/sigoden/aichat) | Inline shell command generation (`Alt-e`) |
-| **Neovim** | [sidekick.nvim](https://github.com/folke/sidekick.nvim), [avante.nvim](https://github.com/yetone/avante.nvim), Copilot |
+Chezmoi translates `dot_` to `.`, `private_` to restricted permissions,
+`executable_` to executable files, and renders `.tmpl` files per host.
+`.chezmoiignore` keeps repository-only files out of home and excludes
+platform-specific configs on the other OS. `.chezmoiremove` lists retired paths;
+review its deletions before applying those targets.
 
-Skills are vendored once in `dot_agents/skills/` → `~/.agents/skills/`, so
-`chezmoi apply` reproduces every skill on a new machine with no network access.
-See [Agent skills](#agent-skills) below.
+## Setup
 
-### CLI Toolbelt
+### Prerequisites and packages
 
-| | |
-|---|---|
-| **Navigate** | [zoxide](https://github.com/ajeetdsouza/zoxide) · [eza](https://eza.rocks/) · [fd](https://github.com/sharkdp/fd) |
-| **Search** | [ripgrep](https://github.com/BurntSushi/ripgrep) · [ast-grep](https://ast-grep.github.io/) · [fzf](https://github.com/junegunn/fzf) · [television](https://github.com/alexpasmantier/television) |
-| **Read** | [bat](https://github.com/sharkdp/bat) · [glow](https://github.com/charmbracelet/glow) · [rich-cli](https://github.com/Textualize/rich-cli) · [tealdeer](https://github.com/tealdeer-rs/tealdeer) |
-| **Inspect** | [btop](https://github.com/aristocratos/btop) · [procs](https://github.com/dalance/procs) · [dua-cli](https://github.com/Byron/dua-cli) · [fastfetch](https://github.com/fastfetch-cli/fastfetch) |
-| **Data** | [jq](https://jqlang.github.io/jq/) · [yq](https://github.com/mikefarah/yq) · [jc](https://github.com/kellyjonbrazil/jc) |
-| **Git** | [gh](https://cli.github.com/) · [git-delta](https://github.com/dandavison/delta) · [git-cliff](https://git-cliff.org/) · [git-extras](https://github.com/tj/git-extras) |
-| **Shell** | [atuin](https://atuin.sh/) · [carapace](https://carapace.sh/) · [direnv](https://direnv.net/) · [vivid](https://github.com/sharkdp/vivid) |
-| **Run** | [just](https://github.com/casey/just) · [entr](https://github.com/eradman/entr) · [lazydocker](https://github.com/jesseduffield/lazydocker) · [OrbStack](https://orbstack.dev/) |
-| **Languages** | [uv](https://docs.astral.sh/uv/) · [pixi](https://pixi.sh/) · [pipx](https://pipx.pypa.io/) · Node · Go · Rust · Lua |
-| **Misc** | [ouch](https://github.com/ouch-org/ouch) · [age](https://github.com/FiloSottile/age) · [aria2](https://aria2.github.io/) · ffmpeg |
+Install Git and chezmoi with your platform package manager. macOS package setup
+uses [Homebrew](https://brew.sh/). Arch/CachyOS scripts expect `sudo`, pacman,
+and an existing `paru`; Fedora scripts are available separately for review.
+Node/npm is needed for skill installation, and `uv` runs the Python helpers.
 
-Full list: [`pkgs/Brewfile`](pkgs/Brewfile).
-
-### Desktop
-
-- **macOS**: [AeroSpace](https://github.com/nikitabobko/AeroSpace) (tiling), [SketchyBar](https://felixkratz.github.io/SketchyBar/), [borders](https://github.com/FelixKratz/JankyBorders), AltTab, Raycast
-- **Linux**: [niri](https://github.com/YaLTeR/niri) or Hyprland, Waybar, walker/wofi, swaync
-
-## Installation
-
-### Prerequisites
-
-Install [Homebrew](https://brew.sh/), then chezmoi:
+Initialize the source without applying it:
 
 ```bash
-brew install chezmoi
+chezmoi init --source "$HOME/zendots" git@github.com:dileep-kishore/zendots.git
 ```
 
-### Quick Start
+Keep this checkout at `~/zendots`: the `work-sync` launcher uses that path.
+The repository's `chezmoi.toml` is an example configuration, not an automatically
+deployed chezmoi config. Encrypted secrets require a separately provisioned age
+identity; do not copy another host's secrets or private manifest into a new setup.
+
+On macOS, install the reviewed Brewfile:
 
 ```bash
-# 1. Initialize, preview, apply
-chezmoi init git@github.com:dileep-kishore/zendots.git
-chezmoi diff
-chezmoi apply
-
-# 2. Install packages
-cd ~/.local/share/chezmoi/pkgs
-brew bundle install        # Homebrew formulae, casks, fonts
-./pipx_packages.sh         # Python CLI tools
-./download_yazi_plugins.sh # Yazi plugins
-./misc_setup.sh            # bat cache, TPM clone
+brew bundle install --file="$HOME/zendots/pkgs/Brewfile"
 ```
 
-Linux hosts use the platform scripts under `pkgs/arch/` and `pkgs/fedora/`
-instead of the Brewfile.
+On Arch/CachyOS, review `pkgs/arch/install_core.sh`, `install_niri.sh`,
+`install_misc.sh`, and `install_latex.sh`, then run only the scripts you need.
+These scripts install packages and may enable services; they are not dry runs.
+They do not replace the separate Noctalia v5 setup described in its guide.
 
-Then start tmux and press `Ctrl-a + Shift-i` to install the tmux plugins.
+### Preview, then apply selected paths
 
-Fonts install from the Brewfile (Monaspace, Maple Mono NF, SF Mono/Pro, and
-several Nerd Fonts). Licensed fonts kept outside Homebrew — Dank Mono,
-MonaLisa, Cartograph, IA Writer — install manually with `font-install.sh`.
-
-## Usage
-
-### Chezmoi Workflow
-
-This repository is the **source**. Edit files here, never in `~/.config`.
+Edit the source first. Always use **destination paths** and recursive previews:
 
 ```bash
-chezmoi edit ~/.zshrc              # Edit (handles the dot_ prefix for you)
-chezmoi diff ~/.zshrc              # Preview
-chezmoi apply ~/.zshrc             # Apply — always scope to the paths you changed
-chezmoi edit --apply ~/.config/nvim/init.lua
+chezmoi edit ~/.zshrc
+chezmoi diff -r ~/.zshrc ~/.shell_exports ~/.shell_aliases
 ```
 
-### Just Recipes
+Review that diff before applying the same paths:
 
 ```bash
-just apply          # chezmoi apply
-just diff           # chezmoi diff
-just install        # brew bundle install
-just dump           # regenerate the Brewfile from installed packages
-just skills add …   # install an agent skill
-just link-skills    # relink ~/.agents/skills into Claude Code
-just capture codex  # capture live config keys back into the managed fragment
+chezmoi apply ~/.zshrc ~/.shell_exports ~/.shell_aliases
 ```
 
-### Agent skills
+Repeat for each selected config. Never use an unscoped apply to pick up a small
+change. Apply hooks can also relink Claude skills and enable the agent-update
+scheduler; inspect `.chezmoiscripts/` before deployment. Agents must show the
+scoped diff and obtain approval before any apply.
 
-`~/.agents/skills/` is the single store for every harness. Always install
-through the wrapper so the result gets recorded in chezmoi:
+After deploying the relevant tool configs:
 
 ```bash
-agent-skills.sh add mattpocock/skills   # or: just skills add …
+bash ~/zendots/pkgs/pipx_packages.sh          # installs copier
+bash ~/zendots/pkgs/download_yazi_plugins.sh # installs the configured Yazi plugins
+bat cache --build
+```
+
+If `~/.tmux/plugins/tpm` does not exist, clone
+`https://github.com/tmux-plugins/tpm` there. Start tmux and press `Ctrl-a`, then
+`Shift-i` to install plugins. The older `pkgs/misc_setup.sh` has a broken bat
+invocation; use the explicit cache command above instead.
+
+Homebrew and Arch lists include fonts. Licensed fonts are installed separately.
+On Linux, `bash ~/.local/bin/font-install.sh /path/to/font.otf otf` copies a
+font into `~/.local/share/fonts/otf` and refreshes fontconfig.
+
+## Daily use
+
+### Source and live configuration
+
+Most files flow from this checkout into home. For an app that rewrites its own
+config, capture intentional GUI changes before applying over them. For example,
+see the [OmniWM capture workflow](docs/omniwm.md#maintaining-the-config).
+
+Claude, Codex, and Serena use modify templates: the fragments in
+`.chezmoidata/` own selected keys, while other live keys are preserved. Capture
+changes to those managed keys with:
+
+```bash
+just capture codex # also accepts claude or serena; writes the source fragment
+```
+
+Review the fragment before the next scoped preview/apply. Missing managed paths
+abort capture without writing. This is not a full import of the live config.
+`chezmoi-sync-from-home.sh` offers an interactive picker for diverged managed
+files, re-adding ordinary files or opening a merge for templates.
+
+### Just recipes
+
+Run `just --list --unsorted` for the available recipes:
+
+| Recipe | Effect |
+| --- | --- |
+| `just install` | Install `pkgs/Brewfile` with Homebrew |
+| `just dump` | Delete and regenerate the Brewfile from installed packages |
+| `just skills …` | Forward arguments to `agent-skills.sh` |
+| `just link-skills` | Relink shared skills into Claude Code |
+| `just capture claude\|codex\|serena` | Capture live managed keys into `.chezmoidata/` |
+| `just sync-from-home` | Interactively capture diverged managed files |
+| `just sync-gtk` | Record live GTK 3/4 settings in the source |
+
+`just apply` / `just a` and `just diff` / `just d` are still **unscoped** wrappers.
+Use explicit `chezmoi diff -r <paths>` and approved `chezmoi apply <paths>` instead.
+
+### Shared agent skills
+
+`~/.agents/skills/` is the canonical store, vendored as `dot_agents/skills/`.
+**Edit skills in the home store**, then record them through the wrapper:
+
+```bash
+agent-skills.sh sync   # record hand edits back into chezmoi
+agent-skills.sh update # update upstream-locked skills
+```
+
+Install with `agent-skills.sh add <owner>/<repo>`, not bare `npx skills`.
+Check for an existing store entry or enabled Claude plugin first. When a
+repository contains existing locally maintained skills, select only new skills;
+a broad reinstall can overwrite local adaptations. The lock identifies upstream
+installs; skills absent from it are locally maintained.
+
+Only Claude Code needs store symlinks; Codex and OpenCode discover the store
+natively. Plugin-provided skills shared with other harnesses link to the plugin
+checkout rather than copying it. Install on one machine only, wait for Syncthing,
+then preview and approve the relevant skill destinations on the other machine.
+Fetched runtimes use `agent-skills.sh fetch`; none is currently pinned.
+
+### OpenCode V2 and Pi
+
+OpenCode's server configuration is `~/.config/opencode/opencode.json`; terminal
+settings are in `cli.json`, and custom agents in `agents/`. The configured
+default is `plan` with `openai/gpt-6.1-sol` and high reasoning. The CLI theme is
+Catppuccin dark. Its template includes Orca's status plugin only when the local
+entrypoint exists; preview/apply `cli.json` again after installing Orca.
+
+Notifier and Ponytail use pinned package versions. Superpowers is pinned to a
+full Git commit and registers its own skills. Update that pin in `opencode.json`,
+not a separate checkout. `sync_skill_collections.sh` only removes known legacy
+Superpowers symlinks and leaves the old checkout alone. Refer to the
+[OpenCode V2 guides](https://opencode.ai/v2/docs/) for configuration fields.
+
+Pi's persistent modes, custom agents, package configuration, and session handoff
+are documented in the [Pi workflow guide](docs/pi-workflow.md).
+
+### Key bindings
+
+| Surface | Binding | Action |
+| --- | --- | --- |
+| tmux (prefix `Ctrl-a`) | `prefix + h` / `v` | Top/bottom / left/right split |
+| tmux | `prefix + o` | sesh/tmuxp session picker |
+| tmux | `prefix + r` | Reload config |
+| tmux | `Ctrl-Shift-h` / `l` | Previous/next window, without wrapping |
+| tmux | `Alt + arrows` | Resize pane |
+| Zsh | `Ctrl-r` | atuin history search |
+| Zsh | `Ctrl-t` | television smart completion |
+| Zsh | `Alt-e` | Generate a command from the current buffer with aichat |
+| Neovim (leader `Space`) | `<leader>ff` / `<leader>fg` | Files / Git files |
+| Neovim | `<leader>sg` / `<leader>gl` | Grep / Lazygit |
+
+`ta [name|path]` opens the session picker or connects to a target.
+`tnew <name> [dir]` registers a sesh session and creates/attaches the standard
+tmuxp layout. `~/.config/sesh/sesh.toml` is intentionally machine-local.
+Full editor mappings live in `private_dot_config/nvim/lua/keymaps/`; desktop
+shortcuts are in the [OmniWM](docs/omniwm.md) and [Noctalia](docs/noctalia-v5.md)
+guides and the Niri config.
+
+## Synchronization and maintenance
+
+`work-sync` is implemented in `tools/work-sync/` and reads the private
+`~/.config/work-sync/folders.json` manifest. Use `work-sync --help` for commands:
+
+- `add`: register a project folder at the same relative path on both hosts.
+- `bootstrap <label>`: preview managed Syncthing rules; `--apply` installs them.
+- `conflicts <path>`: read-only conflict scan; review before using `--apply`.
+- `handoff <target> --dry-run`: inspect transfer of **external Orca worktrees**.
+
+Main project checkouts, including normal `.git` state, sync through Syncthing;
+only worktree-local Git state and transient locks stay local. Use one host at a
+time and wait for Up to Date before switching. A tracked `.stignore` belongs to
+the project; the helper validates it rather than rewriting it.
+
+Update each tool through its own manager:
+
+```bash
+brew update && brew upgrade # Homebrew packages on macOS
+# In Neovim: :Lazy sync
+ya pkg upgrade
 agent-skills.sh update
-agent-skills.sh sync                    # after hand-authoring a skill
-```
-
-Only Claude Code needs symlinks (`link-agent-skills.sh`, run on every apply) —
-Codex and OpenCode resolve `~/.agents/skills` natively. Install a given skill on
-one machine only; the source syncs over Syncthing.
-
-### OpenCode V2
-
-`~/.config/opencode/opencode.json` uses native V2 configuration for providers,
-ordered permissions, MCP servers, and plugins. The default agent is `plan`,
-and the default model is GPT 6.1 Sol with high reasoning. Terminal settings
-live in `~/.config/opencode/cli.json`, with Catppuccin Mocha selected explicitly.
-Custom agents live in `~/.config/opencode/agents/`.
-The CLI template also retains Orca's local status plugin on machines where
-its entrypoint exists. After installing Orca on another machine, preview and
-apply `~/.config/opencode/cli.json` again to include it.
-
-Notifier and Ponytail are pinned to V2-compatible versions. Superpowers loads
-from one pinned Git package, which registers its own skills and bootstrap.
-After approving and applying this migration on each machine, run
-`~/.config/opencode/sync_skill_collections.sh` once to remove the old helper's
-plugin and skills symlinks. It refuses to remove real files or unfamiliar
-links and leaves the old checkout untouched. Future Superpowers upgrades
-change the full commit hash in `opencode.json`, not that checkout.
-
-V2's native background shell and subagents replace `opencode-pty` and
-`opencode-background-agents`. The plugin-specific interactive PTY tools,
-delegation history commands, and automatic Markdown table rewriting are no
-longer installed. V2 has no replacement for the notifier's V1 `plan_exit` event.
-The old `tui.json` and `agent/docs-writer.md` are retired through
-`.chezmoiremove`; review their deletions along with the new files before applying.
-
-Check the setup after applying with `opencode plugin list`, `/models`, and
-`/themes`. Notifications and the Superpowers/Ponytail workflows still need an
-interactive check. OpenCode's published editor schema URL remains in the
-server config, but use the [V2 guides](https://opencode.ai/v2/docs/) as the
-reference for config fields.
-
-### Key Bindings
-
-**Tmux** — prefix is `Ctrl-a`
-
-| | |
-|---|---|
-| `prefix + h` / `v` | Split horizontally / vertically |
-| `prefix + o` | Session manager (sesh + tmuxp) |
-| `prefix + r` | Reload config |
-| `Ctrl-Shift-h` / `l` | Switch windows |
-| `Alt + arrows` | Resize panes |
-
-**Sessions**
-
-- `ta <name\|path>` — attach to a tmux/sesh session, or create a standard one for a directory
-- `tnew <name> [dir]` — register in `~/.config/sesh/sesh.toml`, then create/attach
-
-`sesh.toml` is machine-local and intentionally unmanaged.
-
-**Zsh**
-
-| | |
-|---|---|
-| `Ctrl-r` | atuin history search |
-| `Ctrl-t` | fuzzy file finder |
-| `Alt-e` | aichat command generation |
-
-**Neovim** — leader is `Space`
-
-| | |
-|---|---|
-| `<leader>ff` | Find files |
-| `<leader>fg` | Find git files |
-| `<leader>sg` | Grep search |
-| `<leader>gl` | Lazygit |
-
-Full keymaps: `private_dot_config/nvim/lua/keymaps/`.
-
-## Extras
-
-- **`work-sync`** (`tools/work-sync/`) — manages Syncthing project folders across
-  machines: `.stignore` generation, conflict scanning, and Orca worktree handoff.
-- **`chezmoi-sync-from-home.sh`** — pull drifted changes back from `~` into the repo.
-- **`cfg-capture.py`** — capture keys from a live tool config into its managed fragment.
-
-## Maintenance
-
-```bash
-brew update && brew upgrade   # packages
-nvim +Lazy sync               # Neovim plugins
-ya pkg upgrade                # Yazi plugins
-agent-skills.sh update        # agent skills
 # tmux plugins: prefix + U
 ```
 
-Syncing the repo itself:
+`agent-update` invokes installed agent clients' own update commands. Apply hooks
+schedule it with systemd on Linux and launchd on macOS. It does not refresh all
+plugin marketplaces or perform remote MCP login. The
+[dated agent maintenance record](docs/maintenance/2026-10-20-agent-updates.md)
+describes the last recorded cross-host checks, not reproducible package pins.
 
-```bash
-chezmoi cd && git pull && chezmoi apply
-```
+After repository synchronization, preview the selected destination paths and
+apply only after approval. Do not chain a pull with a broad apply.
 
 ## Troubleshooting
 
-**Changes not applying** — make sure you edited the chezmoi source, not `~`.
-`chezmoi cd` gets you there.
+- **Changes missing:** check `chezmoi source-path`, then `chezmoi status <path>`.
+  Directory diffs require `chezmoi diff -r <path>`.
+- **Managed GUI settings keep reverting:** capture intentional changes first;
+  Noctalia's local state can also override its managed config.
+- **Tmux plugins missing:** check `~/.tmux/plugins/tpm`, then `prefix + I`.
+- **Neovim language server missing:** use `:Mason` to inspect/install it.
+- **Skill edits disappear:** edit `~/.agents/skills/`, not the vendored source,
+  and run `agent-skills.sh sync`.
 
-**Tmux plugins not loading** — `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`, then `prefix + I`.
+## Documentation
 
-**Neovim LSP not working** — `:Mason`, install the missing server.
+- [OmniWM setup and shortcuts](docs/omniwm.md)
+- [Noctalia v5 configuration and maintenance](docs/noctalia-v5.md)
+- [Pi workflows and session handoff](docs/pi-workflow.md)
+- [Dated cross-host maintenance record](docs/maintenance/2026-10-20-agent-updates.md)
+- [Repository agent guidance](CLAUDE.md) and [review rules](REVIEW.md)
 
-**Shell completions broken** — `rm ~/.zcompdump* && exec zsh`.
+`docs/plans/` and `docs/superpowers/` are ignored local planning directories,
+not published setup guides. Remaining material covers unresolved command-guard
+deployment checks, workflow-skill proposals, and the agent-worklog proposal with
+its editable diagram sources. Treat those as plans, not installed features.
 
-## Credits
+## License and credits
 
-[chezmoi](https://www.chezmoi.io/) · [Catppuccin](https://catppuccin.com/) ·
-the Neovim plugin community · and a long tail of dotfiles repos across GitHub.
-
-## License
-
-MIT. Use and modify as you wish.
-
----
-
-**Note**: This is a personal dotfiles repository. Take it as inspiration rather
-than something to apply wholesale — you will want to adjust it to your own
-machines and preferences.
+[MIT](LICENSE). Built on chezmoi, Catppuccin, Neovim's plugin ecosystem, and the
+many upstream tools and configurations referenced here.
