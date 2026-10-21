@@ -20,8 +20,8 @@ One override is already approved. When the base lacks `REVIEW.md` and the
 branch adds it in a commit with the subject `docs(review): add REVIEW.md`
 that touches only that file, `write-review-md` wrote it with the user, so it
 applies to every review on the branch until it merges. Find that commit with
-`git log --format=%H -F --grep='docs(review): add REVIEW.md' <base>..HEAD -- REVIEW.md`
-and confirm `git show --name-only --format= <sha>` lists only `REVIEW.md`.
+`git log --format=%H -F --grep='docs(review): add REVIEW.md' <base>..HEAD -- :/REVIEW.md`
+(`:/` anchors the path to the repository root from any directory) and confirm `git show --name-only --format= <sha>` lists only `REVIEW.md`.
 Say in the report that the override applied, so the user sees which rules
 did.
 
@@ -31,6 +31,7 @@ did.
 anything:
 
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 git show "$base:REVIEW.md" >/dev/null 2>&1 || git show HEAD:REVIEW.md >/dev/null 2>&1 ||
   test -e REVIEW.md || test "$(git config --get review.skipReviewMd)" = true || echo missing
 ```

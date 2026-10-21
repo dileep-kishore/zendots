@@ -38,10 +38,11 @@ using the same model are independent contexts, not a cross-model review.
 
 ## Pin the scope
 
-First run the missing-file check in
-[references/review-rules.md](references/review-rules.md). It can add a
-`REVIEW.md` commit, so run it before recording HEAD. A PR checkout whose only
-commit past the PR head is that approval-marker commit still matches the head.
+Settle the target's checkout first, as the bullets below describe. Then run
+the missing-file check in [references/review-rules.md](references/review-rules.md)
+in that checkout, before recording HEAD, since it can add a `REVIEW.md`
+commit. A PR checkout whose only commit past the PR head is that
+approval-marker commit still matches the head.
 
 Record the absolute checkout path, HEAD, target, and relevant project standards.
 Respect explicit file or staged-only scopes rather than widening them.

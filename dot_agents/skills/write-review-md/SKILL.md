@@ -43,6 +43,7 @@ Read what the repository already knows about its failures:
   seed precedent; one thread is not enough.
 
   ```bash
+  eval "$(gh repo view --json owner,name -q '"owner=\(.owner.login) repo=\(.name)"')"
   gh api graphql -f owner="$owner" -f repo="$repo" -f query='
   query($owner:String!,$repo:String!){
     repository(owner:$owner,name:$repo){
@@ -57,7 +58,8 @@ Read what the repository already knows about its failures:
 
 ## 3. Draft
 
-Write `REVIEW.md` in the review-rules shape: Focus, Skip, Human review,
+Write `REVIEW.md` at the repository root (`git rev-parse --show-toplevel`),
+the only place reviewers look, in the review-rules shape: Focus, Skip, Human review,
 Output, Precedents. Each Focus line names a concrete failure ("a README that
 names a flag the CLI lacks"), never a quality ("docs should be accurate").
 Start Output from this default:
@@ -90,6 +92,7 @@ Show the final file and commit it once the user approves. Commit only that
 path, so staged work the user has in progress stays out of it:
 
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 git add REVIEW.md
 git commit -m "docs(review): add REVIEW.md" -m "<one line: the evidence it was drafted from>" -- REVIEW.md
 ```
