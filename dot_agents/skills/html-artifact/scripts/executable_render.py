@@ -4,18 +4,21 @@
 The runtime (<style id="viz-css"> and <script id="viz-js">) is copied from assets/template.html,
 its only source. Without --page the output suits T3's html_render: no background or padding of its
 own, and T3 supplies the theme tokens. With --page it is a centred standalone page whose Catppuccin
-fallback tokens follow the operating system's light or dark setting.
+fallback tokens follow the operating system's light or dark setting, carrying the favicon of the
+repository OUT is written into (see favicon.py).
 
 Usage: render.py FRAGMENT OUT [--title TITLE] [--page]
 """
 import argparse
 import re
+import subprocess
 import sys
 from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
 
 TEMPLATE = Path(__file__).resolve().parents[1] / "assets" / "template.html"
+FAVICON = Path(__file__).resolve().parent / "favicon.py"
 DOCUMENT = re.compile(r"<!doctype\s|<\s*(?:html|head|body)[\s>]", re.IGNORECASE)
 INLINE_LIMIT = 512_000  # html_render's maximum document length
 
@@ -61,6 +64,15 @@ def main() -> int:
         if args.page
         else "body { margin: 0; }"
     )
+    favicon = []
+    if args.page:
+        made = subprocess.run(
+            [sys.executable, str(FAVICON), "--dir", str(args.out.resolve().parent)],
+            capture_output=True, text=True, check=False,
+        )
+        if made.returncode:
+            sys.exit(made.stderr.strip() or "render.py: favicon.py failed")
+        favicon = [made.stdout.strip()]
     out = "\n".join([
         "<!doctype html>",
         '<html lang="en">',
@@ -68,6 +80,7 @@ def main() -> int:
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         f"<title>{escape(title)}</title>",
+        *favicon,
         block(template, "style", "viz-css"),
         f"<style>{body_css}</style>",
         block(template, "script", "viz-js"),

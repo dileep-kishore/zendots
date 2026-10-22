@@ -142,7 +142,8 @@ python3 <skill-dir>/scripts/render.py fragment.html inline.html --title "Short n
 Preview `inline.html` with `html_preview` at width 728 in dark and 390 in
 light, read its console output, then pass the same document to `html_render`
 with the reported `contentHeight`. `--page` instead gives a standalone page
-with its own background and margins.
+with its own background, margins, and the favicon of the repository the
+output is written into.
 
 ## Check in a browser
 

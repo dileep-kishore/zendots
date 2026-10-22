@@ -53,6 +53,13 @@ when no paragraph restates its neighbouring figure.
 
 Copy `assets/template.html` to the destination, replace every
 `<!-- SLOT: ... -->`, and leave the tokens, layout CSS, and scripts untouched.
+Fill the favicon slot with the line `scripts/favicon.py --dir <project>` prints.
+It hashes the repository name into a dot pattern and accent, so pages from
+one project share a tab icon; pass `--project` outside a repository. When the
+user wants a specific look for a project, pin it once with
+`git config zendots.favicon "<accent> <pattern>"` (either part may be left
+out); every worktree reads it. Pass `--color` or `--pattern` only for a
+one-off page.
 Give each h2 an id. Every visual sits in a `<figure>` with a manuscript-style
 caption (tables in `<figure class="table">`, caption first); the template
 numbers them. Embed Excalidraw SVG exports as described in `references/visuals.md`.
