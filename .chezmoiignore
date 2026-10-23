@@ -60,6 +60,7 @@ bin/
 # Platform-specific: macOS-only configs (ignore on Linux)
 {{- if eq .chezmoi.os "linux" }}
 Library
+.config/karabiner
 .aerospace.toml
 .config/omniwm
 .config/sketchybar
