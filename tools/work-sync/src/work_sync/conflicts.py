@@ -133,9 +133,7 @@ def scan_conflicts(root: Path) -> tuple[Conflict, ...]:
         special_action = None
         if git_dir:
             special_action = _index_action(path, original, git_dir)
-            special_action = special_action or _object_action(
-                path, original, git_dir
-            )
+            special_action = special_action or _object_action(path, original, git_dir)
         if special_action:
             action = special_action
         elif git_dir or (

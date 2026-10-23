@@ -183,7 +183,9 @@ class Orca:
                 self.runner.run(host, [self._binary(host), *args, "--json"])
             )
         except (json.JSONDecodeError, subprocess.CalledProcessError) as error:
-            raise UsageError(f"Orca command failed on {host}: {' '.join(args)}") from error
+            raise UsageError(
+                f"Orca command failed on {host}: {' '.join(args)}"
+            ) from error
         if not isinstance(payload, dict) or payload.get("ok") is not True:
             raise UsageError(f"Orca command failed on {host}: {' '.join(args)}")
         return payload
@@ -300,8 +302,7 @@ class Orca:
         """Verify a worktree still has the expected path and branch."""
         repo = self.repo_for_path(self.inventory(host), repo_path)
         if not any(
-            current.path == worktree.path
-            and current.branch == worktree.branch
+            current.path == worktree.path and current.branch == worktree.branch
             for current in repo.worktrees
         ):
             raise UsageError(f"Orca verification failed: {worktree.path}")
@@ -589,8 +590,12 @@ def inspect_repo(
         branch=branch,
         head=head,
         branches=_branches(runner, host, repo),
-        staged_patch=_git(runner, host, repo, "diff", "--cached", "--binary", "HEAD", "--"),
-        dirty=_git(runner, host, repo, "status", "--porcelain=v1", "--untracked-files=all"),
+        staged_patch=_git(
+            runner, host, repo, "diff", "--cached", "--binary", "HEAD", "--"
+        ),
+        dirty=_git(
+            runner, host, repo, "status", "--porcelain=v1", "--untracked-files=all"
+        ),
     )
 
 
@@ -645,12 +650,8 @@ def _tree_changes(
     local_links = tuple(
         dict.fromkeys(
             (
-                *_absolute_symlink_excludes(
-                    runner, source.host, source.path
-                ),
-                *_absolute_symlink_excludes(
-                    runner, target.host, target.path
-                ),
+                *_absolute_symlink_excludes(runner, source.host, source.path),
+                *_absolute_symlink_excludes(runner, target.host, target.path),
             )
         )
     )
@@ -689,9 +690,7 @@ def preflight_repository(
         fallback_identity=fallback_identity,
     )
     if source.origin != target.origin:
-        raise UsageError(
-            f"origin mismatch: {source.origin} != {target.origin}"
-        )
+        raise UsageError(f"origin mismatch: {source.origin} != {target.origin}")
     if source.branch != target.branch:
         raise UsageError(
             f"checked-out branches differ: {source.branch} != {target.branch}"
@@ -747,13 +746,9 @@ def preflight_missing_worktree(
         fallback_identity=fallback_identity,
     )
     if source.origin != target_repo.origin:
-        raise UsageError(
-            f"origin mismatch: {source.origin} != {target_repo.origin}"
-        )
+        raise UsageError(f"origin mismatch: {source.origin} != {target_repo.origin}")
     if source.branch == target_repo.branch:
-        raise UsageError(
-            f"worktree layout conflict on target branch: {source.branch}"
-        )
+        raise UsageError(f"worktree layout conflict on target branch: {source.branch}")
     base_commit = target_repo.branches.get(source.branch, target_repo.head)
     _require_fast_forward(
         runner,

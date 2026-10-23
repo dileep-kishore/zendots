@@ -141,8 +141,7 @@ def statuses_converged(statuses: dict[Host, dict[str, Any]]) -> bool:
         return False
     for host, other in (("mac", "tsuki"), ("tsuki", "mac")):
         remote_sequences = {
-            int(value)
-            for value in statuses[host].get("remoteSequence", {}).values()
+            int(value) for value in statuses[host].get("remoteSequence", {}).values()
         }
         if int(statuses[other].get("sequence", -1)) not in remote_sequences:
             return False
@@ -230,9 +229,7 @@ class Syncthing:
                 f"refusing different Git heads: {heads[0][:12]} != {heads[1][:12]}"
             )
         if diffs[0] != diffs[1]:
-            raise UsageError(
-                "refusing different tracked changes between mac and tsuki"
-            )
+            raise UsageError("refusing different tracked changes between mac and tsuki")
 
     def _overlap_preflight(
         self,
@@ -271,9 +268,7 @@ class Syncthing:
             raise UsageError(
                 f"existing folder differs from manifest: {current.get('id')}"
             )
-        actual_devices = {
-            item.get("deviceID") for item in current.get("devices", [])
-        }
+        actual_devices = {item.get("deviceID") for item in current.get("devices", [])}
         expected_devices = {
             item.get("deviceID") for item in expected.get("devices", [])
         }
@@ -513,9 +508,7 @@ class Syncthing:
         tsuki_id = self.runner.run("tsuki", ["syncthing", "device-id"])
         expected: dict[Host, dict[str, Any]] = {
             host: folder_payload(
-                json.loads(
-                    self.st(host, "config", "defaults", "folder", "dump-json")
-                ),
+                json.loads(self.st(host, "config", "defaults", "folder", "dump-json")),
                 folder,
                 mac_id,
                 tsuki_id,
@@ -563,9 +556,7 @@ class Syncthing:
         tsuki_id = self.runner.run("tsuki", ["syncthing", "device-id"])
         expected: dict[Host, dict[str, Any]] = {
             host: folder_payload(
-                json.loads(
-                    self.st(host, "config", "defaults", "folder", "dump-json")
-                ),
+                json.loads(self.st(host, "config", "defaults", "folder", "dump-json")),
                 folder,
                 mac_id,
                 tsuki_id,

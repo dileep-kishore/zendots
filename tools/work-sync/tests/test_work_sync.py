@@ -160,9 +160,7 @@ def test_add_detects_root_git_repository_and_plain_folder(tmp_path: Path) -> Non
         == "git"
     )
     assert (
-        source_folder(
-            "mac", plain, Path("/home/dileep/Documents/notes")
-        ).folder_class
+        source_folder("mac", plain, Path("/home/dileep/Documents/notes")).folder_class
         == "plain"
     )
 
@@ -253,9 +251,7 @@ def test_manifest_install_writes_directly_without_chezmoi(
         timeout=10,
     )
 
-    assert all(
-        files[str(path)] == "new\n" for pair in paths.values() for path in pair
-    )
+    assert all(files[str(path)] == "new\n" for pair in paths.values() for path in pair)
     assert not any(command[0] == "chezmoi" for command in calls)
 
 
@@ -488,15 +484,11 @@ def test_preflight_ignores_unrelated_lock_but_rejects_index_lock(
     git_dir = Path(git(source, "rev-parse", "--absolute-git-dir"))
     (git_dir / "project.lock").touch()
 
-    assert preflight_repository(
-        Runner(local_host="mac"), "mac", source, "mac", target
-    )
+    assert preflight_repository(Runner(local_host="mac"), "mac", source, "mac", target)
 
     (git_dir / "index.lock").touch()
     with pytest.raises(UsageError, match="index.lock"):
-        preflight_repository(
-            Runner(local_host="mac"), "mac", source, "mac", target
-        )
+        preflight_repository(Runner(local_host="mac"), "mac", source, "mac", target)
 
 
 def test_preflight_rejects_syncthing_conflict_copies(tmp_path: Path) -> None:
@@ -516,9 +508,7 @@ def test_preflight_rejects_syncthing_conflict_copies(tmp_path: Path) -> None:
     conflict.write_text("unresolved\n", encoding="utf-8")
 
     with pytest.raises(UsageError, match="Syncthing conflict"):
-        preflight_repository(
-            Runner(local_host="mac"), "mac", source, "mac", target
-        )
+        preflight_repository(Runner(local_host="mac"), "mac", source, "mac", target)
 
 
 def test_git_handoff_rejects_target_only_files(tmp_path: Path) -> None:
@@ -660,9 +650,7 @@ def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
                     "id": "repo-1",
                     "path": "/Volumes/WorkSSD/Work/project",
                     "displayName": "project",
-                    "gitRemoteIdentity": {
-                        "canonicalKey": "github.com/example/project"
-                    },
+                    "gitRemoteIdentity": {"canonicalKey": "github.com/example/project"},
                 }
             ]
         },
@@ -736,7 +724,9 @@ def test_orca_pairing_keeps_target_paths_and_finds_missing_branch() -> None:
     assert pairs[0].target.path == Path(
         "/home/dileep/.superset/worktrees/project/feat/a"
     )
-    assert pairs[0].target.id.endswith("/home/dileep/.superset/worktrees/project/feat/a")
+    assert pairs[0].target.id.endswith(
+        "/home/dileep/.superset/worktrees/project/feat/a"
+    )
     assert pairs[1].source.branch == "feat/b"
     assert pairs[1].target is None
 
@@ -1041,9 +1031,7 @@ def test_orca_create_renames_version_normalized_branch() -> None:
 
 def test_orca_verification_uses_stable_path_and_branch() -> None:
     path = Path("/target/worktree")
-    current = OrcaWorktree(
-        "inventory-id", "repo", path, "feat/a", "feat/a", False, ()
-    )
+    current = OrcaWorktree("inventory-id", "repo", path, "feat/a", "feat/a", False, ())
     repo = OrcaRepo(
         "repo",
         Path("/target"),
@@ -1060,9 +1048,7 @@ def test_orca_verification_uses_stable_path_and_branch() -> None:
         "create-response-id", "repo", path, "feat/a", "feat/a", False, ()
     )
 
-    InventoryOrca(Runner(local_host="mac")).verify_worktree(
-        "mac", repo.path, created
-    )
+    InventoryOrca(Runner(local_host="mac")).verify_worktree("mac", repo.path, created)
 
 
 def test_root_help_contains_handoff_examples() -> None:

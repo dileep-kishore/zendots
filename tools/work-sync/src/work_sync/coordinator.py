@@ -24,7 +24,9 @@ from .system import Runner
 
 MANIFEST_PATHS: dict[Host, tuple[Path, Path]] = {
     "mac": (
-        Path("/Users/dkishore/zendots/private_dot_config/work-sync/private_folders.json"),
+        Path(
+            "/Users/dkishore/zendots/private_dot_config/work-sync/private_folders.json"
+        ),
         Path("/Users/dkishore/.config/work-sync/folders.json"),
     ),
     "tsuki": (
@@ -97,8 +99,7 @@ def verify_manifest_copies(runner: Runner) -> str:
     unique = set(digests.values())
     if len(unique) != 1:
         details = ", ".join(
-            f"{host}:{path}={digest[:12]}"
-            for (host, path), digest in digests.items()
+            f"{host}:{path}={digest[:12]}" for (host, path), digest in digests.items()
         )
         raise UsageError(
             "private manifests differ; run the scoped chezmoi apply on the "

@@ -61,9 +61,7 @@ class Manifest:
     def select(self, selector: str) -> Folder:
         """Select exactly one folder by ID or label."""
         matches = [
-            folder
-            for folder in self.folders
-            if selector in {folder.id, folder.label}
+            folder for folder in self.folders if selector in {folder.id, folder.label}
         ]
         if len(matches) != 1:
             raise UsageError(
@@ -82,9 +80,7 @@ class Manifest:
         )
         non_git = [folder.label for folder in folders if folder.folder_class != "git"]
         if non_git:
-            raise UsageError(
-                "handoff accepts Git folders only: " + ", ".join(non_git)
-            )
+            raise UsageError("handoff accepts Git folders only: " + ", ".join(non_git))
         return tuple(dict.fromkeys(folders))
 
 
@@ -92,10 +88,7 @@ def _within(path: str, roots: tuple[str, ...]) -> bool:
     normalized = os.path.normpath(path)
     if not os.path.isabs(normalized):
         return False
-    return any(
-        os.path.commonpath((normalized, root)) == root
-        for root in roots
-    )
+    return any(os.path.commonpath((normalized, root)) == root for root in roots)
 
 
 def _folder(raw: object) -> Folder:
@@ -125,9 +118,9 @@ def _folder(raw: object) -> Folder:
     tsuki_path = Path(raw["tsuki"])
     if (mac_path, tsuki_path) != ZENDOTS_PATHS:
         try:
-            paths_match = mac_path.relative_to(
-                MAC_SYNC_ROOT
-            ) == tsuki_path.relative_to(TSUKI_SYNC_ROOT)
+            paths_match = mac_path.relative_to(MAC_SYNC_ROOT) == tsuki_path.relative_to(
+                TSUKI_SYNC_ROOT
+            )
         except ValueError:
             paths_match = False
         if not paths_match:
@@ -141,8 +134,7 @@ def _folder(raw: object) -> Folder:
         raise UsageError(f"invalid ignore patterns for {raw['label']}")
     worktree_ignores = raw.get("worktree_ignore", [])
     if not isinstance(worktree_ignores, list) or any(
-        not isinstance(pattern, str) or not pattern
-        for pattern in worktree_ignores
+        not isinstance(pattern, str) or not pattern for pattern in worktree_ignores
     ):
         raise UsageError(f"invalid worktree ignore patterns for {raw['label']}")
     return Folder(
