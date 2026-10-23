@@ -26,7 +26,7 @@ package lists, encrypted secrets, and apply hooks before using it on another hos
 | Linux desktop | Niri + Noctalia v5 — [guide](docs/noctalia-v5.md) |
 | Coding agents | Claude Code, Codex, OpenCode V2, Pi, omp; Orca and T3 Code integrations |
 | Shell AI | aichat command generation with `Alt-e` |
-| Project sync | Syncthing + `work-sync` for macmini/tsuki project folders and external Orca worktrees |
+| Project sync | Syncthing + `work-sync` for macmini/macbook/tsuki project folders and external Orca worktrees |
 
 Package inventories: [Homebrew](pkgs/Brewfile), [Arch/CachyOS scripts](pkgs/arch/),
 [Fedora scripts](pkgs/fedora/). These lists are platform-specific, not an
@@ -240,14 +240,21 @@ guides and the Niri config.
 `work-sync` is implemented in `tools/work-sync/` and reads the private
 `~/.config/work-sync/folders.json` manifest. Use `work-sync --help` for commands:
 
-- `add`: register a project folder at the same relative path on both hosts.
+- `add`: register a project folder at the same relative path on every
+  reachable machine.
+- `add-device <machine>`: share every manifest folder with one machine, such as
+  a new Mac or one that was offline during `add`; safe to rerun. A machine that
+  missed an `add` first needs a scoped `chezmoi apply ~/.config/work-sync/folders.json`.
+- `status`: show each folder's Syncthing state on every machine.
 - `bootstrap <label>`: preview managed Syncthing rules; `--apply` installs them.
 - `conflicts <path>`: read-only conflict scan; review before using `--apply`.
 - `handoff <target> --dry-run`: inspect transfer of **external Orca worktrees**.
 
 Main project checkouts, including normal `.git` state, sync through Syncthing;
 only worktree-local Git state and transient locks stay local. Use one host at a
-time and wait for Up to Date before switching. A tracked `.stignore` belongs to
+time and wait for Up to Date before switching. Machines are macmini, macbook,
+and tsuki; unreachable ones are skipped. A Mac other than macmini names itself
+in `~/.config/work-sync/host`, which `provision.sh` writes. A tracked `.stignore` belongs to
 the project; the helper validates it rather than rewriting it.
 
 Update each tool through its own manager:

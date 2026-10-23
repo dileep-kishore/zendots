@@ -5,29 +5,69 @@ from __future__ import annotations
 import json
 import os
 import platform
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, cast
 
-Host = Literal["mac", "tsuki"]
+Host = Literal["mac", "macbook", "tsuki"]
+PathKey = Literal["mac", "tsuki"]
+Platform = Literal["darwin", "linux"]
 FolderClass = Literal["git", "plain", "container"]
 GitPolicy = Literal["local", "nested-local", "none"]
+
+
+@dataclass(frozen=True)
+class HostInfo:
+    """Fixed facts about one machine."""
+
+    path_key: PathKey
+    alias: str
+    platform: Platform
+    home: Path
+
+
+# The MacBook mounts /Volumes/WorkSSD under the same account, so it reuses the
+# Mac Mini's manifest paths.
+HOSTS: dict[Host, HostInfo] = {
+    "mac": HostInfo("mac", "macmini", "darwin", Path("/Users/dkishore")),
+    "macbook": HostInfo("mac", "macbook", "darwin", Path("/Users/dkishore")),
+    "tsuki": HostInfo("tsuki", "tsuki", "linux", Path("/home/dileep")),
+}
+HOST_NAMES: tuple[Host, ...] = tuple(HOSTS)
+HOST_ENV = "WORK_SYNC_HOST"
+HOST_FILE = Path(".config/work-sync/host")
 
 MAC_ROOTS = (
     "/Volumes/WorkSSD/Work",
     "/Volumes/WorkSSD/Personal",
     "/Volumes/WorkSSD/LifeOS",
+    "/Volumes/WorkSSD/Ideaverse",
     "/Users/dkishore/zendots",
 )
 TSUKI_ROOTS = (
     "/home/dileep/Documents/Work",
     "/home/dileep/Documents/Personal",
     "/home/dileep/Documents/LifeOS",
+    "/home/dileep/Documents/Ideaverse",
     "/home/dileep/zendots",
 )
 MAC_SYNC_ROOT = Path("/Volumes/WorkSSD")
 TSUKI_SYNC_ROOT = Path("/home/dileep/Documents")
 ZENDOTS_PATHS = (Path("/Users/dkishore/zendots"), Path("/home/dileep/zendots"))
+
+
+def alias(host: Host) -> str:
+    """Return the SSH alias, which is also the user-facing machine name."""
+    return HOSTS[host].alias
+
+
+def host_for_alias(name: str) -> Host:
+    """Return the host whose SSH alias is the given machine name."""
+    for host, info in HOSTS.items():
+        if info.alias == name:
+            return host
+    raise UsageError(f"unknown machine: {name}")
 
 
 class UsageError(ValueError):
@@ -36,7 +76,7 @@ class UsageError(ValueError):
 
 @dataclass(frozen=True)
 class Folder:
-    """One folder shared between macmini and tsuki."""
+    """One folder shared between the configured machines."""
 
     id: str
     label: str
@@ -49,7 +89,7 @@ class Folder:
 
     def path(self, host: Host) -> Path:
         """Return this folder's path on a host."""
-        return self.mac if host == "mac" else self.tsuki
+        return self.mac if HOSTS[host].path_key == "mac" else self.tsuki
 
 
 @dataclass(frozen=True)
@@ -152,9 +192,18 @@ def _folder(raw: object) -> Folder:
 def load_manifest(path: Path) -> Manifest:
     """Load and validate a private folder manifest."""
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+        text = path.read_text(encoding="utf-8")
+    except OSError as error:
         raise UsageError(f"cannot read manifest {path}: {error}") from error
+    return parse_manifest(text, f"manifest {path}")
+
+
+def parse_manifest(text: str, source: str = "manifest") -> Manifest:
+    """Validate manifest JSON text."""
+    try:
+        raw = json.loads(text)
+    except json.JSONDecodeError as error:
+        raise UsageError(f"cannot read {source}: {error}") from error
     if not isinstance(raw, list):
         raise UsageError("manifest must contain a JSON list")
     folders = tuple(_folder(entry) for entry in raw)
@@ -167,8 +216,33 @@ def load_manifest(path: Path) -> Manifest:
     return Manifest(folders)
 
 
-def detect_host(system_name: str | None = None) -> Host:
-    """Map the operating system to a manifest host name."""
+def _parse_host(value: str, source: str) -> Host:
+    name = value.strip()
+    if name not in HOSTS:
+        raise UsageError(
+            f"invalid host {name!r} in {source}; expected one of "
+            + ", ".join(HOST_NAMES)
+        )
+    return name
+
+
+def detect_host(
+    system_name: str | None = None,
+    *,
+    environ: Mapping[str, str] | None = None,
+    host_file: Path | None = None,
+) -> Host:
+    """Return the local host from WORK_SYNC_HOST, the host file, or the OS."""
+    env = os.environ if environ is None else environ
+    if HOST_ENV in env:
+        return _parse_host(env[HOST_ENV], HOST_ENV)
+    path = host_file or Path.home() / HOST_FILE
+    try:
+        return _parse_host(path.read_text(encoding="utf-8"), str(path))
+    except FileNotFoundError:
+        pass
+    except OSError as error:
+        raise UsageError(f"cannot read host file {path}: {error}") from error
     current = system_name or platform.system()
     if current == "Darwin":
         return "mac"

@@ -1,4 +1,4 @@
-"""Plan a new folder shared between macmini and tsuki."""
+"""Plan a new folder shared between the configured machines."""
 
 from __future__ import annotations
 
@@ -7,15 +7,24 @@ import json
 import os
 import re
 import subprocess
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
 from .coordinator import MANIFEST_PATHS, verify_manifest_copies
-from .manifest import Folder, FolderClass, GitPolicy, Host, UsageError
+from .manifest import (
+    HOSTS,
+    Folder,
+    FolderClass,
+    GitPolicy,
+    Host,
+    PathKey,
+    UsageError,
+)
 from .syncthing import Syncthing
 from .system import Runner
 
-SYNC_ROOTS: dict[Host, Path] = {
+SYNC_ROOTS: dict[PathKey, Path] = {
     "mac": Path("/Volumes/WorkSSD"),
     "tsuki": Path("/home/dileep/Documents"),
 }
@@ -25,18 +34,21 @@ def _normalized(path: Path) -> Path:
     return Path(os.path.normpath(path.expanduser()))
 
 
+def _other_key(host: Host) -> PathKey:
+    return "tsuki" if HOSTS[host].path_key == "mac" else "mac"
+
+
 def infer_destination(source_host: Host, source: Path) -> Path:
-    """Mirror a source's relative path beneath the other machine's root."""
+    """Mirror a source's relative path beneath the other platform's root."""
     source = _normalized(source)
-    root = SYNC_ROOTS[source_host]
+    root = SYNC_ROOTS[HOSTS[source_host].path_key]
     try:
         relative = source.relative_to(root)
     except ValueError as error:
         raise UsageError(f"source is outside {root}: {source}") from error
     if relative == Path("."):
         raise UsageError(f"refusing to sync the whole root: {root}")
-    target: Host = "tsuki" if source_host == "mac" else "mac"
-    return SYNC_ROOTS[target] / relative
+    return SYNC_ROOTS[_other_key(source_host)] / relative
 
 
 def folder_id(relative: Path) -> str:
@@ -71,12 +83,12 @@ def source_folder(
     """Build a manifest folder from one local source and target path."""
     source = _normalized(source)
     destination = _normalized(destination)
-    target_host: Host = "tsuki" if source_host == "mac" else "mac"
+    target_key = _other_key(source_host)
     try:
-        relative = destination.relative_to(SYNC_ROOTS[target_host])
+        relative = destination.relative_to(SYNC_ROOTS[target_key])
     except ValueError as error:
         raise UsageError(
-            f"destination is outside {SYNC_ROOTS[target_host]}: {destination}"
+            f"destination is outside {SYNC_ROOTS[target_key]}: {destination}"
         ) from error
     kind = folder_class or _detect_class(source)
     policy: dict[FolderClass, GitPolicy] = {
@@ -84,7 +96,7 @@ def source_folder(
         "plain": "none",
         "container": "nested-local",
     }
-    paths = {source_host: source, target_host: destination}
+    paths = {HOSTS[source_host].path_key: source, target_key: destination}
     return Folder(
         id=folder_id(relative),
         label=source.name,
@@ -147,16 +159,16 @@ def install_manifest(
     updated: str,
     *,
     timeout: int,
+    hosts: Sequence[Host],
 ) -> None:
-    """Propagate one approved manifest update through the Zendots folder."""
+    """Propagate one approved manifest update to the given reachable hosts."""
     if current == updated:
         return
     stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-    for host, paths in MANIFEST_PATHS.items():
-        home = Path("/Users/dkishore" if host == "mac" else "/home/dileep")
-        for index, path in enumerate(paths):
+    for host in hosts:
+        for index, path in enumerate(MANIFEST_PATHS[host]):
             backup = (
-                home
+                HOSTS[host].home
                 / ".local/state/work-sync/manifest"
                 / stamp
                 / f"{index}-folders.json"
@@ -166,13 +178,17 @@ def install_manifest(
     source, applied = MANIFEST_PATHS[runner.local_host]
     _write(runner, runner.local_host, source, updated)
     _write(runner, runner.local_host, applied, updated)
-    for host in ("mac", "tsuki"):
+    for host in hosts:
         syncthing.scan(host, "zendots")
-    syncthing.wait_idle("zendots", timeout)
+    syncthing.wait_idle("zendots", timeout, syncthing.device_ids(hosts))
 
-    target: Host = "tsuki" if runner.local_host == "mac" else "mac"
-    remote_source, remote_applied = MANIFEST_PATHS[target]
-    if runner.run(target, ["cat", str(remote_source)]) + "\n" != updated:
-        raise UsageError("Zendots synchronized without the new manifest entry")
-    _write(runner, target, remote_applied, updated)
-    verify_manifest_copies(runner)
+    for target in hosts:
+        if target == runner.local_host:
+            continue
+        remote_source, remote_applied = MANIFEST_PATHS[target]
+        if runner.run(target, ["cat", str(remote_source)]) + "\n" != updated:
+            raise UsageError(
+                f"Zendots synchronized to {target} without the new manifest entry"
+            )
+        _write(runner, target, remote_applied, updated)
+    verify_manifest_copies(runner, hosts)

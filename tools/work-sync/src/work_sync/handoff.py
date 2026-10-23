@@ -10,7 +10,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import urlparse
 
-from .manifest import Host, UsageError
+from .manifest import HOSTS, Host, UsageError, alias
 from .syncthing import LOCAL_STATE_IGNORES
 from .system import Runner
 
@@ -314,12 +314,13 @@ def _rsync_endpoints(
     target_host: Host,
     target_path: Path,
 ) -> tuple[Host, tuple[str, str]]:
-    if source_host == "tsuki" and target_host == "mac":
-        return "mac", (f"tsuki:{source_path}/", f"{target_path}/")
+    if HOSTS[source_host].platform == "linux" and HOSTS[target_host].platform == (
+        "darwin"
+    ):
+        return target_host, (f"{alias(source_host)}:{source_path}/", f"{target_path}/")
     destination = f"{target_path}/"
     if target_host != source_host:
-        alias = "tsuki" if target_host == "tsuki" else "macmini"
-        destination = f"{alias}:{destination}"
+        destination = f"{alias(target_host)}:{destination}"
     return source_host, (f"{source_path}/", destination)
 
 
@@ -505,7 +506,10 @@ def _branches(runner: Runner, host: Host, repo: Path) -> dict[str, str]:
 def _exists(runner: Runner, host: Host, path: Path) -> bool:
     try:
         runner.run(host, ["test", "-e", str(path)])
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as error:
+        # Only test's own false result means absent; ssh failures exit 255.
+        if error.returncode != 1:
+            raise
         return False
     return True
 

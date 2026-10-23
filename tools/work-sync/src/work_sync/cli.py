@@ -5,7 +5,7 @@ from __future__ import annotations
 import fcntl
 import os
 import subprocess
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager, nullcontext
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -14,6 +14,7 @@ from typing import Annotated, NoReturn
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.prompt import Confirm
 from rich.table import Table
 
@@ -24,25 +25,52 @@ from .add import (
     source_folder,
 )
 from .conflicts import apply_conflicts, scan_conflicts
-from .coordinator import Handoff, HandoffPlan, verify_manifest_copies
+from .coordinator import (
+    Handoff,
+    HandoffPlan,
+    verify_manifest_copies,
+    verify_manifest_for_device,
+)
 from .handoff import Orca
-from .manifest import Host, UsageError, detect_host, load_manifest
-from .syncthing import BootstrapPlan, Syncthing, managed_patterns
+from .manifest import (
+    HOST_NAMES,
+    Host,
+    UsageError,
+    alias,
+    detect_host,
+    host_for_alias,
+    load_manifest,
+    parse_manifest,
+)
+from .syncthing import (
+    BootstrapPlan,
+    DevicePlan,
+    FolderState,
+    StatusReport,
+    Syncthing,
+    managed_patterns,
+)
 from .system import Runner
 
 ROOT_EPILOG = """
-Target means the receiving machine.
+Machines are macmini, macbook, and tsuki. Target means the receiving machine.
+Unreachable machines are skipped; `work-sync add-device <machine>` catches
+one up later.
 
 Examples:
 
+    work-sync status
     work-sync bootstrap QBio_perspective
     work-sync bootstrap QBio_perspective --apply
     work-sync add /Volumes/WorkSSD/Work/my-project
-    work-sync handoff tsuki
+    work-sync add-device macbook --dry-run
+    work-sync handoff macbook --dry-run
     work-sync handoff tsuki --dry-run
 """
 
 BOOTSTRAP_EPILOG = """
+Configures every reachable machine and lists the ones it skipped.
+
 Examples:
 
     work-sync bootstrap QBio_perspective
@@ -50,6 +78,8 @@ Examples:
 """
 
 ADD_EPILOG = """
+Shares the folder with every reachable machine at the same relative path.
+
 Examples:
 
     cd /Volumes/WorkSSD/Work/my-project && work-sync add
@@ -57,11 +87,34 @@ Examples:
     work-sync add . --yes
 """
 
+ADD_DEVICE_EPILOG = """
+Pairs reachable machines, shares every manifest folder with MACHINE, and
+creates missing folders there with the managed .stignore before Syncthing
+starts them. Rerun after synchronization to finish machine-local Git setup.
+
+Examples:
+
+    work-sync add-device macbook --dry-run
+    work-sync add-device macbook
+    work-sync add-device tsuki --yes
+"""
+
+STATUS_EPILOG = """
+Exits nonzero only when a reachable machine cannot be read.
+
+Examples:
+
+    work-sync status
+"""
+
 HANDOFF_EPILOG = """
+Needs only this machine and the target to be reachable.
+
 Examples:
 
     work-sync handoff tsuki
     work-sync handoff macmini
+    work-sync handoff macbook --folder LifeOS
     work-sync handoff tsuki --folder LifeOS
     work-sync handoff macmini --folder LifeOS --folder CommScores
     work-sync handoff tsuki --dry-run
@@ -76,7 +129,7 @@ Examples:
 
 app = typer.Typer(
     name="work-sync",
-    help="Configure project sync and hand external Orca worktrees to the other machine.",
+    help="Configure project sync and hand external Orca worktrees to another machine.",
     epilog=ROOT_EPILOG,
     invoke_without_command=True,
     no_args_is_help=False,
@@ -87,15 +140,16 @@ DEFAULT_MANIFEST_PATH = Path.home() / ".config/work-sync/folders.json"
 
 
 class Target(StrEnum):
-    """Receiving machine names."""
+    """Machine names, which are also SSH aliases."""
 
     MACMINI = "macmini"
+    MACBOOK = "macbook"
     TSUKI = "tsuki"
 
     @property
     def host(self) -> Host:
         """Return the manifest host name."""
-        return "mac" if self is Target.MACMINI else "tsuki"
+        return host_for_alias(self.value)
 
 
 class FolderKind(StrEnum):
@@ -126,21 +180,38 @@ def _abort(error: Exception) -> NoReturn:
     raise typer.Exit(1)
 
 
-def _show_bootstrap(plan: BootstrapPlan, apply: bool) -> None:
+def _names(hosts: Sequence[Host]) -> str:
+    return ", ".join(alias(host) for host in hosts)
+
+
+def _report_skipped(runner: Runner, hosts: Sequence[Host]) -> None:
+    for host in hosts:
+        console.print(
+            f"[yellow]Skipped {escape(runner.describe(host))}:[/yellow] unreachable "
+            "over SSH, so its Syncthing and manifest copies were not checked. When "
+            "it is online, run [bold]chezmoi apply ~/.config/work-sync/folders.json"
+            f"[/bold] there, then [bold]work-sync add-device {alias(host)}[/bold]."
+        )
+
+
+def _show_bootstrap(runner: Runner, plan: BootstrapPlan, apply: bool) -> None:
     table = Table(title="Syncthing folder")
     table.add_column("Folder")
-    table.add_column("macmini")
-    table.add_column("tsuki")
+    table.add_column("Mac path")
+    table.add_column("tsuki path")
+    table.add_column("Machines")
     table.add_column("Ignores")
     table.add_row(
         plan.folder.label,
         str(plan.folder.mac),
         str(plan.folder.tsuki),
+        _names(plan.hosts),
         ", ".join(managed_patterns(plan.folder)),
     )
     console.print(table)
     if plan.repository_managed_ignore:
         console.print(".stignore is repository-managed and was not edited.")
+    _report_skipped(runner, plan.skipped)
     console.print(
         "[green]Applied and verified.[/green]"
         if apply
@@ -148,13 +219,14 @@ def _show_bootstrap(plan: BootstrapPlan, apply: bool) -> None:
     )
 
 
-def _show_add(plan: BootstrapPlan) -> None:
+def _show_add(runner: Runner, plan: BootstrapPlan) -> None:
     table = Table(title="New Syncthing folder")
     table.add_column("Folder")
     table.add_column("Type")
     table.add_column("ID")
-    table.add_column("macmini")
-    table.add_column("tsuki")
+    table.add_column("Mac path")
+    table.add_column("tsuki path")
+    table.add_column("Machines")
     folder = plan.folder
     table.add_row(
         folder.label,
@@ -162,12 +234,65 @@ def _show_add(plan: BootstrapPlan) -> None:
         folder.id,
         str(folder.mac),
         str(folder.tsuki),
+        _names(plan.hosts),
     )
     console.print(table)
+    _report_skipped(runner, plan.skipped)
+
+
+def _show_device(runner: Runner, plan: DevicePlan, dry_run: bool) -> None:
+    table = Table(title=f"Catch up {alias(plan.target)}")
+    table.add_column("Machine")
+    table.add_column("Folder")
+    table.add_column("Would change" if dry_run else "Changes")
+    table.add_column("Already correct")
+    table.add_column("Skipped")
+    groups: dict[tuple[Host, str], dict[str, list[str]]] = {}
+    for step in plan.steps:
+        group = groups.setdefault(
+            (step.host, step.subject), {"change": [], "ok": [], "skip": []}
+        )
+        group[step.status].append(step.description)
+    for (host, subject), group in groups.items():
+        table.add_row(
+            alias(host),
+            subject,
+            "\n".join(group["change"]),
+            "\n".join(group["ok"]),
+            "\n".join(group["skip"]),
+        )
+    console.print(table)
+    _report_skipped(runner, plan.skipped)
+
+
+def _cell(state: FolderState) -> str:
+    if state.error is not None:
+        return f"[red]error[/red]: {state.error}"
+    if state.completion is None:
+        return state.state
+    return f"{state.state} {state.completion}%"
+
+
+def _show_status(runner: Runner, report: StatusReport, labels: dict[str, str]) -> None:
+    table = Table(title="Syncthing folders")
+    table.add_column("Folder")
+    for host in HOST_NAMES:
+        table.add_column(alias(host))
+    for folder_id, by_host in report.states.items():
+        table.add_row(
+            labels[folder_id],
+            *(_cell(by_host[host]) for host in HOST_NAMES),
+        )
+    console.print(table)
+    if report.unreachable:
+        described = ", ".join(runner.describe(host) for host in report.unreachable)
+        console.print(f"Unreachable over SSH: {escape(described)}.")
 
 
 def _show_handoff(plan: HandoffPlan, dry_run: bool) -> None:
-    table = Table(title=f"Orca worktree handoff {plan.source} -> {plan.target}")
+    table = Table(
+        title=f"Orca worktree handoff {alias(plan.source)} -> {alias(plan.target)}"
+    )
     table.add_column("Repository")
     table.add_column("Branch")
     table.add_column("External worktrees")
@@ -196,6 +321,16 @@ def _handoff_lock() -> Iterator[None]:
         yield
 
 
+ManifestOption = Annotated[
+    Path,
+    typer.Option(
+        "--manifest",
+        help="Private folder manifest.",
+        dir_okay=False,
+    ),
+]
+
+
 @app.command(epilog=BOOTSTRAP_EPILOG, rich_help_panel="Syncthing")
 def bootstrap(
     folder: Annotated[
@@ -210,14 +345,7 @@ def bootstrap(
         int,
         typer.Option(min=1, help="Seconds to wait for Syncthing to become idle."),
     ] = 300,
-    manifest_path: Annotated[
-        Path,
-        typer.Option(
-            "--manifest",
-            help="Private folder manifest.",
-            dir_okay=False,
-        ),
-    ] = DEFAULT_MANIFEST_PATH,
+    manifest_path: ManifestOption = DEFAULT_MANIFEST_PATH,
 ) -> None:
     """Validate or install one manifest-defined Syncthing folder."""
     try:
@@ -231,7 +359,7 @@ def bootstrap(
         )
     except (UsageError, subprocess.CalledProcessError) as error:
         _abort(error)
-    _show_bootstrap(plan, apply)
+    _show_bootstrap(runner, plan, apply)
 
 
 @app.command(epilog=ADD_EPILOG, rich_help_panel="Syncthing")
@@ -244,7 +372,10 @@ def add(
         Path | None,
         typer.Option(
             "--destination",
-            help="Expected path on the other machine. Relative paths must match.",
+            help=(
+                "Expected tsuki path from a Mac, or Mac path from tsuki. "
+                "Relative paths must match."
+            ),
         ),
     ] = None,
     kind: Annotated[
@@ -260,7 +391,7 @@ def add(
         typer.Option(min=1, help="Seconds to wait for synchronization."),
     ] = 300,
 ) -> None:
-    """Add a new folder using the same relative path on both machines."""
+    """Add a new folder using the same relative path on every machine."""
     try:
         host = detect_host()
         local_source = source.expanduser().resolve()
@@ -280,17 +411,82 @@ def add(
             folder_class=kind.value if kind else None,
         )
         updated = manifest_with_folder(current, folder)
+        parse_manifest(updated, "updated manifest")
         service = Syncthing(runner)
         plan = service.plan_new(folder, host)
-        _show_add(plan)
+        _show_add(runner, plan)
         if not yes and not Confirm.ask("Add and synchronize this folder?"):
             console.print("Cancelled. Nothing changed.")
             return
-        install_manifest(runner, service, current, updated, timeout=timeout)
+        install_manifest(
+            runner, service, current, updated, timeout=timeout, hosts=plan.hosts
+        )
         service.apply_new(plan, host, timeout=timeout)
     except (OSError, UsageError, subprocess.CalledProcessError) as error:
         _abort(error)
-    console.print("[green]Added and synchronized on both machines.[/green]")
+    console.print(f"[green]Added and synchronized on {_names(plan.hosts)}.[/green]")
+    _report_skipped(runner, plan.skipped)
+
+
+@app.command("add-device", epilog=ADD_DEVICE_EPILOG, rich_help_panel="Syncthing")
+def add_device(
+    machine: Annotated[
+        Target,
+        typer.Argument(help="Machine to pair and catch up."),
+    ],
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Show the plan without changing anything."),
+    ] = False,
+    yes: Annotated[
+        bool,
+        typer.Option("--yes", help="Skip the confirmation prompt."),
+    ] = False,
+    manifest_path: ManifestOption = DEFAULT_MANIFEST_PATH,
+) -> None:
+    """Share every manifest folder with one machine; safe to rerun."""
+    try:
+        runner = _runner()
+        target = machine.host
+        verify_manifest_for_device(runner, target)
+        folders = load_manifest(manifest_path).folders
+        service = Syncthing(runner)
+        plan = service.plan_device(folders, target)
+        _show_device(runner, plan, dry_run)
+        if dry_run:
+            console.print(
+                "[green]Dry run passed. Nothing changed.[/green] "
+                f"{len(plan.changes)} changes planned."
+            )
+            return
+        if not plan.changes:
+            console.print(f"[green]{machine.value} is already caught up.[/green]")
+            return
+        if not yes and not Confirm.ask(
+            f"Apply {len(plan.changes)} changes for {machine.value}?"
+        ):
+            console.print("Cancelled. Nothing changed.")
+            return
+        service.apply_device(plan)
+    except (UsageError, subprocess.CalledProcessError) as error:
+        _abort(error)
+    console.print(f"[green]Applied {len(plan.changes)} changes.[/green]")
+
+
+@app.command(epilog=STATUS_EPILOG, rich_help_panel="Syncthing")
+def status(
+    manifest_path: ManifestOption = DEFAULT_MANIFEST_PATH,
+) -> None:
+    """Show each manifest folder's Syncthing state on every machine."""
+    try:
+        runner = _runner()
+        folders = load_manifest(manifest_path).folders
+        report = Syncthing(runner).overview(folders)
+    except (UsageError, subprocess.CalledProcessError) as error:
+        _abort(error)
+    _show_status(runner, report, {folder.id: folder.label for folder in folders})
+    if report.failed:
+        raise typer.Exit(1)
 
 
 @app.command(epilog=HANDOFF_EPILOG, rich_help_panel="Git")
@@ -318,17 +514,13 @@ def handoff(
         int,
         typer.Option(min=1, help="Seconds to wait for Syncthing to become idle."),
     ] = 300,
-    manifest_path: Annotated[
-        Path,
-        typer.Option(
-            "--manifest",
-            help="Private folder manifest.",
-            dir_okay=False,
-        ),
-    ] = DEFAULT_MANIFEST_PATH,
+    manifest_path: ManifestOption = DEFAULT_MANIFEST_PATH,
 ) -> None:
     """Hand external Orca worktrees to the target machine."""
-    source = detect_host()
+    try:
+        source = detect_host()
+    except UsageError as error:
+        _abort(error)
     if target.host == source:
         raise typer.BadParameter("target is the current host", param_hint="TARGET")
     try:

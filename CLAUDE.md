@@ -163,15 +163,17 @@ agent-skills.sh remove "skill-name"                   # works for either kind
 the file itself. A Git-tracked `.stignore` belongs to that repository; the
 helper validates its manifest patterns and never edits it. For an untracked
 `.stignore`, `work-sync bootstrap` writes the managed rules independently on
-macmini and tsuki from `~/.config/work-sync/folders.json`, then adds the file to
+each machine from `~/.config/work-sync/folders.json`, then adds the file to
 that checkout's `.git/info/exclude`. Do not ignore `.stignore` globally or add it
 to project `.gitignore` files.
 
 New folders use the same relative path beneath `/Volumes/WorkSSD` on macmini
-and `/home/dileep/Documents` on tsuki. Run `work-sync add` from the new folder,
-or pass its path explicitly. The command detects Git repositories, previews both
-paths, updates the private manifest, configures Syncthing, and waits for both
-machines. Use `--type container` only for a non-Git parent containing nested Git
+and macbook and `/home/dileep/Documents` on tsuki. Run `work-sync add` from the
+new folder, or pass its path explicitly. The command detects Git repositories,
+previews the paths, updates the private manifest, configures Syncthing on every
+reachable machine, and waits for them. A machine that was unreachable catches up
+with a scoped `chezmoi apply ~/.config/work-sync/folders.json` there, then
+`work-sync add-device <machine>`. Use `--type container` only for a non-Git parent containing nested Git
 repositories; `--yes` skips the confirmation prompt.
 
 Project folders sync their complete normal Git repository, including `.git`.

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import subprocess
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,22 +20,25 @@ from .handoff import (
     rebuild_index,
     sync_worktree_files,
 )
-from .manifest import Folder, Host, UsageError
+from .manifest import HOST_NAMES, HOSTS, Folder, Host, UsageError, alias
 from .syncthing import Syncthing
 from .system import Runner
 
 MANIFEST_PATHS: dict[Host, tuple[Path, Path]] = {
-    "mac": (
-        Path(
-            "/Users/dkishore/zendots/private_dot_config/work-sync/private_folders.json"
-        ),
-        Path("/Users/dkishore/.config/work-sync/folders.json"),
-    ),
-    "tsuki": (
-        Path("/home/dileep/zendots/private_dot_config/work-sync/private_folders.json"),
-        Path("/home/dileep/.config/work-sync/folders.json"),
-    ),
+    host: (
+        info.home / "zendots/private_dot_config/work-sync/private_folders.json",
+        info.home / ".config/work-sync/folders.json",
+    )
+    for host, info in HOSTS.items()
 }
+
+
+@dataclass(frozen=True)
+class ManifestCheck:
+    """Matching manifest digest and the hosts that could not be compared."""
+
+    digest: str
+    unreachable: tuple[Host, ...]
 
 
 @dataclass(frozen=True)
@@ -80,22 +85,31 @@ class HandoffResult:
 def _digest(runner: Runner, host: Host, path: Path) -> str:
     command = (
         ["shasum", "-a", "256", str(path)]
-        if host == "mac"
+        if HOSTS[host].platform == "darwin"
         else ["sha256sum", str(path)]
     )
     try:
         return runner.run(host, command).split()[0]
-    except (IndexError, OSError) as error:
-        raise UsageError(f"cannot hash manifest on {host}: {path}") from error
+    except (IndexError, OSError, subprocess.CalledProcessError) as error:
+        raise UsageError(
+            f"cannot hash manifest on {host}: {path}; a new machine needs "
+            f"work-sync add-device {alias(host)} and a scoped chezmoi apply"
+        ) from error
 
 
-def verify_manifest_copies(runner: Runner) -> str:
-    """Require source and applied private manifests to match on both hosts."""
+def verify_manifest_copies(
+    runner: Runner,
+    hosts: Sequence[Host] = HOST_NAMES,
+) -> ManifestCheck:
+    """Require private manifest copies to match on every reachable host."""
+    reachable, unreachable = runner.split_reachable(hosts)
     digests = {
         (host, path): _digest(runner, host, path)
-        for host, paths in MANIFEST_PATHS.items()
-        for path in paths
+        for host in reachable
+        for path in MANIFEST_PATHS[host]
     }
+    if not digests:
+        raise UsageError("no host is reachable for the manifest check")
     unique = set(digests.values())
     if len(unique) != 1:
         details = ", ".join(
@@ -105,7 +119,28 @@ def verify_manifest_copies(runner: Runner) -> str:
             "private manifests differ; run the scoped chezmoi apply on the "
             f"stale host ({details})"
         )
-    return unique.pop()
+    return ManifestCheck(unique.pop(), unreachable)
+
+
+def verify_manifest_for_device(runner: Runner, target: Host) -> ManifestCheck:
+    """Verify manifests, exempting only a remote target that has none applied."""
+    if target == runner.local_host or not runner.reachable(target):
+        return verify_manifest_copies(runner)
+    check = verify_manifest_copies(runner, tuple(h for h in HOST_NAMES if h != target))
+    applied = MANIFEST_PATHS[target][1]
+    try:
+        runner.run(target, ["test", "-e", str(applied)])
+    except subprocess.CalledProcessError as error:
+        # Only exit 1 proves absence; an ssh failure (255) must not skip the check.
+        if error.returncode != 1:
+            raise
+        return check
+    if _digest(runner, target, applied) != check.digest:
+        raise UsageError(
+            f"{alias(target)} has a stale {applied}; run "
+            "`chezmoi apply ~/.config/work-sync/folders.json` there, then retry"
+        )
+    return check
 
 
 def _find_orca_repo(repos: tuple[OrcaRepo, ...], path: Path) -> OrcaRepo | None:
@@ -154,9 +189,12 @@ class Handoff:
         source = self.runner.local_host
         if source == target:
             raise UsageError("target is the current host")
-        verify_manifest_copies(self.runner)
+        if not self.runner.reachable(target):
+            raise UsageError(f"{self.runner.describe(target)} is unreachable over SSH")
+        verify_manifest_copies(self.runner, (source, target))
+        ids = self.syncthing.device_ids((source, target)) if folders else {}
         for folder in folders:
-            self.syncthing.wait_idle(folder.id, timeout)
+            self.syncthing.wait_idle(folder.id, timeout, ids)
 
         source_inventory = self.orca.inventory(source)
         target_inventory = self.orca.inventory(target)
@@ -244,7 +282,7 @@ class Handoff:
             )
 
         stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-        home = Path("/Users/dkishore" if target == "mac" else "/home/dileep")
+        home = HOSTS[target].home
         return HandoffPlan(
             source,
             target,

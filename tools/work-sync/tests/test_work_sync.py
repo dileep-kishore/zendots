@@ -6,6 +6,7 @@ import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import pytest
 from typer.testing import CliRunner
@@ -32,7 +33,14 @@ from work_sync.handoff import (
     preflight_repository,
     sync_worktree_files,
 )
-from work_sync.manifest import Folder, UsageError, detect_host, load_manifest
+from work_sync.manifest import (
+    Folder,
+    Host,
+    UsageError,
+    alias,
+    detect_host,
+    load_manifest,
+)
 from work_sync.syncthing import (
     Syncthing,
     folder_payload,
@@ -128,11 +136,12 @@ def test_manifest_git_folders_filters_non_git_defaults(tmp_path: Path) -> None:
         manifest.git_folders(("Presentations",))
 
 
-def test_detect_host_rejects_unknown_platform() -> None:
-    assert detect_host("Darwin") == "mac"
-    assert detect_host("Linux") == "tsuki"
+def test_detect_host_rejects_unknown_platform(tmp_path: Path) -> None:
+    missing = tmp_path / "host"
+    assert detect_host("Darwin", environ={}, host_file=missing) == "mac"
+    assert detect_host("Linux", environ={}, host_file=missing) == "tsuki"
     with pytest.raises(UsageError, match="unsupported host"):
-        detect_host("Plan9")
+        detect_host("Plan9", environ={}, host_file=missing)
 
 
 def test_add_infers_the_same_relative_path_in_both_directions() -> None:
@@ -237,11 +246,16 @@ def test_manifest_install_writes_directly_without_chezmoi(
         def scan(self, host: str, folder_id: str) -> None:
             pass
 
-        def wait_idle(self, folder_id: str, timeout: int) -> None:
+        def device_ids(self, hosts: tuple[str, ...]) -> dict[str, str]:
+            return {host: f"ID-{host}" for host in hosts}
+
+        def wait_idle(self, folder_id: str, timeout: int, ids: object) -> None:
             files[str(paths["tsuki"][0])] = files[str(paths["mac"][0])]
 
     monkeypatch.setattr(add_module, "MANIFEST_PATHS", paths)
-    monkeypatch.setattr(add_module, "verify_manifest_copies", lambda runner: "ok")
+    monkeypatch.setattr(
+        add_module, "verify_manifest_copies", lambda runner, hosts: "ok"
+    )
 
     install_manifest(
         Runner(local_host="mac", execute=execute),
@@ -249,6 +263,7 @@ def test_manifest_install_writes_directly_without_chezmoi(
         "old\n",
         "new\n",
         timeout=10,
+        hosts=("mac", "tsuki"),
     )
 
     assert all(files[str(path)] == "new\n" for pair in paths.values() for path in pair)
@@ -295,7 +310,7 @@ def test_folder_payload_disables_metadata_sync(tmp_path: Path) -> None:
     write_manifest(path, [ENTRY])
     folder = load_manifest(path).select("qbio")
 
-    payload = folder_payload({}, folder, "MAC-ID", "TSUKI-ID", "mac")
+    payload = folder_payload({}, folder, ("MAC-ID", "TSUKI-ID"), "mac")
 
     assert payload["ignorePerms"] is False
     assert payload["syncOwnership"] is False
@@ -368,23 +383,24 @@ def test_syncthing_control_files_are_locally_git_ignored(tmp_path: Path) -> None
 
 
 def test_syncthing_idle_status_requires_cross_device_sequence_convergence() -> None:
-    statuses = {
+    ids: dict[Host, str] = {"mac": "MAC-ID", "tsuki": "TSUKI-ID"}
+    statuses: dict[Host, dict[str, Any]] = {
         "mac": {
             "state": "idle",
             "sequence": 10,
-            "remoteSequence": {"tsuki": 8},
+            "remoteSequence": {"TSUKI-ID": 8},
         },
         "tsuki": {
             "state": "idle",
             "sequence": 12,
-            "remoteSequence": {"mac": 8},
+            "remoteSequence": {"MAC-ID": 8},
         },
     }
 
-    assert not statuses_converged(statuses)
-    statuses["mac"]["remoteSequence"] = {"tsuki": 12}
-    statuses["tsuki"]["remoteSequence"] = {"mac": 10}
-    assert statuses_converged(statuses)
+    assert not statuses_converged(statuses, ids)
+    statuses["mac"]["remoteSequence"] = {"TSUKI-ID": 12}
+    statuses["tsuki"]["remoteSequence"] = {"MAC-ID": 10}
+    assert statuses_converged(statuses, ids)
 
 
 def test_syncthing_scan_uses_authenticated_rest_post() -> None:
@@ -1090,7 +1106,7 @@ def test_handoff_help_documents_repeatable_folder_and_confirmation() -> None:
 
 
 def test_handoff_rejects_current_machine_as_target() -> None:
-    target = "macmini" if detect_host() == "mac" else "tsuki"
+    target = alias(detect_host())
     result = CliRunner().invoke(app, ["handoff", target, "--dry-run"])
 
     assert result.exit_code == 2
