@@ -134,15 +134,27 @@ merged, a branch that moved after that check, and a branch checked out in the
 main checkout. Report a refusal as it is printed. Do not force past it,
 because each one guards work that exists nowhere else.
 
-When this run happens inside a T3 Code thread whose worktree was removed,
-settle the thread with T3's `t3_thread_organize` tool (`action: "settle"`), so
-it leaves the active list and does not start another turn in a missing
-checkout.
+Last, the script fast-forwards the main checkout to the merged default branch.
+Untracked files do not block it unless the merge adds a file at the same path.
+When it cannot, it prints `skipped-fast-forward` with the reason: the checkout
+is on another branch, tracked files have uncommitted changes, or git refused
+the fast-forward. The main checkout then stays behind until someone pulls.
+
+If T3's `t3_thread_organize` tool is available (the harness may prefix its
+name, as in `mcp__t3-code__t3_thread_organize`), finish the thread with it.
+When every cleanup line succeeded and the thread's worktree was removed,
+settle it (`action: "settle"`) so it does not start another turn in a missing
+checkout. When any line is a refusal, a `warning:`, or `skipped-fast-forward`,
+pin it (`action: "pin"`) instead. T3 settles a thread on its own once its
+linked PR merges and the turn ends, which hides the report; a pinned thread
+stays in the active list until the user unpins it. Without the tool, skip
+this step: other hosts leave the report where the user reads it.
 
 ## Output
 
 Lead with the outcome: merged PRs with their merge SHAs, or the gate that
 stopped the run and the PR it stopped on. Then one line per cleanup result,
 copied from the script (`removed-worktree`, `deleted-branch`,
-`deleted-remote-branch`, `fast-forwarded`, or the refusal). Name anything
-left in place and why.
+`deleted-remote-branch`, `fast-forwarded`, `skipped-fast-forward`, or the
+refusal). Name anything left in place and why, and say when the thread was
+pinned rather than settled.

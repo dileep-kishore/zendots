@@ -4,6 +4,8 @@
 Refuses anything it cannot prove is safe: a dirty worktree, a branch tip that
 is neither in the default branch nor the merged PR's head, a remote branch
 that open PRs still target, or a branch checked out in the main checkout.
+Then fast-forwards the main checkout when it is on the default branch with no
+tracked changes, and prints `skipped-fast-forward` with the reason otherwise.
 """
 
 from __future__ import annotations
@@ -176,12 +178,22 @@ def main() -> int:
         run(cmd, root)
         print(f"{label} {target}".rstrip())
 
-    if not opts.dry_run and git(root, "symbolic-ref", "--quiet", "--short", "HEAD", check=False) == base:
-        clean = not git(root, "status", "--porcelain", "--untracked-files=no")
-        before = git(root, "rev-parse", "HEAD")
-        merged_ff = clean and run(["git", "merge", "--ff-only", "--quiet", f"{remote}/{base}"], root, check=False).returncode == 0
-        if merged_ff and git(root, "rev-parse", "HEAD") != before:
-            print(f"fast-forwarded {root} to {remote}/{base}")
+    # A bare repository has no checkout to update.
+    if not opts.dry_run and git(root, "rev-parse", "--is-bare-repository") != "true":
+        if git(root, "symbolic-ref", "--quiet", "--short", "HEAD", check=False) != base:
+            print(f"skipped-fast-forward {root}: not on {base}")
+        elif git(root, "status", "--porcelain", "--untracked-files=no"):
+            print(f"skipped-fast-forward {root}: uncommitted changes to tracked files")
+        else:
+            before = git(root, "rev-parse", "HEAD")
+            result = run(["git", "merge", "--ff-only", "--quiet", f"{remote}/{base}"], root, check=False)
+            if result.returncode != 0:
+                # Git lists the blocking paths on the lines after its first.
+                lines = (result.stderr + result.stdout).splitlines()
+                detail = " ".join(line.strip() for line in lines if line.strip()) or "git merge --ff-only failed"
+                print(f"skipped-fast-forward {root}: {detail}")
+            elif git(root, "rev-parse", "HEAD") != before:
+                print(f"fast-forwarded {root} to {remote}/{base}")
     print(f"main-checkout {root}")
     return 0
 
