@@ -83,6 +83,15 @@ Linux. Preserve workspace IDs and every hotkey ID, including Unassigned
 entries, when editing the generated file. IPC is enabled for `omniwmctl` checks
 on the Mac; it does not make those checks available on Linux.
 
+`brew upgrade` replaces the app without restarting it, so the old version keeps
+running until you quit and reopen OmniWM. Until then the new `omniwmctl` fails
+with `transport_failure` or `protocol_mismatch`; `omniwmctl version` reports
+the running version once they match. A restart can migrate `settings.toml` to a
+new schema and leave the original as `settings.toml.pre-v<N>`. Compare the two,
+capture the result with `chezmoi add` as below, then delete the backup to
+dismiss OmniWM's notice. The file uses schema 4, written by OmniWM 0.7.6;
+upgrade OmniWM on each other Mac before applying it there.
+
 After changing settings in OmniWM's GUI, capture the live file back into the
 repo before applying dotfiles again:
 
