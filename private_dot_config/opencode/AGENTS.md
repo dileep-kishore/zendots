@@ -112,6 +112,14 @@
   solution and verification, plus risks, limitations, or related issues when
   real. Follow repository templates; no empty sections or file-by-file
   summaries. Keep both current as the PR evolves.
+- In a T3 Code worktree (under `~/.t3/worktrees`), stay on the branch T3
+  created: no `git branch -m`, `git switch -c`, or checkout of another branch.
+  T3 never notices the change, so its merged-worktree cleanup and PR status
+  stop working for that thread. Work that needs another branch, such as the
+  next PR in a stack, goes in a new worktree from `delegate_task` with
+  `isolation: "worktree"` or `t3_thread_launch`.
+- Merge PRs with `merge-pr`; asking for a merge approves removing the merged
+  branches and worktrees.
 
 ## Host safety
 
