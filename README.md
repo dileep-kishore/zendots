@@ -4,8 +4,8 @@
   <p><strong>Personal, keyboard-centric dotfiles for macOS and Linux</strong></p>
 </div>
 
-[chezmoi](https://www.chezmoi.io/) source for **macmini** (macOS) and **tsuki**
-(CachyOS Linux): shells, Neovim, tmux, desktop configuration, and coding agents.
+[chezmoi](https://www.chezmoi.io/) source for **macmini** and **macbook** (macOS)
+and **tsuki** (CachyOS Linux): shells, Neovim, tmux, desktop configuration, and coding agents.
 Catppuccin Mocha is the shared theme. The current desktops are **OmniWM** on
 macOS and **Niri + native Noctalia v5** on Linux; AeroSpace/SketchyBar and
 Hyprland/Waybar configurations are also retained.
@@ -119,6 +119,14 @@ invocation; use the explicit cache command above instead.
 Homebrew and Arch lists include fonts. Licensed fonts are installed separately.
 On Linux, `bash ~/.local/bin/font-install.sh /path/to/font.otf otf` copies a
 font into `~/.local/share/fonts/otf` and refreshes fontconfig.
+
+### Another Mac
+
+[Setting up another Mac](docs/new-mac.md) makes a new Mac a copy of macmini in
+two sittings. `pkgs/macos/provision.sh` runs on macmini and seeds the new Mac
+over SSH: keys, the chezmoi config, one-time app data, and Syncthing sharing.
+`pkgs/macos/setup-mac.sh` runs on the new Mac after the first apply: Brewfile,
+`defaults.sh`, `login-items.sh`, and tool plugins.
 
 ## Daily use
 
@@ -289,6 +297,7 @@ apply only after approval. Do not chain a pull with a broad apply.
 
 ## Documentation
 
+- [Setting up another Mac](docs/new-mac.md)
 - [OmniWM setup and shortcuts](docs/omniwm.md)
 - [Noctalia v5 configuration and maintenance](docs/noctalia-v5.md)
 - [Pi workflows and session handoff](docs/pi-workflow.md)

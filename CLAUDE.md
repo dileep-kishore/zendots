@@ -6,8 +6,9 @@ Repository guidance shared by coding agents. `AGENTS.md` is a symlink to this fi
 
 This is a **dotfiles repository** (zendots) managed by [chezmoi](https://www.chezmoi.io/), a dotfile manager that uses templates to maintain configuration files across different machines. The repository contains comprehensive configurations for a modern terminal-based development environment built around Neovim, Zsh, Tmux, and various CLI tools.
 
-The managed hosts are tsuki (CachyOS Linux, Niri + native Noctalia v5) and
-macmini (macOS, OmniWM). AeroSpace/SketchyBar and Hyprland/Waybar configs
+The managed hosts are tsuki (CachyOS Linux, Niri + native Noctalia v5),
+macmini (macOS, OmniWM), and macbook (the LBNL MacBook, a copy of macmini; see
+`docs/new-mac.md`). AeroSpace/SketchyBar and Hyprland/Waybar configs
 remain available. See `README.md` and the operational guides in `docs/`.
 
 ## Repository Structure
