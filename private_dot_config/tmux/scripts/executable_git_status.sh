@@ -78,7 +78,8 @@ if [[ $SYNC_MODE -eq 0 ]]; then
 	if [[ $NEED_PUSH -gt 0 ]]; then
 		SYNC_MODE=2
 	else
-		LAST_FETCH=$(stat -c %Y .git/FETCH_HEAD | bc)
+		# GNU stat first, then BSD stat for macOS; empty would fetch on every refresh.
+		LAST_FETCH=$(stat -c %Y .git/FETCH_HEAD 2>/dev/null || stat -f %m .git/FETCH_HEAD 2>/dev/null || echo 0)
 		NOW=$(date +%s | bc)
 
 		# if 5 minutes have passed since the last fetch
