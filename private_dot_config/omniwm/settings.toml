@@ -197,11 +197,11 @@ hideEmptyWorkspaces = false
 hideInNativeFullscreen = false
 hoverPreviewsEnabled = true
 notchActiveZoneWidth = 180.0
-notchMode = "off"
+notchMode = "moveBelowMenuBar"
 notificationBadgeRefreshIntervalSeconds = 5.0
-notificationBadges = "off"
+notificationBadges = "dot"
 position = "overlappingMenuBar"
-reserveLayoutSpace = false
+reserveLayoutSpace = true
 revealHoldMilliseconds = 200.0
 revealModifier = "off"
 showAccentHighlights = true
@@ -1106,7 +1106,7 @@ binding = "Unassigned"
 id = "raiseAllFloatingWindows"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+F"
 id = "toggleFloatingFocus"
 
 [[hotkeys]]
@@ -1126,11 +1126,11 @@ binding = "Unassigned"
 id = "openMenuAnywhere"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+M"
 id = "setWindowMark"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Shift+M"
 id = "removeWindowMark"
 
 [[hotkeys]]

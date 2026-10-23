@@ -46,6 +46,8 @@ independent of this macOS configuration.
 | Period / Comma | Cycle column width forward / backward |
 | C | Center the column |
 | V | Toggle floating |
+| F | Jump between floating and tiled windows |
+| M / Shift+M | Name the focused window with a mark / remove a mark |
 | T | Toggle tabbed column |
 
 Hyper excludes Shift, so Hyper+Shift+number is distinct from Hyper+number.
@@ -54,6 +56,13 @@ Niri's Mod+J/K behavior. Workspace switching at the edge does not wrap.
 All other keyboard bindings are Unassigned, preserving ordinary Option
 shortcuts for apps. The remapper must keep the additional physical Shift
 modifier when the WM key is held.
+
+Hyper+F works in both directions. From a tiled window it raises the
+workspace's floating windows and focuses the last-focused one; from a floating
+window it returns to the last tiled window. Hyper+M prompts for a name. Marks
+last until the window closes or OmniWM quits. To jump to a marked window, type
+its name in the Hyper+P palette, where marks sort first, or run
+`omniwmctl window mark focus <name>`.
 
 Reserve Hyper+Space for Raycast by setting its hotkey to
 Control+Option+Command+Space. On the Go60, press Right Command+Space.
@@ -66,8 +75,13 @@ are enabled at 2 points, with a mauve base color, an enabled gradient, and an
 8-point glow at 60% opacity. A lone column stays centered at its configured
 width. Focus does not follow the mouse; keyboard focus still moves the pointer
 to the focused window. The 28-point workspace bar overlaps the macOS menu bar
-without reserving layout space. SketchyBar is not required by this layout,
-although it remains in the Brewfile.
+and shows a dot on app icons with Dock notification badges. On a display with
+a notch, such as a MacBook's built-in screen, `notchMode = "moveBelowMenuBar"`
+moves the bar below the menu bar, and `reserveLayoutSpace = true` keeps windows
+from sliding under it. `moveBelowMenuBar` ignores displays without a notch.
+On the MPG491CX the menu bar is 31 points tall, taller than the bar, so
+`reserveLayoutSpace` reserves nothing there. SketchyBar is not required by
+this layout, although it remains in the Brewfile.
 
 Twelve app rules set initial workspace placement for standard windows, including
 Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.
