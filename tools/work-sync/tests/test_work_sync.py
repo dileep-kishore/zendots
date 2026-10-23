@@ -322,6 +322,7 @@ def test_sensitive_project_files_are_not_default_ignores(tmp_path: Path) -> None
     assert ".git/worktrees" in patterns
     assert ".git/config.worktree" in patterns
     assert ".git/**.lock" in patterns
+    assert ".git/FETCH_HEAD" in patterns
 
 
 def test_ignore_reconciliation_replaces_legacy_git_rule_and_keeps_local_rules(

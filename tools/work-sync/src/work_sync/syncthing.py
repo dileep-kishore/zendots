@@ -99,7 +99,7 @@ def folder_payload(
 def managed_patterns(folder: Folder) -> tuple[str, ...]:
     """Return manifest and shared ignore patterns without duplicates."""
     git_state = (
-        (".git/worktrees", ".git/config.worktree", ".git/**.lock")
+        (".git/worktrees", ".git/config.worktree", ".git/**.lock", ".git/FETCH_HEAD")
         if folder.git != "none"
         else ()
     )

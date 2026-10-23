@@ -175,9 +175,10 @@ machines. Use `--type container` only for a non-Git parent containing nested Git
 repositories; `--yes` skips the confirmation prompt.
 
 Project folders sync their complete normal Git repository, including `.git`.
-Only `.git/worktrees`, `.git/config.worktree`, and transient Git lock files stay
-local because linked worktree indexes, paths, filesystem settings, and active
-locks are machine-specific. Shared branch and remote configuration remains in
+Only `.git/worktrees`, `.git/config.worktree`, `.git/FETCH_HEAD`, and transient
+Git lock files stay local because linked worktree indexes, paths, filesystem
+settings, and active locks are machine-specific. Background fetches rewrite
+`FETCH_HEAD` often enough to make Syncthing pulls fail. Shared branch and remote configuration remains in
 `.git/config`. Use one machine at a time and wait for Syncthing to report `Up to
 Date` before opening the repository on the other machine.
 
