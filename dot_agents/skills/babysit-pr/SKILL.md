@@ -129,6 +129,10 @@ Do not fold the round into earlier commits to keep the count down. Rewriting
 what is already pushed costs the reviewer their "changes since I last looked"
 diff and marks open threads outdated, which is worse than the extra commit.
 
+When a fix changes what a screenshot in the description shows, retake it,
+upload it with `open-pr`'s `scripts/pr-images.py`, and swap the link with
+`gh pr edit`; never commit it to the branch.
+
 Note the push time for step 7's wait, push, then capture the new head:
 
 ```bash

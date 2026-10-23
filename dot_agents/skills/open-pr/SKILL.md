@@ -126,6 +126,19 @@ diff does not show, a related issue, and how to undo the change when
 migration, external state). Never an empty section. Never a
 file-by-file summary.
 
+Screenshots the session already took of a visible change, or that the user
+asks for, go under the Solution paragraph they show. Upload them instead of
+committing them to the branch:
+
+```bash
+python3 ~/.agents/skills/open-pr/scripts/pr-images.py --name <branch without type/> <image>...
+```
+
+It adds them to the repository's one `pr-assets` branch and prints Markdown
+lines pinned to that commit; paste those. Never create another image branch,
+or delete or force-push `pr-assets`: merged PRs link into it. When the script
+refuses, follow [references/pr-images.md](references/pr-images.md).
+
 Keep it to what a reviewer can read before opening the diff. A PR with more
 logical changes gets more Solution paragraphs, not longer ones. Under three
 paragraphs, prose with no headings; past that, headings.
@@ -169,8 +182,9 @@ git push -u origin HEAD
 gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
 
-Report the URL, the commits and any fold made, each `REVIEW.md` Human review
-path the PR touches, then anything skipped: regrouping declined, verification
+Report the URL, the commits and any fold made, the `pr-assets` commit when
+images were uploaded, each `REVIEW.md` Human review path the PR touches, then
+anything skipped: regrouping declined, verification
 missing, motivation the session lacked, a `REVIEW.md` interview skipped or
 declined.
 
