@@ -202,8 +202,9 @@ external worktrees; it does not change the main folder's Syncthing ignores.
 # Install all packages from Brewfile
 just install
 
-# Update Brewfile with currently installed packages
-just dump
+# The Brewfile is curated (apps installed outside Homebrew are listed, skipped
+# ones are not); edit it by hand. `just dump` regenerates it from installed
+# packages and undoes that.
 
 # Install Yazi plugins
 bash pkgs/download_yazi_plugins.sh
