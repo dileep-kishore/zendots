@@ -44,7 +44,7 @@ exhaustive installer for every configured app or agent.
 | `.chezmoidata/` | Managed Claude, Codex, and Serena configuration fragments |
 | `.chezmoiscripts/`, `private_Library/`, `private_dot_config/systemd/` | Apply hooks and platform scheduling |
 | `pkgs/`, `tools/` | Package setup and source-only helper projects |
-| `docs/` | Operational guides and dated maintenance records; not deployed to home |
+| `docs/` | Tracked operational guides and maintenance records, plus ignored local artifacts; not deployed to home |
 
 Chezmoi translates `dot_` to `.`, `private_` to restricted permissions,
 `executable_` to executable files, and renders `.tmpl` files per host.
@@ -305,10 +305,20 @@ apply only after approval. Do not chain a pull with a broad apply.
 - [Ponytail retirement and pending deployment](docs/maintenance/2026-10-20-ponytail-retirement.md)
 - [Repository agent guidance](CLAUDE.md) and [review rules](REVIEW.md)
 
-`docs/plans/` and `docs/superpowers/` are ignored local planning directories,
-not published setup guides. Remaining material covers unresolved command-guard
-deployment checks, workflow-skill proposals, and the agent-worklog proposal with
-its editable diagram sources. Treat those as plans, not installed features.
+`docs/drafts/`, `docs/plans/`, and `docs/superpowers/` hold ignored local artifacts.
+Keep personal feature-summary HTML and required diagrams/assets in a relevant
+feature folder under `docs/drafts/`, or an established ignored artifact location.
+Useful summaries and dependencies may be copied from a completed worktree to
+the main checkout before removal. Copying does not commit them to the main
+branch; GitHub publication requires explicit user approval. Maintained guides
+and existing published documentation stay tracked.
+
+After a successful feature merge, completed plans, review reports, verification
+outputs, scratch/test data, logs, and test screenshots are disposable even if
+linked from chat. Retain useful summary HTML and required dependencies, active
+work, and anything explicitly requested. Stop test processes before deleting
+their output, and record exact scratch paths in existing task notes when
+creating them. See the [personal artifact policy](CLAUDE.md#personal-artifacts).
 
 ## License and credits
 

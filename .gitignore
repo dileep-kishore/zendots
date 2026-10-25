@@ -2,8 +2,14 @@
 .stfolder/
 .serena/
 .claude/settings.local.json
-docs/plans/
 *.pyc
 /.superpowers/brainstorm
 /private_dot_config/work-sync/private_folders.json
+# Personal artifacts; keep maintained guides and published docs tracked.
+docs/plans/
 docs/superpowers/
+docs/drafts/
+/docs/**/*.html
+/docs/**/*.excalidraw
+/docs/**/*.excalidraw.*
+/*.html

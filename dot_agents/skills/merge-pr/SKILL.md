@@ -9,8 +9,9 @@ Takes a PR, or a stack of PRs, from open to merged and then removes each
 merged branch's worktree, local branch, and remote branch. It merges only
 when every review thread is resolved and CI passes on the exact head being
 merged. Asking for the merge authorizes all of it: the merges, the stack
-retargets, and the deletions. Stop without merging anything further when a
-gate fails; PRs already merged stay merged, and the report says where it
+retargets, removal of the completed work's disposable test artifacts, and
+the branch and worktree deletions. Stop without merging anything further
+when a gate fails; PRs already merged stay merged, and the report says where it
 stopped.
 
 T3 Code's "Delete merged worktrees" does not replace the cleanup step: it runs
@@ -26,6 +27,11 @@ gh pr view <number> --json number,url,state,isDraft,baseRefName,headRefName,head
 
 Without a number, use the PR for the current branch; with none, say so and
 stop. A closed PR stops the run. An already merged PR skips to step 4.
+
+Collect the work's exact scratch paths and test-process handles from task
+notes, session history, and worker handoffs. Follow the inventory rules in
+[artifact cleanup](references/artifact-cleanup.md). Record anything that
+cannot be identified; a clean Git status does not cover external test data.
 
 When `baseRefName` is not the default branch, the PR sits on a stack. Walk
 down with
@@ -108,6 +114,13 @@ against its old base.
 
 ## 4. Clean up each merged branch
 
+After confirming the merge, follow [artifact cleanup](references/artifact-cleanup.md)
+before invoking the branch cleanup helper. Preserve useful feature-summary
+HTML in the main checkout's ignored artifact folder, stop owned test jobs,
+and remove completed plans, reports, and scratch data. If cleanup is blocked,
+leave the affected worktree in place and report the reason. For a stack,
+keep shared artifacts until every consuming task has finished.
+
 Change directory to the main checkout first. The current shell may be inside
 the worktree about to be removed, and every later command would fail there.
 
@@ -142,10 +155,11 @@ the fast-forward. The main checkout then stays behind until someone pulls.
 
 If T3's `t3_thread_organize` tool is available (the harness may prefix its
 name, as in `mcp__t3-code__t3_thread_organize`), finish the thread with it.
-When every cleanup line succeeded and the thread's worktree was removed,
-settle it (`action: "settle"`) so it does not start another turn in a missing
-checkout. When any line is a refusal, a `warning:`, or `skipped-fast-forward`,
-pin it (`action: "pin"`) instead. T3 settles a thread on its own once its
+When artifact cleanup and every cleanup line succeeded and the thread's
+worktree was removed, settle it (`action: "settle"`) so it does not start another turn in a missing
+checkout. When artifact cleanup is incomplete or any line is a refusal,
+a `warning:`, or `skipped-fast-forward`, pin it (`action: "pin"`) instead.
+T3 settles a thread on its own once its
 linked PR merges and the turn ends, which hides the report; a pinned thread
 stays in the active list until the user unpins it. Without the tool, skip
 this step: other hosts leave the report where the user reads it.
@@ -156,5 +170,6 @@ Lead with the outcome: merged PRs with their merge SHAs, or the gate that
 stopped the run and the PR it stopped on. Then one line per cleanup result,
 copied from the script (`removed-worktree`, `deleted-branch`,
 `deleted-remote-branch`, `fast-forwarded`, `skipped-fast-forward`, or the
-refusal). Name anything left in place and why, and say when the thread was
-pinned rather than settled.
+refusal). Also list the artifact paths removed, summaries preserved with
+their destination paths, and anything retained or unverified with its reason.
+Say when the thread was pinned rather than settled.

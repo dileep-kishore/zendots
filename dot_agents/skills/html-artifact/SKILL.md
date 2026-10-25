@@ -90,8 +90,24 @@ is unavailable, report that limit rather than treating the checker as visual pro
 
 ## 7. Deliver
 
-Write to the project's docs directory as `docs/<slug>.html`, or the location
-the project already uses for artifacts. Report the absolute path. For a visual the user wants in the conversation, wrap
+Use the project's established ignored artifact folder, such as
+`docs/superpowers/` or `docs/drafts/<feature>/`. Otherwise use
+`docs/drafts/<slug>/<slug>.html` and add `/docs/drafts/` to Git's local
+exclude file, located by `git rev-parse --git-path info/exclude`.
+Change tracked `.gitignore` rules only when the project or user requests it.
+Keep required local assets and diagram sources together in that folder;
+check each path with `git check-ignore <path>`. Personal artifacts stay out
+of commits. Preserve maintained published documentation and product HTML;
+publishing a personal artifact on GitHub requires explicit user approval.
+Honor an explicit destination, ensuring personal output there stays ignored.
+
+When working in a worktree, report the paths needed to preserve a useful
+feature-summary HTML before worktree removal. Merge cleanup copies it and
+its required dependencies to an ignored folder in the main checkout; this
+does not put it on the main branch. Completed test screenshots, raw reports,
+and logs are disposable even when earlier messages linked them.
+
+Report the absolute HTML path. For a visual the user wants in the conversation, wrap
 the fragment with `scripts/render.py` and show it with T3's `html_render`, as
 `references/interactive.md` describes. Publish only
 when the user asks for a link and the harness has an artifact tool, following

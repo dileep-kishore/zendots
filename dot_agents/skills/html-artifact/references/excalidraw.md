@@ -13,9 +13,11 @@ and Playwright's matching Chromium headless shell. On
 Linux, Chromium also needs its usual system libraries; if launch reports a
 missing library, resolve that host dependency rather than changing renderers.
 
+Run from the ignored artifact folder chosen in `SKILL.md`, beside the HTML:
+
 ```bash
 bun run ~/.agents/skills/html-artifact/scripts/excalidraw.ts \
-  docs/diagram.json docs/diagram
+  diagram.json diagram
 ```
 
 For a smoke check, use `assets/excalidraw-example.json` as the input and a
@@ -30,7 +32,8 @@ The command creates:
   `<figure>` in the current template and add a caption. Do not link to the SVG
   files from the page; the fragment already embeds both images.
 
-Keep the authored `docs/<slug>.<name>.json` and editable `.excalidraw` source.
+Keep the authored `<name>.json` and editable `.excalidraw` source beside the
+HTML in its ignored artifact folder.
 After pasting the fragment, remove the generated `.light.svg`, `.dark.svg`,
 and `.images.html` intermediates unless they are wanted as separate exports.
 The command prints the embedded fragment's byte count. The complete HTML page

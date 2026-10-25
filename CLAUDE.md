@@ -42,6 +42,27 @@ The repository follows chezmoi's naming conventions where files/directories are 
 
 - **`dot_pixi/`** → Pixi package manager manifests
 
+## Personal artifacts
+
+Keep personal feature-summary HTML and its required diagrams and assets local
+and untracked in a relevant feature folder under `docs/drafts/`, or an
+established ignored location such as `docs/superpowers/`. Maintained project
+documentation, guides, and existing published documentation stay tracked.
+Product HTML under skills stays tracked.
+
+Before removing a completed worktree, useful summary HTML and its dependencies
+may be copied to the main checkout's ignored artifact folder. Copying files
+does not commit them to the main branch. Publishing them on GitHub requires
+explicit user approval.
+
+After a successful feature merge, completed plans, independent-review reports,
+verify-this outputs, scratch/test data, logs, and test screenshots are
+disposable, even when chat messages link them. Preserve only useful summary
+HTML and its required dependencies, anything needed by active work, and
+anything the user explicitly requested to retain. Stop test processes before
+deleting their output. Record exact scratch paths in existing task notes when
+creating them so merge cleanup can identify them.
+
 ## Common Commands
 
 ### Chezmoi Operations
