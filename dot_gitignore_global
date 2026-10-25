@@ -6,3 +6,6 @@
 
 # Pi subagent runtime state and mission artifacts
 .pi-subagents/
+
+# Serena per-project state and memories
+.serena/
