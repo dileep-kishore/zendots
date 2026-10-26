@@ -1001,6 +1001,8 @@ class Syncthing:
         folder: Folder,
         peer: Host,
     ) -> DeviceStep:
+        if folder.folder_class == "plain":
+            return DeviceStep(target, folder.label, "no Git state", "ok")
         description = "machine-local Git state"
         path = folder.path(target)
         if folder.folder_class == "git":

@@ -686,6 +686,21 @@ def test_add_device_sets_filesystem_git_keys_on_a_macos_target() -> None:
     assert service._missing_filesystem_keys("tsuki", REPO.tsuki) == ()
 
 
+def test_add_device_reports_no_git_state_for_a_running_plain_folder() -> None:
+    fake = _fresh_macbook()
+    fake.share(PLAIN, "macbook", devices=("mac", "tsuki"))
+
+    plan = _service(fake).plan_device((PLAIN,), "macbook")
+
+    target_steps = [
+        step.description
+        for step in plan.steps
+        if step.host == "macbook" and step.subject == "Notes"
+    ]
+    assert target_steps[-1] == "no Git state"
+    assert not any(command[0] == "git" for command in fake.commands("macbook"))
+
+
 def test_add_device_waits_for_a_git_directory_still_syncing() -> None:
     fake, repo, store = _synced_macbook_repo()
     fake.incomplete.add(("macbook", repo))
