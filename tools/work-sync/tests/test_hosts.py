@@ -96,6 +96,7 @@ class FakeHosts:
             host: {} for host in HOST_NAMES
         }
         self.tracked: set[tuple[Host, str]] = set()
+        self.incomplete: set[tuple[Host, str]] = set()
         self.fail_add_json = 0
         self.drops: list[tuple[Host, str]] = []
 
@@ -186,6 +187,10 @@ class FakeHosts:
                 store[(probe, "local", key)] = "true"
             return ""
         repo, args = command[2], command[3:]
+        if (host, repo) in self.incomplete:
+            raise _fail(command, 128)
+        if args[:2] == ["rev-parse", "--git-dir"]:
+            return ".git"
         if args[:2] == ["rev-parse", "HEAD"]:
             return "a" * 40
         if args[:2] == ["rev-parse", "--git-path"]:
@@ -681,6 +686,25 @@ def test_add_device_sets_filesystem_git_keys_on_a_macos_target() -> None:
     assert service._missing_filesystem_keys("tsuki", REPO.tsuki) == ()
 
 
+def test_add_device_waits_for_a_git_directory_still_syncing() -> None:
+    fake, repo, store = _synced_macbook_repo()
+    fake.incomplete.add(("macbook", repo))
+    service = _service(fake)
+
+    plan = service.plan_device((REPO,), "macbook")
+    service.apply_device(plan)
+
+    target_steps = [
+        step.description
+        for step in plan.steps
+        if step.host == "macbook" and step.subject == "Zendots"
+    ]
+    assert target_steps[-1] == (
+        "machine-local Git state waits for synchronization; rerun add-device"
+    )
+    assert not any(scope == "worktree" for _, scope, _ in store)
+
+
 def test_add_device_fails_when_the_worktree_key_read_drops() -> None:
     fake, _, store = _synced_macbook_repo()
     fake.drops.append(("macbook", "config --worktree --get core.ignorecase"))
@@ -756,8 +780,19 @@ def _tracked_peer() -> tuple[FakeHosts, tuple[Host, str]]:
     return fake, ("mac", "ls-files --error-unmatch .stignore")
 
 
+def _repository_probe_target() -> tuple[FakeHosts, tuple[Host, str]]:
+    fake, _, _ = _synced_macbook_repo()
+    return fake, ("macbook", "rev-parse --git-dir")
+
+
 @pytest.mark.parametrize(
-    "setup", [_nonempty_fresh_target, _local_rule_target, _tracked_peer]
+    "setup",
+    [
+        _nonempty_fresh_target,
+        _local_rule_target,
+        _tracked_peer,
+        _repository_probe_target,
+    ],
 )
 def test_add_device_fails_when_a_presence_probe_drops(
     setup: Callable[[], tuple[FakeHosts, tuple[Host, str]]],

@@ -538,6 +538,17 @@ class Syncthing:
         updated = current.rstrip() + "\n" + "\n".join(missing) + "\n"
         self._write_text(host, exclude_path, updated.lstrip("\n"), "0644")
 
+    def _is_repository(self, host: Host, repo: Path) -> bool:
+        """Report whether Git accepts the checkout; a .git still syncing does not."""
+        try:
+            self.runner.run(host, ["git", "-C", str(repo), "rev-parse", "--git-dir"])
+        except subprocess.CalledProcessError as error:
+            # 128 is git's "not a git repository"; ssh failures exit 255.
+            if error.returncode != 128:
+                raise
+            return False
+        return True
+
     def _git_config(self, host: Host, repo: Path, scope: str, key: str) -> str | None:
         """Read one Git config value; only exit 1 means the key is unset."""
         try:
@@ -1000,7 +1011,7 @@ class Syncthing:
                 if self._exists(target, path)
                 else ()
             )
-        if not repos:
+        if not repos or not all(self._is_repository(target, repo) for repo in repos):
             return DeviceStep(
                 target,
                 folder.label,
