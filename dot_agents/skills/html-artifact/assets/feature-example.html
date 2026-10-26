@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design review and done checks in the planning loop</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e1e2e'/%3E%3Ccircle cx='9' cy='9' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='16' cy='9' r='3.4' fill='%2345475a'/%3E%3Ccircle cx='23' cy='9' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='9' cy='16' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='23' cy='16' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='9' cy='23' r='3.4' fill='%23f9e2af'/%3E%3Ccircle cx='16' cy='23' r='3.4' fill='%2345475a'/%3E%3Ccircle cx='23' cy='23' r='3.4' fill='%23f9e2af'/%3E%3C/svg%3E">
+<style>
+/* Faces: an installed copy first, a pinned webfont from jsDelivr second, the system stack last.
+   The @font-face families carry a "Web" suffix so they cannot shadow an installed copy -- a
+   same-name @font-face outranks a system family, which would force the download on a machine
+   that already has the font. An @font-face nobody uses is never fetched, so having the fonts
+   installed costs no bytes and works offline. Nothing is bundled.
+   SN Pro: webfonts/SNPro[ital,wght].woff2 is mislabelled upstream. It carries no ital axis while
+   its OS/2 and name records claim italic, so browsers synthesise a slant from it; the upright
+   variable under fonts/ is used instead and display italics fall back to the system face.
+   iA Writer: the static S families come before the variable V ones. On Linux, Chrome draws an
+   installed V italic at a lighter weight than the text around it; S matches macOS.
+   Pins (fonts here, Mermaid, Vega and highlight.js in the script below) last checked 2026-09-11. */
+@font-face { font-family: "SN Pro Web"; src: url("https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/variable/SNPro%5Bwght%5D.ttf") format("truetype"); font-weight: 200 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Duo Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "iA Writer Mono Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Mono/Variable/iAWriterMonoV.ttf") format("truetype"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "iA Writer Mono Web"; src: url("https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Mono/Variable/iAWriterMonoV-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; font-display: swap; }
+/* Tokens: Catppuccin Mocha (dark, primary on :root) and Latte (light); light applies on system preference or the toggle. Do not edit. */
+:root {
+  --ground: #1e1e2e; --surface: #181825; --surface-2: #313244;
+  --line: #313244; --line-strong: #6c7086;
+  --ink: #cdd6f4; --ink-2: #bac2de; --ink-3: #9399b2;
+  --accent: #cba6f7; --accent-ink: #b4befe; --accent-soft: #cba6f71f;
+  --good: #a6e3a1; --warn: #f9e2af; --bad: #f38ba8;
+  --chart-cat: #89b4fa #fab387 #a6e3a1 #f9e2af #f5c2e7 #94e2d5 #cba6f7 #f38ba8;
+  --tint: #2c3150; --tint-line: #585b8c;
+  --blue: #89b4fa; --peach: #fab387; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af; --teal: #94e2d5; --pink: #f5c2e7;
+  --blue-soft: #89b4fa26; --peach-soft: #fab38726; --green-soft: #a6e3a126; --red-soft: #f38ba826; --teal-soft: #94e2d526;
+  --font-display: "SN Pro", "SN Pro Web", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "iA Writer Duo S", "iA Writer Duo V", "iA Writer Duo Web", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "iA Writer Mono S", "iA Writer Mono V", "iA Writer Mono Web", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --measure: 860px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --ground: #eff1f5; --surface: #e6e9ef; --surface-2: #ccd0da;
+    --line: #ccd0da; --line-strong: #7c7f93;
+    --ink: #4c4f69; --ink-2: #5c5f77; --ink-3: #6c6f85;
+    --accent: #8839ef; --accent-ink: #8839ef; --accent-soft: #8839ef1a;
+    --good: #40a02b; --warn: #df8e1d; --bad: #d20f39;
+    --chart-cat: #1e66f5 #fe640b #40a02b #df8e1d #ea76cb #179299 #8839ef #d20f39;
+    --tint: #dfe4f7; --tint-line: #9aa3d6;
+    --blue: #1e66f5; --peach: #fe640b; --green: #40a02b; --red: #d20f39; --yellow: #df8e1d; --teal: #179299; --pink: #ea76cb;
+    --blue-soft: #1e66f51a; --peach-soft: #fe640b1f; --green-soft: #40a02b1f; --red-soft: #d20f391a; --teal-soft: #1792991f;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+--ground: #eff1f5; --surface: #e6e9ef; --surface-2: #ccd0da;
+  --line: #ccd0da; --line-strong: #7c7f93;
+  --ink: #4c4f69; --ink-2: #5c5f77; --ink-3: #6c6f85;
+  --accent: #8839ef; --accent-ink: #8839ef; --accent-soft: #8839ef1a;
+  --good: #40a02b; --warn: #df8e1d; --bad: #d20f39;
+  --chart-cat: #1e66f5 #fe640b #40a02b #df8e1d #ea76cb #179299 #8839ef #d20f39;
+  --tint: #dfe4f7; --tint-line: #9aa3d6;
+  --blue: #1e66f5; --peach: #fe640b; --green: #40a02b; --red: #d20f39; --yellow: #df8e1d; --teal: #179299; --pink: #ea76cb;
+  --blue-soft: #1e66f51a; --peach-soft: #fe640b1f; --green-soft: #40a02b1f; --red-soft: #d20f391a; --teal-soft: #1792991f;
+  color-scheme: light;
+}
+/* The T3 / shadcn token names the interactive runtime reads, mapped onto the house tokens so they follow the theme. */
+:root {
+  --background: var(--ground); --foreground: var(--ink); --muted: var(--surface-2); --muted-foreground: var(--ink-3);
+  --card: var(--surface); --popover: var(--ground); --popover-foreground: var(--ink); --border: var(--line-strong);
+  --primary: var(--accent); --primary-foreground: var(--ground); --ring: var(--accent); --radius: 4px;
+  --chart-1: var(--blue); --chart-2: var(--peach); --chart-3: var(--green); --chart-4: var(--pink); --chart-5: var(--teal); --chart-6: var(--yellow);
+  --font-sans: var(--font-display);
+  --success: var(--good); --warning: var(--peach); --destructive: var(--bad);
+}
+
+/* Layout */
+* { box-sizing: border-box; }
+html { font-size: 17px; }
+body { margin: 0; color: var(--ink); font: 400 0.9rem/1.6 var(--font-text); background: var(--ground); }
+.page { max-width: 1520px; margin: 0 auto; padding: 32px 40px 64px; display: grid; gap: 48px;
+        grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { .page { grid-template-columns: 200px minmax(0, 1120px); column-gap: 72px; justify-content: center; } }
+nav.toc { position: sticky; top: 24px; align-self: start; max-height: calc(100dvh - 48px); overflow: auto; }
+nav.toc::before { content: "Index"; display: block; font: 500 11px/1 var(--font-mono); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+nav.toc li { display: flex; gap: 10px; align-items: baseline; font: 400 0.85rem/1.35 var(--font-display); }
+nav.toc li.h3 { padding-left: 24px; font-size: 0.8rem; }
+nav.toc li .n { font: 400 12px/1 var(--font-mono); color: var(--accent); flex: none; }
+nav.toc a { color: var(--ink-3); text-decoration: none; border-bottom: 1px solid transparent;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+nav.toc a.active { color: var(--ink); border-bottom-color: var(--accent); }
+@media (max-width: 999px) {
+  nav.toc { top: 0; max-height: none; background: var(--ground); z-index: 2; padding: 8px 0; }
+  nav.toc::before { display: none; }
+  nav.toc ol { flex-direction: row; gap: 16px; overflow-x: auto; }
+  nav.toc li.h3 { display: none; }
+  nav.toc a { white-space: nowrap; display: block; }
+}
+main { min-width: 0; counter-reset: sec fig tbl; display: flex; flex-direction: column; gap: 22px; }
+main > * { margin: 0; }
+/* Running text only. 860px is ~93 characters of iA Writer Duo at 0.9rem, from the advance widths the face
+   actually carries over sample prose; Duo runs 1.2% wider than the IBM Plex Mono it is derived from.
+   Figures, tables, tiles and headings stay full width -- they are looked at, not read line by line. */
+main > p:not(.meta), main > ul, main > ol, main > .callout, main > .timeline, main > .not-doing { max-width: var(--measure); }
+
+/* Type */
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: 2.35rem; font-weight: 600; line-height: 1.1; }
+h2 { font-size: 1.5rem; font-weight: 600; line-height: 1.2; margin-top: 30px;
+  display: flex; gap: 12px; align-items: baseline; }
+h2::before { counter-increment: sec; content: counter(sec, decimal-leading-zero);
+  font: 400 12px/1 var(--font-mono); color: var(--accent); flex: none; }
+h3 { font-size: 1.1rem; font-weight: 600; line-height: 1.25; margin-top: 12px; }
+h2, h3 { scroll-margin-top: 72px; }
+p { margin: 0; }
+p.lead { font-size: 1.12em; line-height: 1.5; color: var(--ink-2); }
+.meta { font: 400 12px/1.5 var(--font-mono); color: var(--ink-3); letter-spacing: 0.04em; }
+a { color: var(--accent-ink); }
+ul, ol { padding-left: 1.2rem; margin: 0; } li { margin: 4px 0; }
+code, pre, .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+td.num, th.num { font-variant-numeric: tabular-nums; }
+code { font-size: 0.78em; background: var(--surface-2); padding: 1px 5px; }
+pre { background: var(--surface); border: 1px solid var(--line); padding: 12px 16px; overflow-x: auto; font-size: 0.86rem; line-height: 1.55; }
+pre code { background: none; padding: 0; }
+/* highlight.js tokens, mapped onto the page tokens so they follow the theme. No CDN theme sheet:
+   the artifact CSP allows no external style-src, and these colours are the Catppuccin mapping anyway. */
+.hljs-comment, .hljs-quote { color: var(--ink-3); font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-doctag { color: var(--accent); }
+.hljs-string, .hljs-addition { color: var(--green); }
+.hljs-number, .hljs-symbol, .hljs-bullet { color: var(--peach); }
+.hljs-title, .hljs-title.function_, .hljs-section, .hljs-name { color: var(--blue); }
+.hljs-type, .hljs-title.class_, .hljs-attribute, .hljs-selector-attr { color: var(--yellow); }
+.hljs-built_in, .hljs-deletion { color: var(--red); }
+.hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-selector-class { color: var(--teal); }
+.hljs-meta, .hljs-regexp, .hljs-link { color: var(--pink); }
+.hljs-operator, .hljs-punctuation { color: var(--ink-2); }
+.hljs-emphasis { font-style: italic; } .hljs-strong { font-weight: 600; }
+strong { font-weight: 600; }
+
+/* Figures: framed, stamped, numbered by CSS counters. Captions go below figures and above tables. */
+figure { margin: 0; padding: 18px 20px 14px; border: 1px solid var(--line-strong); background: var(--surface);
+  display: flex; flex-direction: column; gap: 12px; counter-increment: fig; }
+figure::before { content: "Fig. " counter(fig); font: 400 11px/1 var(--font-mono); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent); }
+figcaption { font-size: 0.84rem; line-height: 1.45; color: var(--ink-2); }
+figcaption::before { content: "Figure " counter(fig) ". "; font-weight: 600; color: var(--accent); }
+figcaption b, figcaption strong { font-weight: 500; font-style: italic; color: var(--ink); }
+figure svg { max-width: 100%; height: auto; display: block; color: var(--ink); }
+figure.table { counter-increment: tbl; gap: 10px; }
+figure.table::before { content: "Table " counter(tbl); order: -2; }
+figure.table figcaption { order: -1; }
+figure.table figcaption::before { content: "Table " counter(tbl) ". "; }
+figure.table .fn { font-size: 0.74rem; color: var(--ink-3); line-height: 1.4; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+thead tr { border-bottom: 1px solid var(--line-strong); }
+th { text-align: left; padding: 6px 8px; font-weight: 400; font-style: italic; color: var(--ink-2); font-size: 0.92em; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.num, th.num { text-align: right; }
+.hot { color: var(--accent); }
+.good { color: var(--good); } .bad { color: var(--bad); }
+.tag { display: inline-block; font: 400 11px/1.6 var(--font-mono); letter-spacing: 0.04em; padding: 1px 8px;
+  border: 1px solid currentColor; border-radius: 2px; color: var(--ink-2); }
+.tag.blue { color: var(--blue); background: var(--blue-soft); } .tag.peach { color: var(--peach); background: var(--peach-soft); }
+.tag.green { color: var(--green); background: var(--green-soft); } .tag.red { color: var(--red); background: var(--red-soft); }
+.tag.teal { color: var(--teal); background: var(--teal-soft); } .tag.mauve { color: var(--accent); background: var(--accent-soft); }
+
+/* Components */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; }
+.tile { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid var(--tint-line); padding-bottom: 6px; }
+.tile .n { font: 500 1.9rem/1 var(--font-display); letter-spacing: -0.01em; }
+.tile .k { font: 400 11px/1.3 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.callout { display: block; padding: 12px 16px; background: var(--tint);
+  border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent); }
+.callout::before { content: "Note"; display: inline-block; margin-right: 14px; font: 400 11px/1.6 var(--font-mono);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); vertical-align: baseline; }
+.callout[data-label]::before { content: attr(data-label); }
+.callout.good, .callout.bad { color: var(--ink); }
+.callout.good { background: var(--green-soft); border-color: var(--green); } .callout.good::before { color: var(--green); }
+.callout.warn { background: var(--peach-soft); border-color: var(--peach); } .callout.warn::before { color: var(--peach); }
+.callout.bad { background: var(--red-soft); border-color: var(--red); } .callout.bad::before { color: var(--red); }
+.timeline { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; }
+.timeline .when { font: 400 12px/1.7 var(--font-mono); color: var(--accent-ink); }
+.not-doing { border: 1px dashed var(--line-strong); padding: 10px 14px 10px 32px; }
+pre.mermaid { background: none; border: 0; padding: 0; overflow-x: auto; font-size: 1rem; }
+.mermaid svg { max-width: 100%; height: auto; }
+.diagram { overflow-x: auto; }
+.diagram svg { display: block; margin: 0 auto; }
+.diagram:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { display: inline-flex; gap: 6px; align-items: center; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.status.good { color: var(--green); } .status.warn { color: var(--yellow); } .status.bad { color: var(--red); }
+button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11px/1 var(--font-mono); letter-spacing: 0.1em;
+  text-transform: uppercase; background: var(--surface); color: var(--ink-2); border: 1px solid var(--line-strong); padding: 6px 10px; cursor: pointer; }
+.vega-embed summary { background: var(--surface) !important; border: 1px solid var(--line-strong) !important;
+  box-shadow: none !important; color: var(--ink-2); opacity: 0; transition: opacity 0.15s; }
+.vega-embed:hover summary, .vega-embed[open] summary { opacity: 0.8; }
+.vega-embed .vega-actions { background: var(--surface) !important; border: 1px solid var(--line-strong) !important; box-shadow: none !important; }
+.vega-embed .vega-actions a { color: var(--ink) !important; font-family: var(--font-mono) !important; font-size: 12px !important; }
+#vg-tooltip-element { background: var(--surface) !important; color: var(--ink) !important; border: 1px solid var(--line-strong) !important;
+  box-shadow: none !important; font-family: var(--font-mono) !important; font-size: 12px !important; }
+#vg-tooltip-element td.key { color: var(--ink-3) !important; }
+@media print {
+  :root { --ground: #ffffff; --surface: #ffffff; --surface-2: #e6e9ef; --line: #ccd0da; --line-strong: #6c6f85;
+    --ink: #4c4f69; --ink-2: #5c5f77; --ink-3: #6c6f85; --accent: #8839ef; --accent-ink: #8839ef; --accent-soft: #8839ef1a;
+    --chart-cat: #1e66f5 #fe640b #40a02b #df8e1d #ea76cb #179299 #8839ef #d20f39; color-scheme: light;
+    --blue: #1e66f5; --peach: #fe640b; --green: #40a02b; --red: #d20f39; --yellow: #df8e1d; --teal: #179299; --pink: #ea76cb;
+    --good: #40a02b; --warn: #df8e1d; --bad: #d20f39; }
+  nav.toc, button.theme { display: none; }
+  .page { grid-template-columns: 1fr; }
+  h2 { break-after: avoid; }
+  figure, .tile, table { break-inside: avoid; }
+  .vega-view text { fill: var(--ink) !important; }
+  .diagram svg { min-width: 0 !important; }
+}
+</style>
+<style id="viz-css">
+/* Interactive figures. Reads T3/shadcn token names: a host (T3 html_render) or the page supplies them; the
+   :where() fallbacks (specificity 0) apply only in a bare standalone file, following the OS theme. */
+:where(:root) {
+  color-scheme: light dark;
+  --background: light-dark(#eff1f5, #1e1e2e); --foreground: light-dark(#4c4f69, #cdd6f4);
+  --muted: light-dark(#ccd0da, #313244); --muted-foreground: light-dark(#5c5f77, #a6adc8);
+  --card: light-dark(#e6e9ef, #181825); --popover: light-dark(#e6e9ef, #181825); --popover-foreground: light-dark(#4c4f69, #cdd6f4);
+  --border: light-dark(#9ca0b0, #585b70); --primary: light-dark(#8839ef, #cba6f7); --primary-foreground: light-dark(#eff1f5, #1e1e2e);
+  --ring: light-dark(#8839ef, #cba6f7); --radius: 6px;
+  --chart-1: light-dark(#1e66f5, #89b4fa); --chart-2: light-dark(#fe640b, #fab387); --chart-3: light-dark(#40a02b, #a6e3a1);
+  --chart-4: light-dark(#ea76cb, #f5c2e7); --chart-5: light-dark(#179299, #94e2d5); --chart-6: light-dark(#df8e1d, #f9e2af);
+  --success: light-dark(#40a02b, #a6e3a1); --warning: light-dark(#fe640b, #fab387); --destructive: light-dark(#d20f39, #f38ba8);
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.viz { display: flex; flex-direction: column; gap: 14px; min-width: 0; color: var(--foreground); font: 400 14px/1.45 var(--font-sans);
+  --viz-grid: color-mix(in srgb, var(--border) 45%, transparent); }
+.viz-controls { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: flex-end; }
+.viz-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; max-width: 320px; font-size: 13px; color: var(--muted-foreground); }
+.viz-field > span { display: flex; justify-content: space-between; gap: 8px; }
+.viz-field output { color: var(--foreground); font-variant-numeric: tabular-nums; }
+.viz input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; cursor: pointer; }
+.viz input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+  background: linear-gradient(var(--primary), var(--primary)) 0 / var(--fill, 50%) 100% no-repeat, var(--muted); }
+.viz input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--background); box-shadow: 0 0 0 1px var(--primary); transition: transform .12s; }
+.viz input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+.viz input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--muted); }
+.viz input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--primary); }
+.viz input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--background); }
+.viz :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.viz select { font: inherit; color: var(--foreground); background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; }
+.viz-seg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 2px; border-radius: calc(var(--radius) + 2px); background: var(--muted); }
+.viz-seg button { font: inherit; font-size: 13px; border: 0; border-radius: var(--radius); padding: 4px 12px; cursor: pointer;
+  background: transparent; color: var(--muted-foreground); transition: background .15s, color .15s; }
+.viz-seg button[aria-pressed="true"] { background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .15); }
+.viz-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 24px; }
+.viz-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.viz-stat .k { font-size: 12px; color: var(--muted-foreground); }
+.viz-stat .v { font-size: 22px; font-weight: 500; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.viz-stat .d { font-size: 12px; color: var(--muted-foreground); }
+.viz-chart { position: relative; min-width: 0; }
+.viz-chart svg { display: block; width: 100%; overflow: visible; touch-action: pan-y; }
+.viz-chart svg:focus-visible { outline-offset: 4px; }
+.viz-chart .grid line { stroke: var(--viz-grid); }
+.viz-chart .axis text, .viz-chart .axis-title, .viz-chart .ref text { fill: var(--muted-foreground); font: 12px var(--font-sans); font-variant-numeric: tabular-nums; }
+.viz-chart .axis .domain, .viz-chart .axis line { stroke: var(--border); }
+.viz-chart .axis.y .domain { display: none; }
+.viz-chart .ref line { stroke: var(--muted-foreground); stroke-dasharray: 2 4; }
+.viz-chart .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.viz-chart .guide { stroke: var(--muted-foreground); stroke-width: 1; }
+.viz-chart .dots circle { stroke: var(--card); stroke-width: 2; }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-bottom: 6px; font-size: 13px; }
+.viz-legend button, .viz-legend span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: none; font: inherit; color: var(--foreground); cursor: pointer; }
+.viz-legend button::before, .viz-legend span::before { content: ""; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.viz-legend button.dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px); }
+.viz-legend button[aria-pressed="false"] { color: var(--muted-foreground); text-decoration: line-through; }
+.viz-legend button[aria-pressed="false"]::before { opacity: .3; }
+.viz-tip { position: absolute; z-index: 5; pointer-events: none; opacity: 0; transition: opacity .12s; white-space: nowrap;
+  background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 7px 10px; font: 12px/1.45 var(--font-sans); font-variant-numeric: tabular-nums; box-shadow: 0 6px 20px rgb(0 0 0 / .18); }
+.viz-tip[data-show] { opacity: 1; }
+.viz-tip.float { white-space: normal; max-width: 260px; }
+.viz-tip .h { color: var(--muted-foreground); margin-bottom: 3px; }
+.viz-tip .r { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; }
+.viz-tip .r i { height: 3px; border-radius: 2px; background: var(--c); }
+.viz-tip .r b { font-weight: 500; text-align: right; }
+.viz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.viz-error { color: var(--muted-foreground); font-size: 13px; padding: 24px 0; }
+:where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes), :where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes) * { box-sizing: border-box; }
+/* Summary components: tile deltas and sparklines, status ledger, evidence, decision form, diff, stepper, lanes. */
+.tile .d { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+svg.spark { display: block; width: 100%; height: 24px; overflow: visible; }
+svg.spark path { fill: none; stroke: var(--chart-1); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.ledger { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+/* The label is positioned, not a grid cell: a grid would make every text run and inline element its own cell. */
+.ledger li { position: relative; padding-left: 100px; margin: 0; }
+.ledger li::before { content: attr(data-status); position: absolute; left: 0; top: .2em; width: 88px; text-align: center; border-radius: 3px; padding: 0 6px;
+  font: 500 11px/1.7 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--foreground); background: color-mix(in srgb, var(--s, var(--muted-foreground)) 22%, transparent); box-shadow: inset 3px 0 0 var(--s, var(--muted-foreground)); }
+@media (max-width: 520px) { .ledger li { padding: 22px 0 0; } .ledger li::before { top: 0; } }
+.ledger [data-status="done"], .ledger-sum .done { --s: var(--success); }
+.ledger [data-status="changed"], .ledger-sum .changed { --s: var(--warning); }
+.ledger [data-status="dropped"], .ledger-sum .dropped { --s: var(--destructive); }
+.ledger [data-status="deferred"], .ledger-sum .deferred { --s: var(--muted-foreground); }
+.ledger-sum { display: flex; flex-direction: column; gap: 6px; font: 12px var(--font-sans); color: var(--muted-foreground); }
+.ledger-sum .bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.ledger-sum .bar i { background: var(--s); }
+details.evidence { border: 1px solid var(--border); border-radius: var(--radius); }
+details.evidence > summary { cursor: pointer; list-style: none; display: flex; gap: 12px; justify-content: space-between; align-items: baseline; padding: 8px 12px; }
+details.evidence > summary::-webkit-details-marker { display: none; }
+details.evidence > summary::before { content: "\25B8"; color: var(--muted-foreground); transition: transform .15s; }
+details.evidence[open] > summary::before { transform: rotate(90deg); }
+details.evidence > summary > :first-child { flex: 1; }
+details.evidence > summary span { font: 12px var(--font-sans); color: var(--muted-foreground); }
+details.evidence > :not(summary) { margin: 0 12px 12px; }
+form.decide { display: flex; flex-direction: column; gap: 14px; }
+form.decide fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+form.decide legend { padding: 0; margin-bottom: 6px; font-weight: 500; }
+form.decide label { position: relative; border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; cursor: pointer; font: 13px var(--font-sans); }
+form.decide label input { position: absolute; opacity: 0; pointer-events: none; }
+form.decide label:has(input:checked) { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+form.decide label:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
+form.decide label:has(input[data-rec])::after { content: " \00B7 recommended"; opacity: .75; font-size: 11px; }
+form.decide textarea { width: 100%; font: 13px var(--font-sans); color: var(--foreground); background: transparent; border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; }
+.decide-out { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.decide-out code { flex: 1 1 260px; font: 12px var(--font-mono); background: var(--muted); padding: 4px 8px; border-radius: 4px; white-space: pre-wrap; }
+.decide-out button, .step-nav button { font: 13px var(--font-sans); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px 12px; cursor: pointer; background: transparent; color: var(--foreground); }
+.decide-out button { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+.step-nav button[aria-pressed="true"] { background: var(--muted); }
+figure.diff { gap: 10px; }
+.diff-sum, .diff-file > summary { font: 12px var(--font-sans); color: var(--muted-foreground); }
+.diff-file { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.diff-file > summary { cursor: pointer; padding: 6px 10px; background: color-mix(in srgb, var(--muted) 50%, transparent); display: flex; justify-content: space-between; gap: 12px; }
+.diff-file > summary code { color: var(--foreground); background: none; padding: 0; font-size: 12px; }
+/* Status hues mixed toward the text colour, so small coloured text keeps 4.5:1 in both themes. */
+.diff .add, .tile .d.good { color: color-mix(in srgb, var(--success) 40%, var(--foreground)); }
+.diff .del, .tile .d.bad { color: color-mix(in srgb, var(--destructive) 40%, var(--foreground)); }
+.diff-lines { overflow-x: auto; font: 12px/1.6 var(--font-mono); }
+.diff-lines > div { display: grid; grid-template-columns: 3.2em 3.2em max-content; white-space: pre; min-width: 100%; width: max-content; }
+.diff-lines > div > span { color: var(--muted-foreground); text-align: right; padding-right: 8px; user-select: none; }
+.diff-lines code { background: none; padding: 0; font: inherit; color: inherit; }
+.diff-lines .h { display: block; color: var(--muted-foreground); background: color-mix(in srgb, var(--muted) 50%, transparent); padding: 0 8px; }
+.diff-lines .a { background: color-mix(in srgb, var(--success) 14%, transparent); }
+.diff-lines .r { background: color-mix(in srgb, var(--destructive) 14%, transparent); }
+.diff-lines .gap { display: block; color: var(--muted-foreground); padding: 0 8px; font-style: italic; }
+.diff-lines b.pin { display: inline-block; min-width: 1.5em; margin-left: 10px; text-align: center; border-radius: 999px; font: 500 11px/1.5 var(--font-sans); background: var(--primary); color: var(--primary-foreground); }
+.diff-notes { margin: 0; padding: 8px 12px 8px 32px; font: 13px/1.45 var(--font-sans); border-top: 1px solid var(--border); }
+.stepper .dim { opacity: .25; transition: opacity .2s; }
+.stepper svg text { font-family: var(--font-sans); }
+.stepper [data-step] { transition: opacity .2s; }
+.step-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font: 13px var(--font-sans); color: var(--muted-foreground); }
+.step-captions { margin: 0; }
+.step-captions li.off { display: none; }
+.lanes { display: grid; grid-template-columns: minmax(64px, max-content) minmax(0, 1fr); gap: 6px 10px; align-items: center; font: 12px var(--font-sans); }
+.lanes .track { position: relative; height: 20px; border-radius: 3px; background: color-mix(in srgb, var(--muted) 45%, transparent); }
+.lanes .track i { position: absolute; top: 0; bottom: 0; min-width: 2px; border-radius: 3px; font-style: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  padding: 0 6px; line-height: 20px; color: var(--foreground); background: color-mix(in srgb, var(--c) 20%, transparent); box-shadow: inset 3px 0 0 var(--c); }
+.lanes .track i.wait { color: transparent; background: repeating-linear-gradient(45deg, var(--border) 0 3px, transparent 3px 7px); }
+.lanes .ticks { grid-column: 2; position: relative; height: 16px; color: var(--muted-foreground); }
+.lanes .ticks span { position: absolute; white-space: nowrap; }
+.lanes:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+@media print {
+  .stepper .dim { opacity: 1; } .step-captions li.off { display: list-item; } .step-nav, .decide-out button { display: none; }
+  .diff-file, .diff-lines { overflow: visible; }
+  .diff-lines > div { width: auto; grid-template-columns: 3.2em 3.2em minmax(0, 1fr); }
+  .diff-lines code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+@media (pointer: coarse) {
+  .viz input[type="range"] { height: 44px; }
+  .viz-seg button, .viz-legend button, .decide-out button, .step-nav button { min-height: 44px; }
+  form.decide label { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .viz *, .viz-tip { transition: none !important; } }
+@media print { :where(:root) { color-scheme: light; } }
+</style>
+<script id="viz-js">
+(function () {
+  'use strict';
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  var d3Loaded, clipSeq = 0;
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function domReady() {
+    return document.readyState === 'loading'
+      ? new Promise(function (r) { document.addEventListener('DOMContentLoaded', r, { once: true }); })
+      : Promise.resolve();
+  }
+  function fail(scope, message) {
+    scope = scope || document;
+    var roots = scope.matches && scope.matches('.viz') ? [scope] : scope.querySelectorAll('.viz');
+    Array.prototype.forEach.call(roots, function (root) {
+      if (root.querySelector('svg, .viz-error')) return;
+      var p = document.createElement('p'); p.className = 'viz-error'; p.textContent = message; root.appendChild(p);
+    });
+  }
+  // Runs fn(d3) once the DOM and D3 are ready. A failure leaves a visible message in the figure, so a
+  // screenshot shows it; ready() runs inside the figure's own <script>, so currentScript names that figure.
+  function ready(fn) {
+    var root = document.currentScript && document.currentScript.closest('.viz');
+    if (!d3Loaded) d3Loaded = window.d3 ? Promise.resolve() : loadScript('https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js');
+    return Promise.all([domReady(), d3Loaded]).then(function () {
+      try { return fn(window.d3); } catch (err) { fail(root || document, 'This figure failed to draw: ' + err.message); throw err; }
+    }, function (err) {
+      fail(document, 'This chart loads D3 from cdn.jsdelivr.net, which did not respond.');
+      throw err;
+    });
+  }
+
+  function normalise(spec) {
+    var xs = spec.x && spec.x.values;
+    if (!Array.isArray(xs) || xs.length < 2) throw new Error('viz.lineChart: x.values needs at least two numbers');
+    xs.forEach(function (v, i) {
+      if (!Number.isFinite(v) || (i && v <= xs[i - 1])) throw new Error('viz.lineChart: x.values must be finite and strictly increasing (index ' + i + ')');
+    });
+    if (spec.x.scale === 'log' && xs[0] <= 0) throw new Error('viz.lineChart: a log x scale needs positive x.values');
+    var series = (spec.series || []).map(function (s, i) {
+      if (!s.values || s.values.length !== xs.length) throw new Error('viz.lineChart: series "' + s.name + '" needs ' + xs.length + ' values');
+      if (!s.values.every(Number.isFinite)) throw new Error('viz.lineChart: series "' + s.name + '" has a non-finite value');
+      return Object.assign({ color: 'var(--chart-' + (i % 6 + 1) + ')' }, s);
+    });
+    return Object.assign({ height: 300, label: '', refs: [] }, spec, { y: spec.y || {}, series: series });
+  }
+
+  // Multi-series line chart on a shared x grid: responsive, cross-series hover readout, legend toggles,
+  // animated updates, touch pinning and keyboard stepping. Returns { update(partialSpec) }.
+  function lineChart(el, spec) {
+    if (typeof el === 'string') el = document.getElementById(el);
+    var d3 = window.d3, raw = spec, cur = normalise(spec), hidden = new Set();
+    var M = { t: 10, r: 18, b: 46, l: 64 }, W = 0, x, y, at = null, pinned = false;
+    el.classList.add('viz-chart');
+    var host = d3.select(el);
+    var legend = host.append('div').attr('class', 'viz-legend');
+    var svg = host.append('svg').attr('tabindex', 0).attr('role', 'img');
+    var gGrid = svg.append('g').attr('class', 'grid'), gRef = svg.append('g').attr('class', 'ref');
+    var gX = svg.append('g').attr('class', 'axis x'), gY = svg.append('g').attr('class', 'axis y');
+    var xTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'x').attr('text-anchor', 'middle');
+    var yTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'y').attr('text-anchor', 'middle');
+    var clipId = 'viz-clip-' + (++clipSeq), clip = svg.append('clipPath').attr('id', clipId).append('rect');
+    var gLines = svg.append('g').attr('clip-path', 'url(#' + clipId + ')');
+    var guide = svg.append('line').attr('class', 'guide').attr('visibility', 'hidden');
+    var gDots = svg.append('g').attr('class', 'dots').attr('visibility', 'hidden').attr('clip-path', 'url(#' + clipId + ')');
+    var tip = host.append('div').attr('class', 'viz-tip').attr('aria-hidden', 'true');
+    var live = host.append('p').attr('class', 'viz-sr').attr('aria-live', 'polite');
+
+    function buildLegend() {
+      legend.style('display', cur.series.length > 1 ? null : 'none')
+        .selectAll('button').data(cur.series, function (s) { return s.name; })
+        .join(function (enter) {
+          return enter.append('button').attr('type', 'button').on('click', function (ev, s) {
+            if (hidden.has(s.name)) hidden.delete(s.name); else hidden.add(s.name);
+            buildLegend(); draw(true);
+          });
+        })
+        .attr('aria-pressed', function (s) { return !hidden.has(s.name); })
+        .classed('dash', function (s) { return !!s.dash; })
+        .style('--c', function (s) { return s.color; })
+        .text(function (s) { return s.name; });
+    }
+
+    function draw(animate) {
+      W = el.clientWidth;
+      if (!W) { lastW = 0; return; }  // hidden: let the observer redraw at any width once shown
+      var H = cur.height, narrow = W < 480, xs = cur.x.values;
+      x = (cur.x.scale === 'log' ? d3.scaleLog().base(cur.x.base || 10) : d3.scaleLinear())
+        .domain([xs[0], xs[xs.length - 1]]).range([M.l, W - M.r]);
+      var vis = cur.series.filter(function (s) { return !hidden.has(s.name); });
+      var ext = d3.extent([].concat.apply([], vis.map(function (s) { return s.values; })));
+      var lo = ext[0] === undefined ? 0 : ext[0], hi = ext[0] === undefined ? 1 : ext[1];
+      var span = hi - lo || Math.abs(hi) || 1;
+      var y0 = cur.y.min != null ? cur.y.min : cur.y.zero ? Math.min(0, lo) : lo - span * 0.06;
+      if (cur.y.min == null && lo >= 0) y0 = Math.max(0, y0);
+      var y1 = cur.y.max != null ? cur.y.max : hi + span * 0.06;
+      var ny = narrow ? 4 : 6;
+      y = d3.scaleLinear().domain([y0, y1]).range([H - M.b, M.t]);
+      if (cur.y.min == null || cur.y.max == null) {
+        y.nice(ny);
+        y.domain([cur.y.min != null ? cur.y.min : y.domain()[0], cur.y.max != null ? cur.y.max : y.domain()[1]]);
+      }
+      var nx = narrow ? 4 : Math.max(2, Math.min(8, Math.floor((W - M.l - M.r) / 80)));
+      var tx = x.ticks(nx);
+      if (cur.x.scale === 'log') tx = tx.filter(function (t) { var e = Math.log(t) / Math.log(cur.x.base || 10); return Math.abs(e - Math.round(e)) < 1e-9; });
+      if (tx.length > nx) { var k = Math.ceil(tx.length / nx); tx = tx.filter(function (_, i) { return i % k === 0; }); }
+      var fx = cur.x.format || d3.format('~g'), fy = cur.y.format || d3.format('~g');
+      // Static draws set attributes at once: transitions wait for animation frames, which hidden tabs and headless capture never run.
+      var t = animate && !reduced.matches ? svg.transition().duration(450).ease(d3.easeCubicOut) : null;
+      function T(sel) {
+        if (t) return sel.transition(t);
+        sel.interrupt().selectAll('*').interrupt();  // axes animate their ticks, not the group
+        return sel;
+      }
+
+      svg.attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', W).attr('height', H).attr('aria-label', cur.label);
+      clip.attr('x', M.l - 6).attr('y', M.t - 6).attr('width', W - M.l - M.r + 12).attr('height', H - M.t - M.b + 12);
+      T(gX.attr('transform', 'translate(0,' + (H - M.b) + ')'))
+        .call(d3.axisBottom(x).tickValues(tx).tickFormat(fx).tickSizeOuter(0).tickSize(4).tickPadding(6));
+      gX.selectAll('.tick text').attr('text-anchor', function (d) { return x(d) > W - M.r - 16 ? 'end' : 'middle'; });
+      T(gY.attr('transform', 'translate(' + M.l + ',0)'))
+        .call(d3.axisLeft(y).ticks(ny).tickFormat(fy).tickSize(0).tickPadding(8));
+      T(gGrid.selectAll('line').data(y.ticks(ny)).join('line').attr('x1', M.l).attr('x2', W - M.r))
+        .attr('y1', function (d) { return y(d); }).attr('y2', function (d) { return y(d); });
+      xTitle.attr('x', (M.l + W - M.r) / 2).attr('y', H - 6).text(cur.x.label || '');
+      yTitle.attr('transform', 'translate(14,' + (M.t + H - M.b) / 2 + ') rotate(-90)').text(cur.y.label || '');
+
+      var line = d3.line().x(function (_, i) { return x(xs[i]); }).y(function (v) { return y(v); });
+      T(gLines.selectAll('path').data(cur.series, function (s) { return s.name; }).join('path')
+        .attr('class', 'line').style('stroke', function (s) { return s.color; })
+        .attr('stroke-dasharray', function (s) { return s.dash ? '5 4' : null; }))
+        .attr('d', function (s) { return line(s.values); })
+        .style('opacity', function (s) { return hidden.has(s.name) ? 0 : 1; });
+
+      var yd = y.domain(), xd = x.domain();
+      var refs = cur.refs.filter(function (r) { return r.y != null ? r.y >= yd[0] && r.y <= yd[1] : r.x >= xd[0] && r.x <= xd[1]; });
+      gRef.selectAll('g').data(refs, function (r) { return r.label; })
+        .join(function (enter) { var g = enter.append('g'); g.append('line'); g.append('text'); return g; })
+        .each(function (r) {
+          var g = d3.select(this), horiz = r.y != null;
+          T(g.select('line'))
+            .attr('x1', horiz ? M.l : x(r.x)).attr('x2', horiz ? W - M.r : x(r.x))
+            .attr('y1', horiz ? y(r.y) : M.t).attr('y2', horiz ? y(r.y) : H - M.b);
+          T(g.select('text').text(r.label).attr('text-anchor', 'start'))
+            .attr('x', horiz ? M.l + 6 : x(r.x) + 4).attr('y', horiz ? y(r.y) - 5 : M.t + 10);
+        });
+
+      if (pinned && at != null) inspect(at); else hide();
+    }
+
+    function inspect(xv, py, announce) {
+      var xs = cur.x.values, H = cur.height;
+      xv = Math.max(xs[0], Math.min(xs[xs.length - 1], xv));
+      var j = Math.max(1, Math.min(xs.length - 1, d3.bisectLeft(xs, xv)));
+      if (cur.x.snap) xv = x(xv) - x(xs[j - 1]) < x(xs[j]) - x(xv) ? xs[j - 1] : xs[j];
+      var f = (x(xv) - x(xs[j - 1])) / (x(xs[j]) - x(xs[j - 1]));
+      var rows = cur.series.filter(function (s) { return !hidden.has(s.name); }).map(function (s) {
+        return { s: s, v: s.values[j - 1] + (s.values[j] - s.values[j - 1]) * f };
+      }).sort(function (a, b) { return b.v - a.v; });
+      at = xv;
+      var px = x(xv), fx = cur.x.format || d3.format('~g'), fy = cur.tipFormat || cur.y.format || d3.format('~g');
+      guide.attr('visibility', 'visible').attr('x1', px).attr('x2', px).attr('y1', M.t).attr('y2', H - M.b);
+      gDots.attr('visibility', 'visible').selectAll('circle').data(rows, function (r) { return r.s.name; }).join('circle')
+        .attr('r', 4).attr('cx', px).attr('cy', function (r) { return y(r.v); }).style('fill', function (r) { return r.s.color; });
+      var node = tip.node(); node.textContent = '';
+      var head = document.createElement('div'); head.className = 'h'; head.textContent = (cur.x.label ? cur.x.label + ': ' : '') + fx(xv);
+      node.appendChild(head);
+      rows.forEach(function (r) {
+        var row = document.createElement('div'); row.className = 'r'; row.style.setProperty('--c', r.s.color);
+        var sw = document.createElement('i'), name = document.createElement('span'), val = document.createElement('b');
+        name.textContent = r.s.name; val.textContent = fy(r.v);
+        row.append(sw, name, val); node.appendChild(row);
+      });
+      var tw = node.offsetWidth, th = node.offsetHeight, left = px + 14;
+      if (left + tw > W) left = Math.max(0, px - 14 - tw);
+      var top = Math.max(0, Math.min(H - th, (py == null ? M.t + 20 : py) - th / 2));
+      var oy = svg.node().getBoundingClientRect().top - el.getBoundingClientRect().top;
+      node.style.left = left + 'px'; node.style.top = top + oy + 'px';
+      node.setAttribute('data-show', '');
+      if (announce) live.text(head.textContent + '. ' + rows.map(function (r) { return r.s.name + ' ' + fy(r.v); }).join(', '));
+    }
+    function hide() {
+      guide.attr('visibility', 'hidden'); gDots.attr('visibility', 'hidden'); tip.attr('data-show', null);
+    }
+    function pointerX(ev) { var p = d3.pointer(ev); return [Math.max(M.l, Math.min(W - M.r, p[0])), p[1]]; }
+
+    svg.on('pointermove', function (ev) { var p = pointerX(ev); inspect(x.invert(p[0]), p[1]); })
+      .on('pointerleave', function () { if (!pinned) hide(); })
+      .on('pointerdown', function (ev) { if (ev.pointerType !== 'mouse') { pinned = true; var p = pointerX(ev); inspect(x.invert(p[0]), p[1]); } })
+      .on('focus', function () { inspect(at == null ? cur.x.values[cur.x.values.length - 1] : at, null, true); })
+      .on('blur', function () { if (!pinned) hide(); })
+      .on('keydown', function (ev) {
+        var xs = cur.x.values, step = Math.max(1, Math.round(xs.length / 40));
+        var j = at == null ? xs.length - 1 : Math.min(xs.length - 1, d3.bisectLeft(xs, at));
+        if (ev.key === 'ArrowRight') j = Math.min(xs.length - 1, j + step);
+        else if (ev.key === 'ArrowLeft') j = Math.max(0, j - step);
+        else if (ev.key === 'Home') j = 0;
+        else if (ev.key === 'End') j = xs.length - 1;
+        else if (ev.key === 'Escape') { pinned = false; hide(); return; }
+        else return;
+        ev.preventDefault(); inspect(xs[j], null, true);
+      });
+    document.addEventListener('pointerdown', function (ev) { if (!el.contains(ev.target)) { pinned = false; hide(); } });
+
+    var lastW = 0;
+    new ResizeObserver(function () { var w = el.clientWidth; if (w && w !== lastW) { lastW = w; draw(false); } }).observe(el);
+    buildLegend(); draw(false); lastW = W;
+    return {
+      update: function (next) { raw = Object.assign({}, raw, next); cur = normalise(raw); buildLegend(); draw(true); }
+    };
+  }
+
+  // [data-tooltip] on any element: hover, focus or tap shows it, Escape hides it.
+  var floatTip;
+  function showTip(target) {
+    if (!floatTip) { floatTip = document.createElement('div'); floatTip.className = 'viz-tip float'; floatTip.setAttribute('role', 'tooltip'); document.body.appendChild(floatTip); }
+    floatTip.textContent = target.getAttribute('data-tooltip');
+    floatTip.setAttribute('data-show', '');
+    var r = target.getBoundingClientRect(), w = floatTip.offsetWidth, h = floatTip.offsetHeight;
+    var left = Math.max(4, Math.min(r.left + r.width / 2 - w / 2, document.documentElement.clientWidth - w - 4));
+    var top = r.top - h - 8 < 0 ? r.bottom + 8 : r.top - h - 8;
+    floatTip.style.left = left + scrollX + 'px'; floatTip.style.top = top + scrollY + 'px';
+  }
+  function hideTip() { if (floatTip) floatTip.removeAttribute('data-show'); }
+  function onTarget(ev) {
+    var t = ev.target.closest && ev.target.closest('[data-tooltip]');
+    if (t) showTip(t); else hideTip();
+  }
+  document.addEventListener('pointerover', onTarget);
+  document.addEventListener('focusin', onTarget);
+  document.addEventListener('focusout', hideTip);
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') hideTip(); });
+
+  // A chart <svg tabindex="0"> or a .lanes timeline steps through its [data-tooltip] marks with the arrow keys and announces each,
+  // so a value shown on hover is also reachable by keyboard and screen reader without a tab stop per mark.
+  var announcer;
+  document.addEventListener('keydown', function (ev) {
+    var svg = ev.target.closest && ev.target.closest('svg[tabindex], .lanes');
+    var marks = svg ? svg.querySelectorAll('[data-tooltip]') : [], n = marks.length;
+    if (!n) return;
+    var i = svg.vizMark == null ? -1 : Math.min(svg.vizMark, n - 1);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') i = Math.min(n - 1, i + 1);
+    else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') i = Math.max(0, i - 1);
+    else if (ev.key === 'Home') i = 0;
+    else if (ev.key === 'End') i = n - 1;
+    else return;
+    ev.preventDefault(); svg.vizMark = i; showTip(marks[i]);
+    if (!announcer) { announcer = document.createElement('p'); announcer.className = 'viz-sr'; announcer.setAttribute('aria-live', 'polite'); document.body.appendChild(announcer); }
+    announcer.textContent = marks[i].getAttribute('data-tooltip');
+  });
+
+  // .viz-seg: single-select button group. Toggles aria-pressed, shows the panel named by aria-controls,
+  // and fires a 'change' event with detail.value on the group.
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('.viz-seg button');
+    if (!b || b.getAttribute('aria-pressed') === 'true') return;
+    var group = b.closest('.viz-seg');
+    group.querySelectorAll('button').forEach(function (o) {
+      o.setAttribute('aria-pressed', String(o === b));
+      var panel = o.getAttribute('aria-controls');
+      if (panel) document.getElementById(panel).hidden = o !== b;
+    });
+    group.dispatchEvent(new CustomEvent('change', { detail: { value: b.value } }));
+  });
+
+  // Range inputs paint their filled track from --fill (WebKit has no progress pseudo-element).
+  function fill(r) {
+    var min = r.min === '' ? 0 : +r.min, max = r.max === '' ? 100 : +r.max;
+    r.style.setProperty('--fill', (r.value - min) / (max - min) * 100 + '%');
+  }
+  document.addEventListener('input', function (ev) { if (ev.target.matches && ev.target.matches('.viz input[type="range"]')) fill(ev.target); });
+  domReady().then(function () { document.querySelectorAll('.viz input[type="range"]').forEach(fill); });
+
+  // Summary components. Each enhances plain markup, so the page still reads without scripts and in print.
+  function sparks() {
+    document.querySelectorAll('svg.spark[data-values]').forEach(function (svg) {
+      var v = svg.getAttribute('data-values').trim().split(/[\s,]+/).map(Number).filter(Number.isFinite);
+      if (v.length < 2) return;
+      var lo = Math.min.apply(null, v), span = Math.max.apply(null, v) - lo || 1;
+      var d = v.map(function (y, i) { return (i ? 'L' : 'M') + (i / (v.length - 1) * 100).toFixed(2) + ',' + (22 - (y - lo) / span * 20).toFixed(2); }).join('');
+      svg.setAttribute('viewBox', '0 0 100 24'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('role', 'img');
+      if (!svg.getAttribute('aria-label')) svg.setAttribute('aria-label', 'Trend from ' + v[0] + ' to ' + v[v.length - 1]);
+      svg.innerHTML = '<path d="' + d + '"/>';
+    });
+  }
+
+  function ledgers() {
+    document.querySelectorAll('ul.ledger').forEach(function (ul) {
+      var counts = {}, parts = [], bar = document.createElement('div'), text = document.createElement('span'), sum = document.createElement('div');
+      ul.querySelectorAll(':scope > li[data-status]').forEach(function (li) { counts[li.dataset.status] = (counts[li.dataset.status] || 0) + 1; });
+      ['done', 'changed', 'dropped', 'deferred'].forEach(function (k) {
+        if (!counts[k]) return;
+        var seg = document.createElement('i'); seg.className = k; seg.style.flex = counts[k]; bar.appendChild(seg);
+        parts.push(counts[k] + ' ' + k);
+      });
+      if (!parts.length) return;
+      bar.className = 'bar'; bar.setAttribute('aria-hidden', 'true'); text.textContent = parts.join(' · ');
+      sum.className = 'ledger-sum'; sum.append(bar, text); ul.before(sum);
+    });
+  }
+
+  function decides() {
+    document.querySelectorAll('form.decide').forEach(function (form) {
+      var out = document.createElement('div'), code = document.createElement('code'), btn = document.createElement('button');
+      out.className = 'decide-out'; btn.type = 'button'; btn.textContent = 'Copy as prompt';
+      out.append(code, btn); form.appendChild(out);
+      function compose() {
+        var parts = [].map.call(form.querySelectorAll('fieldset'), function (fs) {
+          var c = fs.querySelector('input:checked'), legend = fs.querySelector('legend');
+          return c && (legend ? legend.textContent.trim() + ' → ' : '') + c.value;
+        }).filter(Boolean);
+        var note = form.querySelector('textarea');
+        if (note && note.value.trim()) parts.push(note.value.trim());
+        code.textContent = (form.dataset.prompt ? form.dataset.prompt + ': ' : '') + parts.join('; ');
+      }
+      function select() { var r = document.createRange(); r.selectNodeContents(code); getSelection().removeAllRanges(); getSelection().addRange(r); }
+      function said(ok) { btn.textContent = ok ? 'Copied' : 'Press ⌘C to copy'; setTimeout(function () { btn.textContent = 'Copy as prompt'; }, 1800); }
+      form.addEventListener('input', compose);
+      form.addEventListener('submit', function (ev) { ev.preventDefault(); });
+      // The clipboard API is refused inside some sandboxed frames; selecting the text keeps a manual copy possible.
+      btn.addEventListener('click', function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(code.textContent).then(function () { said(true); }, function () { select(); said(false); });
+        else { select(); said(false); }
+      });
+      compose();
+    });
+  }
+
+  function steppers() {
+    document.querySelectorAll('figure.stepper').forEach(function (fig) {
+      var parts = fig.querySelectorAll('[data-step]'), list = fig.querySelector('.step-captions');
+      var caps = list ? list.querySelectorAll(':scope > li') : [], n = caps.length;
+      if (!n) return;
+      var nav = document.createElement('div'), status = document.createElement('span'), cur = 0;
+      function button(label, go) { var b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.addEventListener('click', go); nav.appendChild(b); return b; }
+      nav.className = 'step-nav';
+      var all = button('All steps', function () { show(0); }), prev = button('Previous', function () { show(cur - 1); }), next = button('Next', function () { show(cur + 1); });
+      status.setAttribute('aria-live', 'polite'); nav.appendChild(status); list.before(nav);
+      caps.forEach(function (li, i) { li.value = i + 1; });  // hidden items would otherwise renumber the visible one as 1
+      function show(k) {
+        cur = Math.max(0, Math.min(n, k));
+        parts.forEach(function (el) { el.classList.toggle('dim', cur > 0 && el.getAttribute('data-step').split(/\s+/).indexOf(String(cur)) < 0); });
+        caps.forEach(function (li, i) { li.classList.toggle('off', cur > 0 && i !== cur - 1); });
+        all.setAttribute('aria-pressed', String(cur === 0)); prev.disabled = cur <= 1; next.disabled = cur === n;
+        status.textContent = cur ? 'Step ' + cur + ' of ' + n : 'All ' + n + ' steps';
+      }
+      show(0);
+    });
+  }
+
+  function niceStep(raw) {
+    var p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+  }
+  function lanes() {
+    document.querySelectorAll('.lanes').forEach(function (el) {
+      var src = el.querySelector('script[type="application/json"]'), spec;
+      if (!src) return;
+      try { spec = JSON.parse(src.textContent); } catch (err) { el.textContent = 'Timeline data is not valid JSON: ' + err.message; return; }
+      var at = function (v) { return typeof v === 'number' ? v : Date.parse(v); }, spans = [];
+      spec.lanes.forEach(function (lane) { lane.spans.forEach(function (s) { spans.push(s); }); });
+      var t0 = Math.min.apply(null, spans.map(function (s) { return at(s.start); }));
+      var range = Math.max.apply(null, spans.map(function (s) { return at(s.end); })) - t0 || 1;
+      var iso = spans.some(function (s) { return typeof s.start === 'string'; }), f = 1, unit = spec.unit || '';
+      if (iso) { f = range < 7.2e6 ? 6e4 : range < 1.728e8 ? 3.6e6 : 8.64e7; unit = f === 6e4 ? 'min' : f === 3.6e6 ? 'h' : 'd'; }
+      var amount = function (ms) { return +(ms / f).toFixed(ms / f < 100 ? 1 : 0) + (unit ? ' ' + unit : ''); };
+      // A span's own length reads best in its own unit: a 9-minute span as "9 min", not "0.2 h".
+      var length = function (ms) {
+        if (!iso) return amount(ms);
+        return ms < 6e4 ? Math.round(ms / 1e3) + ' s' : ms < 3.6e6 ? Math.round(ms / 6e4) + ' min' : ms < 1.728e8 ? +(ms / 3.6e6).toFixed(1) + ' h' : +(ms / 8.64e7).toFixed(1) + ' d';
+      };
+      var clock = function (v, fine) { return iso ? new Date(v).toTimeString().slice(0, fine ? 8 : 5) : amount(v - t0); };
+      spec.lanes.forEach(function (lane, li) {
+        var name = document.createElement('span'), track = document.createElement('div');
+        name.textContent = lane.name; track.className = 'track';
+        lane.spans.forEach(function (s) {
+          var a = at(s.start), b = at(s.end), mark = document.createElement('i');
+          if (!(b >= a)) { console.warn('lanes: span ends before it starts', s); return; }
+          mark.style.left = (a - t0) / range * 100 + '%'; mark.style.width = (b - a) / range * 100 + '%';
+          if (s.wait) mark.className = 'wait'; else mark.style.setProperty('--c', s.color || 'var(--chart-' + (li % 6 + 1) + ')');
+          mark.textContent = s.label || '';
+          mark.setAttribute('data-tooltip', lane.name + ': ' + (s.label ? s.label + ', ' : '') + clock(a, b - a < 1.2e5) + '–' + clock(b, b - a < 1.2e5) + ' (' + length(b - a) + ')');
+          track.appendChild(mark);
+        });
+        el.append(name, track);
+      });
+      var ticks = document.createElement('div'), step = niceStep(range / f / 4);
+      ticks.className = 'ticks'; ticks.setAttribute('aria-hidden', 'true');
+      for (var v = 0; v <= range / f + 1e-9; v += step) {
+        var pos = v * f / range * 100, tick = document.createElement('span');
+        tick.style.left = pos + '%'; tick.style.transform = pos > 92 ? 'translateX(-100%)' : pos < 8 ? 'none' : 'translateX(-50%)';
+        tick.textContent = +v.toFixed(6) + (unit ? ' ' + unit : ''); ticks.appendChild(tick);
+      }
+      el.appendChild(ticks); el.tabIndex = 0; el.setAttribute('role', 'group');
+    });
+  }
+
+  // Print shows every collapsed section, then restores what the reader had closed.
+  var reopened = [];
+  addEventListener('beforeprint', function () {
+    reopened = [].filter.call(document.querySelectorAll('details:not([open])'), function (d) { d.open = true; return true; });
+  });
+  addEventListener('afterprint', function () { reopened.forEach(function (d) { d.open = false; }); reopened = []; });
+  // Gives each tooltip owner outside an SVG a hidden description, so focusing it reads the text too.
+  function describe() {
+    document.querySelectorAll('[data-tooltip]').forEach(function (el, i) {
+      if (el.closest('svg, .lanes') || el.dataset.vizDescribed) return;
+      var d = document.createElement('span'); d.id = 'viz-desc-' + i; d.className = 'viz-sr'; d.textContent = el.getAttribute('data-tooltip');
+      document.body.appendChild(d); el.dataset.vizDescribed = '1';
+      el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '') + ' ' + d.id).trim());
+    });
+  }
+  domReady().then(function () { sparks(); ledgers(); decides(); steppers(); lanes(); describe(); });
+
+  window.viz = { ready: ready, lineChart: lineChart, fail: fail };
+})();
+</script>
+</head>
+<body>
+<button class="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+<div class="page">
+  <nav class="toc" aria-label="Contents"><ol></ol></nav>
+  <main>
+    <p class="meta">2026-10-26 · Built · docs/drafts/agentic-planning/agentic-planning.html · feature page</p>
+    <h1>Design review and done checks in the planning loop</h1>
+    <p class="lead">Before a project-size spec is planned, a fresh Claude reviewer and a Codex reviewer check it against your own recorded words and its done checks, and only you see the result, on this kind of page. It serves you reading one summary page per feature instead of specs and plans. It exists because SuperFocus's costliest misses, a login choice nobody asked you about and a dashboard with no way to create a season, started in the spec, where code review never looks.</p>
+    <div class="tiles">
+  <div class="tile"><div class="n">Built</div><div class="k">stage, uncommitted</div></div>
+  <div class="tile"><div class="n">1 of 5</div><div class="k">done checks passing</div></div>
+  <div class="tile"><div class="n hot">3</div><div class="k">decisions waiting on you</div></div>
+  <div class="tile"><div class="n">8</div><div class="k">changes from the approved plan</div></div>
+</div>
+
+<h2 id="how" data-toc="How it works">Two reviewers check the spec before planning, and done checks run before the final review</h2>
+<figure>
+<div class="diagram" style="overflow-x:auto" tabindex="0" role="group" aria-label="Scrollable diagram">
+<svg viewBox="0 0 760 554" role="img" aria-labelledby="loop-t loop-d" style="width:100%;height:auto;max-width:760px;min-width:600px">
+<title id="loop-t">Recommended feature loop, eight stages</title><desc id="loop-d">Eight-stage loop in two phases. Decide: brainstorm, spec with intent file and done checks, design review with drift check by a mixed reviewer pair, plan that may amend the spec. Deliver: build, done checks on real inputs, code review with spec lens, summary page and docs pass. The summary page feeds the next brainstorm.</desc>
+<defs><marker id="loop-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3)"/></marker></defs>
+<rect x="16" y="16" width="287" height="482" rx="10" style="fill:var(--surface-2);fill-opacity:.55;stroke:var(--line-strong);stroke-opacity:.6;stroke-dasharray:4 4"/>
+<rect x="457" y="16" width="287" height="482" rx="10" style="fill:var(--surface-2);fill-opacity:.55;stroke:var(--line-strong);stroke-opacity:.6;stroke-dasharray:4 4"/>
+<path d="M159.5,113 L159.5,171" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M159.5,234 L159.5,292" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M159.5,355 L159.5,413" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M281,444.5 L479,444.5" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M600.5,413 L600.5,355" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M600.5,292 L600.5,234" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M600.5,171 L600.5,113" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M479,81.5 L281,81.5" marker-end="url(#loop-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<text x="171.5" y="145.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">answers</text>
+<text x="171.5" y="266.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">spec</text>
+<text x="171.5" y="387.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">summary page</text>
+<text x="365.2" y="432.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">plan</text>
+<text x="612.5" y="387.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">commits</text>
+<text x="612.5" y="266.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">evidence</text>
+<text x="612.5" y="145.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">fixes + reruns</text>
+<text x="332.8" y="69.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">next feature</text>
+<rect x="24" y="23" width="59.8" height="18" style="fill:var(--surface)"/>
+<rect x="24" y="23" width="59.8" height="18" style="fill:var(--surface-2);fill-opacity:.55"/>
+<text x="30" y="36" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">DECIDE</text>
+<rect x="465" y="23" width="67.1" height="18" style="fill:var(--surface)"/>
+<rect x="465" y="23" width="67.1" height="18" style="fill:var(--surface-2);fill-opacity:.55"/>
+<text x="471" y="36" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">DELIVER</text>
+<rect x="38" y="50" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<text x="159.5" y="77.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Brainstorm</text>
+<text x="159.5" y="96.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">Superpowers</text>
+<rect x="38" y="171" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--teal);stroke-width:1.4"/>
+<text x="159.5" y="198.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Spec</text>
+<text x="159.5" y="217.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">intent file + done checks</text>
+<rect x="38" y="292" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--accent);stroke-width:2"/>
+<rect x="38" y="292" width="243" height="63" rx="6" style="fill:var(--accent-soft)"/>
+<text x="159.5" y="319.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Design review</text>
+<text x="159.5" y="338.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">drift check, mixed pair</text>
+<rect x="38" y="413" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--yellow);stroke-width:1.4"/>
+<text x="159.5" y="440.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Plan</text>
+<text x="159.5" y="459.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">may amend the spec</text>
+<rect x="479" y="413" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<text x="600.5" y="440.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Build</text>
+<text x="600.5" y="459.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">SDD per task</text>
+<rect x="479" y="292" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--teal);stroke-width:1.4"/>
+<text x="600.5" y="319.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Done checks</text>
+<text x="600.5" y="338.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">on real inputs</text>
+<rect x="479" y="171" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--yellow);stroke-width:1.4"/>
+<text x="600.5" y="198.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Code review</text>
+<text x="600.5" y="217.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">with spec lens</text>
+<rect x="479" y="50" width="243" height="63" rx="6" style="fill:var(--ground);stroke:var(--teal);stroke-width:1.4"/>
+<text x="600.5" y="77.0" text-anchor="middle" style="font:600 15px var(--font-display);fill:var(--ink)">Summary page</text>
+<text x="600.5" y="96.0" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">+ docs pass</text>
+<rect x="16.0" y="526" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--teal);stroke-width:1.4"/>
+<text x="41.0" y="536.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">new</text>
+<rect x="86.3" y="526" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--yellow);stroke-width:1.4"/>
+<text x="111.3" y="536.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">gains a check</text>
+<rect x="230.8" y="526" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<text x="255.8" y="536.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">unchanged</text>
+<rect x="345.7" y="526" width="18" height="12" rx="3" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4"/>
+<text x="370.7" y="536.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">focal stage</text>
+</svg>
+</div>
+  <figcaption><b>The feature loop, in two phases.</b> Boxes are stages, arrows carry what each stage hands on; teal stages are new, yellow ones gain a check, the mauve stage is the design review this feature adds, and the dashed arrow returns to the next feature. You read only the summary page that leaves the design review and the one the delivery phase refreshes.</figcaption>
+</figure>
+<p>The interviewing session writes your words to <code>&lt;spec&gt;-intent.md</code> as you answer. A fresh Claude reviewer and a Codex reviewer then check the spec against those words, its done checks, simpler existing options and the code it touches, without seeing the agent's reasoning.</p>
+
+<h2 id="decisions" data-toc="Key decisions">The spec stays open to the models except for your words and its done checks</h2>
+<figure class="table">
+  <figcaption><b>Decisions that shape the workflow.</b> "Who" says whether you chose, the agent defaulted without asking, or a review settled it; agent defaults come first so you can overrule them. Two of the eight are agent defaults.</figcaption>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Decision</th><th>Chosen</th><th>Rejected</th><th>Why</th><th>Who</th></tr></thead>
+    <tbody>
+      <tr><td>Drift check</td><td>A lens of the design review, on the areas the spec touches</td><td>A scheduled job</td><td>It runs when the next plan starts, with no schedule to maintain</td><td><span class="tag peach">agent default</span></td></tr>
+      <tr><td>EGM itself</td><td>Borrow its ideas; do not install the plugin</td><td>Install <code>google/elephant-goldfish-model</code></td><td>Version 0.1.0, changes daily, and its brainstorm duplicates Superpowers</td><td><span class="tag peach">agent default</span></td></tr>
+      <tr><td>Where the review lives</td><td>A design-document target in <code>independent-review</code></td><td>A new skill; the EGM plugin</td><td>Reuses its finder and verifier briefs</td><td><span class="tag blue">you</span></td></tr>
+      <tr><td>Acceptance</td><td>3 to 6 done checks that fit the work</td><td>User journeys only</td><td>Science and algorithm work needs known answers, references and properties</td><td><span class="tag blue">you</span></td></tr>
+      <tr><td>What is fixed</td><td>Your words and the done checks; models amend the rest and log it</td><td>A locked spec</td><td>Models improve the spec when they hit problems</td><td><span class="tag blue">you</span></td></tr>
+      <tr><td>Reviewers</td><td>One fresh Claude finder and one Codex finder, Claude verifiers</td><td>Codex alone</td><td>A mixed pair found 56.7% of planted errors against 42.7% for two same-model reviews</td><td><span class="tag mauve">review</span></td></tr>
+      <tr><td>Intent file</td><td><code>&lt;spec&gt;-intent.md</code>, each answer beside its question and options</td><td>A section inside the spec</td><td>A bare "B" means nothing to a reviewer without the question</td><td><span class="tag mauve">review</span></td></tr>
+      <tr><td>Check order</td><td>Done checks before the final code review, rerun after its fixes</td><td>After the review</td><td>The review needs their evidence</td><td><span class="tag mauve">review</span></td></tr>
+    </tbody>
+  </table></div>
+</figure>
+
+<h2 id="done" data-toc="Done checks">One of five done checks passes; the rest wait for the apply and a real spec</h2>
+<figure class="table">
+  <figcaption><b>Done checks and their evidence.</b> Each row names its kind, the command that shows it, and the result on the working tree at <code>56f059c</code>. The known-answer check replays the SuperFocus spec that missed the connector default.</figcaption>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Check</th><th>Kind</th><th>Command</th><th>Status</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>Every local link in the changed skills resolves</td><td>property</td><td>link scan over <code>independent-review</code> and <code>html-artifact</code></td><td><span class="status good">pass</span></td><td>no missing local targets</td></tr>
+      <tr><td>A design review of SuperFocus's original spec flags "a Console API key, not my claude.ai login" as an undiscussed default</td><td>known answer</td><td><code>independent-review</code> design mode on <code>0af115e</code></td><td><span class="status">planned</span></td><td>not yet run</td></tr>
+      <tr><td>A finding about a missing screen survives verification without a code line</td><td>property</td><td>the same run, season-creation finding</td><td><span class="status">planned</span></td><td>not yet run</td></tr>
+      <tr><td>Claude and Codex read the new global bullet on both machines</td><td>real-data run</td><td>scoped apply, then a fresh session on each host</td><td><span class="status">planned</span></td><td>waiting for your apply</td></tr>
+      <tr><td>The next SuperFocus plan needs fewer pre-flight rulings than the 11 to 18 baseline</td><td>real-data run</td><td>the pilot plan's SDD ledger</td><td><span class="status">planned</span></td><td>next feature</td></tr>
+    </tbody>
+  </table></div>
+</figure>
+
+<h2 id="changes" data-toc="What changed from the design">Eight parts of the approved plan changed during review and the build</h2>
+<ul class="ledger">
+  <li data-status="changed"><b>User journeys</b> became done checks that fit the work, at your request, so science code gets known answers and properties.</li>
+  <li data-status="changed"><b>Check order</b>: done checks now run before the final code review, which needs their evidence.</li>
+  <li data-status="changed"><b>Intent trace</b>: an exclusion counts only when you approved it, so "out of scope" cannot hide a request.</li>
+  <li data-status="changed"><b>Intent file</b>: answers sit beside their questions and options.</li>
+  <li data-status="changed"><b>Drift</b> moved into the design review; nothing else would have triggered it.</li>
+  <li data-status="changed"><b>Summary page</b> is refreshed before SDD deletes its workspace, from an amendment log that lives in the intent file.</li>
+  <li data-status="dropped"><b>Claude finder at the deep tier</b>: the deep tier already alternates vendors across lenses.</li>
+  <li data-status="deferred"><b>SuperFocus recipe and REVIEW.md rules</b> wait for the pilot plan.</li>
+</ul>
+
+<h2 id="risks" data-toc="Risks and review">The workflow is reviewed but not yet run on a real spec</h2>
+<div class="callout good" data-label="Result">Codex found nine problems in the plan and one in the implementation; Claude verifiers confirmed all ten, and every one is fixed.</div>
+<ul>
+  <li>No design review has run on a real spec yet. Mitigation: the known-answer check above replays the SuperFocus spec whose miss is already known.</li>
+  <li>An agent in a long brainstorm may skip the intent file. Mitigation: the global bullet requires it as you answer, and the review marks its intent lens partial when the file is missing.</li>
+  <li>Each project-size feature costs about six more agent runs. Mitigation: quick tasks and small changes skip the design review.</li>
+</ul>
+<details class="evidence"><summary><b>All ten review findings were confirmed and fixed.</b> <span>Codex finders, Claude verifiers</span></summary>
+<div class="table-wrap"><table>
+  <thead><tr><th>Finding</th><th>Severity</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Finder and verifier rules demanded a faulty code line</td><td>P2</td><td>Design review has its own gates</td></tr>
+    <tr><td>Code review asked for done-check evidence produced later</td><td>P2</td><td>Checks run first</td></tr>
+    <tr><td>"Out of scope" could satisfy an explicit request</td><td>P2</td><td>Exclusions need your approval</td></tr>
+    <tr><td>The summary page was never refreshed after the build</td><td>P2</td><td>Refresh before cleanup</td></tr>
+    <tr><td>Nothing triggered the drift check</td><td>P2</td><td>Drift is a design-review lens</td></tr>
+    <tr><td>"Fixed" spec parts could not be corrected</td><td>P2</td><td>Corrections keep the original and evidence</td></tr>
+    <tr><td>The connector miss was credited to the intent trace</td><td>P2</td><td>Credited to the undiscussed default and a probe</td></tr>
+    <tr><td>Intent answers lost their questions</td><td>P2</td><td>Questions and options kept beside each answer</td></tr>
+    <tr><td>The intent record had no file or owner</td><td>P3</td><td><code>&lt;spec&gt;-intent.md</code>, written by the interviewer</td></tr>
+    <tr><td>Science checks required every evidence type</td><td>P3</td><td>Pick the checks that fit</td></tr>
+  </tbody>
+</table></div>
+</details>
+
+<h2 id="not-doing" data-toc="Not doing">Not doing</h2>
+<ul class="not-doing">
+  <li>Installing the EGM plugin, or writing a README in every folder.</li>
+  <li>Asking you to read specs or plans; you read this page.</li>
+  <li>A locked spec, mandatory TDD inside the agent loop, finding quotas, debate rounds or persona pipelines.</li>
+  <li>A scheduled drift job.</li>
+</ul>
+
+<h2 id="decide" data-toc="Waiting on you">Three decisions wait on you</h2>
+<form class="decide" data-prompt="Decisions on the design-review workflow">
+  <fieldset><legend>Apply the skills and the global AGENTS.md bullet on both hosts?</legend>
+    <label><input type="radio" name="apply" value="apply on tsuki and macmini" checked data-rec>Apply on tsuki and macmini</label>
+    <label><input type="radio" name="apply" value="revise first">Revise first</label>
+  </fieldset>
+  <fieldset><legend>Run the known-answer check on SuperFocus's original spec now?</legend>
+    <label><input type="radio" name="known" value="run the design review on SuperFocus 0af115e now" checked data-rec>Run it now</label>
+    <label><input type="radio" name="known" value="wait for the pilot plan">Wait for the pilot</label>
+  </fieldset>
+  <fieldset><legend>Run EGM's own review once as a comparison?</legend>
+    <label><input type="radio" name="egm" value="skip the EGM comparison" checked data-rec>Skip it</label>
+    <label><input type="radio" name="egm" value="run egm-review once in a scratch worktree">Run it once</label>
+  </fieldset>
+  <textarea name="note" rows="2" aria-label="Anything else" placeholder="Anything else"></textarea>
+</form>
+
+  </main>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  try { var saved = localStorage.getItem('theme'); if (saved) root.dataset.theme = saved; } catch (e) {}
+  function effective() {
+    if (root.dataset.theme) return root.dataset.theme;
+    return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  document.querySelector('button.theme').addEventListener('click', function () {
+    var next = effective() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    document.dispatchEvent(new CustomEvent('themechange'));
+  });
+
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', function () {
+    if (!root.dataset.theme) document.dispatchEvent(new CustomEvent('themechange'));
+  });
+
+  // Index from h2/h3: h2 entries numbered, the entry in view highlighted.
+  var list = document.querySelector('nav.toc ol');
+  var heads = Array.prototype.slice.call(document.querySelectorAll('main h2, main h3'));
+  var n = 0;
+  heads.forEach(function (h) {
+    if (!h.id) h.id = h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var li = document.createElement('li'); li.className = h.tagName.toLowerCase();
+    if (li.className === 'h2') { n += 1; var num = document.createElement('span'); num.className = 'n';
+      num.textContent = (n < 10 ? '0' : '') + n; li.appendChild(num); }
+    var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.dataset.toc || h.textContent;
+    li.appendChild(a); list.appendChild(li);
+  });
+  var links = list.querySelectorAll('a');
+  var ticking = false;
+  function markActive() {
+    ticking = false;
+    var atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    var current = 0;
+    heads.forEach(function (h, i) { if (h.getBoundingClientRect().top <= 96) current = i; });
+    if (atEnd) current = heads.length - 1;
+    links.forEach(function (a, i) { a.classList.toggle('active', i === current); });
+  }
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(markActive); } });
+  addEventListener('resize', markActive);
+  if (heads.length) markActive();
+
+  var css = getComputedStyle(root);
+  function tok(name) { return css.getPropertyValue(name).trim(); }
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  // Mermaid, themed from the tokens and re-rendered on toggle. Loaded only when used.
+  if (document.querySelector('.mermaid')) {
+    import('https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.esm.min.mjs').then(function (m) {
+      var mermaid = m.default;
+      var nodes = document.querySelectorAll('.mermaid');
+      nodes.forEach(function (el) { el.dataset.src = el.textContent; });
+      var rendering = Promise.resolve();
+      function render() {
+        rendering = rendering.then(async function () {
+          css = getComputedStyle(root);
+          mermaid.initialize({
+            startOnLoad: false, securityLevel: 'strict', theme: 'base', fontFamily: tok('--font-display'),
+            gantt: { fontSize: 14, barHeight: 26, barGap: 8, topPadding: 44, leftPadding: 110, sectionFontSize: 14, numberSectionStyles: 2 },
+            sequence: { actorFontFamily: tok('--font-display'), messageFontFamily: tok('--font-display'), noteFontFamily: tok('--font-display'), actorFontSize: 15, messageFontSize: 14, noteFontSize: 14 },
+            themeVariables: {
+              background: tok('--surface'), primaryColor: tok('--tint'), primaryTextColor: tok('--ink'),
+              primaryBorderColor: tok('--tint-line'), lineColor: tok('--ink-2'), secondaryColor: tok('--surface'),
+              tertiaryColor: tok('--ground'), edgeLabelBackground: tok('--surface'), fontSize: '15px',
+              noteBkgColor: tok('--surface-2'), noteTextColor: tok('--ink'), noteBorderColor: tok('--line-strong'),
+              actorBkg: tok('--surface-2'), actorBorder: tok('--ink-2'), actorTextColor: tok('--ink'),
+              signalColor: tok('--ink-2'), signalTextColor: tok('--ink'), labelBoxBkgColor: tok('--surface-2'),
+              labelTextColor: tok('--ink'), loopTextColor: tok('--ink'),
+              taskBkgColor: tok('--tint'), taskBorderColor: tok('--tint-line'), taskTextColor: tok('--ink'), taskTextOutsideColor: tok('--ink'),
+              taskTextLightColor: tok('--ink'), taskTextDarkColor: tok('--ink'),
+              activeTaskBkgColor: tok('--accent-soft'), activeTaskBorderColor: tok('--accent'),
+              doneTaskBkgColor: tok('--surface-2'), doneTaskBorderColor: tok('--line-strong'),
+              critBkgColor: tok('--red-soft'), critBorderColor: tok('--red'),
+              sectionBkgColor: 'transparent', sectionBkgColor2: 'transparent', altSectionBkgColor: 'transparent',
+              gridColor: tok('--line'), todayLineColor: tok('--peach'), titleColor: tok('--ink'),
+              transitionColor: tok('--ink-2'), transitionLabelColor: tok('--ink'), stateLabelColor: tok('--ink'), stateBkg: tok('--tint')
+            }
+          });
+          nodes.forEach(function (el) { el.textContent = el.dataset.src; el.removeAttribute('data-processed'); });
+          await mermaid.run({ nodes: nodes });
+        }).catch(function (error) { console.error('Mermaid render failed:', error); });
+        return rendering;
+      }
+      render();
+      document.addEventListener('themechange', render);
+    });
+  }
+
+  // Vega-Lite through vega-embed, one shared config, SVG renderer. Loaded only when used.
+  if (document.querySelector('.vega')) {
+    loadScript('https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js')
+      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-lite@6.4.3/build/vega-lite.min.js'); })
+      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-embed@7.2.0/build/vega-embed.min.js'); })
+      .then(function () {
+        function config() {
+          css = getComputedStyle(root);
+          var cat = tok('--chart-cat').split(/\s+/);
+          return {
+            background: 'transparent', font: tok('--font-text'),
+            mark: { color: cat[0] },
+            point: { filled: true, size: 60 },
+            axis: { labelColor: tok('--ink-3'), titleColor: tok('--ink-2'), gridColor: tok('--line'),
+                    domainColor: tok('--ink-2'), tickColor: tok('--ink-2'),
+                    labelFont: tok('--font-mono'), labelFontSize: 11, titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400 },
+            axisX: { labelAngle: 0 },
+            axisDiscrete: { labelOverlap: false },
+            axisQuantitative: { labelOverlap: 'parity' },
+            header: { labelColor: tok('--ink-2'), titleColor: tok('--ink-2'), labelFont: tok('--font-mono'), labelFontSize: 12,
+                      titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400, labelPadding: 6 },
+            legend: { labelColor: tok('--ink-2'), titleColor: tok('--ink-2'), labelFont: tok('--font-mono'), labelFontSize: 11,
+                      titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400,
+                      symbolFillColor: tok('--ink-2'), symbolStrokeColor: tok('--ink-2') },
+            title: { color: tok('--ink'), fontSize: 16, fontWeight: 400, anchor: 'start' },
+            view: { stroke: null },
+            range: { category: cat }
+          };
+        }
+        function render() {
+          document.querySelectorAll('.vega').forEach(function (el) {
+            var spec = JSON.parse(el.querySelector('script[type="application/json"]').textContent);
+            var view = el.querySelector('.vega-view');
+            if (!view) { view = document.createElement('div'); view.className = 'vega-view'; el.appendChild(view); }
+            vegaEmbed(view, spec, { config: config(), renderer: 'svg',
+              actions: { export: true, source: false, compiled: false, editor: false } });
+          });
+        }
+        render();
+        document.addEventListener('themechange', render);
+      });
+  }
+
+  // Syntax highlighting. Loaded only when a code block declares a language; the colours are in the CSS
+  // above, so nothing is fetched from a style host. pre.mermaid has no <code> child and is never touched.
+  if (document.querySelector('pre code[class*="language-"]')) {
+    loadScript('https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/highlight.min.js')
+      .then(function () { hljs.highlightAll(); })
+      .catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
