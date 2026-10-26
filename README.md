@@ -202,7 +202,10 @@ non-ignored untracked files, and work on a clean tree. Change reviews retain
 their introduced-defect requirement. Both use fresh finders and independent
 verifiers. Performance findings must connect a concrete consequence to expected
 load supported by repository evidence, including tests or code bounds, with
-assumptions stated.
+assumptions stated. A design review checks a spec before planning against the
+user's recorded words and its done checks, with a Claude and a Codex finder and
+gates that need no code yet; the global `AGENTS.md` runs one for every
+project-size spec.
 
 ### OpenCode V2 and Pi
 

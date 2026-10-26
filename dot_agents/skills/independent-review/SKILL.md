@@ -29,6 +29,9 @@ would materially change the review.
   migrations, money, or concurrency: several finders, each with one lens from
   [references/lenses.md](references/lenses.md), split across both vendors.
   State that you chose deep and why.
+- **Design review**, for a spec or design document before planning: one
+  fresh Claude finder and one Codex finder, as
+  [references/design-review.md](references/design-review.md) describes.
 - Wait and triage by default. If the user requests a background handoff, return
   the run handles, brief/report paths, and how to retrieve results, then stop.
 
@@ -42,6 +45,9 @@ Distinguish a change review from an explicitly requested repository or folder
 audit. Record that kind in the intent supplied to finders and verifiers. For an
 audit, use [references/repository-audit.md](references/repository-audit.md).
 An audit can report existing defects in its named scope, even on a clean tree.
+A design review is a third kind; its finding and verifier gates replace the
+code-centred ones, as [references/design-review.md](references/design-review.md)
+describes.
 
 Settle the target's checkout first, as the bullets below describe. Then run
 the missing-file check in [references/review-rules.md](references/review-rules.md)
@@ -66,6 +72,9 @@ Respect explicit file or staged-only scopes rather than widening them.
 - **Repository or folder audit:** pin the current tree and named scope as
   [references/repository-audit.md](references/repository-audit.md) describes.
   A diff or last commit does not define this target.
+- **Design document:** pin the spec, its intent file, and the rules, earlier
+  specs and code it touches, as
+  [references/design-review.md](references/design-review.md) describes.
 
 A repeat review of a branch or PR target already reviewed in this session
 covers only the commits since the previously pinned HEAD, unless the user
@@ -99,7 +108,8 @@ Create a private temporary directory outside the checkout with `mktemp -d`.
 Fill [references/review-brief.md](references/review-brief.md) with the intent,
 pinned scope, standards, and a per-finder report path and completion token.
 `{LENS}` is the finder's lens for deep review; otherwise "Full review: cover
-every step of the process." Append a user-requested focus verbatim. Every
+every step of the process." A design review fills `{LENS}` and the finding
+and verifier gates from its reference. Append a user-requested focus verbatim. Every
 finder gets the same substantive brief apart from its lens. Do not include
 your suspected findings, preferred solution, implementation chat, or another
 reviewer's report.
