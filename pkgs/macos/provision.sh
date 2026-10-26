@@ -17,6 +17,9 @@ remote() { ssh "${ssh_opts[@]}" "$target" "$@"; }
 # The alias doubles as the new Mac's work-sync host name.
 [[ "$target" == "macbook" ]] || die "target must be macbook, the work-sync host name"
 [[ "$(uname -s)" == "Darwin" ]] || die "run this on the Mac Mini"
+# The first run writes this file on the new Mac; there ssh would reach itself.
+[[ "$(cat "$HOME/.config/work-sync/host" 2>/dev/null)" != "$target" ]] ||
+    die "this is $target; run this on the Mac Mini"
 [[ -d /Volumes/WorkSSD ]] || die "/Volumes/WorkSSD is not mounted here"
 [[ -f "$HOME/.config/chezmoi/key.txt" ]] || die "missing ~/.config/chezmoi/key.txt"
 
