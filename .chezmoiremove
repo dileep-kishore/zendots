@@ -22,3 +22,9 @@
 .agents/skills/archify
 .claude/skills/archify
 .agents/runtimes/archify
+
+# html-artifact draws diagrams from graph specs; the Excalidraw exporter is retired.
+.agents/skills/html-artifact/scripts/excalidraw
+.agents/skills/html-artifact/scripts/excalidraw.ts
+.agents/skills/html-artifact/references/excalidraw.md
+.agents/skills/html-artifact/assets/excalidraw-example.json

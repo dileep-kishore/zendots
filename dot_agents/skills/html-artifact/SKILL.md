@@ -37,10 +37,15 @@ works step by step, when work ran, or what the reader must decide, use the
 components in [references/components.md](references/components.md); it is a
 guide, not a checklist.
 
-Diagrams are Excalidraw. For a huge diagram you may offer hand-drawn Mermaid,
-and use it only when the user explicitly chooses it. Generate diagrams with the bundled Bun command in
-[references/excalidraw.md](references/excalidraw.md). It installs locked packages
-outside the skill and repository; do not reconstruct the setup or vendor dependencies.
+Diagrams are written as a short graph spec and laid out by the bundled
+command in [references/diagrams.md](references/diagrams.md); never place
+coordinates by hand. Its output is inline SVG on the page's own tokens. A
+sequence goes in a numbered table, a schedule in `.timeline` or duration
+lanes, and a step-by-step mechanism in a stepper over inline SVG
+([references/components.md](references/components.md)). For a huge diagram
+you may offer hand-drawn Mermaid, and use it only when the user explicitly
+chooses it. The diagram command installs locked packages outside the skill
+and repository; do not reconstruct the setup or vendor dependencies.
 
 ## 4. Write concisely
 
@@ -62,13 +67,13 @@ out); every worktree reads it. Pass `--color` or `--pattern` only for a
 one-off page.
 Give each h2 an id. Every visual sits in a `<figure>` with a manuscript-style
 caption (tables in `<figure class="table">`, caption first); the template
-numbers them. Embed Excalidraw SVG exports as described in `references/visuals.md`.
+numbers them. Paste a diagram fragment as `references/visuals.md` describes.
 User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
 `<div class="vega"><script type="application/json">`, an interactive figure's
 `<div class="viz" id="...">` fragment before its `<figcaption>`. A diff view
 is the output of `scripts/diff.py`, pasted as it stands. `assets/example.html`
-is a component catalogue, not a model for length. It includes an Excalidraw
-figure and a hand-drawn Mermaid example explicitly labelled as opt-in.
+is a component catalogue, not a model for length. It includes a graph-spec
+diagram and a hand-drawn Mermaid example explicitly labelled as opt-in.
 
 To update an existing page, edit its `<main>` in place and leave its copied
 CSS and script alone; regenerate from the template only when the user asks

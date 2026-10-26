@@ -7,16 +7,16 @@ shows its point, or none when a sentence says it faster.
 
 | The section answers | Use |
 |---|---|
-| How does the process or decision flow? | Excalidraw flow diagram |
-| Who calls whom, in what order? | Excalidraw sequence diagram |
-| When does each piece happen? | Excalidraw schedule, or `.timeline` for a short list |
-| Which states and transitions exist? | Excalidraw state diagram |
+| How does the process or decision flow, or how do the parts connect? | Diagram from a graph spec ([diagrams.md](diagrams.md)) |
+| Who calls whom, in what order? | Numbered table of calls, or a graph spec with numbered edge labels |
+| When does each piece happen? | `.timeline` for a short list, duration lanes for measured times |
+| Which states and transitions exist? | Diagram from a graph spec |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
 | How does the result respond to an input the reader can change? | Interactive figure, per [interactive.md](interactive.md) |
 | Which exact values do several series take at a point the reader picks? | `viz.lineChart` interactive figure |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
 | What are the two to four headline numbers? | `.tiles` |
-| What mechanism do none of those express? | Excalidraw explanatory diagram |
+| What mechanism do none of those express? | Stepper over inline SVG ([components.md](components.md)) |
 | What exactly does the reader run or paste? | `<pre><code class="language-...">` |
 
 Comparisons draw the difference, not one box per option. One value is a
@@ -43,7 +43,7 @@ Write captions to the three-part shape in
 ```
 
 Mark the one value or node the reader must notice with `class="hot"` (cells,
-tile numbers) or `$accent` in an Excalidraw diagram; never more than one
+tile numbers) or `tone: "accent"` in a graph spec; never more than one
 per figure.
 
 ## Code
@@ -60,18 +60,12 @@ sheet. Without the class a block renders as plain monospace, which is right for
 console transcripts and output. Escape `<`, `>` and `&`, and keep the opening
 tag tight against the first character or the block gains a blank first line.
 
-## Excalidraw
+## Diagrams
 
-Generate an editable Excalidraw scene and export SVG for the figure. Local
-generation uses the [bundled exporter](excalidraw.md); MCP is optional. Paste its
-`.images.html` fragment inside the figure; the template selects the matching
-light/dark SVG. Keep the authored `.json` and editable `.excalidraw`
-source alongside the artifact.
-Use the house palette, preserve legible labels, and check arrow bindings,
-spacing, and the rendered result in both themes. Load fonts before measuring
-text and embed them in SVG exports. For exported SVGs with embedded font
-styles, use an `<img src="data:image/svg+xml;base64,..." alt="...">`; the
-inline-SVG restrictions below apply to markup inserted directly into the page.
+Write a graph spec and run the [diagram command](diagrams.md). Paste its
+`.diagram.html` fragment, an inline SVG inside `<div class="diagram">`, before
+the figure's caption. The SVG reads the page's colour tokens and fonts, so it
+needs no light/dark pair. Keep the spec JSON beside the artifact.
 
 ## Mermaid, only when chosen by the user
 
@@ -169,7 +163,8 @@ Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
 ## Inline SVG
 
 These rules apply when incorporating an existing SVG asset. Author new
-diagrams with Excalidraw by default.
+diagrams as a graph spec by default; its generated SVG styles marks with
+`style="...var(--token)..."`, which follows the theme and is allowed.
 
 ```html
 <figure>
@@ -201,7 +196,7 @@ Never a screenshot of text.
 
 ## Printing
 
-Excalidraw prints its light export automatically. For Mermaid and Vega, switch
+Graph-spec diagrams print with the page's light tokens. For Mermaid and Vega, switch
 the page to light mode and wait for rendering before opening the print dialog.
 Their marks retain their rendered palette in print. Print CSS keeps Vega labels
 legible but cannot await asynchronous rerendering during the browser's print event.

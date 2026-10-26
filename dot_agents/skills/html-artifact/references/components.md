@@ -90,8 +90,8 @@ For explaining a mechanism one stage at a time. It opens on the complete
 diagram, so the first view is still the whole picture, and prints every step.
 The diagram must be inline SVG or HTML: mark each part with the steps it
 belongs to (`data-step="2"` or `data-step="2 3"`), and give one caption per
-step. An Excalidraw export is an image and cannot step; use separate figures
-for its states instead.
+step. A generated graph-spec diagram carries no step marks; draw the
+stepper's SVG by hand or use one figure per state.
 
 ```html
 <figure class="stepper">
