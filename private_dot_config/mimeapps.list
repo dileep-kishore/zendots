@@ -26,7 +26,7 @@ x-scheme-handler/slack=slack.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 x-scheme-handler/codex=chatgpt.desktop
 x-scheme-handler/webcal=google-chrome.desktop
-x-scheme-handler/t3code=t3code-url-handler.desktop
+x-scheme-handler/t3code=com.t3tools.T3Code.desktop
 x-scheme-handler/grokbot=grok-bot.desktop
 x-scheme-handler/sand=grok-bot.desktop
 
