@@ -25,6 +25,9 @@ correct. Do not stage data through an external drive: exFAT and volumes with
 On the new Mac:
 
 1. Turn on System Settings > General > Sharing > Remote Login for your user.
+   In its (i) panel, turn on "Allow full disk access for remote users";
+   without it, macOS blocks SSH from writing into `~/Documents` and
+   `~/Downloads`. Turn on FileVault under Privacy & Security, matching macmini.
    Sign in to the App Store so `mas` can install App Store apps.
 2. Install Homebrew from <https://brew.sh>, then chezmoi, uv (several chezmoi
    templates run as uv scripts), and the network tools:
@@ -45,9 +48,16 @@ On the new Mac:
    sudo diskutil apfs addVolume disk3 APFS WorkSSD -passprompt
    ```
 
-   Use the container from the first command in place of `disk3`. When Finder
-   first asks for the passphrase, tick "Remember this password in my keychain".
-   Reboot once and confirm `/Volumes/WorkSSD` mounts without a prompt.
+   Use the container from the first command in place of `disk3`. In Disk
+   Utility instead, select Macintosh HD, click + (Add APFS Volume), and choose
+   "APFS (Encrypted)", not a case-sensitive format, since macmini's WorkSSD is
+   case-insensitive. When Finder first asks for the passphrase, tick "Remember
+   this password in my keychain". Reboot once and confirm `/Volumes/WorkSSD`
+   mounts without a prompt.
+
+   If the Mac came with Chrome or another Brewfile app already installed, let
+   Homebrew take it over so `brew bundle` does not fail on it:
+   `brew install --cask --adopt google-chrome`.
 
 On macmini and on tsuki, give `ssh` the `macbook` alias. Without it, tsuki
 logs in as `dileep` and `work-sync` reports the new Mac as unreachable:
@@ -73,6 +83,21 @@ On macmini:
    it skips what is already there, resumes an interrupted copy, and never
    overwrites a differing file. It waits until the new Mac has received
    macmini's current index of `~/zendots`, not only until the folder is idle.
+   On a fresh Mac, `add-device` can sit for several minutes on one Syncthing
+   call while the new device creates thousands of directories; it is busy, not
+   hung.
+
+   A managed laptop may sleep after a minute idle, which stops Syncthing. Keep
+   it awake but let the screen sleep, and copy the home folders Syncthing does
+   not carry. `ditto` keeps metadata and merges into the existing folders,
+   overwriting same-named files, so check for name clashes first:
+
+   ```bash
+   ssh macbook 'nohup caffeinate -ims -t 172800 >/dev/null 2>&1 </dev/null &'
+   for d in Desktop Documents Downloads; do
+       ditto -c "$HOME/$d" - | ssh macbook "ditto -x - \"\$HOME/$d\""
+   done
+   ```
 
 On the new Mac:
 
@@ -89,7 +114,11 @@ On the new Mac:
    scoped-apply rule: on a fresh Mac the whole diff is the setup. The installer
    trusts the Brewfile's taps, runs `brew bundle`, `defaults.sh`, and
    `login-items.sh`, then installs TPM, Yazi plugins, the bat cache, and pipx
-   packages. It lists failed steps at the end and can be rerun.
+   packages. It lists failed steps at the end and can be rerun. Run over SSH,
+   it installs everything except the `.pkg` casks and `mas` apps, which need a
+   sudo password, and the login items, which need a click to let Terminal
+   control System Events. Rerun it once in Terminal on the new Mac to finish
+   those.
 6. On tsuki, run `ssh macbook true` once and accept the host key, so
    `work-sync`'s non-interactive SSH can reach the new Mac.
 7. Leave the Mac plugged in and awake overnight while Syncthing copies the
