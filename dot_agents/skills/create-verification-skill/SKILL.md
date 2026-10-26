@@ -44,7 +44,9 @@ Cover, with the project's real commands:
 - **Health check:** a read-only probe that the right build and instance are
   up with the access needed. Rerun it after any unexpected failure.
 - **Drive:** the real user entry points, with the expected observable result
-  of each action, side effects included.
+  of each action, side effects included. For science or algorithm code, the
+  flows are its done checks: a known answer, a reference comparison, a
+  property, or a run on the real data, each with its tolerance.
 - **Evidence:** how to capture it, what revision it applies to, and where
   private artifacts go. Secrets stay out.
 - **Cleanup:** stop what the run started, keep the evidence, and list any

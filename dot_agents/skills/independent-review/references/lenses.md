@@ -25,7 +25,9 @@ issue it notices outside the lens.
 5. **Intent and verification.** Requirements missing, partial, or
    implemented wrongly; behaviour added that was not asked for; tests that do
    not exercise the changed behaviour or that assert on mocks; docs, config,
-   and migration steps the change leaves stale.
+   and migration steps the change leaves stale. When the spec lists done
+   checks, each needs evidence for the reviewed revision, and a check changed
+   since the spec was approved needs a logged reason.
 
 ## Assignment
 

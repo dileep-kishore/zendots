@@ -30,6 +30,22 @@
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
   without questions, record your assumptions and continue.
+- I read the feature summary page, not specs or plans; write it in
+  `html-artifact`'s feature-page format. For a project-size spec, the
+  interviewing session writes `<spec>-intent.md` beside it as I answer: my
+  messages verbatim, each beside the question and options it answers, each
+  consequential default I never discussed, and an amendment log. The spec
+  gets 3 to 6 done checks that fit the work, each an observable result with
+  the command that shows it: a known answer, a reference comparison, a
+  property, a run on real inputs (for an app, from empty state in the client
+  I use), or degenerate input. Before planning, run `independent-review` on
+  the spec as a design review. Plans and builds may change the spec when
+  they hit problems; log each change in one line. Never edit my quoted
+  words; correcting a done check or excluding something I asked for keeps
+  the original and the evidence. Run the done checks before the final review
+  and rerun affected ones after its fixes. Before cleanup, refresh the
+  summary page with the undiscussed defaults, each done check's result and
+  revision, and changes to my requests or a done check.
 - Keep changes focused and complexity proportionate. Before fixing a bug,
   trace the failing path and search for callers of the operation causing it,
   including affected sibling paths. Before deleting or renaming code, config,
