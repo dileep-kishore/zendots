@@ -148,9 +148,9 @@ macOS does not let scripts grant privacy permissions, so these stay manual.
 - Sign in to Zotero and enable sync; the library is already in `~/Zotero`.
 - In Obsidian, open the vaults in `/Volumes/WorkSSD`.
 - Run `claude` then `/login`, `codex login`, and `gh auth login`.
-- Download the apps without a Homebrew cask from their vendors: Superfocus,
-  Grok Bot, and Superhuman Go. Rerun `pkgs/macos/login-items.sh` afterwards so
-  Superfocus and Grok Bot become login items.
+- Download the apps without a Homebrew cask from their vendors: Grok Bot and
+  Superhuman Go. Rerun `pkgs/macos/login-items.sh` afterwards so Grok Bot
+  becomes a login item.
 
 ## Final check
 
@@ -164,8 +164,8 @@ ssh macmini '~/.local/bin/work-sync add-device macbook --dry-run' # nothing left
 osascript -e 'tell application "System Events" to get the name of every login item'
 ```
 
-The login items should match macmini's 15. With two windows open, Hyper+2 and
-Hyper+1 should switch OmniWM workspaces.
+The login items should match macmini's, except Superfocus, which is retired.
+With two windows open, Hyper+2 and Hyper+1 should switch OmniWM workspaces.
 
 ## Deliberately not installed
 
