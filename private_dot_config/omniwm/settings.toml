@@ -182,7 +182,7 @@ mode = "macOS"
 [statusBar]
 showAppNames = true
 showIcon = true
-showWorkspaceName = true
+showWorkspaceName = false
 useWorkspaceId = false
 
 [workspaceBar]
