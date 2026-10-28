@@ -213,6 +213,12 @@ project, add its pattern to that project's `ignore` list in the manifest, then
 rerun `work-sync bootstrap <label> --apply`. Extra lines added directly
 to one `.stignore` stay local to that machine.
 
+tsuki keeps staggered file versions, for up to 365 days, of the folders without
+Git history: Conferences, Courses, Presentations, Paperwork, and Proposals.
+Syncthing stores them in each folder's `.stversions` on tsuki and saves only
+changes that arrive from the Macs, not edits made on tsuki itself. This
+setting lives in tsuki's Syncthing config, not the work-sync manifest.
+
 `work-sync handoff` is only for external Orca worktrees, including older
 worktrees still registered from Superset paths. Main checkout Git state belongs
 to Syncthing. Run `work-sync conflicts <path>` before deleting any
