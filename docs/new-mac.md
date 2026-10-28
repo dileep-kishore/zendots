@@ -90,11 +90,13 @@ On macmini:
    A managed laptop may sleep after a minute idle, which stops Syncthing. Keep
    it awake but let the screen sleep, and copy the home folders Syncthing does
    not carry. `ditto` keeps metadata and merges into the existing folders,
-   overwriting same-named files, so check for name clashes first:
+   overwriting same-named files, so check for name clashes first.
+   `Library/Fonts` carries the fonts no cask provides, such as MonoLisa,
+   Operator Mono, Dank Mono, Cartograph, SN Pro, and iA Writer:
 
    ```bash
    ssh macbook 'nohup caffeinate -ims -t 172800 >/dev/null 2>&1 </dev/null &'
-   for d in Desktop Documents Downloads; do
+   for d in Desktop Documents Downloads Library/Fonts; do
        ditto -c "$HOME/$d" - | ssh macbook "ditto -x - \"\$HOME/$d\""
    done
    ```
@@ -119,6 +121,23 @@ On the new Mac:
    sudo password, and the login items, which need a click to let Terminal
    control System Events. Rerun it once in Terminal on the new Mac to finish
    those.
+
+   The Brewfile installs opencode. Install the other coding agents with their
+   vendors' installers, so each agent's own update command, which
+   `agent-update` runs, works:
+
+   ```bash
+   curl -fsSL https://claude.ai/install.sh | bash
+   curl -fsSL https://chatgpt.com/codex/install.sh | sh
+   curl -fsSL https://pi.dev/install.sh | sh
+   curl -fsSL https://omp.sh/install | sh
+   curl https://cursor.com/install -fsS | bash
+   ```
+
+   Over SSH, `cursor-agent --version` fails on the locked login keychain. Check
+   `agent-update` with
+   `launchctl kickstart "gui/$(id -u)/com.dkishore.agent-update"` and read
+   `~/.local/state/agent-update.log`.
 6. On tsuki, run `ssh macbook true` once and accept the host key, so
    `work-sync`'s non-interactive SSH can reach the new Mac.
 7. Leave the Mac plugged in and awake overnight while Syncthing copies the
