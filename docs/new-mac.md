@@ -148,7 +148,7 @@ macOS does not let scripts grant privacy permissions, so these stay manual.
 - Sign in to Zotero and enable sync; the library is already in `~/Zotero`.
 - In Obsidian, open the vaults in `/Volumes/WorkSSD`.
 - Run `claude` then `/login`, `codex login`, and `gh auth login`.
-- Download the apps without a Homebrew cask from their vendors: Orca, Superfocus,
+- Download the apps without a Homebrew cask from their vendors: Superfocus,
   Grok Bot, and Superhuman Go. Rerun `pkgs/macos/login-items.sh` afterwards so
   Superfocus and Grok Bot become login items.
 
