@@ -70,6 +70,3 @@ Library
 # misc
 tests/
 .config/sesh/sesh.toml
-
-# Orca rewrites this for its opencode status plugin; V2 reads cli.json.
-.config/opencode/tui.json

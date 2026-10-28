@@ -102,8 +102,8 @@ windowMoveFingerCount = 4
 windowResizeEnabled = false
 windowResizeFingerCount = 3
 workspaceSwipeAxis = "vertical"
-workspaceSwipeEnabled = true
-workspaceSwipeFingerCount = 4
+workspaceSwipeEnabled = false
+workspaceSwipeFingerCount = 3
 
 [hiddenBar]
 enabled = false
@@ -122,7 +122,6 @@ containerPrimarySpanPresets = [0.25, 0.5, 0.75, 1.0]
 defaultContainerPrimarySpan = 0.5
 edgeGaps = true
 infiniteLoop = false
-resizeStepPercent = 5
 singleWindowFit = "container_primary_span"
 visibleContainerCount = 2
 
@@ -392,13 +391,6 @@ axRole = "AXWindow"
 axSubrole = "AXStandardWindow"
 bundleId = "com.granola.app"
 id = "EFBC9FE8-21B6-4B6E-8DC2-FCF3B5BAF933"
-layout = "float"
-
-[[appRules]]
-axRole = "AXWindow"
-axSubrole = "AXStandardWindow"
-bundleId = "com.apple.Notes"
-id = "7471DB0A-065E-4985-BDC2-609F331793DC"
 layout = "float"
 
 [[hotkeys]]

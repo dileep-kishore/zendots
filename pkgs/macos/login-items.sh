@@ -15,6 +15,7 @@ apps=(
     "Notion"
     "Morgen"
     "Caffeinated"
+    "Superfocus"
     "OmniWM"
     "CodexBar"
     "Wispr Flow"

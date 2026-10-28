@@ -101,6 +101,22 @@ On macmini:
    done
    ```
 
+   The desktop wallpaper rotation exists only in macOS's wallpaper store: the
+   six images are copies inside the image extension's container, and their
+   originals in `~/Downloads` are gone. Copy the store, the extension's
+   preferences, and the images, then restart WallpaperAgent. SSH can write
+   the sandboxed container, which a terminal without Full Disk Access cannot:
+
+   ```bash
+   img=Library/Containers/com.apple.wallpaper.extension.image/Data/Library
+   store="Library/Application Support/com.apple.wallpaper/Store/Index.plist"
+   tar -C "$HOME/$img/Caches" -cf - . | ssh macbook "tar -C \"\$HOME/$img/Caches\" -xf -"
+   scp "$HOME/$img/Preferences/com.apple.wallpaper.extension.image.plist" macbook:/tmp/wp-image.plist
+   scp "$HOME/$store" macbook:/tmp/wp-index.plist
+   ssh macbook "defaults import \"\$HOME/$img/Preferences/com.apple.wallpaper.extension.image\" /tmp/wp-image.plist &&
+       cp /tmp/wp-index.plist \"\$HOME/$store\" && killall WallpaperAgent"
+   ```
+
 On the new Mac:
 
 5. Apply the dotfiles and run the installer. The chezmoi config copied in
