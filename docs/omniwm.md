@@ -80,7 +80,10 @@ a notch, such as a MacBook's built-in screen, `notchMode = "moveBelowMenuBar"`
 moves the bar below the menu bar, and `reserveLayoutSpace = true` keeps windows
 from sliding under it. `moveBelowMenuBar` ignores displays without a notch.
 On the MPG491CX the menu bar is 31 points tall, taller than the bar, so
-`reserveLayoutSpace` reserves nothing there. SketchyBar is not required by
+`reserveLayoutSpace` reserves nothing there. The bar uses
+`windowLevel = "status"` (window layer 25), one layer below Vorssaint's
+Dynamic Island (layer 26), so the island's expanded panel draws over the bar.
+The `popup` level (layer 101) covered the panel. SketchyBar is not required by
 this layout, although it remains in the Brewfile.
 
 Twelve app rules set initial workspace placement for standard windows, including

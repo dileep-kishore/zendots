@@ -212,7 +212,7 @@ showLabels = true
 solidBlackBackground = false
 systemStatsButton = false
 transparentBackground = false
-windowLevel = "popup"
+windowLevel = "status"
 xOffset = 0.0
 yOffset = 0.0
 
