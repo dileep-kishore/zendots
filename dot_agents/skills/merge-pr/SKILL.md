@@ -57,8 +57,12 @@ gate that was visible up front.
    [babysit-pr step 2](../babysit-pr/SKILL.md#2-enumerate-every-unresolved-thread),
    paging until `hasNextPage` is false. Any thread with `isResolved: false`,
    outdated or not, fails the gate. So does `reviewDecision:
-   CHANGES_REQUESTED`. Report each open thread's author, `path:line`, and URL,
-   then point the user to babysit-pr. Do not resolve threads here.
+   CHANGES_REQUESTED`. So does an unanswered summary finding: a defect named
+   in a review body or PR comment, as
+   [babysit-pr step 2](../babysit-pr/SKILL.md#2-enumerate-every-unresolved-thread)
+   defines it, with no later reply that answers it. Report each open thread's
+   or finding's author, `path:line` when it has one, and URL, then point the
+   user to babysit-pr. Do not resolve threads or answer findings here.
 
 3. **CI passes on the head.** Watch the checks for at most 20 minutes, in
    the background where the harness reports when it exits, or in the

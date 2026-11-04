@@ -43,7 +43,8 @@ the push, or `result timeout` 20 minutes after it, listing the pending ones.
 Run it in the background where the harness reports when it exits; otherwise
 in the foreground under a shell timeout, rerunning with the same `--since`
 until it prints a result, since that resumes the same deadline. Then continue
-to step 2 whatever the result. With no unresolved threads, skip to step 6 so CI
+to step 2 whatever the result. When step 2 finds no unresolved threads and no
+summary findings, skip to step 6 so CI
 on the head is still watched, then report.
 
 ## 2. Enumerate every unresolved thread
@@ -72,12 +73,21 @@ thread where `isResolved` is false — the reply and resolve steps both need it.
 the current code before deciding. Outdated-and-unresolved is the usual shape of
 a finding everyone forgot about.
 
-Review summaries posted as issue comments are not threads and carry no `id`;
-read them separately and treat them as context, not as items to resolve:
+Review bodies and PR comments are not threads and carry no `id`, but some
+reviewers put their findings there: pr-agent's default output is one summary
+comment it edits in place, and other bots list findings in a review body.
+Read them too:
 
 ```bash
 gh pr view <number> --json reviews,comments
 ```
+
+Each concrete defect one of them names, at a file or behaviour, is a summary
+finding and gets a triage row like a thread. Skip walkthroughs, change
+summaries, "no issues found", and findings an earlier reply of yours already
+answered. A bot that edits its comment in place keeps the same URL, so match
+on the finding, not the URL. A summary finding that repeats a thread's
+finding is that thread's row, with both sources listed.
 
 ## 3. Verify and triage each finding
 
@@ -104,8 +114,9 @@ Keep one triage table for the report:
 | `PRRT_…` | `justfile:37` | P2 re-sources .env after Hub defaults | CONFIRMED | drop the nested `just run` |
 | `PRRT_…` | `api/db.py:88` | P3 unbounded query | REFUTED — `limit` applied at `api/routes.py:142` | rebut |
 
-Every unresolved thread appears in the table, including ones you plan only to
-rebut. Then carry on through steps 4–7 without asking. Leave a thread open,
+Every unresolved thread and summary finding appears in the table, including
+ones you plan only to rebut. A summary finding's Thread cell holds its
+comment or review URL. Then carry on through steps 4–7 without asking. Leave a thread open,
 and say why in the report, when it needs the user: a product or design call,
 a human reviewer's request you would decline, or a fix outside the PR's
 scope. When a rebuttal's reason, or a fixed finding's mistake, has come up
@@ -180,6 +191,12 @@ Resolve after replying, in both cases. A rebutted finding is answered, not
 pending. Leave a thread open only when it needs the user's decision, and say
 which ones in the report.
 
+Summary findings have no thread to reply in or resolve. Answer all of a
+round's summary findings in one PR comment, one line each: the link to the
+source comment or review, a quote of the finding's title, and the same fixed
+or rebutted reply a thread would get. Post it with `gh pr comment <number>
+--body-file -`. That comment is what step 2 matches against next round.
+
 ## 6. Watch the new head
 
 A round is not finished at the push; it is finished when CI has run against
@@ -205,8 +222,9 @@ passes on rerun) instead of patching around it.
 
 Report:
 
-- threads answered, split into fixed and rebutted
-- threads deliberately left open, and what each is waiting on
+- threads and summary findings answered, split into fixed and rebutted
+- threads and summary findings deliberately left open, and what each is
+  waiting on
 - the pushed commit SHAs
 - the triage table, and any `REVIEW.md` precedent proposed
 - CI conclusions on the final head, and whether each reviewer bot has
@@ -214,9 +232,10 @@ Report:
 
 Fixes can prompt the review bots to open new threads. After a round that
 pushed, rerun step 1's wait for the new head, then list unresolved threads
-again; any thread that does not need the user starts the next round at step
-2. Stop when that listing leaves nothing to answer (the wait reported no bot,
-or a completed review opened no new threads), after three rounds, or when
+again, with any new summary findings; anything that does not need the user
+starts the next round at step 2. Stop when that listing leaves nothing to
+answer (the wait reported no bot, or a completed review added no new threads
+or summary findings), after three rounds, or when
 everything left needs the user. A bot still pending at the deadline means the
 PR is not yet known to be clean; report it that way.
 
