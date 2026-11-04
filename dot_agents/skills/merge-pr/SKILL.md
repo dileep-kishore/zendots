@@ -53,6 +53,12 @@ gate that was visible up front.
    python3 ~/.agents/skills/babysit-pr/scripts/wait-for-reviews.py --pr <number>
    ```
 
+   `result done` passes. `result none` passes, and the report says no review
+   bot ran on the head. `result timeout` fails the gate, naming each pending
+   bot. So does exit code 1, a query error, or a `head` line that differs
+   from the `headRefOid` you will merge. A `bot <name> done quiet` line
+   passes, but the report says that bot's review of the head is unconfirmed.
+
 2. **No unresolved review threads.** Run the `reviewThreads` query from
    [babysit-pr step 2](../babysit-pr/SKILL.md#2-enumerate-every-unresolved-thread),
    paging until `hasNextPage` is false. Any thread with `isResolved: false`,
@@ -66,8 +72,8 @@ gate that was visible up front.
 
 3. **CI passes on the head.** Watch the checks for at most 20 minutes, in
    the background where the harness reports when it exits, or in the
-   foreground under the shell tool's own timeout. macOS has no `timeout`
-   command, so do not wrap the call in one.
+   foreground under the shell tool's own timeout. Older macOS releases have
+   no `timeout` command, so do not wrap the call in one.
 
    ```bash
    gh pr checks <number> --watch --interval 30

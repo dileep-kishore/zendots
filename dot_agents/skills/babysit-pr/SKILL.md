@@ -40,6 +40,9 @@ and dependency bots; `--ignore <bot>` drops another. It waits only for bots
 that show activity on this head, and exits on its own with `result done` once
 they finish, `result none` when no review bot appears within three minutes of
 the push, or `result timeout` 20 minutes after it, listing the pending ones.
+Each `bot <name> done` line names its evidence: `reviewed-head`, `checks`, or
+`quiet`. `quiet` is inferred from silence, so the report says that bot's
+review is unconfirmed.
 Run it in the background where the harness reports when it exits; otherwise
 in the foreground under a shell timeout, rerunning with the same `--since`
 until it prints a result, since that resumes the same deadline. Then continue
@@ -200,11 +203,13 @@ or rebutted reply a thread would get. Post it with `gh pr comment <number>
 ## 6. Watch the new head
 
 A round is not finished at the push; it is finished when CI has run against
-the new head. Wait for it, in the background or with a timeout well under the
-shell tool's cap:
+the new head. Wait for it for at most 20 minutes, in the background where the
+harness reports when it exits, or in the foreground under the shell tool's
+own timeout. Older macOS releases have no `timeout` command, so do not wrap
+the call in one:
 
 ```bash
-timeout 1200 gh pr checks <number> --watch --interval 30
+gh pr checks <number> --watch --interval 30
 ```
 
 Right after a push, checks may not be registered yet: `gh pr checks` then

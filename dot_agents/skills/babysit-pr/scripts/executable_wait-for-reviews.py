@@ -11,9 +11,12 @@ repositories without review bots are never polled for long.
 
 A bot is running while it is a requested reviewer, has an unfinished check run
 or pending commit status, or has an eyes reaction on the PR or on an
-"@bot review" comment. Once it is not running, it is done when it has reviewed
-the head commit, its checks have finished, or it has been quiet for the settle
-period.
+"@bot review" comment that no later review of the head answers. A comment
+does not answer it: bots post progress comments while they work. Once it is
+not running, it is done when it has reviewed the head commit, its checks have
+finished, or it has been quiet for the settle period.
+A bot that reviewed an older commit after --since never counts as done by
+quiet time alone: it is expected to review the head too.
 
 Every time runs from --since, the moment just before the push that created the
 head: only activity after it counts, and the grace period and timeout start
@@ -37,7 +40,9 @@ EXAMPLES = """examples:
   wait-for-reviews.py --pr 42 --since 2026-10-07T21:43:00Z
   wait-for-reviews.py --pr 42 --repo owner/name --ignore vercel
 
-output: "bot <name> done|pending" lines, then "result done|none|timeout"
+output: "bot <name> done <evidence>" or "bot <name> pending" lines, then
+"result done|none|timeout"; evidence is reviewed-head, checks, or quiet, the
+last an inference from silence rather than a finished review
 exit codes: 0 every active bot finished on the head, 2 deadline passed with
 bots pending, 3 no review bot showed up within the grace period, 1 error
 """
@@ -101,7 +106,7 @@ def snapshot(repo: str, pr: int, head: str) -> dict:
 
 
 def survey(pr: dict, snap: dict, head: str, since: float) -> dict[str, dict]:
-    """Collect each bot active on this head: running, reviewed, checks, last."""
+    """Collect each bot active on this head and the evidence of its progress."""
     bots: dict[str, dict] = {}
 
     def see(user: dict | None, when: float | None = None) -> dict | None:
@@ -109,7 +114,16 @@ def survey(pr: dict, snap: dict, head: str, since: float) -> dict[str, dict]:
         if name is None:
             return None
         info = bots.setdefault(
-            name, {"running": False, "reviewed": False, "checks": {}, "last": 0.0}
+            name,
+            {
+                "requested": False,
+                "eyes": 0.0,
+                "answered": 0.0,
+                "reviewed": False,
+                "stale": False,
+                "checks": {},
+                "last": 0.0,
+            },
         )
         if when is not None:
             info["last"] = max(info["last"], when)
@@ -117,19 +131,23 @@ def survey(pr: dict, snap: dict, head: str, since: float) -> dict[str, dict]:
 
     for user in pr.get("requested_reviewers", []):
         if info := see(user):
-            info["running"] = True
+            info["requested"] = True
     for r in snap["reviews"]:
         when = ts(r.get("submitted_at"))
         if when is not None and when >= since and (info := see(r["user"], when)):
-            info["reviewed"] |= r["commit_id"] == head
+            if r["commit_id"] == head:
+                info["reviewed"] = True
+                info["answered"] = max(info["answered"], when)
+            else:
+                info["stale"] = True
     for c in snap["comments"]:
         when = ts(c["updated_at"])
         if when >= since:
             see(c["user"], when)
     for r in snap["reactions"]:
         when = ts(r["created_at"])
-        if when >= since and (info := see(r["user"], when)):
-            info["running"] |= r["content"] == "eyes"
+        if when >= since and (info := see(r["user"], when)) and r["content"] == "eyes":
+            info["eyes"] = max(info["eyes"], when)
     for c in snap["checks"]:
         app = {"login": (c.get("app") or {}).get("slug", ""), "type": "Bot"}
         if info := see(app, ts(c.get("started_at"))):
@@ -141,14 +159,18 @@ def survey(pr: dict, snap: dict, head: str, since: float) -> dict[str, dict]:
     return bots
 
 
-def done(info: dict, now: float, settle: int) -> bool:
-    if info["running"] or not all(info["checks"].values()):
-        return False
-    return (
-        info["reviewed"]
-        or bool(info["checks"])
-        or (info["last"] > 0 and now - info["last"] >= settle)
-    )
+def done(info: dict, now: float, settle: int) -> str | None:
+    """Return the evidence that the bot finished on the head, or None."""
+    running = info["requested"] or info["eyes"] > info["answered"]
+    if running or not all(info["checks"].values()):
+        return None
+    if info["reviewed"]:
+        return "reviewed-head"
+    if info["checks"]:
+        return "checks"
+    if not info["stale"] and info["last"] > 0 and now - info["last"] >= settle:
+        return "quiet"
+    return None
 
 
 def main() -> int:
@@ -226,8 +248,8 @@ def main() -> int:
         if result is None:
             time.sleep(a.interval)
             continue
-        for name, ok in states.items():
-            print(f"bot {name} {'done' if ok else 'pending'}")
+        for name, evidence in states.items():
+            print(f"bot {name} {'done ' + evidence if evidence else 'pending'}")
         print(f"result {result}")
         return code
 
