@@ -59,7 +59,8 @@ Read what the repository already knows about its failures:
 ## 3. Draft
 
 Write `REVIEW.md` at the repository root (`git rev-parse --show-toplevel`),
-the only place reviewers look, in the review-rules shape: Focus, Skip, Human review,
+the file every reviewer reads; a nested `REVIEW.md` only adds rules for its
+own directory. Use the review-rules shape: Focus, Skip, Human review,
 Output, Precedents. Each Focus line names a concrete failure ("a README that
 names a flag the CLI lacks"), never a quality ("docs should be accurate").
 Start Output from this default:
@@ -98,7 +99,10 @@ git commit -m "docs(review): add REVIEW.md" -m "<one line: the evidence it was d
 ```
 
 That exact subject, on a commit touching only `REVIEW.md`, is the approval
-marker review-rules reads. Do not push; `open-pr` pushes it with the PR.
+marker review-rules reads. Because a contributor can copy the subject,
+review-rules also needs this session's approval of the text or a signature
+GitHub verified as the user's. Do not push;
+`open-pr` pushes it with the PR.
 
 ## Output
 
