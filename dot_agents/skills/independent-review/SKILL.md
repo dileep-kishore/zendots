@@ -80,7 +80,9 @@ A repeat review of a branch or PR target already reviewed in this session
 covers only the commits since the previously pinned HEAD, unless the user
 asks for a full review. Working-change targets always get a full review:
 their fixes are usually uncommitted, so a commit range from an unchanged HEAD
-would be empty.
+would be empty. A force-push, a changed base, or changed review rules break
+the commit range, so they get a full review too. Every repeat review
+reconciles the findings ledger, as described under Verify findings.
 
 For committed branch/PR reviews, check for pre-existing dirty files even when
 HEAD matches. Use a clean isolated checkout or read all surrounding context
@@ -179,6 +181,38 @@ context with [references/verify-brief.md](references/verify-brief.md):
 - A verifier that fails or misses the deadline leaves its finding UNVERIFIED,
   never refuted.
 
+### Findings ledger
+
+A repeat review must not lose an unfixed finding because the new commits are
+clean. After the first triage on a target, write `ledger.md` in that run's
+private directory, and reuse it for every later review of the target in this
+session. One row per finding: ID, location, title, verdict, state, the
+evidence for that state, the base of the comparison it was found in, and the
+HEAD it was last checked at. CONFIRMED,
+PLAUSIBLE, and UNVERIFIED findings start `open`. REFUTED ones start
+`dismissed` with the refuting file:line, and a finding the user dismisses
+records the user's reason.
+
+Never give the ledger to finders: they review unseeded. Reconcile it after
+they finish, while merging duplicates:
+
+- An open finding whose code the reviewed change touched goes to a fresh
+  verifier. Its brief pins the current HEAD but diffs from the finding's
+  recorded base, so the introduction gate judges it against the change it
+  was found in, not only the new commits. CONFIRMED or PLAUSIBLE keeps it
+  open. REFUTED marks it `fixed` only when the refuting file:line is a guard
+  or fix in the current code. A refutation on scope alone keeps it open. A
+  commit message saying it is fixed is not evidence.
+- An open finding whose code did not change stays open, without
+  reverification, and the report lists it as carried forward.
+- A new finding with the same failure as an open one is that ledger finding,
+  verified once, keeping its ID.
+- A new finding with the same failure as a dismissed one is not raised again
+  unless the new code makes it worse. List it with REFUTED findings as
+  previously dismissed, with the reason.
+
+Update the ledger after triage.
+
 ## Triage and report
 
 Read every report and verdict in full. Overrule a verdict only with code
@@ -188,8 +222,9 @@ finding from one finder may be the most serious.
 Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
 UNVERIFIED ones labeled with the step left unproven, most severe first. Give
 each its location, trigger, evidence, repro, smallest fix, and finder and
-verifier attribution. List REFUTED findings one line each with the refuting
-file:line. Then coverage: the concern map, lenses run or skipped, what no one
+verifier attribution. On a repeat review, list ledger findings carried
+forward or newly fixed after them. List REFUTED findings one line each with
+the refuting file:line. Then coverage: the concern map, lenses run or skipped, what no one
 could verify, whether the approved `REVIEW.md` override applied, and each
 Human review path the change touches or the audit includes. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
