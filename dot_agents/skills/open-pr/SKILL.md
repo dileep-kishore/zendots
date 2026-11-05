@@ -24,11 +24,16 @@ base=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
 git status --short
 git branch --show-current
 git log --oneline "origin/$base"..HEAD
-gh pr view --json number,url,state 2>/dev/null
+gh pr view --json number,url,state,title,body 2>/dev/null
 ```
 
 A PR already open for this branch means updating its title and description, not
-creating a second one.
+creating a second one. Its live body may hold text others added since it
+was written, such as a reviewer's migration note or a linked issue. Compare
+it with the full base-to-head diff: rewrite the sentences the branch now
+contradicts, and keep everything else, unless the user asked for a rewrite.
+Read the body again just before `gh pr edit`; if it changed since the
+survey, merge those edits too.
 
 `base` is the branch this work forked from, not always the default: an open
 PR's base, or the base a calling workflow already settled (Superpowers'
