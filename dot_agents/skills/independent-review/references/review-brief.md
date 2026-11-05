@@ -63,7 +63,11 @@ Report an issue when all of these hold:
 5. A linter, type checker, compiler, or formatter would not already catch it.
 
 For a probable bug, data loss, or security issue, report it even when the
-trigger is narrow, and state how narrow. For lower-severity concerns, be
+trigger is narrow, and state how narrow. When such an issue has one step
+the repository cannot prove, such as runtime configuration or an external
+service's behaviour, report it anyway with that step marked unproven under
+Mechanism; the verifier settles it. This is the only exception to criteria
+2 and 3. For lower-severity concerns, be
 certain before reporting. A request to "check", "verify", or "consider"
 something is not a finding; find out yourself.
 
@@ -142,6 +146,10 @@ needs a human, with its evidence>
 ## Coverage
 - Concern map, and what you read beyond the diff for each concern
 - Expected load, evidence for it and assumptions
+- Failure modes: up to three ways the change could still fail after merge
+  that are not findings, each with its trigger, what would detect it (a
+  named test, alert, or nothing), and whether a test in this change covers
+  it. Do not claim a test ran unless you ran it.
 - Outside-scope issues; in change reviews, pre-existing issues not introduced here
 - What you could not verify, and what would settle it
 ```
