@@ -65,7 +65,12 @@ Respect explicit file or staged-only scopes rather than widening them.
 - **Branch:** resolve the requested base and HEAD to commit IDs, compute their
   merge base, and review the diff from that merge base to the pinned head.
   Infer the base from PR/default-branch metadata, not a hard-coded branch name.
-- **PR:** read its base, head SHA, and intent. Confirm the checkout matches that
+- **PR:** read its base, head SHA, and intent. The intent includes the
+  issues it closes (`gh pr view <number> --json closingIssuesReferences`,
+  then `gh issue view` on each): copy their requirements and acceptance
+  criteria into the intent. An issue the PR body only mentions is a
+  candidate: include it only when its text describes this change, and say
+  which you included. Confirm the checkout matches that
   head before reviewing. If it does not, prepare an isolated checkout when
   authorized or ask; never switch the user's checkout without authorization.
   Resolve the PR base from its repository, accounting for forked PRs.
