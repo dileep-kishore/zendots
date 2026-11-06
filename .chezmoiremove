@@ -27,3 +27,8 @@
 .agents/skills/html-artifact/scripts/excalidraw.ts
 .agents/skills/html-artifact/references/excalidraw.md
 .agents/skills/html-artifact/assets/excalidraw-example.json
+
+# Retired: build-reveal-deck covers talk decks, including its PowerPoint import.
+.agents/skills/frontend-slides
+.claude/skills/frontend-slides
+.pi/agent/skills/frontend-slides
