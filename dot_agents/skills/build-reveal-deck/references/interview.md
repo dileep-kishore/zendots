@@ -8,27 +8,39 @@ assumptions into `brief.md` and go on.
 
 ## How to ask
 
-Use the structured question tool your host offers in its current mode, and
-check your tool list for it:
+Ask through the host's structured question tool, which T3 Code and other
+hosts show as a form. Find it in your tool list. If it is listed as deferred,
+load its schema with the host's tool search first.
 
-- `AskUserQuestion` in Claude Code;
-- in Codex, `request_user_input` in Plan mode, or `request_user_input_async`
-  where the host offers it in Default mode;
-- `ask_user` in Gemini CLI.
+- **Claude (Claude Code, the Agent SDK, T3 Code):** `AskUserQuestion`. Send
+  one question per call. Each call needs these fields:
+  - `question`: the full question, which must make sense on its own;
+  - `header`: a chip label of at most 12 characters;
+  - `multiSelect`: true or false;
+  - `options`: two to four, each with a `label` and a `description`.
 
-T3 Code and other hosts show these tools as a form. When no usable tool
-exists, ask in chat in the same shape.
+  Put the recommended option first and end its label with "(Recommended)".
+  For a visual choice in a single-select question, add a `preview` to each
+  option. A preview is a short ASCII mockup or code snippet shown beside the
+  options.
+- **Codex:** `request_user_input` in Plan mode, or `request_user_input_async`
+  where the host offers it in Default mode.
+- **Gemini CLI:** `ask_user`.
+
+When no usable tool exists, ask in chat in the same shape. Claude.ai chat
+without the tool is one such case.
 
 - Ask one question at a time. Ask the next one after the answer, since an
   answer often changes the next question or settles it.
-- Give two to four options. Put the recommended option first, mark it
-  "(Recommended)", and give a one-line reason. The form adds a free-text
-  "Other" option, so do not add one.
+- Give a one-line reason for the recommended option. The form adds a
+  free-text "Other" option, so do not add one yourself.
 - Make each question stand on its own. The form can hide your earlier
   message, so name what you found in the question itself.
-- For choices about how something looks (layout, template, chart form), add a
-  preview to each option, such as a small ASCII mockup or the path to a
-  rendered sample slide. Showing a choice beats describing it.
+- To compare rendered looks, such as templates, put the path to each sample
+  screenshot in that option's description, or open the screenshots for the
+  user before asking.
+- Read the answer as written. An "Other" reply can change the plan or ask
+  for something new; follow it rather than forcing it into an option.
 
 ## Before the outline
 
@@ -45,8 +57,9 @@ exists, ask in chat in the same shape.
 | Which template and how much motion? | Look and pace | Default · KBase · Another organisation's template; builds per click · Minimal motion |
 
 For the template question, render one sample slide in each candidate
-template into a scratch folder with `deck.py new` and `deck.py check`. Show
-the screenshots as the option previews, or open them for the user.
+template into a scratch folder with `deck.py new` and `deck.py check`. Put
+each screenshot's path in its option's description, and open the screenshots
+for the user.
 
 ## After the outline
 

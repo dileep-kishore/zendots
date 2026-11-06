@@ -79,6 +79,9 @@ fix something every deck needs, and copy that fix back into the skill.
   every box. `check` tests this.
 - `.flow` adds moving dashes to an arrow that is always shown. Use it
   sparingly.
+- Decks animate fully even when the viewer's system asks for reduced motion.
+  To honour that setting, which suits a public or accessibility-focused
+  talk, add `data-motion="respect-system"` to the `<html>` tag.
 
 ## Density
 

@@ -123,8 +123,8 @@ html, body { background: var(--bg); }
 .flow { stroke-dasharray: 8 10; animation: flow 1.4s linear infinite; }
 @keyframes flow { to { stroke-dashoffset: -36; } }
 
-/* viewers who ask for less motion get the final state without movement */
+/* full motion by default; a deck opts in to the system's reduce-motion setting with <html data-motion="respect-system"> */
 @media (prefers-reduced-motion: reduce) {
-  .reveal .slides section, .reveal .fragment { transition-duration: 1ms !important; }
-  .reveal section.present .enter, .flow, .reveal .slides section * { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+  html[data-motion="respect-system"] .reveal .slides section, html[data-motion="respect-system"] .reveal .fragment { transition-duration: 1ms !important; }
+  html[data-motion="respect-system"] .reveal section.present .enter, html[data-motion="respect-system"] .flow, html[data-motion="respect-system"] .reveal .slides section * { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }

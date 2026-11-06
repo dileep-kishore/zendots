@@ -8,11 +8,13 @@ Reveal.initialize({
 
 // An arrow's head (marker-end) is attached only once its line has finished drawing.
 // Put data-marker="<marker id>" on the path instead of marker-end.
-// Viewers who ask for less motion get the whole line and its head at once.
+// Full motion by default. With <html data-motion="respect-system">, viewers whose system asks
+// for less motion get the whole line and its head at once.
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let DRAW_MS = 0;
 function setDrawMs() {
-  DRAW_MS = reduceMotion.matches ? 0 : 1100;
+  const honor = document.documentElement.dataset.motion === 'respect-system';
+  DRAW_MS = honor && reduceMotion.matches ? 0 : 1100;
   document.documentElement.style.setProperty('--draw-ms', DRAW_MS + 'ms');
 }
 setDrawMs();
