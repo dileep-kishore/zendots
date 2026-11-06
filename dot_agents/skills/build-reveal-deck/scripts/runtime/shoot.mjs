@@ -6,7 +6,8 @@ import { pathToFileURL } from "node:url";
 const [mode, html, outDir, stepSlide] = process.argv.slice(2);
 const SETTLE_MS = 2600; // longest fragment transition (draw 1100 ms) plus arrowhead timers
 const b = await chromium.launch();
-const p = await b.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: mode === "pdf" ? 2 : 1 });
+const [vw, vh] = (mode === "pdf" ? "1600x900" : process.env.DECK_VIEWPORT || "1600x900").split("x").map(Number);
+const p = await b.newPage({ viewport: { width: vw, height: vh }, deviceScaleFactor: mode === "pdf" ? 2 : 1 });
 const errs = []; p.on("pageerror", e => errs.push(String(e)));
 const failed = [];
 p.on("requestfailed", r => failed.push(r.url()));

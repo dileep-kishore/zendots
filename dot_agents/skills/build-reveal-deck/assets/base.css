@@ -122,3 +122,9 @@ html, body { background: var(--bg); }
 /* moving dashes on an always-on arrow */
 .flow { stroke-dasharray: 8 10; animation: flow 1.4s linear infinite; }
 @keyframes flow { to { stroke-dashoffset: -36; } }
+
+/* viewers who ask for less motion get the final state without movement */
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section, .reveal .fragment, .reveal .fragment.draw :is(path, line, polyline) { transition-duration: 1ms !important; }
+  .reveal section.present .enter, .flow, .reveal .slides section * { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+}

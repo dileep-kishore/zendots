@@ -80,6 +80,21 @@ fix something every deck needs, and copy that fix back into the skill.
 - `.flow` adds moving dashes to an arrow that is always shown. Use it
   sparingly.
 
+## Density
+
+These are starting points, not caps. Go past them when the slide still reads
+at a glance from the back of the room, and split the slide when it does not.
+
+| Slide type | Comfortable amount |
+|---|---|
+| Title | Title, one subtitle line, presenter and date |
+| Text | 4 to 6 bullets, or 2 short paragraphs |
+| Diagram | 3 to 7 boxes, each with a heading and one short line |
+| Cards or grid | Up to 6 cards |
+| Table | Up to 6 rows and 5 columns |
+| Code | 8 to 10 lines, never scrolling |
+| Numbers | 1 headline figure and up to 4 supporting rows |
+
 ## Readability
 
 - Text is at least 18px on the 1600px slide. Body text in boxes is 19 to

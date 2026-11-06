@@ -38,6 +38,20 @@ def fail(msg: str) -> None:
     sys.exit(1)
 
 
+def guard_untracked(dest: Path) -> None:
+    """Refuse a deck folder that git would track, so personal decks stay out of commits."""
+    probe = dest
+    while not probe.exists():
+        probe = probe.parent
+    top = subprocess.run(["git", "-C", str(probe), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    if top.returncode != 0:
+        return
+    ignored = subprocess.run(["git", "-C", top.stdout.strip(), "check-ignore", "-q", str(dest / "index.html")])
+    if ignored.returncode != 0:
+        fail(f"git would track {dest}. Use the project's ignored artifact folder (docs/superpowers/ or docs/drafts/), "
+             "add the folder to the file `git rev-parse --git-path info/exclude` names, or pass --tracked to commit it")
+
+
 def cmd_new(a: argparse.Namespace) -> None:
     tdir = ASSETS / "templates" / a.template
     if not tdir.is_dir():
@@ -45,6 +59,8 @@ def cmd_new(a: argparse.Namespace) -> None:
     dest = Path(a.dest).expanduser().resolve()
     if dest.exists() and any(dest.iterdir()):
         fail(f"{dest} is not empty; pick a new folder so an existing deck is never overwritten")
+    if not a.tracked:
+        guard_untracked(dest)
     cfg = json.loads((tdir / "template.json").read_text())
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ASSETS / "lib", dest / "lib")
@@ -59,6 +75,21 @@ def cmd_new(a: argparse.Namespace) -> None:
                      "PRESENTER": a.presenter, "DATE": a.date}.items():
         html = html.replace("{{" + key + "}}", val)
     (dest / "index.html").write_text(html)
+    (dest / "brief.md").write_text(f"""# Brief: {a.title}
+
+Answers from the interview (references/interview.md). Update when one changes.
+
+- Audience:
+- Goal (what they should do after):
+- How the deck is used (live, projected, sent):
+- Slot length and discussion time:
+- The one sentence to remember:
+- The hardest question, and the slide that answers it:
+- Evidence sources:
+- Sensitive points:
+- Template and motion: {a.template}
+- Assumptions made without asking:
+""")
     print(dest / "index.html")
 
 
@@ -100,8 +131,9 @@ def shoot(mode: str, a: argparse.Namespace, extra: list[str] | None = None) -> d
     for old in out.glob("slide-*.png"):
         old.unlink()
     rdir, env = runtime()
+    w, h = (int(x) for x in getattr(a, "size", "1600x900").lower().split("x"))
     res = subprocess.run(["node", "shoot.mjs", mode, str(idx), str(out), *(extra or [])],
-                         cwd=rdir, env=env, capture_output=True, text=True, timeout=900)
+                         cwd=rdir, env={**env, "DECK_VIEWPORT": f"{w}x{h}"}, capture_output=True, text=True, timeout=900)
     if res.returncode != 0:
         fail(res.stderr.strip() or res.stdout.strip())
     return json.loads(res.stdout)
@@ -228,16 +260,20 @@ def main() -> None:
     n.add_argument("--title", required=True)
     n.add_argument("--presenter", default="Dileep Kishore")
     n.add_argument("--date", default=date.today().strftime("%-d %B %Y"))
+    n.add_argument("--tracked", action="store_true", help="allow a folder git would track")
     for name, helptext in (("check", "screenshot and audit every slide"), ("pdf", "write a PDF"), ("bundle", "write one HTML file")):
         s = sub.add_parser(name, help=helptext)
         s.add_argument("deck", help="deck folder or its index.html")
         s.add_argument("--out", help="screenshot folder (check) or output file (bundle)")
+        if name == "check":
+            s.add_argument("--size", default="1600x900", help="browser window WIDTHxHEIGHT, e.g. 1280x960 for a 4:3 projector")
         if name == "pdf":
             s.add_argument("--pdf", help="output PDF path; default <deck folder>/<folder name>.pdf")
     st = sub.add_parser("steps", help="screenshot one slide at every fragment step")
     st.add_argument("deck")
     st.add_argument("slide", type=int, help="slide number, starting at 1")
     st.add_argument("--out")
+    st.add_argument("--size", default="1600x900", help="browser window WIDTHxHEIGHT")
     a = ap.parse_args()
     {"new": cmd_new, "check": cmd_check, "steps": cmd_steps, "pdf": cmd_pdf, "bundle": cmd_bundle}[a.cmd](a)
 
