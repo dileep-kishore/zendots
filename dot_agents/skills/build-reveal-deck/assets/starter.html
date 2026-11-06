@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="{{FONTS}}" rel="stylesheet">
+<link rel="stylesheet" href="lib/reset.min.css">
+<link rel="stylesheet" href="lib/reveal.min.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- 1 Title -->
+<section data-transition="fade">
+  {{TITLE_LOGO}}
+  <div class="title-wrap">
+    <div class="eyebrow enter">Meeting or series · topic</div>
+    <h1 class="enter d1">{{TITLE}}</h1>
+    <p class="enter d2">One sentence that says what the audience gets from this talk.</p>
+    <div class="who enter d3">{{PRESENTER}} <span>· {{DATE}}</span></div>
+  </div>
+  <div class="hero box c-accent enter d2"><span class="tag">proposed · illustrative</span><h4>Preview of the thing you propose</h4><p>Replace with a small mock (window, search, list) that shows the end product.</p></div>
+</section>
+
+<!-- 2 One visual: a flow whose arrows arrive with the box they point to -->
+<section>
+  <div class="kicker">The problem</div>
+  <h2>A one-line claim, not a topic</h2>
+  <div class="stage">
+    <svg viewBox="0 0 1440 588" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible" aria-hidden="true">
+      <defs><marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--faint)"/></marker></defs>
+      <g class="fragment draw" data-fragment-index="1" stroke="var(--faint)" stroke-width="3" fill="none"><line x1="404" y1="290" x2="514" y2="290" data-marker="m2"/></g>
+      <g class="fragment draw" data-fragment-index="2" stroke="var(--faint)" stroke-width="3" fill="none"><line x1="924" y1="290" x2="1034" y2="290" data-marker="m2"/></g>
+    </svg>
+    <div class="box c-blue enter" style="left:0;top:190px;width:400px;height:200px"><span class="tag">today</span><h4>Step one</h4><p>Short phrase, not a sentence list.</p></div>
+    <div class="box c-accent fragment pop" data-fragment-index="1" style="left:520px;top:190px;width:400px;height:200px"><span class="tag">next</span><h4>Step two</h4><p>Arrives with the arrow that points to it.</p></div>
+    <div class="box c-green fragment pop" data-fragment-index="2" style="left:1040px;top:190px;width:400px;height:200px"><span class="tag">result</span><h4>Step three</h4><p>What changes for the audience.</p></div>
+  </div>
+  <ul class="takeaway fragment rise" data-fragment-index="3"><li>The one thing to remember from this slide.</li></ul>
+</section>
+
+<!-- 3 Gaps today -> what we will do -->
+<section>
+  <div class="kicker">Where we stand today</div>
+  <h2>Each gap is paired with what we will do</h2>
+  <div class="stage">
+    <div class="colhead enter" style="left:0;color:var(--red)">GAPS TODAY</div>
+    <div class="colhead enter" style="left:800px;color:var(--green)">WHAT WE WILL DO</div>
+    <div class="lim" style="top:0">
+      <div class="bad enter"><h4>A gap, stated as a fact</h4><p>Where the evidence for it comes from.</p></div>
+      <svg class="arrow fragment draw" data-fragment-index="1" viewBox="0 0 136 40"><line x1="8" y1="20" x2="124" y2="20" stroke="var(--green)" stroke-width="4" data-marker="m3"/></svg>
+      <div class="good fragment pop" data-fragment-index="1"><h4>What we will build</h4><p>How it closes the gap.</p></div>
+    </div>
+    <div class="lim" style="top:146px">
+      <div class="bad enter d1"><h4>A second gap</h4><p>One sentence of evidence.</p></div>
+      <svg class="arrow fragment draw" data-fragment-index="2" viewBox="0 0 136 40"><line x1="8" y1="20" x2="124" y2="20" stroke="var(--green)" stroke-width="4" data-marker="m3"/></svg>
+      <div class="good fragment pop" data-fragment-index="2"><h4>The matching fix</h4><p>One sentence.</p></div>
+    </div>
+    <svg width="0" height="0" style="position:absolute"><defs><marker id="m3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker></defs></svg>
+  </div>
+  <ul class="takeaway fragment rise" data-fragment-index="3"><li>Name the gap in our own systems, not in other people's tools.</li></ul>
+</section>
+
+<!-- 4 Evidence from real data -->
+<section>
+  <div class="kicker">Example · observed in real data</div>
+  <h2>What one real project produced</h2>
+  <div class="stage">
+    <div class="box c-blue enter" style="left:0;top:0;width:420px;height:588px"><span class="tag">the headline number</span><div class="big" style="color:var(--blue)">44</div><h4>what the number counts</h4><p>out of what total, from which source</p></div>
+    <div class="lane-label enter" style="left:500px;top:0">What else it showed</div>
+    <div class="box krow c-accent fragment rise" style="left:500px;top:34px;width:940px;height:130px"><div class="big">9 of 14</div><div><h4>what this count means</h4><p>why the audience should care</p></div></div>
+    <div class="box krow c-accent fragment rise" style="left:500px;top:188px;width:940px;height:130px"><div class="big">105</div><div><h4>a second finding</h4><p>its consequence</p></div></div>
+  </div>
+  <div class="source" style="left:80px;bottom:104px">Source: project or dataset name, date</div>
+  <ul class="takeaway fragment rise"><li>Numbers come from the source file, checked before they go on a slide.</li></ul>
+</section>
+
+<!-- 5 Summary: what we have, how we get there, the end product -->
+<section>
+  <div class="kicker">Summary</div>
+  <h2>From the pieces we have to one product</h2>
+  <div class="stage tall">
+    <svg viewBox="0 0 1440 650" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible" aria-hidden="true">
+      <defs><marker id="m5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--faint)"/></marker></defs>
+      <g class="fragment draw" data-fragment-index="1" stroke="var(--faint)" stroke-width="3" fill="none"><line x1="424" y1="290" x2="504" y2="290" data-marker="m5"/></g>
+      <g class="fragment draw" data-fragment-index="2" stroke="var(--faint)" stroke-width="3" fill="none"><line x1="934" y1="290" x2="1014" y2="290" data-marker="m5"/></g>
+    </svg>
+    <div class="col enter" style="left:0;border-color:var(--blue)"><h3>What we have</h3><ul><li>Building block one</li><li>Building block two</li></ul></div>
+    <div class="col fragment pop" data-fragment-index="1" style="left:510px;border-color:var(--accent)"><h3>How we get there</h3><ul><li>First step</li><li>Second step</li></ul></div>
+    <div class="col fragment pop" data-fragment-index="2" style="left:1020px;border-color:var(--green)"><h3>The end product</h3><ul><li>What users get</li><li>How we know it worked</li></ul></div>
+  </div>
+</section>
+
+</div>
+</div>
+<script src="lib/reveal.min.js"></script>
+<script src="lib/plugin/notes.min.js"></script>
+<script src="deck.js"></script>
+</body>
+</html>

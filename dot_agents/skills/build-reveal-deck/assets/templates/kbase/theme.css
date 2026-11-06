@@ -1,0 +1,45 @@
+/* KBase theme: wave header band with the title inside it, DOE + KBase logos bottom right, slide counter bottom left. */
+:root {
+  --bg: #ffffff;
+  --ink: #1e2b30;
+  --muted: #5e6e76;
+  --faint: #93a3ab;
+  --line: #d3dfe5;
+  --card: #ffffff;
+  --bar: #eef4f6;
+  --shadow: rgba(11, 60, 70, .35);
+  --accent: #078b9c;
+  --accent-soft: #e3f3f5;
+  --alt: #6a4c9c;
+  --alt-soft: #eee9f6;
+  --blue: #2b5c93;
+  --blue-soft: #e3ecf6;
+  --green: #5a8a1c;
+  --green-soft: #eef5e0;
+  --orange: #d4891c;
+  --orange-soft: #fcf1de;
+  --red: #c8462b;
+  --red-soft: #fbe7e2;
+  --deep: #0b4a55;
+  --sans: "Google Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --display: "Google Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+
+.reveal .progress span { background: linear-gradient(90deg, var(--blue), var(--accent), var(--green)); }
+.reveal .slide-number { background: transparent; color: var(--muted); font: 500 16px var(--sans); left: 122px; right: auto; bottom: 21px; }
+.reveal .controls { left: 104px; right: auto; }
+
+/* the band is drawn oversized so it still fills the top edge when the window is wider or taller than 16:9 */
+.reveal .slides > section::before { content: ""; position: absolute; left: -1600px; top: -900px; width: 4800px; height: 1026px; background: url(assets/kbase-band.png) 1600px 900px / 1600px 126px no-repeat, #bfecf0; pointer-events: none; }
+.reveal .slides > section::after { content: ""; position: absolute; right: 36px; bottom: 12px; width: 260px; height: 52px; background: url(assets/doe-kbase.png) right center / contain no-repeat; pointer-events: none; }
+
+.reveal .kicker { top: 22px; font: 700 15px/1 var(--sans); letter-spacing: .14em; color: var(--deep); }
+.reveal h2 { top: 46px; font: 500 46px/1.12 var(--display); letter-spacing: -.01em; }
+.title-logo { position: absolute; left: 80px; top: 170px; height: 132px; }
+.title-wrap { top: 350px; width: 760px; }
+.title-wrap .eyebrow { font: 700 18px/1 var(--sans); color: var(--deep); }
+.title-wrap h1 { margin: 22px 0 24px; font: 700 64px/1.08 var(--display); letter-spacing: -.02em; }
+.title-wrap p { font-size: 26px; }
+.title-wrap .who { margin-top: 34px; }
+.hero { top: 170px; height: 600px; }

@@ -1,0 +1,8 @@
+{
+  "name": "build-reveal-deck-runtime",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
+}
