@@ -57,8 +57,9 @@ const audit = () => {
     // text lines are measured by their glyphs, since a list item's box spans the full width
     const lineRects = e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; };
     const hits = r => r.width && r.left < foot.right && r.right > foot.left && r.top < foot.bottom && r.bottom > foot.top;
-    s.querySelectorAll(".takeaway li, .source, .box, .col, .term, .window").forEach(e => {
-      const rects = e.matches(".takeaway li, .source") ? lineRects(e) : [e.getBoundingClientRect()];
+    const textSel = ".takeaway li, .source, .bullets li, .prose p";
+    s.querySelectorAll(`${textSel}, .box, .col, .term, .window`).forEach(e => {
+      const rects = e.matches(textSel) ? lineRects(e) : [e.getBoundingClientRect()];
       if (rects.some(hits)) issues.push(`covers the footer logos: "${label(e)}"`);
     });
   }

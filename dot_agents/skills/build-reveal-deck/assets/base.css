@@ -30,6 +30,19 @@ html, body { background: var(--bg); }
 .title-wrap .who span { color: var(--muted); }
 .hero { position: absolute; right: 70px; top: 130px; width: 620px; height: 640px; }
 
+/* text slides: bullets or paragraphs placed below the title */
+.reveal .bullets { position: absolute; left: 80px; right: 80px; top: 190px; margin: 0; padding: 0; list-style: none; font: 400 32px/1.4 var(--sans); color: var(--ink); }
+.reveal .bullets > li { position: relative; padding-left: 34px; margin: 0 0 20px; }
+.reveal .bullets > li::before { content: ""; position: absolute; left: 0; top: .55em; width: 14px; height: 14px; border-radius: 4px; background: var(--accent); }
+.reveal .bullets ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: 26px; color: var(--muted); }
+.reveal .bullets ul li { position: relative; padding-left: 26px; margin: 4px 0; }
+.reveal .bullets ul li::before { content: ""; position: absolute; left: 0; top: .6em; width: 9px; height: 9px; border-radius: 50%; background: var(--faint); }
+.reveal .prose { position: absolute; left: 80px; top: 190px; width: 1150px; font: 400 32px/1.45 var(--sans); color: var(--ink); }
+.reveal .prose p { margin: 0 0 24px; }
+.reveal table.data { border-collapse: collapse; font-size: 22px; width: 100%; }
+.reveal table.data th { text-align: left; font: 600 16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--line); padding: 10px 14px; }
+.reveal table.data td { border-bottom: 1px solid var(--line); padding: 12px 14px; color: var(--ink); vertical-align: top; }
+
 /* boxes and colour roles */
 .box { position: absolute; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 18px 22px; box-sizing: border-box; box-shadow: 0 10px 30px -18px var(--shadow); }
 .box h4 { margin: 0 0 6px; font: 700 26px/1.2 var(--display); letter-spacing: -.01em; color: var(--ink); text-transform: none; }
@@ -51,7 +64,7 @@ html, body { background: var(--bg); }
 .box.krow .big { font-size: 52px; margin: 0; min-width: 210px; text-align: right; flex: none; }
 .box.krow h4 { font-size: 24px; }
 
-/* two columns: problem today -> what we will do */
+/* comparison rows: left item -> right item */
 .lim { position: absolute; left: 0; right: 0; height: 124px; }
 .lim .bad, .lim .good { position: absolute; top: 0; height: 124px; width: 640px; box-sizing: border-box; border-radius: 16px; padding: 11px 20px; border: 2px solid; background: var(--card); box-shadow: 0 10px 26px -18px var(--shadow); }
 .lim .bad { left: 0; border-color: var(--red); }
@@ -61,7 +74,7 @@ html, body { background: var(--bg); }
 .lim .arrow { position: absolute; left: 652px; top: 42px; width: 136px; height: 40px; }
 .colhead { position: absolute; top: -34px; font: 600 16px var(--mono); letter-spacing: .1em; }
 
-/* summary columns: what we have -> how we get there -> the end product */
+/* tall columns, e.g. three stages joined by arrows */
 .col { position: absolute; top: 10px; height: 560px; width: 420px; box-sizing: border-box; border-radius: 18px; border: 2px solid; padding: 22px 24px; background: var(--card); box-shadow: 0 16px 36px -24px var(--shadow); }
 .col h3 { margin: 0 0 10px; font: 700 32px/1.2 var(--display); color: var(--ink); text-transform: none; letter-spacing: -.01em; }
 .col ul { list-style: none; margin: 0; padding: 0; }

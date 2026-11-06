@@ -25,7 +25,7 @@
   --mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
 }
 
-.reveal .slide-number { background: transparent; color: var(--faint); font: 500 15px var(--sans); right: 28px; bottom: 22px; }
+.reveal .slide-number { background: transparent; color: var(--faint); font: 500 15px var(--sans); left: 32px; right: auto; bottom: 22px; }
 .reveal .kicker { top: 46px; }
 .reveal h2 { top: 78px; font: 700 54px/1.12 var(--display); }
 .title-wrap { top: 200px; }
