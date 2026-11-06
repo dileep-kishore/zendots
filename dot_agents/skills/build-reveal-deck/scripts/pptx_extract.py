@@ -21,6 +21,18 @@ except ImportError:
     sys.exit("python-pptx is missing; run this script with `uv run --with python-pptx python3 ...`")
 
 
+def picture(shape):
+    """Return the image a shape shows, including a filled picture placeholder, or None."""
+    if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+        return shape.image
+    if getattr(shape, "is_placeholder", False):
+        try:
+            return shape.image
+        except (AttributeError, ValueError):
+            return None
+    return None
+
+
 def shape_lines(shape, media: Path, slide_no: int, counter: list[int]) -> list[str]:
     """Return markdown lines for one shape, saving any picture it holds.
 
@@ -37,10 +49,11 @@ def shape_lines(shape, media: Path, slide_no: int, counter: list[int]) -> list[s
     """
     if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
         return [line for s in shape.shapes for line in shape_lines(s, media, slide_no, counter)]
-    if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+    image = picture(shape)
+    if image is not None:
         counter[0] += 1
-        name = f"slide-{slide_no:02d}-{counter[0]}.{shape.image.ext}"
-        (media / name).write_bytes(shape.image.blob)
+        name = f"slide-{slide_no:02d}-{counter[0]}.{image.ext}"
+        (media / name).write_bytes(image.blob)
         return [f"![{shape.name}](media/{name})"]
     if shape.has_table:
         rows = [[cell.text.strip().replace("\n", " ") for cell in row.cells] for row in shape.table.rows]
@@ -49,7 +62,8 @@ def shape_lines(shape, media: Path, slide_no: int, counter: list[int]) -> list[s
     if shape.has_text_frame:
         lines = []
         for para in shape.text_frame.paragraphs:
-            text = "".join(run.text for run in para.runs).strip()
+            # para.text keeps soft line breaks (Shift+Enter) as \v; runs alone would glue the words together
+            text = para.text.replace("\v", "<br>").strip()
             if text:
                 lines.append("  " * para.level + f"- {text}")
         return lines

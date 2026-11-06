@@ -38,18 +38,31 @@ def fail(msg: str) -> None:
     sys.exit(1)
 
 
-def guard_untracked(dest: Path) -> None:
-    """Refuse a deck folder that git would track, so personal decks stay out of commits."""
+def guard_untracked(dest: Path, files: list[Path]) -> None:
+    """Refuse a deck folder where git would track any file ``new`` writes.
+
+    Parameters
+    ----------
+    dest : Path
+        Deck folder, which may not exist yet.
+    files : list of Path
+        Paths relative to ``dest`` that ``new`` will create.
+    """
     probe = dest
     while not probe.exists():
         probe = probe.parent
     top = subprocess.run(["git", "-C", str(probe), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if top.returncode != 0:
         return
-    ignored = subprocess.run(["git", "-C", top.stdout.strip(), "check-ignore", "-q", str(dest / "index.html")])
-    if ignored.returncode != 0:
-        fail(f"git would track {dest}. Use the project's ignored artifact folder (docs/superpowers/ or docs/drafts/), "
-             "add the folder to the file `git rev-parse --git-path info/exclude` names, or pass --tracked to commit it")
+    wanted = [str(dest / f) for f in files]
+    res = subprocess.run(["git", "-C", top.stdout.strip(), "check-ignore", "--no-index", "--stdin"],
+                         input="\n".join(wanted), capture_output=True, text=True)
+    ignored = {Path(line).resolve() for line in res.stdout.splitlines() if line}
+    tracked = [str(f) for f in files if (dest / f).resolve() not in ignored]
+    if tracked:
+        fail(f"git would track {len(tracked)} file(s) in {dest}, e.g. {', '.join(tracked[:3])}. Use the project's "
+             "ignored artifact folder (docs/superpowers/ or docs/drafts/), add the whole folder to the file "
+             "`git rev-parse --git-path info/exclude` names, or pass --tracked to commit it")
 
 
 def cmd_new(a: argparse.Namespace) -> None:
@@ -60,7 +73,11 @@ def cmd_new(a: argparse.Namespace) -> None:
     if dest.exists() and any(dest.iterdir()):
         fail(f"{dest} is not empty; pick a new folder so an existing deck is never overwritten")
     if not a.tracked:
-        guard_untracked(dest)
+        made = ["index.html", "brief.md", "deck.css", "base.css", "deck.js", "theme.css"]
+        made += [f"lib/{f.relative_to(ASSETS / 'lib')}" for f in (ASSETS / "lib").rglob("*") if f.is_file()]
+        if (tdir / "assets").is_dir():
+            made += [f"assets/{f.relative_to(tdir / 'assets')}" for f in (tdir / "assets").rglob("*") if f.is_file()]
+        guard_untracked(dest, [Path(m) for m in made])
     cfg = json.loads((tdir / "template.json").read_text())
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ASSETS / "lib", dest / "lib")

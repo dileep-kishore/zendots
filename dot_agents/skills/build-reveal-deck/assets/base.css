@@ -125,6 +125,6 @@ html, body { background: var(--bg); }
 
 /* viewers who ask for less motion get the final state without movement */
 @media (prefers-reduced-motion: reduce) {
-  .reveal .slides section, .reveal .fragment, .reveal .fragment.draw :is(path, line, polyline) { transition-duration: 1ms !important; }
+  .reveal .slides section, .reveal .fragment { transition-duration: 1ms !important; }
   .reveal section.present .enter, .flow, .reveal .slides section * { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }

@@ -56,9 +56,17 @@ const audit = () => {
     const right = dr.right - parseFloat(after.right) * k, bottom = dr.bottom - parseFloat(after.bottom) * k;
     const foot = { left: right - w, right, top: bottom - h, bottom };
     // text lines are measured by their glyphs, since a list item's box spans the full width
-    const lineRects = e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; };
+    // glyph boxes of each text node; a range over the element would add the boxes of nested lists
+    const lineRects = e => {
+      const out = [], walk = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+      for (let t = walk.nextNode(); t; t = walk.nextNode()) {
+        if (!t.textContent.trim()) continue;
+        const rg = document.createRange(); rg.selectNodeContents(t); out.push(...rg.getClientRects());
+      }
+      return out;
+    };
     const hits = r => r.width && r.left < foot.right && r.right > foot.left && r.top < foot.bottom && r.bottom > foot.top;
-    const textSel = ".takeaway li, .source, .bullets li, .prose p";
+    const textSel = ".takeaway li, .source, .bullets li, .prose p, table th, table td";
     s.querySelectorAll(`${textSel}, .box, .col, .term, .window`).forEach(e => {
       const rects = e.matches(textSel) ? lineRects(e) : [e.getBoundingClientRect()];
       if (rects.some(hits)) issues.push(`covers the footer logos: "${label(e)}"`);

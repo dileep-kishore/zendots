@@ -8,14 +8,16 @@ assumptions into `brief.md` and go on.
 
 ## How to ask
 
-Use the host's structured question tool when it has one:
+Use the structured question tool your host offers in its current mode, and
+check your tool list for it:
 
 - `AskUserQuestion` in Claude Code;
-- `request_user_input` in Codex;
+- in Codex, `request_user_input` in Plan mode, or `request_user_input_async`
+  where the host offers it in Default mode;
 - `ask_user` in Gemini CLI.
 
-T3 Code and other hosts show these tools as a form. When no such tool exists,
-ask in chat in the same shape.
+T3 Code and other hosts show these tools as a form. When no usable tool
+exists, ask in chat in the same shape.
 
 - Ask one question at a time. Ask the next one after the answer, since an
   answer often changes the next question or settles it.

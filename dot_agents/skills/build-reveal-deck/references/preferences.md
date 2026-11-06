@@ -12,9 +12,10 @@ with that deck and does not belong here.
 - Use a light theme with smooth transitions and animations: a slide
   transition, staggered entrances, and content that builds with clicks where
   that helps the explanation.
-- Store decks in `/Volumes/WorkSSD/Work/Presentations/<Topic>_<YYYY>_<Mon>/`.
-  That folder syncs between machines, so keep scratch files and screenshots
-  out of it.
+- Store decks as SKILL.md step 2 says: in a git project, in its ignored
+  artifact folder; in the Presentations folder only when the user asks, in
+  that deck's own subfolder. The Presentations folder syncs between
+  machines, so keep scratch files and screenshots out of it.
 
 ## What a slide looks like
 

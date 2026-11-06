@@ -8,8 +8,15 @@ Reveal.initialize({
 
 // An arrow's head (marker-end) is attached only once its line has finished drawing.
 // Put data-marker="<marker id>" on the path instead of marker-end.
-const DRAW_MS = 1100;
-document.documentElement.style.setProperty('--draw-ms', DRAW_MS + 'ms');
+// Viewers who ask for less motion get the whole line and its head at once.
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let DRAW_MS = 0;
+function setDrawMs() {
+  DRAW_MS = reduceMotion.matches ? 0 : 1100;
+  document.documentElement.style.setProperty('--draw-ms', DRAW_MS + 'ms');
+}
+setDrawMs();
+reduceMotion.addEventListener('change', setDrawMs);
 
 function markerTargets(f) {
   return [...(f.matches('[data-marker]') ? [f] : []), ...f.querySelectorAll('[data-marker]')];
