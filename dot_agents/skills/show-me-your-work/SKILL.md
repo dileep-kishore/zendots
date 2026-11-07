@@ -28,10 +28,23 @@ ts	phase	decision	why	evidence	result
 - **result**: the outcome or state: `tests green`, `reverted`, `open`,
   `INCONCLUSIVE`.
 
-Append with `printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" ...`.
-Strip tabs and newlines from cells, and prefix a cell that starts with `=`,
-`+`, `-`, or `@` with a single quote so a spreadsheet never treats it as a
-formula.
+Append with the helper, which stamps `ts`, writes the header on first use,
+strips tabs and newlines, and prefixes a cell that starts with `=`, `+`, `-`,
+or `@` with a single quote so a spreadsheet never treats it as a formula:
+
+```bash
+~/.agents/skills/show-me-your-work/scripts/log.sh <log> <phase> <decision> <why> <evidence> <result>
+```
+
+## Runs
+
+A run is one agent session, including its later turns and any summary that
+continues it. A handoff, a replacement agent, or a new chat starts a new
+run. When a run adds to a log that already has rows, its first row has phase
+`start`, with the `ts` range of earlier rows it did not write in `decision`
+and the session or agent id in `evidence`. A run that returns to a log in a
+later turn reads the last rows first, and writes another `start` row if a
+different run wrote since. Use phase `start` for nothing else.
 
 ## What to log
 
@@ -56,13 +69,18 @@ to trust the result; then it renders as a table in the PR.
 
 ## Before handing back
 
-Walk the log against what you actually did this session. Every row maps to a
-real action; every evidence pointer resolves and shows what the row claims;
-a fork, pivot, or abandoned approach that shaped the work is logged; padding
-is cut. Fix the log, not the story. If the user wants the trail reviewed by a
+Audit this run's rows, from its `start` row or the top of a log it created
+up to the next run's `start` row, against tool evidence: the commands you
+ran and their output, commits, and files written, not your memory of the
+session. Every row maps to a real action; every evidence pointer resolves
+and shows what the row claims; a fork, pivot, or abandoned approach that
+shaped the work is logged. Correct the log, not the story: the log stays
+append-only, so a wrong or invented row gets a new row that supersedes it
+with what happened and a pointer that resolves. If the user wants the trail reviewed by a
 fresh context, use the `independent-review` skill on the log and the diff.
 
 Other skills that need an audit trail point here instead of inventing one.
 
 Locally maintained. Adapted from Cursor pstack's
-[show-me-your-work](https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md).
+[show-me-your-work](https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md);
+`scripts/log.sh` is copied from it under its MIT license.
