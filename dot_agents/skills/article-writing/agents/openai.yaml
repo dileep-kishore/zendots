@@ -1,0 +1,5 @@
+interface:
+  display_name: "Article Writing"
+  short_description: "Write long-form content in a given voice"
+policy:
+  allow_implicit_invocation: false
