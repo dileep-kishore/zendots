@@ -1,6 +1,6 @@
 ---
 name: create-skill
-description: Use when the user asks to create, author, or add a new agent skill to the shared ~/.agents/skills store so Claude Code, Codex, Pi, and OpenCode all pick it up.
+description: Use when the user asks to create, author, or add an agent skill to the shared ~/.agents/skills store so Claude Code, Codex, Pi, and OpenCode all pick it up, or to make an edit that changes what an existing skill makes agents do.
 disable-model-invocation: true
 ---
 
@@ -10,6 +10,8 @@ disable-model-invocation: true
 it as `dot_agents/skills/<name>` in `~/zendots`. Codex, Pi, and OpenCode read
 the store directly; Claude Code reads it through symlinks in `~/.claude/skills`
 that `agent-skills.sh` maintains. Never write a skill anywhere else.
+
+An edit to an existing skill follows step 3's rules, then steps 5 and 6.
 
 ## 1. Check it does not already exist
 
@@ -95,6 +97,10 @@ OpenCode ask before loading it:
 
 ## 5. Record and verify
 
+Run one realistic task with a new skill in a fresh context, and check the
+result against the Output pinned in step 2. An edit gets the comparison in
+[references/compare-versions.md](references/compare-versions.md) instead.
+
 ```bash
 agent-skills.sh sync          # chezmoi add + relink ~/.claude/skills
 ls -l ~/.claude/skills/<name> # symlink into ~/.agents/skills
@@ -114,6 +120,3 @@ Skills reach the other machine through Syncthing plus
 `chezmoi apply ~/.agents/skills/<name>`. A scoped apply skips `run_after`
 scripts, so then run `~/.local/bin/link-agent-skills.sh` there to create the
 Claude link. Author on one machine only.
-
-For prompt-based evals of a finished skill, Claude Code's `skill-creator`
-plugin has the tooling; nothing here depends on it.

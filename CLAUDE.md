@@ -94,7 +94,10 @@ add …`). Check for existing local adaptations and plugin duplicates first;
 do not reinstall an entire collection over existing locally maintained skills.
 
 To author a skill, invoke the `create-skill` skill; it covers layout, the
-manual-only frontmatter for each harness, and recording the result.
+manual-only frontmatter for each harness, and recording the result. Before
+committing an edit that changes what a skill makes agents do, read and run
+`~/.agents/skills/create-skill/references/compare-versions.md`: the old and
+new versions on the same tasks in fresh contexts, scored by a blind judge.
 
 Every skill absent from `~/.agents/.skill-lock.json` (`humanizer`, `open-pr`,
 `create-skill`, `find-docs`, and the rest) is locally maintained. Do not
