@@ -34,6 +34,13 @@ gets more. Sections, omitting any that would be empty:
   highest useful one. Add or change tests only where they protect behavior;
   no coverage quota. State the choice; ask only if a new seam is a
   consequential design decision.
+- **Done checks**: 3 to 6 for a project-size spec, fewer for a small one.
+  Each is a row: the requirement it settles, the command or action that
+  shows it, the expected result, and a wrong result it would reject. Fit the
+  kind to the work: a known answer, a comparison with a reference, a
+  property, a run on real inputs (for an app, from empty state in the
+  client the user uses), or degenerate input. Take expected results from the
+  requirement, never from what the code currently outputs.
 - **Out of scope**.
 - **Open questions**: the unresolved consequential choices, if any.
 
