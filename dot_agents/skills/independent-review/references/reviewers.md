@@ -11,7 +11,7 @@ when one is replaced.
 |---|---|---|---|
 | 1 | GPT-6.1 Sol, high effort | OpenAI | tiers 1-3, verifier |
 | 2 | Gemini 4 Argon, high thinking, through Antigravity | Google | tiers 2-3 |
-| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3 only |
+| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3; Argon's fallback in tier 2 |
 | - | Claude Opus 5.5, high effort | Anthropic | rank 1 when Claude did not write the change; verifier |
 
 When Codex wrote the change, Claude Opus takes rank 1 and Sol drops out.
@@ -22,10 +22,10 @@ When Codex wrote the change, Claude Opus takes rank 1 and Sol drops out.
 - **Tier 2:** the first two eligible reviewers.
 - **Tier 3 (council):** the first three eligible reviewers, Grok included.
 
-A seat whose reviewer is unavailable goes to the next eligible reviewer,
-except that Grok fills tier 3 seats only. With no eligible substitute, leave
-the seat empty and label the review partial. Say which seat moved or stayed
-empty, and why.
+A seat whose reviewer is unavailable goes to the next eligible reviewer.
+Grok fills a tier 2 seat only as Argon's fallback, under Gemini finders
+below. With no eligible substitute, leave the seat empty and label the
+review partial. Say which seat moved or stayed empty, and why.
 
 ## Verifiers
 
@@ -40,8 +40,22 @@ Antigravity's Gemini models tend to read files in small slices, re-read what
 they already have, and open files they guess at, which can burn quota for
 tens of minutes. Every Gemini finder's brief gets the
 [reading budget](reading-budget.md) inserted before its Intent section, and
-a 25-minute deadline: at the deadline, cancel the task (`task_cancel` in T3)
-and label that seat partial.
+a 20-minute deadline from launch.
+
+At the deadline, cancel the task (`task_cancel` in T3) and launch Grok 4.7
+high fast with the same brief, minus the reading budget, into that seat. Do
+the same at once when Argon is unavailable or its launch fails. Grok gets
+its own 20-minute deadline; if it misses that too, label the seat partial.
+Report the seat as fallen back, with Argon's elapsed time, and keep Argon's
+calibration row with `findings` empty. In tier 3, when Argon falls back,
+Grok already holds a seat, so that seat stays empty and the review is
+partial.
+
+A November 2026 bake-off on one 46-line diff with five known defects set
+this order: Sol found 5 of 5 in 38 seconds, Argon 5 of 5 in about 2
+minutes, and Grok high fast 4 of 5 in about 3 minutes, with severity
+inflated to P0. One small diff cannot separate Sol from Argon; the
+calibration log decides from here.
 
 ## Launch routes
 
@@ -55,8 +69,8 @@ report: save it unchanged to the report path.
 | Reviewer | T3 `target` | CLI |
 |---|---|---|
 | Sol | `providerInstanceId: "codex"`, `model: "gpt-6.1-sol"`, `options: {reasoningEffort: "high"}` | `codex exec -C <checkout> -s read-only -m gpt-6.1-sol -c model_reasoning_effort=high --ephemeral -o <report> "<prompt>"` |
-| Argon | `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thinking_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --print-timeout 25m -p "<prompt>" > <report>`, run from the checkout |
-| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout |
+| Argon | `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thinking_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --print-timeout 20m -p "<prompt>" > <report>`, run from the checkout |
+| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}`; as Argon's fallback, `fastMode: true` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout; as Argon's fallback, `--model grok-4.7-high-fast` |
 | Claude Opus | `providerInstanceId: "claudeAgent"`, `model: "claude-opus-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-opus-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
 
 `<prompt>` is one short line: read the brief at its absolute path and follow
@@ -69,7 +83,7 @@ Before launching either, or any Gemini finder, save the log, the diff,
 `git status --short --untracked-files=all`, and the list of changed and
 untracked files into the private directory, and fill the brief's
 `{SAVED_INPUTS}` with those paths. Both CLIs can exit 0 without a report; the
-completion token decides. For `agy`, use `--print-timeout 25m` as the Gemini
+completion token decides. For `agy`, `--print-timeout 20m` is the Gemini
 deadline.
 
 ## Score line

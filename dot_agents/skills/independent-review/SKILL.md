@@ -22,7 +22,8 @@ family that wrote the change and gives each reviewer's launch route.
 
 - **Tier 1**, the default: one finder, GPT-6.1 Sol when Claude wrote the
   change.
-- **Tier 2**: two finders, adding Gemini 4 Argon. Move up to it without asking
+- **Tier 2**: two finders, adding Gemini 4 Argon, or Grok 4.7 when Argon
+  misses its deadline. Move up to it without asking
   when the change is large (roughly 1,000+ changed lines) or touches
   authentication, authorization, persistent data or migrations, money, or
   concurrency; for a design review; and when the user asks for a dual, total,
