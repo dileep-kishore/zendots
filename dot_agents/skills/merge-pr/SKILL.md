@@ -85,10 +85,43 @@ gate that was visible up front.
    20 minutes leave CI unverified, which also fails the gate. A PR with no
    checks passes, and the report says CI was absent.
 
+   A required check that has not registered yet is missing from that list,
+   not passing. Read the required names for the base branch:
+
+   ```bash
+   gh api "repos/<owner>/<repo>/rules/branches/<base>" --jq '.[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context'
+   gh api "repos/<owner>/<repo>/branches/<base>" --jq '.protection.required_status_checks | (.contexts[]?, .checks[]?.context)' | sort -u
+   ```
+
+   The branch endpoint shows classic protection to any reader; the protection
+   endpoint itself needs admin access and answers 404 otherwise. A 403 from
+   the rules endpoint saying the feature needs GitHub Pro means it sets none:
+   free private repositories have no rulesets. Each required name absent
+   from the head's checks counts as pending. When either call fails for
+   another reason, say in the report that required checks are unknown.
+
 4. **Mergeable.** `mergeStateStatus` must be `CLEAN` or `HAS_HOOKS`.
    `UNKNOWN` means GitHub is still computing it: re-query for up to a minute.
    `DIRTY` (conflicts), `BEHIND`, `BLOCKED`, `UNSTABLE`, and `DRAFT` fail the
    gate with that status named.
+
+5. **Tested against the current base.** GitHub reports `BEHIND` only when
+   branch protection requires up-to-date branches, so `CLEAN` can sit on CI
+   that never saw newer base commits. Find base commits the head lacks that
+   touch this PR's files. `<remote>` is the remote whose URL is the PR's base
+   repository (`gh pr view <number> --json url`): usually `origin`, but often
+   `upstream` in a clone of a fork.
+
+   ```bash
+   git fetch <remote> <base> "refs/pull/<number>/head" && head=<headRefOid>
+   comm -12 <(git diff --name-only "$(git merge-base "$head" <remote>/<base>)" <remote>/<base> | sort) \
+            <(gh pr diff <number> --name-only | sort)
+   ```
+
+   Any output fails the gate until the branch includes those commits: run
+   `gh pr update-branch <number>`, which merges the base without a force-push,
+   re-read `headRefOid` with `gh pr view`, and rerun gates 1 to 5 on that
+   head.
 
 ## 3. Merge, bottom-up
 
@@ -105,10 +138,14 @@ Immediately before each merge, re-run gate 2, and gate 1 too if a review
 arrived since the last check. A reviewer can open a thread during the CI wait
 or while earlier stack PRs merge, and `--match-head-commit` only refuses the
 merge when someone pushed after the gates passed. Do not pass
-`--delete-branch`; step 4 deletes branches safely. Confirm `state` is
-`MERGED` before moving on.
+`--delete-branch`; step 4 deletes branches safely. Never pass `--admin` or
+otherwise bypass branch protection. Confirm `state` is `MERGED` before moving
+on. When the repository uses a merge queue or auto-merge, `gh pr merge`
+returns with the PR still open: wait until it reports `MERGED` (in T3, with
+`watch_pull_request`), and stop with the reason if it leaves the queue
+unmerged.
 
-For the next PR up the stack, retarget it, then re-run gates 2 to 4 on it:
+For the next PR up the stack, retarget it, then re-run gates 2 to 5 on it:
 
 ```bash
 gh pr edit <child> --base <default-branch>
@@ -118,9 +155,9 @@ If the repository deleted the parent branch on merge, GitHub retargets the
 child itself; check `baseRefName` rather than assuming. Retargeting keeps the
 head SHA, and many workflows do not re-run on a base change, so the green
 checks may come from runs against the old base. Wait a few minutes for new
-runs to register; if none do, merge on the existing results only when
-`mergeStateStatus` is `CLEAN`, and say in the report that the child's CI ran
-against its old base.
+runs to register. If none do, run `gh pr update-branch <child>` so CI runs on
+a head that contains the new base, re-read the child's `headRefOid`, and rerun
+gates 1 to 5 on it. Never merge a child on CI from its old base.
 
 ## 4. Clean up each merged branch
 
@@ -130,6 +167,16 @@ HTML in the main checkout's ignored artifact folder, stop owned test jobs,
 and remove completed plans, reports, and scratch data. If cleanup is blocked,
 leave the affected worktree in place and report the reason. For a stack,
 keep shared artifacts until every consuming task has finished.
+
+When `gh pr update-branch` moved a PR's head during this run, GitHub holds a
+merge commit the local branch lacks, and the helper refuses a local tip that
+is neither `--pr-head` nor merged. Bring the local branch to the head first
+through the PR's own ref, which survives automatic head-branch deletion:
+`git fetch <remote> "refs/pull/<number>/head"`, then
+`git -C <worktree> merge --ff-only FETCH_HEAD` where it is checked out, or
+`git branch -f <headRefName> FETCH_HEAD` after confirming with
+`git merge-base --is-ancestor <headRefName> FETCH_HEAD` when it is not. Pass
+the refreshed `headRefOid` as `--pr-head`.
 
 Change directory to the main checkout first. The current shell may be inside
 the worktree about to be removed, and every later command would fail there.

@@ -115,6 +115,13 @@ A repository template at `.github/PULL_REQUEST_TEMPLATE.md` or
 structure below, then apply the final writing pass in this step.
 
 Title names the main change, in the style of the commits, under 70 characters.
+Prefer what the change achieves over how it does it, with a number only when
+the session measured it:
+
+```
+perf(server): negotiate permessage-deflate on the websocket   # mechanism
+perf(server): cut websocket frame size by 70% with deflate     # outcome
+```
 
 Body, in order:
 
@@ -123,7 +130,8 @@ Body, in order:
    it does and the one decision the reviewer needs. The diff shows the detail;
    the paragraph says what it achieves.
 3. **Verification** — one line per command that ran: the command and its
-   result.
+   result. When `independent-review` ran on this change in the session, add
+   its score line.
 
 Then, only when real, one sentence each: what was left out and why, a risk the
 diff does not show, a related issue, and how to undo the change when
@@ -149,13 +157,13 @@ logical changes gets more Solution paragraphs, not longer ones. Under three
 paragraphs, prose with no headings; past that, headings.
 
 Read the body once more as the reviewer and cut every sentence that does not
-change how they read the diff or what they check. Before creating or updating
-the PR, read and apply [humanizer](../humanizer/SKILL.md) to both the title and
-description in embedded mode, returning only the final text. Keep the tone
-natural and technical. Preserve facts, verification results, uncertainty,
-code, commands, links, and structure: the section order, headings, and title
-style set above, or the repository template's. Humanizer rewrites sentences,
-not the skeleton. Do not invent claims or add personality that does not fit.
+change how they read the diff or what they check. Then check the title and
+body against [references/pr-prose.md](references/pr-prose.md), including its
+scan for secrets and private details.
+
+When the branch carries someone else's commits, keep their authorship and
+trailers, and credit them in the description, as `modernize` step 5
+describes.
 
 ## 6. Stop only for these
 
@@ -186,6 +194,10 @@ date -u +%Y-%m-%dT%H:%M:%SZ   # note it: the push time for step 8
 git push -u origin HEAD
 gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: gh pr edit
 ```
+
+`gh pr create` uses GraphQL. When that rate limit is spent, open the PR
+through REST instead:
+`gh api repos/<owner>/<repo>/pulls -f title=<title> -f head=<branch> -f base="$base" -F body=@<file>`.
 
 Report the URL, the commits and any fold made, the `pr-assets` commit when
 images were uploaded, each `REVIEW.md` Human review path the PR touches, then

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Modernize PR"
+  short_description: "Rebase an old PR and decide whether it should still exist"
+  default_prompt: "Use $modernize to bring this PR up to date and tell me whether it should stay open."
+policy:
+  allow_implicit_invocation: false

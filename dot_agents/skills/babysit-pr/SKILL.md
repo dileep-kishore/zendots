@@ -11,8 +11,48 @@ from "has unresolved threads" to "every thread replied to and resolved"
 without stopping for approval: asking for it authorizes the fixes, pushes, and
 replies.
 
-Generating a fresh review is a different job: use `independent-review` or
-`/code-review` for that. This skill only answers review that already exists.
+Generating a fresh review is a different job: use `independent-review` for
+that. This skill only answers review that already exists.
+
+## Waiting in T3 Code
+
+When `watch_pull_request` is available, it replaces the long waits in steps 1,
+6, and 7. T3 wakes this thread when a check fails, the required checks pass,
+someone comments or reviews, or the branch conflicts; it never wakes on a
+deadline, so watch only while something can still produce one of those events.
+
+Answer what already exists (steps 2 to 5). Within three minutes of a push, run
+the step 1 waiter once with `--timeout 240`, so a head that draws no review bot
+ends in `result none` instead of a silent watch. Then decide, in this order:
+
+- **A step 7 stop holds:** three rounds are done, or everything left needs
+  the user, including a requested human review that is the only thing
+  pending. Go to step 7 and report. Do not watch.
+- **Work you will act on is pending** on the current head: a check is queued
+  or running, or a review bot is pending. Call `watch_pull_request` and end
+  the turn.
+- **Nothing is pending and nothing is left to answer:** go to step 7 and
+  report. Do not watch.
+
+On each wake, re-read the live head, checks, and threads and apply the same
+decision, continuing from step 2 when something needs an answer. When a wake
+needs no action and something is still pending, end the turn without a
+message. Never post or say "still waiting".
+- Only the thread that owns the PR watches it. A delegated child never calls
+  `watch_pull_request`; its parent owns the PR.
+- Call `unwatch_pull_request` before any stop in step 7: done, blocked, or
+  asking the user. A merge or close ends the watch on its own.
+
+Outside T3, use the scripts below.
+
+## Unattended runs
+
+When the user is not watching ("I'm stepping away", "finish this
+overnight"), a question in an ordinary message looks like a finished thread.
+Ask through the harness's question tool with the PR link, what blocks you, and
+the options with your recommendation first. Without a question tool, leave
+the PR as it is and open the final message with the question. Merge only when
+the user asked for a merge, and then through `merge-pr`.
 
 ## 1. Locate the PR and wait for the bots
 
@@ -75,6 +115,16 @@ Read every comment in the thread, not only the first: a later reply may
 narrow the finding, report a fix, or hold an earlier rebuttal. For a thread
 whose `totalCount` exceeds 50, read the rest at its first comment's `url`.
 
+When the GraphQL rate limit is spent (`gh api rate_limit --jq
+.resources.graphql`), REST has its own budget: read the PR with `gh api
+repos/$owner/$repo/pulls/<number>`, and page with `--paginate` through its
+review comments (`.../pulls/<number>/comments`), reviews
+(`.../pulls/<number>/reviews`), PR comments
+(`.../issues/<number>/comments`), and checks
+(`.../commits/<sha>/check-runs`). Thread
+IDs and resolving exist only in GraphQL, so wait once for the `reset` time it
+reports rather than retrying in a loop.
+
 `isOutdated: true` means the diff moved, not that the concern was handled. Read
 the current code before deciding. Outdated-and-unresolved is the usual shape of
 a finding everyone forgot about.
@@ -124,20 +174,29 @@ Keep one triage table for the report:
 |---|---|---|---|---|
 | `PRRT_…` | `justfile:37` | P2 re-sources .env after Hub defaults | CONFIRMED | drop the nested `just run` |
 | `PRRT_…` | `api/db.py:88` | P3 unbounded query | REFUTED — `limit` applied at `api/routes.py:142` | rebut |
+| `PRRT_…` | `cli.py:40` | P3 add a test for the empty-config path | DECLINED — the PR changes no config loading | decline, follow-up |
 
 Every unresolved thread and summary finding appears in the table, including
 ones you plan only to rebut. A summary finding's Thread cell holds its
 comment or review URL. Then carry on through steps 4–7 without asking. Leave a thread open,
 and say why in the report, when it needs the user: a product or design call,
-a human reviewer's request you would decline, or a fix outside the PR's
-scope. When a rebuttal's reason, or a fixed finding's mistake, has come up
+a human reviewer's request you would decline, or a defect outside the PR's
+scope.
+
+Review loops grow a PR one cheap-looking fix at a time, so push back. A bot
+suggestion that holds but that the PR's goal does not need gets the verdict
+DECLINED, with a reply giving the reason, and is resolved and listed as a
+follow-up: extra tests, guards for paths the PR does not reach, extra
+compatibility, refactors, and small performance costs. A defect in the
+intended case is fixed, never declined. When a rebuttal's reason, or a fixed finding's mistake, has come up
 before in this repository, propose a `REVIEW.md` precedent or a source fix in
 the report, as [review-rules](../independent-review/references/review-rules.md)
 describes, rather than writing it.
 
 ## 4. Fix and push
 
-Make the smallest change that answers each finding that held, run the project's
+Make the smallest change that answers each finding that held, preferring the
+fix that deletes or narrows code, run the project's
 checks, then commit the round as one commit, subject naming its dominant change.
 Every reply in the round cites that one SHA. The reply says what changed and the
 commit says where, which is the whole of the audit trail; a commit per thread
@@ -174,11 +233,9 @@ git rev-parse --short HEAD
 Two separate operations. Doing only the second leaves the reviewer guessing;
 doing only the first leaves the PR looking unaddressed.
 
-Before posting any PR comment or thread reply, read and apply
-[humanizer](../humanizer/SKILL.md) to the draft in embedded mode, returning only
-the final text. Keep it concise, natural, and respectful. Preserve the finding,
-decision, evidence, uncertainty, commit SHAs, file references, commands, and
-verification results. Do not invent claims or turn a rebuttal into agreement.
+Write every PR comment and thread reply by
+[open-pr's PR prose rules](../open-pr/references/pr-prose.md), including the
+check for secrets and private details.
 
 ```bash
 gh api graphql -f threadId=<thread-id> -f body='<reply>' -f query='
@@ -204,8 +261,13 @@ A reply to one that did not names the evidence that refutes it:
 > Not applicable here — `limit` is applied by the only caller
 > (`api/routes.py:142`), so the query is already bounded. Leaving as is.
 
-Resolve after replying, in both cases. A rebutted finding is answered, not
-pending. Leave a thread open only when it needs the user's decision, and say
+A declined suggestion names the reason and where it is tracked:
+
+> Declining for this PR: the guard covers a caller that does not exist yet
+> (`grep -rn load_cache` finds one call site). Listed as a follow-up.
+
+Resolve only after the reply mutation returned a comment URL, in every case. A
+rebutted or declined finding is answered, not pending. Leave a thread open only when it needs the user's decision, and say
 which ones in the report.
 
 Summary findings have no thread to reply in or resolve. Answer all of a
@@ -241,7 +303,8 @@ passes on rerun) instead of patching around it.
 
 Report:
 
-- threads and summary findings answered, split into fixed and rebutted
+- threads and summary findings answered, split into fixed, rebutted, and
+  declined, with the declined ones as a follow-up list
 - threads and summary findings deliberately left open, and what each is
   waiting on
 - the pushed commit SHAs
