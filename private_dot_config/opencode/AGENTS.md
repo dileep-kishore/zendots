@@ -4,8 +4,14 @@
 
 - Before substantial work, read around it, including code, docs, and project
   instructions the request doesn't name. Settle what observable result means
-  done and how to check it, then iterate until that check passes. Name what
-  stayed unverified; the edit itself is not the result.
+  done, the check that shows it, and a wrong result that check would reject,
+  then iterate until it passes. For a bug, reproduce the reported symptom
+  before editing, or say why you can't. Reuse evidence only while its code,
+  command, and environment still match; otherwise rerun it or name the gap.
+  Never weaken a test, threshold, or expected result to get a pass, and zero
+  tests run is no pass. Label each claim you report observed, inferred, or
+  unverified, and run a check yourself instead of asking me to. The edit
+  itself is not the result.
 - Questions, reviews, diagnoses, and plans: inspect and report without
   changing code; the workflow's own artifacts (plans, briefs, task lists) are
   fine. Change, build, and fix requests: make in-scope edits and run local
@@ -62,8 +68,9 @@
   regression, test-first when that clarifies a bug fix, and a smoke check for
   reversible, low-impact changes. Honor repository requirements and reuse the
   project's verification recipes. `verify-this` settles a disputed claim;
-  suggest `create-verification-skill` for a recurring manual check and
-  `maintain-verification-skill` when a recipe drifts.
+  suggest `create-verification-skill` for a recurring manual check,
+  `maintain-verification-skill` when a recipe drifts, and `correct` when I
+  correct the same kind of mistake a second time.
 - After substantial work passes its check, run one `independent-review` of
   the whole working change, untracked files included, at the reviewer tier
   that skill picks. Fix each finding its verifier confirms, fix or explain each
