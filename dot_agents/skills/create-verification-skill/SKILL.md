@@ -41,8 +41,14 @@ Cover, with the project's real commands:
 
 - **Launch:** prerequisites, the startup command, the readiness signal, and
   the handles (PIDs, ports, profile dirs) for everything the run creates.
+  Launch reaches a usable state from an empty data directory, migrations and
+  seed data included. Ready means usable: a database can answer its health
+  check while its init scripts still run.
 - **Health check:** a read-only probe that the right build and instance are
   up with the access needed. Rerun it after any unexpected failure.
+- **Reset:** the known state a retry starts from, and how to reach it, for
+  failures the health check cannot see, such as a stuck dialog in a healthy
+  process.
 - **Drive:** the real user entry points, with the expected observable result
   of each action, side effects included. For science or algorithm code, the
   flows are its done checks: a known answer, a reference comparison, a
@@ -58,10 +64,16 @@ been exercised. Split into per-feature files only once the index gets long.
 
 ## 3. Prove it
 
-Run one mapped flow from the recipe as a fresh agent would. When a step
-fails, fix the recipe and rerun from that step; keep going until the flow
-passes or you hit a blocker the recipe cannot fix. Never loosen an expected
-result to make it pass. Clean up after failed attempts as well.
+Run one mapped flow from the recipe as a fresh agent would, starting from
+an empty data directory. When a step fails, fix the recipe and rerun from
+that step; keep going until the flow passes or you hit a blocker the recipe
+cannot fix. Never loosen an expected result to make it pass. Clean up after
+failed attempts as well.
+
+If you proved it in a stand-in for the real target, such as a container in
+place of a fresh machine or a local stack in place of a remote one, list
+each setup step the stand-in did that the target will not. Those steps stay
+unverified until a run on the real target covers them.
 
 If both Claude and Codex are available, start a fresh session in each and
 confirm it finds the skill. File layout alone does not prove discovery.
@@ -70,7 +82,8 @@ confirm it finds the skill. File layout alone does not prove discovery.
 
 `ready` for the flows actually exercised, or `draft` / `blocked` with what is
 missing. List the files written, checks run, evidence paths, flows not yet
-exercised, discovery results, and cleanup left pending. Commit or publish only
+exercised, stand-in setup left unverified, discovery results, and cleanup
+left pending. Commit or publish only
 when asked.
 
 Locally maintained. Adapted from Cursor pstack's

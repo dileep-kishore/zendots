@@ -33,14 +33,21 @@ drives a shared running instance.
 ## 3. Run every scoped flow
 
 Update the recipes, then run each flow using the recipe's own launch and
-health checks, capturing actions and results. Sort each failure:
+health checks, capturing actions and results. Start at least one launch in
+the run from an empty data directory, through migrations and seed data to a
+usable state; a recipe that cannot do that has a gap. If the run happens in
+a stand-in for the real target, such as a container or a local stack, list
+each setup step the stand-in supplied that the target will not; those stay
+unverified. Sort each failure:
 
 - **Doc drift or recipe gap:** fix the recipe or its helper and rerun.
 - **Product defect:** leave the expected result as it is and report it.
 - **Missing prerequisite** (credentials, a service): report as unverified.
 
-After an unexpected failure, rerun the health check or reset state before
-retrying. If a flow still fails for the same reason, treat it as a blocker
+After an unexpected failure, rerun the health check before retrying; when
+the failure is one the health check cannot see, such as a stuck dialog in a
+healthy process, reset to the recipe's known state or relaunch. A recipe
+with no reset for that case has a gap. If a flow still fails for the same reason, treat it as a blocker
 and move on to the next flow rather than retrying further. Clean up what the
 run created, failed attempts included, and confirm the evidence survived.
 
@@ -54,7 +61,8 @@ One outcome for the stated scope:
   corrections separately.
 
 Include the scope, revision checked, per-flow evidence, files changed,
-product defects, unverified prerequisites, and cleanup left pending. Leave
+product defects, unverified prerequisites, stand-in setup left unverified,
+and cleanup left pending. Leave
 committing and review to the parent workflow. Long audits can keep a
 decision trail with `show-me-your-work`.
 
