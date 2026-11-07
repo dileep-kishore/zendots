@@ -1,0 +1,5 @@
+interface:
+  display_name: "Find Skills"
+  short_description: "Search for, vet, and install an agent skill"
+policy:
+  allow_implicit_invocation: false
