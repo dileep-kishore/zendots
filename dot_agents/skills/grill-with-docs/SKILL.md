@@ -12,9 +12,13 @@ rest yourself, and write the answers into the project's existing docs.
 ## 1. Find the facts first
 
 Facts are your job, not the user's. Before asking anything, read what the
-project already holds: the plan or spec being grilled, the glossary
-(`CONTEXT.md` or equivalent), ADRs, recent commits, and the code the plan
-touches. Look up anything a question would otherwise ask the user to recall.
+project already holds: the plan or spec being grilled, the glossary, ADRs,
+recent commits, and the code the plan touches. The glossary is `GLOSSARY.md`,
+or `CONTEXT.md` in older repositories. A root `GLOSSARY-MAP.md` (or
+`CONTEXT-MAP.md`) means the repository has several contexts: it points to one
+glossary per context, and ADRs may sit beside each context as well as in
+`docs/adr/`. Read those for the contexts the plan touches. Look up anything a
+question would otherwise ask the user to recall.
 
 ## 2. Ask only consequential questions
 
@@ -38,9 +42,10 @@ contradictions between what the user says and what the code does.
 
 Create nothing speculative; update what exists:
 
-- A sharpened or new domain term goes into the project's glossary. Create a
-  `CONTEXT.md` only when the project has no glossary and a term was actually
-  resolved.
+- A sharpened or new domain term goes into the glossary of the context it
+  belongs to. Create a `GLOSSARY.md` only when the project has no glossary
+  and a term was actually resolved; keep an existing `CONTEXT.md` under its
+  name rather than renaming it.
 - Write an ADR only when the decision is hard to reverse, surprising without
   context, and the result of a real trade-off. Use the project's existing ADR
   format and location; otherwise `docs/adr/NNNN-<slug>.md`.
