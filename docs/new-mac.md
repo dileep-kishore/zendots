@@ -148,6 +148,7 @@ On the new Mac:
    curl -fsSL https://pi.dev/install.sh | sh
    curl -fsSL https://omp.sh/install | sh
    curl https://cursor.com/install -fsS | bash
+   curl -fsSL https://antigravity.google/cli/install.sh | bash
    ```
 
    Over SSH, `cursor-agent --version` fails on the locked login keychain. Check
