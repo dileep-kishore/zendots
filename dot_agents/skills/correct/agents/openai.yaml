@@ -1,0 +1,5 @@
+interface:
+  display_name: "Correct"
+  short_description: "Make a repeated agent mistake fail a check"
+policy:
+  allow_implicit_invocation: false

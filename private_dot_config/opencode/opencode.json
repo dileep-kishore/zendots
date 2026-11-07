@@ -81,6 +81,7 @@
 		{ "action": "shell", "resource": "*", "effect": "allow" },
 		{ "action": "webfetch", "resource": "*", "effect": "allow" },
 		{ "action": "external_directory", "resource": "*", "effect": "ask" },
+		{ "action": "skill", "resource": "correct", "effect": "ask" },
 		{ "action": "skill", "resource": "create-skill", "effect": "ask" },
 		{ "action": "skill", "resource": "create-verification-skill", "effect": "ask" },
 		{ "action": "skill", "resource": "humanizer", "effect": "ask" },
