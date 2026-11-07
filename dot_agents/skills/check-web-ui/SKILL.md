@@ -117,6 +117,12 @@ Playwright. At 320px, 390px, and a desktop width, and in each theme:
    if needed (empty fixture, throttled or blocked request). A blocked request
    passes when the error state appears and retry works.
 
+After fixing anything this section found, repeat the interaction that
+showed the problem, then one neighbouring flow that worked before, at the
+same width and theme. Compare what is on screen and the console against the
+first run; the fix passes when the problem is gone and the neighbour still
+behaves as it did.
+
 If the UI cannot be run here, say so, check each control by reading the
 code, and label the result unverified in the browser.
 
