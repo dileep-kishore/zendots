@@ -17,10 +17,10 @@ the spec's own stated goals and mark that lens partial under coverage.
 
 ## Reviewers
 
-Default to one fresh Claude finder and one Codex finder, each covering every
-lens below, with Claude verifiers. A fresh same-model reviewer and a
-cross-model reviewer find partly different errors, so the pair beats two
-reviewers from one vendor. For deep review, split the lenses across vendors as
+Use tier 2's two finders from [reviewers.md](reviewers.md), each covering
+every lens below, with verifiers chosen by that file's verifier rule. Two
+cross-model reviewers find partly different errors, so the pair beats two
+reviewers from one vendor. For deep review, split the lenses across them as
 [lenses.md](lenses.md) assigns them.
 
 ## Lenses

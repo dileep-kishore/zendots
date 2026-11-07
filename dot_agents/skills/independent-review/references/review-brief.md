@@ -38,6 +38,8 @@ Pinned state: {PINNED_STATE}
 
 {UNTRACKED_FILES}
 
+{SAVED_INPUTS}
+
 ## Focus
 
 {LENS}
@@ -133,6 +135,7 @@ the user requests another:
 
 ## Verdict
 Ready to merge: Yes | No | With fixes
+Score: <0-10>/10, how close the target is to its intent as reviewed
 <one or two sentences of technical reasoning>
 For a repository audit, use Audit: Healthy | Action needed | Incomplete instead.
 

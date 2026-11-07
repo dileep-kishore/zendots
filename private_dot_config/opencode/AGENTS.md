@@ -65,9 +65,8 @@
   suggest `create-verification-skill` for a recurring manual check and
   `maintain-verification-skill` when a recipe drifts.
 - After substantial work passes its check, run one `independent-review` of
-  the whole working change, untracked files included, with a reviewer from
-  the other vendor when available: Codex if you are Claude, Claude if you are
-  GPT. Fix each finding its verifier confirms, fix or explain each
+  the whole working change, untracked files included, at the reviewer tier
+  that skill picks. Fix each finding its verifier confirms, fix or explain each
   plausible one, then rerun affected checks. A second review needs a
   concrete new concern; this replaces other skills' review rounds. When
   behavior, APIs, or setup changed, update the docs in the same change with

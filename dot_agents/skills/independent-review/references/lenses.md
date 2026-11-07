@@ -34,8 +34,8 @@ issue it notices outside the lens.
 - Use every lens the change can reach. Skip a lens only when the diff gives
   it nothing to examine (no trust boundary, no shared state), and list the
   skipped lens under coverage.
-- Alternate vendors across lenses, starting with the vendor that did not
-  write the change. For lens 1 and any lens the user names as the main risk,
-  run one finder from each vendor.
+- Alternate the tier's reviewers across lenses in roster order, as
+  [reviewers.md](reviewers.md) ranks them. For lens 1 and any lens the user
+  names as the main risk, run one finder from each of the tier's reviewers.
 - For a diff over roughly 2,000 changed lines, split the heaviest lenses by
   area of the concern map as well, up to about eight finders in total.

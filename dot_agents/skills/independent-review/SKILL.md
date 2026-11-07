@@ -1,6 +1,6 @@
 ---
 name: independent-review
-description: Use when independently reviewing a PR, branch, or working changes, auditing a repository or folder, or when the user asks for total or deep review or project instructions require an independent review.
+description: Use when independently reviewing a PR, branch, or working changes, auditing a repository or folder, or when the user asks for a total, deep, or council review or project instructions require an independent review.
 ---
 
 # Independent review
@@ -17,27 +17,36 @@ Use the user's target, reviewer, and intent. Infer routine missing details from
 the checkout, PR, or spec and state the assumptions. Ask only when ambiguity
 would materially change the review.
 
-- **Single**, the default: one fresh finder. Honor a named provider/model;
-  otherwise prefer the other vendor: Codex when Claude wrote the change,
-  Claude when GPT did. Another tier from the same vendor (Opus and Sonnet)
-  does not count. Fall back to any reviewer with a separate context.
-- **Dual / total review**, when requested: Claude and Codex independently review
-  the same scope, preferably in parallel. Honor another requested pair. Use
-  configured model defaults unless the user specifies models or effort.
-- **Deep**, when requested, or when the change is large (roughly 1,000+
-  changed lines) or touches authentication, authorization, persistent data or
-  migrations, money, or concurrency: several finders, each with one lens from
-  [references/lenses.md](references/lenses.md), split across both vendors.
-  State that you chose deep and why.
-- **Design review**, for a spec or design document before planning: one
-  fresh Claude finder and one Codex finder, as
-  [references/design-review.md](references/design-review.md) describes.
-- Wait and triage by default. If the user requests a background handoff, return
-  the run handles, brief/report paths, and how to retrieve results, then stop.
+Finders fill the seats of a tier from the ranked roster in
+[references/reviewers.md](references/reviewers.md), which skips the model
+family that wrote the change and gives each reviewer's launch route.
 
-Do not silently substitute a named reviewer. If one is unavailable, explain the
-limitation and ask whether the available alternative is acceptable. Two agents
-using the same model are independent contexts, not a cross-model review.
+- **Tier 1**, the default: one finder, GPT-6.1 Sol when Claude wrote the
+  change.
+- **Tier 2**: two finders, adding Gemini 4 Argon. Move up to it without asking
+  when the change is large (roughly 1,000+ changed lines) or touches
+  authentication, authorization, persistent data or migrations, money, or
+  concurrency; for a design review; and when the user asks for a dual, total,
+  pair, or deep review.
+- **Tier 3**, the council: three finders, adding Grok 4.7. Only when the user
+  asks for a council.
+
+Shape is separate from tier. Each finder reviews the whole scope by default.
+**Deep** review instead gives each finder one lens from
+[references/lenses.md](references/lenses.md), split across the tier's
+reviewers; use it when size or risk moved the review to tier 2, or when the
+user asks for deep. A **design review** of a spec or design document before
+planning follows [references/design-review.md](references/design-review.md).
+State the tier, shape, and reason.
+
+Wait and triage by default. If the user requests a background handoff, return
+the run handles, brief/report paths, and how to retrieve results, then stop.
+
+A reviewer or model the user names takes the seat over the roster. Do not
+silently substitute it: if it is unavailable, explain the limitation and ask
+whether the available alternative is acceptable. An unnamed seat follows the
+roster's fallback rule. Two agents using the same model are independent
+contexts, not a cross-model review.
 
 ## Pin the scope
 
@@ -116,19 +125,24 @@ Fill [references/review-brief.md](references/review-brief.md) with the intent,
 pinned scope, standards, and a per-finder report path and completion token.
 `{LENS}` is the finder's lens for deep review; otherwise "Full review: cover
 every step of the process." A design review fills `{LENS}` and the finding
-and verifier gates from its reference. Append a user-requested focus verbatim. Every
+and verifier gates from its reference. `{SAVED_INPUTS}` lists the saved
+command output a finder without shell access reads instead, and is empty
+otherwise. Append a user-requested focus verbatim. Every
 finder gets the same substantive brief apart from its lens. Do not include
 your suspected findings, preferred solution, implementation chat, or another
 reviewer's report.
 
-Choose a supported launcher in the current environment:
+Launch each finder by the route
+[references/reviewers.md](references/reviewers.md) gives for the current host:
 
-- **Native subagents:** start with no inherited conversation, supplying only
-  the brief and checkout. Use read-only permissions when supported. Reviewers
-  should perform their own review without recursively launching reviewers.
-- **External processes:** inspect the installed CLI's help and available
-  provider instructions. Use a fresh noninteractive invocation, explicit cwd,
-  and read-only controls where available. Pass the brief through a file/stdin,
+- **T3 Code:** `delegate_task` with the roster's target, one task per finder.
+- **Native subagents:** for a seat in the coordinator's own family. Start with
+  no inherited conversation, supplying only the brief and checkout. Use
+  read-only permissions when supported. Reviewers should perform their own
+  review without recursively launching reviewers.
+- **External processes:** the roster's CLI command, after checking the
+  installed CLI's help. Use a fresh noninteractive invocation, explicit cwd,
+  and read-only controls where available. Pass the brief through a file,
   not shell-interpolated user text. Do not resume an implementation session or
   disable permission checks to get a review running. Launch Claude as
   `env -u ANTHROPIC_API_KEY claude -p ...`: with that variable set, the CLI
@@ -176,9 +190,9 @@ context with [references/verify-brief.md](references/verify-brief.md):
 
 - One verifier per P0–P2 finding, in parallel; P3 findings share one verifier,
   which receives that batch and no other findings.
-- Launch verifiers like finders, with no inherited conversation. Prefer a model
-  family other than the finding's reviewer; your own fresh subagents usually
-  qualify for single review.
+- Launch verifiers like finders, with no inherited conversation. Pick each
+  one by the roster's verifier rule: never from the finding reviewer's family,
+  and never a finder-only model.
 - Give each verifier its finding verbatim with the scope, intent, rules, a
   report path and completion token, and its own scratch directory inside the
   private temporary directory, not other findings, other reports, or your
@@ -229,10 +243,13 @@ UNVERIFIED ones labeled with the step left unproven, most severe first. Give
 each its location, trigger, evidence, repro, smallest fix, and finder and
 verifier attribution. On a repeat review, list ledger findings carried
 forward or newly fixed after them. List REFUTED findings one line each with
-the refuting file:line. Then coverage: the concern map, lenses run or skipped, what no one
+the refuting file:line. Then coverage: the tier and shape, each seat's
+reviewer and route, any seat that fell back, the concern map, lenses run or skipped, what no one
 could verify, whether the approved `REVIEW.md` override applied, and each
 Human review path the change touches or the audit includes. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
+End with the score line and append the calibration rows, both as
+[references/reviewers.md](references/reviewers.md) describes.
 
 When a refuted or user-dismissed finding's reason, or a confirmed finding's
 mistake, has come up before in this repository, propose a precedent or a
@@ -242,6 +259,15 @@ describes. Write it only after the user approves.
 A review request does not authorize fixes, commits, or pushes. If fixes were
 already requested, fix CONFIRMED findings and settle each PLAUSIBLE one by
 fixing it or recording why not; otherwise present the findings for decision.
+
+Fixing is a second decision, and reviewers pull toward scope creep. Make the
+smallest change that resolves the verified failure within the stated intent,
+and prefer deleting or narrowing code when required behaviour, validation,
+and compatibility survive. Push back on fixes the intent does not need:
+decline extra tests, guards for paths the intent does not reach,
+compatibility work, and refactors with a one-line reason, and list them as
+follow-ups. If the fix round grew `git diff --shortstat` against the base,
+cut first. A confirmed defect in the intended case still gets fixed.
 
 Locally maintained. Inspired by the neutral reviewer briefs in
 [gpt-review](https://github.com/davidondrej/skills/blob/main/skills/agent-orchestration/gpt-review/SKILL.md)

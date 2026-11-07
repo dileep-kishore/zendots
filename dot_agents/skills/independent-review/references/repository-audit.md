@@ -2,9 +2,9 @@
 
 Use this target when the user asks to audit a repository, package, or folder,
 including requests to review the whole codebase. Ordinary change reviews keep
-their diff-based scope and introduced-defect requirement. The single, dual, and
-deep reviewer choices and the independent verifier workflow remain the same.
-Apply the depth criteria to the audited scope and its risks rather than a
+their diff-based scope and introduced-defect requirement. The reviewer tiers,
+the deep shape, and the independent verifier workflow remain the same. Apply
+the tier 2 criteria to the audited scope and its risks rather than a
 changed-line count.
 
 ## Pin the current target
