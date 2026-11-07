@@ -32,3 +32,15 @@
 .agents/skills/frontend-slides
 .claude/skills/frontend-slides
 .pi/agent/skills/frontend-slides
+
+# Folded into the global AGENTS.md (context-reentry, coding-standards) and
+# python-patterns (python-testing).
+.agents/skills/context-reentry
+.claude/skills/context-reentry
+.pi/agent/skills/context-reentry
+.agents/skills/coding-standards
+.claude/skills/coding-standards
+.pi/agent/skills/coding-standards
+.agents/skills/python-testing
+.claude/skills/python-testing
+.pi/agent/skills/python-testing

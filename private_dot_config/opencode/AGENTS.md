@@ -77,6 +77,9 @@
   has not followed the session. The first and last lines stand alone: what
   happened, and what is waiting on me. End a long or multi-step run with three
   headings: Blocked on me, Changed, Found. Order lists by importance.
+- Assume I return without the scrollback. Name the project, branch, and PR
+  in status reports, and make each question self-contained: its background,
+  options, and your recommendation, with no "the earlier fix" or "option B".
 - Write prose a reader can act on: name the mechanism, number, or instruction
   instead of how something feels, and cut a sentence that would fit unchanged
   in another project's docs. One idea per sentence, active voice with a named
@@ -113,7 +116,8 @@
   never for skill files outside the repository.
 - Python: uv (pixi where appropriate), Ruff, ty, type hints, NumPy-style
   docstrings, Pydantic for validation.
-- JavaScript/TypeScript: Bun, strict TypeScript, interfaces for object shapes.
+- JavaScript/TypeScript: Bun, strict TypeScript with no `any` (take `unknown`
+  and narrow), interfaces for object shapes, JSDoc on exported functions.
 - System and global installs: Paru or Homebrew, not pip, conda, apt, npm, or
   yarn, unless I ask. Inside a project, use its package manager.
 

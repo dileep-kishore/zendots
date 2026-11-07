@@ -1,6 +1,6 @@
 ---
 name: python-patterns
-description: Python conventions for this user's projects (uv, Ruff, ty, Pydantic, NumPy docstrings, 3.10+ typing). Use when writing, reviewing, or setting up Python code.
+description: Python conventions for this user's projects (uv, Ruff, ty, Pydantic, NumPy docstrings, 3.10+ typing, pytest). Use when writing, reviewing, testing, or setting up Python code.
 ---
 
 # Python Conventions
@@ -18,7 +18,11 @@ project:
 - Formatting, import sorting, and linting: Ruff (`ruff format .`,
   `ruff check .`).
 - Type checking: `ty check`.
-- Tests: pytest (see the `python-testing` skill).
+- Tests: pytest, run through the project's environment (`uv run pytest`).
+  Keep slow and integration tests behind markers so the default run stays
+  fast. Coverage finds gaps; it is not a target. Measure it with
+  `pytest --cov=<package> --cov-report=term-missing`, and add no coverage
+  gate unless the project requires one.
 
 ## Code
 
