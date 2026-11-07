@@ -9,8 +9,8 @@ completion still gives an agent its config and data early.
 #!/usr/bin/env bash
 set -euo pipefail
 
-TREE="${ORCA_WORKTREE_PATH:-${T3CODE_WORKTREE_PATH:-$PWD}}"
-ROOT="${ORCA_ROOT_PATH:-${T3CODE_PROJECT_ROOT:-$(dirname "$(git -C "$TREE" rev-parse --path-format=absolute --git-common-dir)")}}"
+TREE="${T3CODE_WORKTREE_PATH:-$PWD}"
+ROOT="${T3CODE_PROJECT_ROOT:-$(dirname "$(git -C "$TREE" rev-parse --path-format=absolute --git-common-dir)")}"
 cd "$TREE"
 
 echo "==> Copying local config"
@@ -32,7 +32,7 @@ uv sync
 echo "==> Worktree ready"
 ```
 
-Add `NAME="${ORCA_WORKSPACE_NAME:-$(basename "$TREE")}"` to the header only when
+Add `NAME="$(basename "$TREE")"` to the header only when
 something derives a port, database name, or container name from it.
 
 ## Teardown

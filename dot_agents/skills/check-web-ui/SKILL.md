@@ -103,7 +103,7 @@ product. As a default, cut or rework it:
 ## 6. Prove it in a browser
 
 Run the app and drive it in a real browser, using whatever the host provides:
-a built-in browser pane, Orca's browser, a browser extension, or the project's
+a built-in browser pane, a browser extension, or the project's
 Playwright. At 320px, 390px, and a desktop width, and in each theme:
 
 1. Watch the console from page load. Any error or uncaught exception is a

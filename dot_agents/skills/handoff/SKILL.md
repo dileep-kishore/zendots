@@ -69,7 +69,7 @@ the user names it; never sync or publish a handoff on your own.
 ## 4. Do not act on the handoff
 
 A handoff launches nothing and transfers no ownership. If the user asks to
-start the next session or transfer through Orca, use that tool's own
+start the next session or transfer through another tool, use that tool's own
 workflow. Do not tell the next agent to wait or to continue; the user's
 instructions govern that.
 

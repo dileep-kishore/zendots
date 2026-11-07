@@ -196,12 +196,10 @@ still target, so finish every retarget first. For a PR with
 contributor's fork, which `origin` does not hold, and the report names that
 branch as left in place.
 
-The script removes Orca worktrees through `orca worktree rm` so Orca's sidebar
-stays accurate, and other worktrees with `git worktree remove`. When Orca is
-installed but not running, it removes with git and prints a `warning:` line;
-pass that on. It refuses a dirty worktree, a branch tip it cannot prove
-merged, a branch that moved after that check, and a branch checked out in the
-main checkout. Report a refusal as it is printed. Do not force past it,
+The script removes worktrees with `git worktree remove`. It refuses a dirty
+worktree, a branch tip it cannot prove merged, a branch that moved after that
+check, and a branch checked out in the main checkout. Report a refusal as it
+is printed. Do not force past it,
 because each one guards work that exists nowhere else.
 
 Last, the script fast-forwards the main checkout to the merged default branch.
@@ -214,8 +212,8 @@ If T3's `t3_thread_organize` tool is available (the harness may prefix its
 name, as in `mcp__t3-code__t3_thread_organize`), finish the thread with it.
 When artifact cleanup and every cleanup line succeeded and the thread's
 worktree was removed, settle it (`action: "settle"`) so it does not start another turn in a missing
-checkout. When artifact cleanup is incomplete or any line is a refusal,
-a `warning:`, or `skipped-fast-forward`, pin it (`action: "pin"`) instead.
+checkout. When artifact cleanup is incomplete or any line is a refusal
+or `skipped-fast-forward`, pin it (`action: "pin"`) instead.
 T3 settles a thread on its own once its
 linked PR merges and the turn ends, which hides the report; a pinned thread
 stays in the active list until the user unpins it. Without the tool, skip

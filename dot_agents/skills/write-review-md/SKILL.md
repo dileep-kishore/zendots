@@ -20,7 +20,7 @@ ask "This repository has no REVIEW.md. Draft one now?" Offer "Yes"
 and "Never here" to run `git config --local review.skipReviewMd true` and stop.
 
 Skip the offer when the user asked for the file directly. When no human can
-answer (a non-interactive harness, a subagent, an Orca worker), stop without
+answer (a non-interactive harness, a subagent, a delegated worker), stop without
 asking and tell the caller, which reports "no REVIEW.md; interview skipped".
 
 ## 2. Gather evidence

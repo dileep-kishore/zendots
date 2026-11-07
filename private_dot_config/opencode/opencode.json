@@ -85,7 +85,6 @@
 		{ "action": "skill", "resource": "create-verification-skill", "effect": "ask" },
 		{ "action": "skill", "resource": "humanizer", "effect": "ask" },
 		{ "action": "skill", "resource": "maintain-verification-skill", "effect": "ask" },
-		{ "action": "skill", "resource": "orca-independent-review", "effect": "ask" },
 		{ "action": "playwright_*", "resource": "*", "effect": "deny" },
 		{ "action": "serena_*", "resource": "*", "effect": "deny" }
 	],

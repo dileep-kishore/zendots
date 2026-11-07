@@ -44,3 +44,35 @@ def merge_command_guard(doc):
         elif kept:
             remaining.append({**entry, "hooks": kept})
     hooks["PreToolUse"] = [*remaining, desired]
+
+
+# Orca re-registers these on every launch; it is no longer used.
+ORCA_HOOK_MARKERS = ("ORCA_AGENT_HOOK", "orca-agent-hook", "/.orca/agent-hooks/")
+
+
+def drop_orca_hooks(doc):
+    hooks = doc.get("hooks")
+    if not isinstance(hooks, dict):
+        return
+    for event in list(hooks):
+        entries = hooks[event]
+        if not isinstance(entries, list):
+            continue
+        remaining = []
+        for entry in entries:
+            inner = entry.get("hooks") if isinstance(entry, dict) else None
+            if not isinstance(inner, list):
+                remaining.append(entry)
+                continue
+            kept = [
+                hook for hook in inner
+                if not (isinstance(hook, dict) and any(m in str(hook.get("command", "")) for m in ORCA_HOOK_MARKERS))
+            ]
+            if len(kept) == len(inner):
+                remaining.append(entry)
+            elif kept:
+                remaining.append({**entry, "hooks": kept})
+        if remaining:
+            hooks[event] = remaining
+        else:
+            del hooks[event]

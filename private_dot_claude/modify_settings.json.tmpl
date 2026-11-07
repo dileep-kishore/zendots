@@ -4,9 +4,9 @@
 # ///
 # chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
 # from .chezmoidata/claude_managed.json over the live file on stdin. Claude
-# Code (and Orca hook injection) rewrite this file at runtime; every
-# key absent from the fragment passes through untouched, except our guard hook
-# and the retired Ponytail registrations.
+# Code rewrites this file at runtime; every key absent from the fragment passes
+# through untouched, except our guard hook, the retired Ponytail registrations,
+# and Orca's hooks.
 # A semantic no-op emits stdin byte-for-byte.
 import base64
 import copy
@@ -60,6 +60,7 @@ for section, key in (
     entries = doc.get(section)
     if isinstance(entries, dict):
         entries.pop(key, None)
+drop_orca_hooks(doc)
 merge_command_guard(doc)
 if doc == before:
     sys.stdout.write(raw)

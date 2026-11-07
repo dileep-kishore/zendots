@@ -44,3 +44,25 @@
 .agents/skills/python-testing
 .claude/skills/python-testing
 .pi/agent/skills/python-testing
+
+# Retired with Orca, which is no longer used: its skills and its agent hooks.
+.agents/skills/orca-cli
+.claude/skills/orca-cli
+.pi/agent/skills/orca-cli
+.agents/skills/orca-linear
+.claude/skills/orca-linear
+.pi/agent/skills/orca-linear
+.agents/skills/orchestration
+.claude/skills/orchestration
+.pi/agent/skills/orchestration
+.agents/skills/orca-computer-use
+.claude/skills/orca-computer-use
+.pi/agent/skills/orca-computer-use
+.agents/skills/computer-use
+.claude/skills/computer-use
+.pi/agent/skills/computer-use
+.agents/skills/orca-independent-review
+.claude/skills/orca-independent-review
+.pi/agent/skills/orca-independent-review
+.config/opencode/plugins/orca-opencode-status-tui
+.config/opencode/plugins/orca-opencode-status.js

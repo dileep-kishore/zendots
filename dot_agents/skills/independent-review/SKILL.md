@@ -8,8 +8,7 @@ description: Use when independently reviewing a PR, branch, or working changes, 
 Coordinate a fresh, read-only review without passing along this conversation or
 your conclusions. Finders hunt for bugs, a fresh verifier tries to refute each
 finding against the code, and you triage what survives. You own scope,
-briefing, completion, and triage; launchers such as `orca-independent-review`
-supply only session mechanics.
+briefing, completion, and triage.
 
 ## Choose the review
 
@@ -153,9 +152,6 @@ Launch each finder by the route
   their own briefs and output rules, so they cannot replace the finder brief
   here. Do not call the Codex plugin's private rescue runtime from another
   context.
-- **Orca:** when requested, use `orca-independent-review` for launch and terminal
-  monitoring, retaining this shared workflow. When that wrapper is already
-  executing, continue there instead of invoking it recursively.
 
 Use whichever native tools or installed CLIs are actually available. If no
 independent launcher is available, report that blocker rather than presenting

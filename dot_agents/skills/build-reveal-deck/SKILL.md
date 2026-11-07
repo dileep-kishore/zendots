@@ -101,8 +101,6 @@ Look at the slides in a real browser, choosing by where you run:
 - **T3 Code:** use T3's built-in browser preview. Serve the deck first with
   `python3 -m http.server <port> --bind 127.0.0.1` from the deck folder,
   open `http://127.0.0.1:<port>/`, and take screenshots or snapshots.
-- **Orca:** use Orca's embedded browser through the `orca-cli` skill. Do not
-  drive Orca when you run under another host.
 - **Anywhere else:** use Chrome through the Claude in Chrome extension when
   it is connected, or another browser tool the host provides.
 

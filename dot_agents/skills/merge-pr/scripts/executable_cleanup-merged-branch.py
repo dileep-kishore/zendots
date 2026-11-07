@@ -11,7 +11,6 @@ tracked changes, and prints `skipped-fast-forward` with the reason otherwise.
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 import subprocess
@@ -72,25 +71,6 @@ def open_prs_based_on(root: Path, branch: str) -> list[str] | None:
     return result.stdout.split()
 
 
-def orca_owns(path: Path) -> bool | None:
-    """True or False when Orca answers, None when it cannot be asked."""
-    if shutil.which("orca") is None:
-        return False
-    result = subprocess.run(
-        ["orca", "worktree", "show", "--worktree", f"path:{path}", "--json"], text=True, capture_output=True, check=False
-    )
-    try:
-        reply = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        reply = {}
-    if reply.get("ok") is True:
-        return True
-    code = (reply.get("error") or {}).get("code")
-    if code in (None, "runtime_unavailable"):
-        return None
-    return False
-
-
 def remote_tip_of(root: Path, remote: str, branch: str) -> str:
     # An exact refname, because ls-remote patterns also match archive/<branch>.
     for line in git(root, "ls-remote", remote, f"refs/heads/{branch}").splitlines():
@@ -107,7 +87,6 @@ def main() -> int:
     parser.add_argument("--remote", default="origin")
     parser.add_argument("--pr-head", help="merged PR's headRefOid; proves a squash or rebase merge")
     parser.add_argument("--keep-remote", action="store_true", help="leave the remote branch alone")
-    parser.add_argument("--no-orca", action="store_true", help="remove worktrees with git even if Orca manages them")
     parser.add_argument("--dry-run", action="store_true", help="print the plan; skips the fetch, so merge proof uses cached refs")
     opts = parser.parse_args()
 
@@ -145,13 +124,7 @@ def main() -> int:
         dirty = git(path, "status", "--porcelain", "--untracked-files=all")
         if dirty:
             raise SystemExit(f"error: {path} has uncommitted changes:\n{dirty}")
-        owned = False if opts.no_orca else orca_owns(path)
-        if owned is None:
-            print(f"warning: Orca is not running; if it tracks {path}, its sidebar may keep a stale entry")
-        if owned:
-            plan.append(("removed-worktree", ["orca", "worktree", "rm", "--worktree", f"path:{path}", "--json"], str(path)))
-        else:
-            plan.append(("removed-worktree", ["git", "worktree", "remove", str(path)], str(path)))
+        plan.append(("removed-worktree", ["git", "worktree", "remove", str(path)], str(path)))
     plan.append(("pruned-worktrees", ["git", "worktree", "prune"], ""))
     if local_tip:
         # Deletes only if the tip is still the commit proven merged above; worktree removal already freed the ref.

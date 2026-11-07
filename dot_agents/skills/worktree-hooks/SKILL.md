@@ -1,6 +1,6 @@
 ---
 name: worktree-hooks
-description: Use when a new git worktree needs the setup (and where supported, teardown) shell script that makes it usable without manual steps — Orca worktree hooks, a T3 Code setup action or `t3.json`, an archive script, or any host that runs a script on worktree creation.
+description: Use when a new git worktree needs the setup (and where supported, teardown) shell script that makes it usable without manual steps — a T3 Code setup action or `t3.json`, an archive script, or any host that runs a script on worktree creation.
 ---
 
 # Worktree Hooks
@@ -21,11 +21,10 @@ script written for the wrong host reads variables that host never sets.
 
 | Host | Root var | Worktree var | Teardown hook | Where the script lives |
 |---|---|---|---|---|
-| Orca | `$ORCA_ROOT_PATH` | `$ORCA_WORKTREE_PATH` | yes, Archive | pasted into Settings → Worktree Hooks |
 | T3 Code | `$T3CODE_PROJECT_ROOT` | `$T3CODE_WORKTREE_PATH` | **none** | an Action, or `t3.json` at the repo root |
 | anything else | ask | ask | ask | ask |
 
-Orca also sets `$ORCA_WORKSPACE_NAME`; T3 Code has no equivalent.
+T3 Code has no workspace-name variable.
 
 For any host not in the table, ask the user to describe it and take them at
 their word — pasting that host's docs is the fastest form of the answer:
@@ -36,9 +35,9 @@ their word — pasting that host's docs is the fastest form of the answer:
 - how the script is installed: pasted into a settings pane, or a file in the repo
 
 If they do not know the variable names, [references/hosts.md](references/hosts.md)
-has a way to dump them from a throwaway worktree. That file also covers how Orca
-and T3 Code install the script and what each does *not* do for you — read the
-section for your host before delivering.
+has a way to dump them from a throwaway worktree. That file also covers how T3 Code
+installs the script and what it does *not* do for you — read the section for
+your host before delivering.
 
 One script then runs on any of them, because the header in step 5 normalizes the
 variables; a new host is one more name in that chain.
@@ -153,9 +152,9 @@ Open with this header, which resolves the same two paths on every host:
 #!/usr/bin/env bash
 set -euo pipefail
 
-TREE="${ORCA_WORKTREE_PATH:-${T3CODE_WORKTREE_PATH:-$PWD}}"
-ROOT="${ORCA_ROOT_PATH:-${T3CODE_PROJECT_ROOT:-$(dirname "$(git -C "$TREE" rev-parse --path-format=absolute --git-common-dir)")}}"
-NAME="${ORCA_WORKSPACE_NAME:-$(basename "$TREE")}"
+TREE="${T3CODE_WORKTREE_PATH:-$PWD}"
+ROOT="${T3CODE_PROJECT_ROOT:-$(dirname "$(git -C "$TREE" rev-parse --path-format=absolute --git-common-dir)")}"
+NAME="$(basename "$TREE")"
 cd "$TREE"
 ```
 
@@ -163,7 +162,7 @@ cd "$TREE"
 `.git` when run from a main checkout. Drop the `NAME` line unless something uses it.
 
 For a host the user described in step 1, put its variables first in each chain —
-`TREE="${THEIR_WORKTREE_VAR:-${ORCA_WORKTREE_PATH:-...}}"`. A host that sets no
+`TREE="${THEIR_WORKTREE_VAR:-${T3CODE_WORKTREE_PATH:-...}}"`. A host that sets no
 variables at all still works: `$PWD` is the worktree, and `git` recovers the main
 checkout from it.
 

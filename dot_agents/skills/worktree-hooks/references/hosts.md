@@ -2,31 +2,6 @@
 
 How each host installs the script, and what it does *not* do for you.
 
-## Orca
-
-Variables: `$ORCA_ROOT_PATH`, `$ORCA_WORKTREE_PATH`, `$ORCA_WORKSPACE_NAME`.
-
-Two hooks, both whole shell scripts pasted into **Settings → Worktree Hooks**:
-Setup Script and Archive Script. Neither assumes a working directory.
-
-Print both scripts in fenced `bash` blocks, then put the setup script on the
-clipboard — that is the one pasted first:
-
-```bash
-cat > /tmp/worktree-setup.sh <<'HOOK_EOF'
-...script...
-HOOK_EOF
-bash -n /tmp/worktree-setup.sh
-if command -v pbcopy >/dev/null; then pbcopy < /tmp/worktree-setup.sh
-elif command -v wl-copy >/dev/null; then wl-copy < /tmp/worktree-setup.sh
-elif command -v xclip >/dev/null; then xclip -selection clipboard < /tmp/worktree-setup.sh
-else echo "no clipboard tool found" >&2; false
-fi
-```
-
-If the copy succeeded, tell the user it is on the clipboard and offer to copy
-the archive script next; otherwise point them to `/tmp/worktree-setup.sh`.
-
 ## T3 Code
 
 Variables: `$T3CODE_PROJECT_ROOT` (main checkout), `$T3CODE_WORKTREE_PATH` (set

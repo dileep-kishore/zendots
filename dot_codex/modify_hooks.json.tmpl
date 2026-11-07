@@ -2,7 +2,7 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-# Preserve live Orca/third-party registrations while adding our command guard.
+# Preserve live third-party registrations, drop Orca's, and add our command guard.
 import copy
 import json
 import sys
@@ -23,6 +23,7 @@ except json.JSONDecodeError:
 if not isinstance(doc, dict):
     die("root is not a mapping")
 before = copy.deepcopy(doc)
+drop_orca_hooks(doc)
 merge_command_guard(doc)
 if doc == before:
     sys.stdout.write(raw)
