@@ -105,6 +105,17 @@ something is not a finding; find out yourself.
 5. Verification: do tests meaningfully cover reviewed behaviour and relevant
    contracts? Mocks are appropriate for isolation, but do not prove an external
    integration works. Report consequential gaps, not a blanket coverage quota.
+   In a change review, list every check the change weakens: a test
+   deleted, skipped, or marked expected to fail; an assertion loosened; a
+   tolerance, threshold, timeout, or snapshot relaxed; a lint, type, or
+   security suppression added; an exception swallowed; a CI step or required
+   check removed; acceptance criteria or expected results edited. Find each
+   one's reason in the diff, commit messages, or intent; one reason can cover
+   several related changes. A weakening the intent gives no reason for is a
+   finding. So is a test or done check that would still pass with the
+   behaviour wrong, such as an expected value copied from the code's own
+   output, an assertion on a mock, or a command that selects zero tests,
+   when it is the only evidence for a requirement.
 6. Standards: violations of the project standards above. A rule-based finding
    quotes the rule and must be one the rule actually scopes to this file.
 7. Security: only issues you can trace from an entry point an attacker
@@ -148,6 +159,7 @@ needs a human, with its evidence>
 
 ## Coverage
 - Concern map, and what you read beyond the diff for each concern
+- Weakened checks: each one from Process step 5 with its reason, or `None`
 - Expected load, evidence for it and assumptions
 - Failure modes: up to three ways the change could still fail after merge
   that are not findings, each with its trigger, what would detect it (a
@@ -170,5 +182,6 @@ all.
 - Mechanism: <what the code does wrong, citing file:line for each step>
 - Consequence: <what the user or caller observes>
 - Repro: <a command, input, or test that shows it; or why none is practical>
+- Method: <source trace | executed reproduction | both>
 - Fix: <smallest safe change>
 ```

@@ -85,5 +85,6 @@ Verdict: CONFIRMED | PLAUSIBLE | REFUTED
 Severity: <P0-P3, revised if needed, with one clause why>
 Restated: <trigger -> faulty step -> consequence>
 Evidence: <file:line hops, test or repro output, or the refuting line>
+Method: <source trace | executed reproduction | both>
 Unproven: <the step you could not settle; omit when CONFIRMED>
 ```

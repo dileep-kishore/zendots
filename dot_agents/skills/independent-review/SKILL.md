@@ -236,8 +236,9 @@ finding from one finder may be the most serious.
 
 Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
 UNVERIFIED ones labeled with the step left unproven, most severe first. Give
-each its location, trigger, evidence, repro, smallest fix, and finder and
-verifier attribution. On a repeat review, list ledger findings carried
+each its location, trigger, evidence and its method (source trace, executed
+reproduction, or both), repro, smallest fix, and finder and verifier
+attribution. On a repeat review, list ledger findings carried
 forward or newly fixed after them. List REFUTED findings one line each with
 the refuting file:line. Then coverage: the tier and shape, each seat's
 reviewer and route, any seat that fell back, the concern map, lenses run or skipped, what no one
