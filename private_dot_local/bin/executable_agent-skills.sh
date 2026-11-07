@@ -109,7 +109,21 @@ fetch_one() { # <name>
   printf 'fetched %s at %s\n' "$name" "${rev:0:12}"
 }
 
+# The other machine's skill changes reach the source through Syncthing before
+# `chezmoi apply` lands them here. chezmoi status shows them with a blank first
+# column: this store still matches what chezmoi last wrote, but the source has
+# moved on. Recording now copies the older store over them.
+refuse_unapplied() {
+  local pending
+  pending=$(chezmoi status "$store" "$skill_lock" 2>/dev/null | sed -n 's#^ [^ ] #~/#p')
+  [ -z "$pending" ] && return 0
+  printf 'The source has skill changes not yet applied here:\n%s\n' "$pending" >&2
+  printf 'Refusing to record. Review them with `chezmoi diff -r <path>`, then apply them first.\n' >&2
+  exit 1
+}
+
 record() {
+  refuse_unapplied
   # `skills add` recursively removes the canonical path before copying, so an
   # install that happens to carry a fetched skill's name replaces the link with
   # the whole upstream tree. Catch it here, before it reaches chezmoi and git.
@@ -266,12 +280,15 @@ cmd_remove_fetched() { # <name>
 case "${1:-}" in
 fetch)
   shift
+  # A bare fetch only restores runtimes and never records; the other forms do.
+  [ $# -gt 0 ] && refuse_unapplied
   cmd_fetch "$@"
   exit 0
   ;;
 remove)
   if [ -n "${2:-}" ] && command -v jq >/dev/null 2>&1 &&
     jq -e --arg n "$2" '.skills | has($n)' "$runtime_lock" >/dev/null 2>&1; then
+    refuse_unapplied
     cmd_remove_fetched "$2"
     exit 0
   fi
@@ -281,6 +298,7 @@ esac
 # `skills` installs project-locally when the cwd is a git repo; run from $HOME so
 # it always resolves to the global store, whether or not -g was passed.
 if [ "${1:-}" != "sync" ]; then
+  refuse_unapplied
   require_cmd npx
   # `skills` treats any directory holding a skills-lock.json as a project and
   # updates those entries in place, over the store's local edits. That is how a
