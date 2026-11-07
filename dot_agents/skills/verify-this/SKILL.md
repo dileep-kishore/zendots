@@ -20,14 +20,20 @@ produced for the same state counts and need not be regathered.
      faster or smaller. Capture a baseline (the old commit, a failing repro,
      a prior measurement), then the treatment under the same command, data,
      warm-up, and environment. A fix stays comparative even if the new
-     version passes its checks.
+     version passes its checks. For a performance number, also follow
+     [references/performance.md](references/performance.md).
 3. Pick the smallest safe surface that could disprove the claim, reusing the
-   project's verification recipes and commands. Record the revision or
-   working state checked.
+   project's verification recipes and commands. It must be the surface the
+   claim is about: a pass on a neighbouring path, a different build, or a
+   test that never reaches the changed code is INCONCLUSIVE. Record the
+   revision or working state checked.
 4. Observe the result: output, side effects, exit status, or a measured
    value. A build, a mock, or an internal state setter proves only what it
    actually exercises. If a check fails for an incidental reason (a port in
-   use, a cold cache), fix the setup and rerun rather than reporting noise.
+   use, a cold cache), fix the setup and rerun rather than reporting noise,
+   at most twice; a third failure for the same reason is INCONCLUSIVE with
+   that reason. Never edit the check, its expected result, or the baseline
+   to get a pass.
 5. Return one verdict for the claim as stated. If the evidence supports a
    narrower claim, name that separately.
 
@@ -37,6 +43,18 @@ Focused tests or repros, CLI transcripts, UI action-and-result captures, API
 responses, timings, or profiles, using tools the project already has. Keep
 artifacts worth preserving in a private `mktemp -d` directory and report the
 path; ask before storing sensitive payloads on disk.
+
+Say how far the evidence for the claim got:
+
+1. Asserted: someone said so.
+2. Located: a `file:line`, or the library's own source, shows it.
+3. Traced: the failing case was walked step by step and cannot happen.
+4. Ran: a script or test called the real code and would have failed if the
+   claim were false.
+5. Reproduced: the running app showed it the way a user would see it.
+
+`VERIFIED` needs level 4 or 5. A check counts only if it could fail: for a
+comparative claim, the baseline must show the failure or the old number.
 
 ## Verdicts
 
@@ -54,10 +72,13 @@ VERIFIED | NOT VERIFIED | INCONCLUSIVE
 Claim: <claim and acceptance condition>
 Type: acceptance | comparative
 Checked: <revision or working state, relevant environment>
+Level: <1-5, from the list above>
 Evidence: <command or action, expected, observed, artifact path>
 Comparison: <baseline, treatment, delta; omit for acceptance>
 Limits: <what stayed unverified, confounds; or none>
 ```
 
 Locally maintained. Adapted from Cursor's
-[verify-this](https://github.com/cursor/plugins/blob/main/cursor-team-kit/skills/verify-this/SKILL.md).
+[verify-this](https://github.com/cursor/plugins/blob/main/cursor-team-kit/skills/verify-this/SKILL.md),
+with the evidence levels from pstack's
+[blast-radius](https://github.com/cursor/plugins/blob/main/pstack/skills/blast-radius/SKILL.md).
