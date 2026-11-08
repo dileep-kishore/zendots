@@ -31,7 +31,7 @@ ask.
 
 ## Limits
 
-Stop after 3 review rounds or 6 hours from the trigger, whichever comes
+Stop after 3 review rounds or 12 hours from the trigger, whichever comes
 first. A round is one pass of `babysit-pr` that pushed fixes. At the limit,
 do not merge: unwatch, then ask whether to continue, with what remains, the
 options, and your recommendation first. Keep a `show-me-your-work` log for
@@ -39,8 +39,8 @@ the run.
 
 `watch_pull_request` never wakes on a deadline, so arm one. In T3, at the
 trigger, call `schedule_task` bound to this thread with
-`schedule: {type: "once", runAt: <trigger + 6 hours, ISO 8601>}` and a prompt
-naming the PR and the six-hour limit. If it fires before the run ends, apply
+`schedule: {type: "once", runAt: <trigger + 12 hours, ISO 8601>}` and a prompt
+naming the PR and the twelve-hour limit. If it fires before the run ends, apply
 the limit; if the run ends first, delete it with `delete_scheduled_task`.
 Outside T3 every wait is bounded, so check the clock after each one.
 
