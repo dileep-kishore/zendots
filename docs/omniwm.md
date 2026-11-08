@@ -42,7 +42,7 @@ independent of this macOS configuration.
 | Tab | Toggle between current and last-used workspace |
 | Space | Raycast, configured separately in Raycast |
 | P | OmniWM command palette |
-| Return | Toggle OmniWM fullscreen, within the workspace |
+| Return | Toggle the Quake Terminal (Ghostty) |
 | O | Overview |
 | Period / Comma | Cycle column width forward / backward |
 | C | Center the column |
@@ -99,8 +99,9 @@ which is the bar's thickness on a side edge. It limits the lanes to `omniwm`,
 `workspaces`, and `scratchpads`, and uses the Catppuccin palette. A comment in
 the file keeps the full-width top layout for switching back.
 
-Quake Terminal is enabled with Ghostty as its provider. Its
-`toggleQuakeTerminal` hotkey is Unassigned.
+Quake Terminal is enabled with Ghostty as its provider, and Hyper+Return toggles
+it. OmniWM fullscreen (`toggleFullscreen`) is Unassigned; Hyper+Period reaches
+a 100% column width instead.
 
 Twelve app rules set initial workspace placement for standard windows, including
 Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.
