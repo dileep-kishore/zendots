@@ -20,8 +20,9 @@ independent of this macOS configuration.
    Displays have separate Spaces enabled under Mission Control. If you change
    that setting, log out and back in. Start with one native macOS Space.
 3. Quit other window managers before starting OmniWM.
-4. Preview `chezmoi diff -r ~/.config/omniwm/settings.toml`, then apply only
-   that file after approval: `chezmoi apply ~/.config/omniwm/settings.toml`.
+4. Preview `chezmoi diff -r ~/.config/omniwm`, then apply only the two managed
+   files after approval:
+   `chezmoi apply ~/.config/omniwm/settings.toml ~/.config/omniwm/shell/shell.toml`.
 5. Open OmniWM. Grant Accessibility and Input Monitoring. Screen Recording is
    optional and enables Overview thumbnails. Click Start OmniWM or Continue
    Without Screen Recording in its permissions window.
@@ -75,9 +76,10 @@ are enabled at 2 points, with a mauve base color, an enabled gradient, and an
 8-point glow at 60% opacity. A lone column stays centered at its configured
 width. Focus does not follow the mouse; keyboard focus still moves the pointer
 to the focused window. The 28-point workspace bar overlaps the macOS menu bar
-and shows a dot on app icons with Dock notification badges. On a display with
-a notch, such as a MacBook's built-in screen, `notchMode = "moveBelowMenuBar"`
-moves the bar below the menu bar, and `reserveLayoutSpace = true` keeps windows
+and shows a dot on app icons with Dock notification badges. Its size and lanes
+come from the profile override in `shell/shell.toml`, described below. On a
+display with a notch, such as a MacBook's built-in screen,
+`notchMode = "moveBelowMenuBar"` moves the bar below the menu bar, and `reserveLayoutSpace = true` keeps windows
 from sliding under it. `moveBelowMenuBar` ignores displays without a notch.
 On the MPG491CX the menu bar is 31 points tall, taller than the bar, so
 `reserveLayoutSpace` reserves nothing there. The bar uses
@@ -85,6 +87,21 @@ On the MPG491CX the menu bar is 31 points tall, taller than the bar, so
 Dynamic Island (layer 26), so the island's expanded panel draws over the bar.
 The `popup` level (layer 101) covered the panel. SketchyBar is not required by
 this layout, although it remains in the Brewfile.
+
+OmniWM 0.8.0 draws the workspace bar with OmniShell. Its bundled Default style
+in `~/.config/omniwm/shell/default/` makes the bar full width at 32 points.
+OmniWM manages that folder and overwrites it on update. A style's values take
+precedence over the `[workspaceBar]` keys in `settings.toml`. A full-width bar
+that is not `belowMenuBar` sets the macOS "Automatically hide and show the menu
+bar" setting to Always. Third-party menu bar icons, such as BetterDisplay,
+Raycast, and Tailscale, are then reachable only through OmniWM's Hidden Bar.
+`shell/shell.toml` overrides the Default profile to keep the native menu bar
+visible. It sets `fullWidth = false` and `height = 28`, limits the lanes to
+`omniwm`, `workspaces`, and `scratchpads`, and uses the Catppuccin palette. A
+comment in the file keeps the full-width lane layout for switching back.
+
+Quake Terminal is enabled with Ghostty as its provider. Its
+`toggleQuakeTerminal` hotkey is Unassigned.
 
 Twelve app rules set initial workspace placement for standard windows, including
 Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.
@@ -94,8 +111,9 @@ standard windows float by default.
 
 ## Maintaining the config
 
-Edit `private_dot_config/omniwm/settings.toml` in this repo, then preview and
-apply the destination path above on macOS. Chezmoi ignores this config on
+Edit `private_dot_config/omniwm/settings.toml` or
+`private_dot_config/omniwm/shell/shell.toml` in this repo, then preview and
+apply the destination paths above on macOS. Chezmoi ignores this config on
 Linux. Preserve workspace IDs and every hotkey ID, including Unassigned
 entries, when editing the generated file. IPC is enabled for `omniwmctl` checks
 on the Mac; it does not make those checks available on Linux.
@@ -106,22 +124,28 @@ with `transport_failure` or `protocol_mismatch`; `omniwmctl version` reports
 the running version once they match. A restart can migrate `settings.toml` to a
 new schema and leave the original as `settings.toml.pre-v<N>`. Compare the two,
 capture the result with `chezmoi add` as below, then delete the backup to
-dismiss OmniWM's notice. The file uses schema 4, written by OmniWM 0.7.6;
-upgrade OmniWM on each other Mac before applying it there.
+dismiss OmniWM's notice. `settings.toml` uses schema 5, written by OmniWM 0.8.0,
+which macmini and macbook both run. Upgrade OmniWM on a Mac before applying a
+newer schema there.
 
-After changing settings in OmniWM's GUI, capture the live file back into the
+After changing settings in OmniWM's GUI, capture the live files back into the
 repo before applying dotfiles again:
 
 ```bash
-chezmoi add ~/.config/omniwm/settings.toml
-chezmoi diff -r ~/.config/omniwm/settings.toml
-chezmoi status ~/.config/omniwm/settings.toml
+chezmoi add ~/.config/omniwm/settings.toml ~/.config/omniwm/shell/shell.toml
+chezmoi diff -r ~/.config/omniwm
+chezmoi status ~/.config/omniwm
 ```
 
 Both verification commands should print nothing when source and live settings
 match. Review the captured changes with
-`git diff -- private_dot_config/omniwm/settings.toml` from this repo. No
+`git diff -- private_dot_config/omniwm` from this repo. No
 `chezmoi apply` is needed to capture GUI changes.
+
+OmniWM rewrites `shell/shell.toml` when you change bar or palette settings in
+its Settings window. The rewrite can drop the file's comments, including the
+full-width lane layout, so check the diff for removed comments before
+committing.
 
 System-wide Window Corners and Start at Login are macOS preferences outside
 this TOML file and must be configured separately on each Mac. This repo does

@@ -1,0 +1,19 @@
+profile = "default"
+
+# A full-width bar sets macOS menu-bar auto-hide to Always (OmniWM 0.8.0+),
+# which hides third-party menu bar icons, so keep the bar beside the menu bar.
+[profiles.default]
+theme = "catppuccin"
+leading = ["omniwm", "workspaces", "scratchpads"]
+center = []
+trailing = []
+
+[profiles.default.workspaceBar]
+fullWidth = false
+height = 28
+
+# Full-width layout set up on the MacBook on 2026-11-08. To use it, replace the
+# lanes above with these and delete [profiles.default.workspaceBar].
+# leading = ["apple-menu", "app-menu", "omniwm", "workspaces", "scratchpads"]
+# center = []
+# trailing = ["media", "notifications", "volume", "wifi", "battery-details", "control-center", "system-stats", "clock"]
