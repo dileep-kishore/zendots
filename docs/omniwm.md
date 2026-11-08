@@ -100,7 +100,11 @@ which is the bar's thickness on a side edge. It limits the lanes to `omniwm`,
 the file keeps the full-width top layout for switching back.
 
 Quake Terminal is enabled with Ghostty as its provider, and Hyper+Return toggles
-it. OmniWM fullscreen (`toggleFullscreen`) is Unassigned; Hyper+Period reaches
+it. It slides in from the top at 80% width and 60% height, with 0.8 opacity and
+a 25-point standard blur. It reads `~/.config/ghostty/config` through libghostty,
+which ships no themes, so the repo keeps a copy of Ghostty's built-in
+`Catppuccin Mocha` in `~/.config/ghostty/themes/`
+([OmniWM #272](https://github.com/OmniNull/OmniWM/issues/272)). OmniWM fullscreen (`toggleFullscreen`) is Unassigned; Hyper+Period reaches
 a 100% column width instead.
 
 Twelve app rules set initial workspace placement for standard windows, including

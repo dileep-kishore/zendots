@@ -180,17 +180,25 @@ green = 0.8
 red = 0.3
 
 [quakeTerminal]
-animationDuration = 0.2
+animationDuration = 0.30000000000000004
 autoHide = false
-backgroundBlurRadius = 0
+backgroundBlurRadius = 25
 backgroundEffect = "standardBlur"
 enabled = true
-heightPercent = 50.0
+heightPercent = 60.0
 monitorMode = "focusedWindow"
-opacity = 1.0
-position = "center"
+opacity = 0.8
+position = "top"
 provider = "ghostty"
-widthPercent = 50.0
+widthPercent = 80.0
+
+[quakeTerminal.kitty]
+opacity = 0.9500000000000001
+
+[quakeTerminal.kitty.placement]
+heightPercent = 60.0
+position = "top"
+widthPercent = 100.0
 
 [routing]
 arrangements = []
