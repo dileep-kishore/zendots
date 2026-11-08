@@ -232,23 +232,23 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   --success: light-dark(#40a02b, #a6e3a1); --warning: light-dark(#fe640b, #fab387); --destructive: light-dark(#d20f39, #f38ba8);
   --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-.viz { display: flex; flex-direction: column; gap: 14px; min-width: 0; color: var(--foreground); font: 400 14px/1.45 var(--font-sans);
+.viz, .widget { display: flex; flex-direction: column; gap: 14px; min-width: 0; color: var(--foreground); font: 400 14px/1.45 var(--font-sans);
   --viz-grid: color-mix(in srgb, var(--border) 45%, transparent); }
 .viz-controls { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: flex-end; }
 .viz-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; max-width: 320px; font-size: 13px; color: var(--muted-foreground); }
 .viz-field > span { display: flex; justify-content: space-between; gap: 8px; }
 .viz-field output { color: var(--foreground); font-variant-numeric: tabular-nums; }
-.viz input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; cursor: pointer; }
-.viz input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+:is(.viz, .widget) input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; cursor: pointer; }
+:is(.viz, .widget) input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
   background: linear-gradient(var(--primary), var(--primary)) 0 / var(--fill, 50%) 100% no-repeat, var(--muted); }
-.viz input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+:is(.viz, .widget) input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
   background: var(--primary); border: 2px solid var(--background); box-shadow: 0 0 0 1px var(--primary); transition: transform .12s; }
-.viz input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
-.viz input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--muted); }
-.viz input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--primary); }
-.viz input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--background); }
-.viz :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.viz select { font: inherit; color: var(--foreground); background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; }
+:is(.viz, .widget) input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+:is(.viz, .widget) input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--muted); }
+:is(.viz, .widget) input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--primary); }
+:is(.viz, .widget) input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--background); }
+:is(.viz, .widget) :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+:is(.viz, .widget) select { font: inherit; color: var(--foreground); background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; }
 .viz-seg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 2px; border-radius: calc(var(--radius) + 2px); background: var(--muted); }
 .viz-seg button { font: inherit; font-size: 13px; border: 0; border-radius: var(--radius); padding: 4px 12px; cursor: pointer;
   background: transparent; color: var(--muted-foreground); transition: background .15s, color .15s; }
@@ -279,15 +279,25 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
   background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 7px 10px; font: 12px/1.45 var(--font-sans); font-variant-numeric: tabular-nums; box-shadow: 0 6px 20px rgb(0 0 0 / .18); }
 .viz-tip[data-show] { opacity: 1; }
-.viz-tip.float { white-space: normal; max-width: 260px; }
+.viz-tip.float { white-space: pre-line; max-width: 260px; }
 .viz-tip .h { color: var(--muted-foreground); margin-bottom: 3px; }
 .viz-tip .r { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; }
 .viz-tip .r i { height: 3px; border-radius: 2px; background: var(--c); }
 .viz-tip .r b { font-weight: 500; text-align: right; }
 .viz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .viz-error { color: var(--muted-foreground); font-size: 13px; padding: 24px 0; }
-:where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes), :where(.viz, .ledger, form.decide, figure.diff, figure.stepper, .lanes) * { box-sizing: border-box; }
-/* Summary components: tile deltas and sparklines, status ledger, evidence, decision form, diff, stepper, lanes. */
+.widget-row { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: flex-end; }
+.widget-row > .viz-stat { flex: 1 1 140px; }
+.widget-table { overflow-x: auto; }
+.widget table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.widget th, .widget td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--viz-grid); white-space: nowrap; }
+.widget th { font-weight: 400; color: var(--muted-foreground); }
+.widget th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.widget-foot, .widget-sources { margin: 0; font-size: 12px; color: var(--muted-foreground); }
+.widget-chart .vega-embed { width: 100%; }
+.widget-error pre { margin: 0; max-height: 240px; overflow: auto; font: 12px/1.5 var(--font-mono); white-space: pre-wrap; }
+:where(.viz, .widget, .ledger, figure.diff, figure.stepper, .lanes), :where(.viz, .widget, .ledger, figure.diff, figure.stepper, .lanes) * { box-sizing: border-box; }
+/* Summary components: tile deltas and sparklines, status ledger, evidence, diff, stepper, lanes. */
 .tile .d { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
 svg.spark { display: block; width: 100%; height: 24px; overflow: visible; }
 svg.spark path { fill: none; stroke: var(--chart-1); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
@@ -313,19 +323,7 @@ details.evidence[open] > summary::before { transform: rotate(90deg); }
 details.evidence > summary > :first-child { flex: 1; }
 details.evidence > summary span { font: 12px var(--font-sans); color: var(--muted-foreground); }
 details.evidence > :not(summary) { margin: 0 12px 12px; }
-form.decide { display: flex; flex-direction: column; gap: 14px; }
-form.decide fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-form.decide legend { padding: 0; margin-bottom: 6px; font-weight: 500; }
-form.decide label { position: relative; border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; cursor: pointer; font: 13px var(--font-sans); }
-form.decide label input { position: absolute; opacity: 0; pointer-events: none; }
-form.decide label:has(input:checked) { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
-form.decide label:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
-form.decide label:has(input[data-rec])::after { content: " \00B7 recommended"; opacity: .75; font-size: 11px; }
-form.decide textarea { width: 100%; font: 13px var(--font-sans); color: var(--foreground); background: transparent; border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; }
-.decide-out { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.decide-out code { flex: 1 1 260px; font: 12px var(--font-mono); background: var(--muted); padding: 4px 8px; border-radius: 4px; white-space: pre-wrap; }
-.decide-out button, .step-nav button { font: 13px var(--font-sans); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px 12px; cursor: pointer; background: transparent; color: var(--foreground); }
-.decide-out button { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+.step-nav button { font: 13px var(--font-sans); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px 12px; cursor: pointer; background: transparent; color: var(--foreground); }
 .step-nav button[aria-pressed="true"] { background: var(--muted); }
 figure.diff { gap: 10px; }
 .diff-sum, .diff-file > summary { font: 12px var(--font-sans); color: var(--muted-foreground); }
@@ -360,17 +358,16 @@ figure.diff { gap: 10px; }
 .lanes .ticks span { position: absolute; white-space: nowrap; }
 .lanes:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
 @media print {
-  .stepper .dim { opacity: 1; } .step-captions li.off { display: list-item; } .step-nav, .decide-out button { display: none; }
+  .stepper .dim { opacity: 1; } .step-captions li.off { display: list-item; } .step-nav { display: none; }
   .diff-file, .diff-lines { overflow: visible; }
   .diff-lines > div { width: auto; grid-template-columns: 3.2em 3.2em minmax(0, 1fr); }
   .diff-lines code { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 @media (pointer: coarse) {
-  .viz input[type="range"] { height: 44px; }
-  .viz-seg button, .viz-legend button, .decide-out button, .step-nav button { min-height: 44px; }
-  form.decide label { display: inline-flex; align-items: center; min-height: 44px; }
+  :is(.viz, .widget) input[type="range"] { height: 44px; }
+  .viz-seg button, .viz-legend button, .step-nav button, .widget th button { min-height: 44px; }
 }
-@media (prefers-reduced-motion: reduce) { .viz *, .viz-tip { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .viz *, .widget *, .viz-tip { transition: none !important; } }
 @media print { :where(:root) { color-scheme: light; } }
 </style>
 <script id="viz-js">
@@ -648,7 +645,7 @@ figure.diff { gap: 10px; }
     var min = r.min === '' ? 0 : +r.min, max = r.max === '' ? 100 : +r.max;
     r.style.setProperty('--fill', (r.value - min) / (max - min) * 100 + '%');
   }
-  document.addEventListener('input', function (ev) { if (ev.target.matches && ev.target.matches('.viz input[type="range"]')) fill(ev.target); });
+  document.addEventListener('input', function (ev) { if (ev.target.matches && ev.target.matches(':is(.viz, .widget) input[type="range"]')) fill(ev.target); });
   domReady().then(function () { document.querySelectorAll('.viz input[type="range"]').forEach(fill); });
 
   // Summary components. Each enhances plain markup, so the page still reads without scripts and in print.
@@ -676,33 +673,6 @@ figure.diff { gap: 10px; }
       if (!parts.length) return;
       bar.className = 'bar'; bar.setAttribute('aria-hidden', 'true'); text.textContent = parts.join(' · ');
       sum.className = 'ledger-sum'; sum.append(bar, text); ul.before(sum);
-    });
-  }
-
-  function decides() {
-    document.querySelectorAll('form.decide').forEach(function (form) {
-      var out = document.createElement('div'), code = document.createElement('code'), btn = document.createElement('button');
-      out.className = 'decide-out'; btn.type = 'button'; btn.textContent = 'Copy as prompt';
-      out.append(code, btn); form.appendChild(out);
-      function compose() {
-        var parts = [].map.call(form.querySelectorAll('fieldset'), function (fs) {
-          var c = fs.querySelector('input:checked'), legend = fs.querySelector('legend');
-          return c && (legend ? legend.textContent.trim() + ' → ' : '') + c.value;
-        }).filter(Boolean);
-        var note = form.querySelector('textarea');
-        if (note && note.value.trim()) parts.push(note.value.trim());
-        code.textContent = (form.dataset.prompt ? form.dataset.prompt + ': ' : '') + parts.join('; ');
-      }
-      function select() { var r = document.createRange(); r.selectNodeContents(code); getSelection().removeAllRanges(); getSelection().addRange(r); }
-      function said(ok) { btn.textContent = ok ? 'Copied' : 'Press ⌘C to copy'; setTimeout(function () { btn.textContent = 'Copy as prompt'; }, 1800); }
-      form.addEventListener('input', compose);
-      form.addEventListener('submit', function (ev) { ev.preventDefault(); });
-      // The clipboard API is refused inside some sandboxed frames; selecting the text keeps a manual copy possible.
-      btn.addEventListener('click', function () {
-        if (navigator.clipboard) navigator.clipboard.writeText(code.textContent).then(function () { said(true); }, function () { select(); said(false); });
-        else { select(); said(false); }
-      });
-      compose();
     });
   }
 
@@ -775,6 +745,402 @@ figure.diff { gap: 10px; }
     });
   }
 
+  // Vega, loaded once for .vega figures and widget charts; in viz-js so render.py's inline wrapper carries it.
+  var vegaLoaded;
+  function loadVega() {
+    if (!vegaLoaded) vegaLoaded = window.vegaEmbed ? Promise.resolve() : loadScript('https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js')
+      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-lite@6.4.3/build/vega-lite.min.js'); })
+      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-embed@7.2.0/build/vega-embed.min.js'); })
+      .catch(function () { vegaLoaded = null; throw new Error('this chart loads Vega from cdn.jsdelivr.net, which did not respond'); });
+    return vegaLoaded;
+  }
+  // Vega writes colours into SVG attributes, so each token is resolved through a probe, never passed as var().
+  function vegaConfig() {
+    var css = getComputedStyle(document.documentElement), probe = document.createElement('span');
+    probe.style.display = 'none'; document.body.appendChild(probe);
+    function house(name) { return css.getPropertyValue(name).trim(); }
+    function color(name, fallback) {
+      if (house(name)) return house(name);
+      probe.style.color = 'var(' + fallback + ')'; return getComputedStyle(probe).color;
+    }
+    var cat = house('--chart-cat').split(/\s+/).filter(Boolean);
+    if (!cat.length) cat = [1, 2, 3, 4, 5, 6].map(function (i) { return color('', '--chart-' + i); });
+    var ink = color('--ink', '--foreground'), ink2 = color('--ink-2', '--foreground'), ink3 = color('--ink-3', '--muted-foreground');
+    var line = color('--line', '--border'), mono = house('--font-mono'), text = house('--font-text') || house('--font-sans');
+    probe.remove();
+    var t = { titleColor: ink2, titleFont: text, titleFontSize: 14, titleFontWeight: 400, labelFont: mono, labelFontSize: 11 };
+    return {
+      background: 'transparent', font: text,
+      mark: { color: cat[0] },
+      point: { filled: true, size: 60 },
+      axis: Object.assign({ labelColor: ink3, gridColor: line, domainColor: ink2, tickColor: ink2 }, t),
+      axisX: { labelAngle: 0 },
+      axisDiscrete: { labelOverlap: false },
+      axisQuantitative: { labelOverlap: 'parity' },
+      header: Object.assign({}, t, { labelColor: ink2, labelFontSize: 12, labelPadding: 6 }),
+      legend: Object.assign({ labelColor: ink2, symbolFillColor: ink2, symbolStrokeColor: ink2 }, t),
+      title: { color: ink, fontSize: 16, fontWeight: 400, anchor: 'start' },
+      view: { stroke: null },
+      range: { category: cat }
+    };
+  }
+  // Runs fn when the colours change: the page's toggle, T3's host-context message, or the OS theme in a bare file.
+  var themed = [];
+  function onTheme(fn) {
+    if (!themed.length) {
+      var all = function () { setTimeout(function () { themed.forEach(function (f) { f(); }); }, 0); };
+      document.addEventListener('themechange', all);
+      addEventListener('message', function (ev) {
+        var d = ev.data;
+        if (d && d.jsonrpc === '2.0' && d.method === 'ui/notifications/host-context-changed') all();
+      });
+      if (!document.querySelector('button.theme')) matchMedia('(prefers-color-scheme: light)').addEventListener('change', all);
+    }
+    themed.push(fn);
+  }
+
+  // Row widgets, ported from BERIL Workbench chat widgets (lib/widgets.ts, widget/library.tsx, chart.tsx). One-way.
+  var OPS = ['>=', '>', '<=', '<', '==', '!=', 'contains'];
+  var STAT_OPS = ['count', 'missing', 'mean', 'median', 'min', 'max', 'sum'];
+  // Each argument's kind; a capital letter marks a required one.
+  var ARGS = {
+    Stat: { label: 'S', rows: 'R', op: 'O', field: 's', where: 'w' },
+    Slider: { label: 'S', min: 'N', max: 'N', step: 'N', value: 'V' },
+    Select: { label: 'S', options: 'P', value: 'V' },
+    Table: { rows: 'R', columns: 'c', where: 'w', sort: 't', limit: 'l' },
+    Chart: { rows: 'R', spec: 'J', where: 'w', params: 'j' }
+  };
+  var URLV = /url\s*\(/i;
+  function isRef(v) { return typeof v === 'string' && /^\$[A-Za-z_]\w*$/.test(v); }
+  function missing(v) { return v === null || v === undefined || v === '' || (typeof v === 'number' && isNaN(v)); }
+  function num(v) {
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    if (typeof v === 'string' && v.trim() !== '') { var n = Number(v); return isFinite(n) ? n : null; }
+    return null;
+  }
+  // A row missing the field never passes; a condition with no value (an "All" choice) is skipped.
+  function holds(row, c) {
+    if (c.value === null || c.value === undefined || c.value === '') return true;
+    var v = row[c.field];
+    if (missing(v)) return false;
+    if (c.op === '==') return String(v) === String(c.value);
+    if (c.op === '!=') return String(v) !== String(c.value);
+    if (c.op === 'contains') return String(v).toLowerCase().indexOf(String(c.value).toLowerCase()) >= 0;
+    var a = num(v), b = num(c.value);
+    if (a === null || b === null) return false;
+    return c.op === '>=' ? a >= b : c.op === '>' ? a > b : c.op === '<=' ? a <= b : a < b;
+  }
+  // count is out of all rows, missing out of the passing ones; the rest skip missing cells, null when none remain.
+  function stat(rows, base, op, field) {
+    if (op === 'count') return { value: base.length, total: rows.length };
+    if (op === 'missing') return { value: base.filter(function (r) { return missing(r[field]); }).length, total: base.length };
+    var v = base.map(function (r) { return num(r[field]); }).filter(function (x) { return x !== null; }), n = v.length;
+    if (!n) return { value: null, total: 0 };
+    var sum = v.reduce(function (a, b) { return a + b; }, 0);
+    if (op === 'sum') return { value: sum, total: n };
+    if (op === 'mean') return { value: sum / n, total: n };
+    if (op === 'min') return { value: v.reduce(function (a, b) { return b < a ? b : a; }), total: n };
+    if (op === 'max') return { value: v.reduce(function (a, b) { return b > a ? b : a; }), total: n };
+    v.sort(function (a, b) { return a - b; });
+    return { value: n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2, total: n };
+  }
+  function show(v) {
+    if (missing(v)) return '—';
+    if (typeof v === 'number') return Number.isInteger(v) ? v.toLocaleString() : v.toLocaleString(undefined, { maximumFractionDigits: 3 });
+    return String(v);
+  }
+  function compare(a, b) {
+    var am = missing(a), bm = missing(b);
+    if (am || bm) return am === bm ? 0 : am ? 1 : -1;
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    return String(a).localeCompare(String(b));
+  }
+
+  // The same refusals check.py makes, so a widget that slipped past it shows errors, never a partial view.
+  function isObj(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function isNum(v) { return typeof v === 'number' && isFinite(v); }
+  function checkWidget(spec) {
+    var errs = [], err = function (m) { errs.push(m); };
+    if (!isObj(spec)) return ['The widget JSON must be an object.'];
+    Object.keys(spec).forEach(function (k) { if (['state', 'rows', 'where', 'view'].indexOf(k) < 0) err('Unknown top-level key "' + k + '".'); });
+    ['state', 'rows', 'where'].forEach(function (k) { if (k in spec && !isObj(spec[k])) err(k + ' must be an object.'); });
+    var state = isObj(spec.state) ? spec.state : {}, rows = isObj(spec.rows) ? spec.rows : {}, named = isObj(spec.where) ? spec.where : {};
+    var good = {};
+    Object.keys(rows).forEach(function (k) {
+      if (Array.isArray(rows[k]) && rows[k].every(isObj)) good[k] = rows[k]; else err('rows "' + k + '" must be a list of objects.');
+    });
+    function ref(v, where) { if (isRef(v) && !(v.slice(1) in state)) err(where + ' reads undeclared ' + v + '.'); }
+    function hasField(set, f, where) {
+      if (good[set] && good[set].length && !good[set].some(function (r) { return f in r; })) err(where + ' names field "' + f + '", which no row of "' + set + '" has.');
+    }
+    function condList(w, set, where) {
+      [].concat(w).forEach(function (c) {
+        if (!isObj(c) || typeof c.field !== 'string') { err(where + ' has a condition without a field.'); return; }
+        Object.keys(c).forEach(function (k) { if (['field', 'op', 'value'].indexOf(k) < 0) err(where + ' condition has unknown key "' + k + '".'); });
+        if (OPS.indexOf(c.op) < 0) err(where + ' uses op "' + c.op + '"; use one of ' + OPS.join(' ') + '.');
+        ref(c.value, where); if (set) hasField(set, c.field, where);
+      });
+    }
+    // A named set holds conditions, never another name, so the runtime resolves each name exactly once.
+    Object.keys(named).forEach(function (k) { if (typeof named[k] === 'string') err('where "' + k + '" must hold conditions, not a name.'); });
+    function conds(w, set, where) {
+      if (w === undefined || w === null) return;
+      if (typeof w === 'string') {
+        if (!(w in named)) err(where + ' uses where "' + w + '", which is not declared.');
+        else if (typeof named[w] !== 'string') condList(named[w], set, where);
+        return;
+      }
+      condList(w, set, where);
+    }
+    function forbid(v, where) {
+      if (Array.isArray(v)) { v.forEach(function (x) { forbid(x, where); }); return; }
+      if (typeof v === 'string') { if (URLV.test(v)) err(where + ' spec has a url(...) value, which would load a file.'); return; }
+      if (!isObj(v)) return;
+      Object.keys(v).forEach(function (k) {
+        if (k === 'url' || k === 'data' || k === 'datasets') err(where + ' spec has a "' + k + '" key, which would load a file.');
+        if (k === 'mark' && (v[k] === 'image' || (isObj(v[k]) && v[k].type === 'image'))) err(where + ' spec has an image mark, which would load a file.');
+        forbid(v[k], where);
+      });
+    }
+    function option(o) { return o === null || typeof o === 'string' || isNum(o) || (isObj(o) && typeof o.label === 'string' && (o.value === null || typeof o.value === 'string' || isNum(o.value))); }
+    var KIND = {
+      s: [function (v) { return typeof v === 'string'; }, 'a string'], n: [isNum, 'a number'], v: [isRef, 'a "$name" from state'],
+      r: [function (v) { return typeof v === 'string' && Array.isArray(rows[v]); }, 'a declared rows name'],
+      o: [function (v) { return STAT_OPS.indexOf(v) >= 0; }, 'one of ' + STAT_OPS.join(' ')],
+      p: [function (v) { return Array.isArray(v) && v.length && v.every(option); }, 'a list of strings, numbers, null or {value, label}'],
+      c: [function (v) { return Array.isArray(v) && v.every(function (c) { return typeof c === 'string'; }); }, 'a list of field names'],
+      t: [function (v) { return isObj(v) && typeof v.field === 'string'; }, '{field, desc}'],
+      l: [function (v) { return isNum(v) && v > 0; }, 'a positive number'], j: [isObj, 'an object']
+    };
+    function node(n, path) {
+      var name = isObj(n) && Object.keys(n).length === 1 ? Object.keys(n)[0] : null;
+      if (!name) { err(path + ' must be {"Component": {...}}.'); return; }
+      var a = n[name], at = path + ' ' + name;
+      if (name === 'Row') { if (!Array.isArray(a)) err(at + ' takes a list of components.'); else a.forEach(function (k, i) { node(k, at + '[' + i + ']'); }); return; }
+      if (name === 'Sources') { if (!KIND.c[0](a)) err(at + ' takes a list of strings.'); return; }
+      if (!ARGS[name]) { err(at + ' is not a widget component.'); return; }
+      if (!isObj(a)) { err(at + ' takes an object of arguments.'); return; }
+      var bad = {};
+      Object.keys(a).forEach(function (k) { if (!(k in ARGS[name])) err(at + ' has unknown argument "' + k + '".'); });
+      Object.keys(ARGS[name]).forEach(function (k) {
+        var kind = ARGS[name][k], test = KIND[kind.toLowerCase()];
+        if (a[k] === undefined) { if (kind !== kind.toLowerCase()) err(at + ' needs "' + k + '".'); return; }
+        if (test && !test[0](a[k])) { bad[k] = true; err(at + ' ' + k + ' must be ' + test[1] + '.'); }
+      });
+      if (isRef(a.value)) ref(a.value, at);
+      var set = !bad.rows && good[a.rows] ? a.rows : null;
+      conds(a.where, set, at);
+      if (name === 'Stat' && !bad.op && a.op !== 'count' && typeof a.field !== 'string') err(at + ' op "' + a.op + '" needs a field.');
+      if (set) [a.field].concat(bad.columns ? [] : a.columns || [], a.sort && !bad.sort ? [a.sort.field] : []).forEach(function (f) { if (typeof f === 'string') hasField(set, f, at); });
+      if (name === 'Chart' && !bad.spec) forbid(a.spec, at);
+      if (!bad.params) Object.keys(a.params || {}).forEach(function (k) { ref(a.params[k], at); });
+    }
+    if (!Array.isArray(spec.view)) err('view must be a list of components.');
+    else spec.view.forEach(function (n, i) { node(n, 'view[' + i + ']'); });
+    return errs;
+  }
+
+  function widgetError(root, errs, source) {
+    var box = document.createElement('div'), p = document.createElement('p'), ul = document.createElement('ul'), pre = document.createElement('pre');
+    box.className = 'viz-error widget-error'; p.textContent = 'This widget was not drawn:';
+    errs.forEach(function (m) { var li = document.createElement('li'); li.textContent = m; ul.appendChild(li); });
+    pre.textContent = source;
+    root.textContent = ''; box.append(p, ul, pre); root.appendChild(box);
+  }
+
+  // BERIL's fullSpec; resize, as rows arrive after the first, empty draw and the layout must refit.
+  function cleanSpec(v) {
+    if (Array.isArray(v)) return v.map(cleanSpec);
+    if (typeof v === 'string' && URLV.test(v)) return null;
+    if (!v || typeof v !== 'object') return v;
+    var out = {};
+    Object.keys(v).forEach(function (k) {
+      if (k === 'usermeta' || k === 'href' || (k === 'bind' && typeof v[k] !== 'string')) return;
+      if (k === 'cursor' && !/^[a-z-]+$/.test(v[k])) return;
+      out[k] = cleanSpec(v[k]);
+    });
+    return out;
+  }
+  function fullSpec(spec, params, config) {
+    var rest = cleanSpec(spec), declared = Array.isArray(rest.params) ? rest.params : [];
+    delete rest.$schema;
+    var names = declared.map(function (p) { return p.name; });
+    var added = Object.keys(params).filter(function (k) { return names.indexOf(k) < 0; }).map(function (k) { return { name: k, value: params[k] }; });
+    return Object.assign({ width: 'container', height: 220, autosize: { type: 'fit-x', contains: 'padding', resize: true } }, rest,
+      { data: { name: 'rows' }, params: declared.concat(added), config: Object.assign({}, config, rest.config || {}) });
+  }
+  // Text-only tooltips: vega-tooltip's default writes HTML, so an image field would become a loading <img>.
+  var chartTip;
+  function textTip(handler, event, item, value) {
+    if (!chartTip) { chartTip = document.createElement('div'); chartTip.className = 'viz-tip float'; chartTip.style.position = 'fixed'; document.body.appendChild(chartTip); }
+    if (value === null || value === undefined || value === '') { chartTip.removeAttribute('data-show'); return; }
+    chartTip.textContent = typeof value === 'object'
+      ? Object.keys(value).map(function (k) { return k + ': ' + show(value[k]); }).join('\n') : String(value);
+    chartTip.style.left = event.clientX + 12 + 'px'; chartTip.style.top = event.clientY + 12 + 'px';
+    chartTip.setAttribute('data-show', '');
+  }
+
+  function buildWidget(root, spec) {
+    var state = Object.assign({}, spec.state), rows = spec.rows || {}, named = spec.where || {}, draws = [];
+    function val(v) { return isRef(v) ? state[v.slice(1)] : v; }
+    function passing(set, w) {
+      var list = typeof w === 'string' ? named[w] : w;
+      var cs = list ? [].concat(list).map(function (c) { return { field: c.field, op: c.op, value: val(c.value) }; }) : [];
+      return rows[set].filter(function (r) { return cs.every(function (c) { return holds(r, c); }); });
+    }
+    function refresh() { draws.forEach(function (f) { f(); }); }
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+    var make = {
+      Row: function (kids) { var row = el('div', 'widget-row'); kids.forEach(function (k) { row.appendChild(build(k)); }); return row; },
+      Sources: function (list) { return el('p', 'widget-sources', 'Sources: ' + list.join('; ')); },
+      Stat: function (a) {
+        var box = el('div', 'viz-stat'), v = el('span', 'v'), d = el('span', 'd');
+        box.append(el('span', 'k', a.label), v, d);
+        draws.push(function () {
+          var s = stat(rows[a.rows], passing(a.rows, a.where), a.op, a.field), of = a.op === 'count' || a.op === 'missing';
+          v.textContent = show(s.value) + (of && s.value !== null ? ' of ' + show(s.total) : '');
+          d.textContent = !of && s.value !== null ? 'n = ' + show(s.total) : '';
+        });
+        return box;
+      },
+      Slider: function (a) {
+        var name = a.value.slice(1), lab = el('label', 'viz-field'), head = el('span', null, a.label), out = el('output'), input = el('input');
+        input.type = 'range'; input.min = a.min; input.max = a.max; input.step = a.step;
+        if (typeof state[name] !== 'number') state[name] = a.min;
+        input.addEventListener('input', function () { state[name] = +input.value; refresh(); });
+        // Another control may share this variable.
+        draws.push(function () { input.value = state[name]; out.textContent = show(state[name]); fill(input); });
+        head.appendChild(out); lab.append(head, input);
+        return lab;
+      },
+      Select: function (a) {
+        var name = a.value.slice(1), lab = el('label', 'viz-field'), sel = el('select');
+        // Options go by position, so null ("All") and numbers keep their types.
+        var opts = a.options.map(function (o) { return o !== null && typeof o === 'object' ? o : { value: o, label: o === null ? 'All' : String(o) }; });
+        opts.forEach(function (o, i) { var op = el('option', null, o.label); op.value = String(i); sel.appendChild(op); });
+        function at() { return opts.map(function (o) { return o.value; }).indexOf(state[name]); }
+        if (at() < 0) state[name] = opts[0].value;
+        sel.addEventListener('change', function () { state[name] = opts[+sel.value].value; refresh(); });
+        draws.push(function () { sel.value = String(at()); });
+        lab.append(el('span', null, a.label), sel);
+        return lab;
+      },
+      Table: function (a) {
+        var wrap = el('div', 'widget-table'), table = el('table'), foot = el('p', 'widget-foot'), limit = a.limit || 50;
+        var order = a.sort ? { field: a.sort.field, desc: !!a.sort.desc } : null;
+        var cols = a.columns && a.columns.length ? a.columns : rows[a.rows].reduce(function (all, r) {
+          Object.keys(r).forEach(function (k) { if (all.indexOf(k) < 0) all.push(k); }); return all;
+        }, []);
+        wrap.append(table, foot);
+        function draw() {
+          var shown = passing(a.rows, a.where).slice();
+          if (order) shown.sort(function (x, y) {
+            var c = compare(x[order.field], y[order.field]);
+            // Missing values stay last whichever way the column sorts.
+            return missing(x[order.field]) || missing(y[order.field]) ? c : order.desc ? -c : c;
+          });
+          var head = el('tr');
+          cols.forEach(function (c) {
+            var th = el('th'), b = el('button', null, c + (order && order.field === c ? (order.desc ? ' ↓' : ' ↑') : ''));
+            b.type = 'button';
+            if (order && order.field === c) th.setAttribute('aria-sort', order.desc ? 'descending' : 'ascending');
+            b.addEventListener('click', function () {
+              order = { field: c, desc: order && order.field === c ? !order.desc : false }; draw();
+              // draw() rebuilt the header, so refocus this column's new button.
+              table.querySelectorAll('th button')[cols.indexOf(c)].focus();
+            });
+            th.appendChild(b); head.appendChild(th);
+          });
+          var thead = el('thead'), tbody = el('tbody');
+          thead.appendChild(head);
+          shown.slice(0, limit).forEach(function (r) {
+            var tr = el('tr'); cols.forEach(function (c) { tr.appendChild(el('td', null, show(r[c]))); }); tbody.appendChild(tr);
+          });
+          table.textContent = ''; table.append(thead, tbody);
+          foot.textContent = shown.length > limit ? 'Showing ' + limit + ' of ' + shown.length + ' rows.' : shown.length + (shown.length === 1 ? ' row.' : ' rows.');
+        }
+        draws.push(draw);
+        return wrap;
+      },
+      Chart: function (a) {
+        var host = el('div', 'widget-chart'), box = el('div'), msg = el('p', 'viz-error'), view = null, failed = null;
+        msg.hidden = true; host.append(box, msg);
+        function params() { var o = {}; Object.keys(a.params || {}).forEach(function (k) { o[k] = val(a.params[k]); }); return o; }
+        // Hidden, not removed: stale marks would disagree with the rows beside them.
+        function broke(e) { box.hidden = true; msg.hidden = false; msg.textContent = 'This chart could not be drawn: ' + (e && e.message || e); }
+        function sync() {
+          if (!view) return Promise.resolve();
+          failed = null;
+          // A url(...) cell drawn as an SVG paint would be fetched, so the chart gets null in its place.
+          view.data('rows', passing(a.rows, a.where).map(function (r) {
+            var o = {}; Object.keys(r).forEach(function (k) { o[k] = typeof r[k] === 'string' && URLV.test(r[k]) ? null : r[k]; }); return o;
+          }));
+          var p = params();
+          Object.keys(p).forEach(function (k) { try { view.signal(k, p[k]); } catch (e) { /* a selection param is not a plain signal */ } });
+          return view.runAsync().then(function () {
+            if (failed) throw new Error(failed);
+            box.hidden = false; msg.hidden = true;
+          });
+        }
+        var generation = 0;
+        function embed() {
+          var mine = ++generation;
+          return loadVega().then(function () {
+            var loader = window.vega.loader(), refuse = function () { return Promise.reject(new Error('a widget chart cannot load files')); };
+            loader.load = refuse; loader.sanitize = refuse;
+            var same = function () { return logger; }, logger = { level: function (l) { return l === undefined ? 2 : logger; }, warn: same, info: same, debug: same,
+              error: function () { failed = failed || [].map.call(arguments, function (x) { return x && x.message || String(x); }).join(' '); return logger; } };
+            return window.vegaEmbed(box, fullSpec(a.spec, params(), vegaConfig()), { actions: false, renderer: 'svg', loader: loader, tooltip: textTip, logger: logger });
+          }).then(function (res) {
+            // A newer embed started meanwhile, so this result is stale.
+            if (mine !== generation) { res.view.finalize(); return; }
+            if (view) view.finalize();
+            view = res.view;
+            var early = failed; failed = null;
+            if (early) throw new Error(early);
+            return sync();
+          }).catch(function (e) { if (mine === generation) broke(e); });
+        }
+        draws.push(function () { sync().catch(broke); });
+        onTheme(embed);
+        embed();
+        return host;
+      }
+    };
+    function build(n) { var name = Object.keys(n)[0]; return make[name](n[name]); }
+    var parts = spec.view.map(build);
+    root.append.apply(root, parts);
+    refresh();
+  }
+
+  function vegaFigures() {
+    var figs = document.querySelectorAll('.vega');
+    if (!figs.length) return;
+    loadVega().then(function () {
+      function render() {
+        figs.forEach(function (el) {
+          var spec = JSON.parse(el.querySelector('script[type="application/json"]').textContent);
+          var view = el.querySelector('.vega-view');
+          if (!view) { view = document.createElement('div'); view.className = 'vega-view'; el.appendChild(view); }
+          window.vegaEmbed(view, spec, { config: vegaConfig(), renderer: 'svg',
+            actions: { export: true, source: false, compiled: false, editor: false } });
+        });
+      }
+      render();
+      onTheme(render);
+    }, function (e) { figs.forEach(function (el) { el.textContent = 'This chart failed to draw: ' + e.message; }); });
+  }
+
+  function widgets() {
+    document.querySelectorAll('.widget').forEach(function (root) {
+      var src = root.querySelector(':scope > script[type="application/json"]'), text = src ? src.textContent : '', spec, errs;
+      try { spec = JSON.parse(text); } catch (e) { widgetError(root, ['The widget JSON does not parse: ' + e.message], text); return; }
+      try { errs = checkWidget(spec); } catch (e) { errs = ['The widget check failed: ' + e.message]; }
+      if (errs.length) { widgetError(root, errs, text); return; }
+      try { buildWidget(root, spec); } catch (e) { widgetError(root, ['The widget failed to draw: ' + e.message], text); }
+    });
+  }
+
   // Print shows every collapsed section, then restores what the reader had closed.
   var reopened = [];
   addEventListener('beforeprint', function () {
@@ -790,7 +1156,7 @@ figure.diff { gap: 10px; }
       el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '') + ' ' + d.id).trim());
     });
   }
-  domReady().then(function () { sparks(); ledgers(); decides(); steppers(); lanes(); describe(); });
+  domReady().then(function () { sparks(); ledgers(); steppers(); lanes(); vegaFigures(); widgets(); describe(); });
 
   window.viz = { ready: ready, lineChart: lineChart, fail: fail };
 })();
@@ -901,49 +1267,6 @@ figure.diff { gap: 10px; }
       render();
       document.addEventListener('themechange', render);
     });
-  }
-
-  // Vega-Lite through vega-embed, one shared config, SVG renderer. Loaded only when used.
-  if (document.querySelector('.vega')) {
-    loadScript('https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js')
-      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-lite@6.4.3/build/vega-lite.min.js'); })
-      .then(function () { return loadScript('https://cdn.jsdelivr.net/npm/vega-embed@7.2.0/build/vega-embed.min.js'); })
-      .then(function () {
-        function config() {
-          css = getComputedStyle(root);
-          var cat = tok('--chart-cat').split(/\s+/);
-          return {
-            background: 'transparent', font: tok('--font-text'),
-            mark: { color: cat[0] },
-            point: { filled: true, size: 60 },
-            axis: { labelColor: tok('--ink-3'), titleColor: tok('--ink-2'), gridColor: tok('--line'),
-                    domainColor: tok('--ink-2'), tickColor: tok('--ink-2'),
-                    labelFont: tok('--font-mono'), labelFontSize: 11, titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400 },
-            axisX: { labelAngle: 0 },
-            axisDiscrete: { labelOverlap: false },
-            axisQuantitative: { labelOverlap: 'parity' },
-            header: { labelColor: tok('--ink-2'), titleColor: tok('--ink-2'), labelFont: tok('--font-mono'), labelFontSize: 12,
-                      titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400, labelPadding: 6 },
-            legend: { labelColor: tok('--ink-2'), titleColor: tok('--ink-2'), labelFont: tok('--font-mono'), labelFontSize: 11,
-                      titleFont: tok('--font-text'), titleFontSize: 14, titleFontWeight: 400,
-                      symbolFillColor: tok('--ink-2'), symbolStrokeColor: tok('--ink-2') },
-            title: { color: tok('--ink'), fontSize: 16, fontWeight: 400, anchor: 'start' },
-            view: { stroke: null },
-            range: { category: cat }
-          };
-        }
-        function render() {
-          document.querySelectorAll('.vega').forEach(function (el) {
-            var spec = JSON.parse(el.querySelector('script[type="application/json"]').textContent);
-            var view = el.querySelector('.vega-view');
-            if (!view) { view = document.createElement('div'); view.className = 'vega-view'; el.appendChild(view); }
-            vegaEmbed(view, spec, { config: config(), renderer: 'svg',
-              actions: { export: true, source: false, compiled: false, editor: false } });
-          });
-        }
-        render();
-        document.addEventListener('themechange', render);
-      });
   }
 
   // Syntax highlighting. Loaded only when a code block declares a language; the colours are in the CSS

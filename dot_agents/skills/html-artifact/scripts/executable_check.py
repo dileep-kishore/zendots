@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Validate an html-artifact page: single file, allowlisted hosts, pinned libraries and fonts, TOC-able headings,
-and well-formed interactive figures.
+and well-formed interactive figures and widgets.
 
 Usage: check.py FILE
 Exit 0 when there are no errors, 1 otherwise. Warnings never fail the check.
 """
 import argparse
 import json
+import math
 import re
 import sys
 from html.parser import HTMLParser
@@ -34,6 +35,8 @@ class Page(HTMLParser):
         self.ids, self.viz_roots, self.code = [], [], []
         self.runtime, self.raw_js = set(), False
         self.lanes, self.last_div, self.raw_lanes = [], [], False
+        # Widget roots and their direct-child JSON scripts, tied through the open-element stack.
+        self.widget_roots, self.widgets, self.raw_widget, self.stack = [], [], False, []
         self.raw_tag = None
 
     def handle_starttag(self, tag, attrs):
@@ -42,6 +45,13 @@ class Page(HTMLParser):
             self.ids.append(attrs["id"])
         if "viz" in (attrs.get("class") or "").split():
             self.viz_roots.append(attrs.get("id"))
+        parent = self.stack[-1][1] if self.stack else None
+        root = None
+        if tag == "div" and "widget" in (attrs.get("class") or "").split():
+            root = len(self.widget_roots)
+            self.widget_roots.append(attrs.get("id"))
+        if tag not in VOID:
+            self.stack.append((tag, root))
         if tag == "h2":
             self.headings.append(attrs.get("id"))
         for key in ("src", "poster"):
@@ -60,6 +70,9 @@ class Page(HTMLParser):
             self.raw_lanes = tag == "script" and attrs.get("type") == "application/json" and "lanes" in self.last_div
             if self.raw_lanes:
                 self.lanes.append("")
+            self.raw_widget = tag == "script" and attrs.get("type") == "application/json" and parent is not None
+            if self.raw_widget:
+                self.widgets.append([parent, ""])
             if attrs.get("id") in {"viz-css", "viz-js"}:
                 self.runtime.add((tag, attrs["id"]))
             self.raw_js = tag == "script" and (attrs.get("type") or "text/javascript") in JS_TYPES
@@ -67,6 +80,9 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag == self.raw_tag:
             self.raw_tag = None
+        if any(t == tag for t, _ in self.stack):
+            while self.stack and self.stack.pop()[0] != tag:
+                pass
 
     def handle_data(self, data):
         if self.raw_tag == "style":
@@ -77,6 +93,208 @@ class Page(HTMLParser):
                 self.code.append(data)
             if self.raw_lanes:
                 self.lanes[-1] += data
+            if self.raw_widget:
+                self.widgets[-1][1] += data
+
+
+OPS = (">=", ">", "<=", "<", "==", "!=", "contains")
+STAT_OPS = ("count", "missing", "mean", "median", "min", "max", "sum")
+# Each widget component's arguments, True when required. Row and Sources take a list. Mirrors viz-js checkWidget.
+ARGS = {
+    "Stat": {"label": True, "rows": True, "op": True, "field": False, "where": False},
+    "Slider": {"label": True, "min": True, "max": True, "step": True, "value": True},
+    "Select": {"label": True, "options": True, "value": True},
+    "Table": {"rows": True, "columns": False, "where": False, "sort": False, "limit": False},
+    "Chart": {"rows": True, "spec": True, "where": False, "params": False},
+}
+REF = re.compile(r"^\$[A-Za-z_]\w*$")
+URL_VALUE = re.compile(r"url\s*\(", re.I)
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+
+
+def is_obj(v) -> bool:
+    return isinstance(v, dict)
+
+
+def is_num(v) -> bool:
+    # bool is an int subclass, and JSON true is not a number to the runtime.
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def check_widget(spec, errors: list, warns: list) -> None:
+    """The widget refusals viz-js checkWidget makes at runtime, moved to check time."""
+    if not is_obj(spec):
+        errors.append("widget JSON must be an object")
+        return
+    for k in spec:
+        if k not in ("state", "rows", "where", "view"):
+            errors.append(f'widget has unknown top-level key "{k}"')
+    for k in ("state", "rows", "where"):
+        if k in spec and not is_obj(spec[k]):
+            errors.append(f"widget {k} must be an object")
+    state = spec["state"] if is_obj(spec.get("state")) else {}
+    rows = spec["rows"] if is_obj(spec.get("rows")) else {}
+    named = spec["where"] if is_obj(spec.get("where")) else {}
+    good = {}
+    for k, v in rows.items():
+        if isinstance(v, list) and all(is_obj(r) for r in v):
+            good[k] = v
+            if not v:
+                warns.append(f'widget rows "{k}" is empty; its field names are not checked')
+        else:
+            errors.append(f'widget rows "{k}" must be a list of objects')
+
+    def ref(v, at):
+        if isinstance(v, str) and REF.match(v) and v[1:] not in state:
+            errors.append(f"widget {at} reads {v}, which state does not declare")
+
+    def has_field(dataset, field, at):
+        data = good.get(dataset)
+        if data and not any(field in r for r in data):
+            errors.append(f'widget {at} names field "{field}", which no row of "{dataset}" has')
+
+    def cond_list(where, dataset, at):
+        for c in where if isinstance(where, list) else [where]:
+            if not is_obj(c) or not isinstance(c.get("field"), str):
+                errors.append(f"widget {at} has a condition that is not {{field, op, value}}")
+                continue
+            for k in c:
+                if k not in ("field", "op", "value"):
+                    errors.append(f'widget {at} condition has unknown key "{k}"')
+            if c.get("op") not in OPS:
+                errors.append(f'widget {at} uses op "{c.get("op")}"; use one of {" ".join(OPS)}')
+            ref(c.get("value"), at)
+            if dataset:
+                has_field(dataset, c["field"], at)
+
+    # A named set holds conditions, never another name, so the runtime resolves each name exactly once.
+    for k, v in named.items():
+        if isinstance(v, str):
+            errors.append(f'widget where "{k}" must hold conditions, not another name')
+
+    def conds(where, dataset, at):
+        if where is None:
+            return
+        if isinstance(where, str):
+            if where not in named:
+                errors.append(f'widget {at} uses where "{where}", which is not declared')
+            elif not isinstance(named[where], str):
+                cond_list(named[where], dataset, at)
+            return
+        cond_list(where, dataset, at)
+
+    def forbid(v, at):
+        if isinstance(v, list):
+            for x in v:
+                forbid(x, at)
+        elif isinstance(v, str):
+            if URL_VALUE.search(v):
+                errors.append(f"widget {at} spec has a url(...) value, which would load a file")
+        elif is_obj(v):
+            for k, x in v.items():
+                if k in ("url", "data", "datasets"):
+                    errors.append(f'widget {at} spec has a "{k}" key; a widget chart draws only its rows')
+                if k == "mark" and (x == "image" or (is_obj(x) and x.get("type") == "image")):
+                    errors.append(f"widget {at} spec has an image mark, which would load files")
+                forbid(x, at)
+
+    def option(o) -> bool:
+        if o is None or isinstance(o, str) or is_num(o):
+            return True
+        return is_obj(o) and isinstance(o.get("label"), str) and (o.get("value") is None or isinstance(o.get("value"), str) or is_num(o.get("value")))
+
+    def node(n, path):
+        if not (is_obj(n) and len(n) == 1):
+            errors.append(f"widget {path} must be an object with one component name")
+            return
+        name, a = next(iter(n.items()))
+        at = f"{path} {name}"
+        if name == "Row":
+            if not isinstance(a, list):
+                errors.append(f"widget {at} takes a list of components")
+            else:
+                for i, k in enumerate(a):
+                    node(k, f"{at}[{i}]")
+            return
+        if name == "Sources":
+            if not (isinstance(a, list) and all(isinstance(x, str) for x in a)):
+                errors.append(f"widget {at} takes a list of strings")
+            return
+        if name not in ARGS:
+            errors.append(f"widget {at} is not a component; use Row, Stat, Slider, Select, Table, Chart or Sources")
+            return
+        if not is_obj(a):
+            errors.append(f"widget {at} takes an object of arguments")
+            return
+        for k in a:
+            if k not in ARGS[name]:
+                errors.append(f'widget {at} has unknown argument "{k}"')
+        for k, required in ARGS[name].items():
+            if required and k not in a:
+                errors.append(f'widget {at} needs "{k}"')
+        if "label" in a and not isinstance(a["label"], str):
+            errors.append(f"widget {at} label must be a string")
+        if "rows" in a and not (isinstance(a["rows"], str) and isinstance(rows.get(a["rows"]), list)):
+            errors.append(f'widget {at} reads rows "{a["rows"]}", which is not declared')
+        dataset = a["rows"] if isinstance(a.get("rows"), str) and a["rows"] in good else None
+        conds(a.get("where"), dataset, at)
+        if name == "Stat":
+            if a.get("op") not in STAT_OPS:
+                errors.append(f'widget {at} uses op "{a.get("op")}"; use one of {" ".join(STAT_OPS)}')
+            elif a["op"] != "count" and not isinstance(a.get("field"), str):
+                errors.append(f'widget {at} op "{a["op"]}" needs a field')
+            if dataset and isinstance(a.get("field"), str):
+                has_field(dataset, a["field"], at)
+        if name in ("Slider", "Select"):
+            v = a.get("value")
+            if not (isinstance(v, str) and REF.match(v)):
+                errors.append(f'widget {at} value must be a "$name" from state')
+            else:
+                ref(v, at)
+        if name == "Slider":
+            for k in ("min", "max", "step"):
+                if k in a and not is_num(a[k]):
+                    errors.append(f"widget {at} {k} must be a number")
+        if name == "Select":
+            opts = a.get("options")
+            if not (isinstance(opts, list) and opts and all(option(o) for o in opts)):
+                errors.append(f"widget {at} options must be a non-empty list of strings, numbers, null or {{value, label}}")
+        if name == "Table":
+            cols = a.get("columns")
+            if "columns" in a and not (isinstance(cols, list) and all(isinstance(c, str) for c in cols)):
+                errors.append(f"widget {at} columns must be a list of field names")
+            elif dataset:
+                for c in cols or []:
+                    has_field(dataset, c, at)
+            sort = a.get("sort")
+            if "sort" in a and not (is_obj(sort) and isinstance(sort.get("field"), str)):
+                errors.append(f"widget {at} sort must be {{field, desc}}")
+            elif sort and dataset:
+                has_field(dataset, sort["field"], at)
+            if "limit" in a and not (is_num(a["limit"]) and a["limit"] > 0):
+                errors.append(f"widget {at} limit must be a positive number")
+        if name == "Chart":
+            if not is_obj(a.get("spec")):
+                errors.append(f"widget {at} spec must be a Vega-Lite object")
+            else:
+                forbid(a["spec"], at)
+            params = a.get("params")
+            if "params" in a and not is_obj(params):
+                errors.append(f"widget {at} params must be an object")
+            else:
+                for v in (params or {}).values():
+                    ref(v, at)
+
+    view = spec.get("view")
+    if not isinstance(view, list):
+        errors.append("widget view must be a list of components")
+    else:
+        for i, n in enumerate(view):
+            node(n, f"view[{i}]")
+
+def reject_constant(name):
+    """NaN and Infinity are Python JSON extensions; the browser's JSON.parse refuses them."""
+    raise ValueError(f"{name} is not valid JSON")
 
 
 def check(path: Path) -> int:
@@ -134,11 +352,22 @@ def check(path: Path) -> int:
     dupes = sorted({i for i in page.ids if page.ids.count(i) > 1})
     if dupes:
         errors.append("duplicate id: " + ", ".join(dupes))
-    if page.viz_roots:
+    if page.viz_roots or page.widget_roots:
         if page.runtime != {("style", "viz-css"), ("script", "viz-js")}:
             errors.append("interactive figure but no viz runtime; copy viz-css and viz-js from the template")
         if not all(page.viz_roots):
             errors.append('interactive figure root without an id: <div class="viz" id="...">')
+        if not all(page.widget_roots):
+            errors.append('widget root without an id: <div class="widget" id="...">')
+    sources = [idx for idx, _ in page.widgets]
+    for idx, wid in enumerate(page.widget_roots):
+        if sources.count(idx) != 1:
+            errors.append(f'widget root "{wid}" needs exactly one direct-child <script type="application/json">')
+    for _, spec in page.widgets:
+        try:
+            check_widget(json.loads(spec, parse_constant=reject_constant), errors, warns)
+        except (json.JSONDecodeError, ValueError) as e:
+            errors.append(f"widget JSON is not valid: {e}")
     if re.search(r"\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(", LITERALS.sub(substitutions, "\n".join(page.code))):
         errors.append("script makes a network request; inline the data instead")
 

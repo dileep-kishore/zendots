@@ -23,10 +23,10 @@ way. Headings stay claims about this feature, per [writing.md](writing.md).
 | 3 | `done` "Done checks" | The spec's done checks: check, kind (known answer, reference, property, real-data run, degenerate input, or app run from empty state), the command, status, evidence | Table with `.status` dots: `planned`, `pass` (good), `fail` (bad); evidence names the revision checked |
 | 4 | `risks` "Risks and review" | The design review's verdict in one line, then the two or three risks that matter, each with its mitigation | One `.callout`; full review findings in an evidence disclosure |
 | 5 | `not-doing` "Not doing" | What is out of scope, and why when it is not obvious | `.not-doing` list |
-| 6 | `decide` "Waiting on you" | Only what needs the user's call | Decision form ([components.md](components.md)), or one sentence: "Nothing waits on you." |
+| 6 | `decide` "Waiting on you" | Only what needs the user's call, each with its recommendation; the delivering reply repeats the same numbers | Numbered open decisions ([components.md](components.md#open-decisions)), or one sentence: "Nothing waits on you." |
 
 After the build, add section 7. It sits between Done checks and Risks and
-review, beside the results it explains, so the decision form stays last:
+review, beside the results it explains, so the open decisions stay last:
 
 | # | `id` and `data-toc` | Content | Visual |
 |---|---|---|---|

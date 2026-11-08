@@ -9,7 +9,9 @@ One self-contained page in the house style: a sticky table of contents on the
 left, a lead paragraph, and sections that show their point with a diagram,
 chart, table, or tiles before they say it in prose. The template is fixed; you
 supply content and visuals only. A figure may be interactive: sliders, toggles
-and hover readouts drawn by the template's own runtime.
+and hover readouts drawn by the template's own runtime, or a declared row
+widget whose controls move its counts, chart and table. Interactivity is
+one-way: the reader explores the page and answers in chat.
 
 ## 1. Collect
 
@@ -33,7 +35,9 @@ faster. Done when every section has a visual decision written down.
 
 When the point is how a result responds to an input, or the reader needs exact
 values across series, make the figure interactive following
-[references/interactive.md](references/interactive.md). For what changed, what
+[references/interactive.md](references/interactive.md). When the reader
+filters or thresholds real rows, declare a row widget from that file instead
+of writing a script. For what changed, what
 became of each planned item, the evidence behind a claim, how a mechanism
 works step by step, when work ran, or what the reader must decide, use the
 components in [references/components.md](references/components.md); it is a
@@ -72,7 +76,8 @@ caption (tables in `<figure class="table">`, caption first); the template
 numbers them. Paste a diagram fragment as `references/visuals.md` describes.
 User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
 `<div class="vega"><script type="application/json">`, an interactive figure's
-`<div class="viz" id="...">` fragment before its `<figcaption>`. A diff view
+`<div class="viz" id="...">` fragment or a row widget's
+`<div class="widget" id="...">` before its `<figcaption>`. A diff view
 is the output of `scripts/diff.py`, pasted as it stands. `assets/example.html`
 is a component catalogue, not a model for length. It includes a graph-spec
 diagram and a hand-drawn Mermaid example explicitly labelled as opt-in.

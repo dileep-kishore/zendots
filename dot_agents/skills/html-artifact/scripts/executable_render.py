@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wrap one interactive-figure fragment in the html-artifact runtime as a self-contained page.
+"""Wrap one interactive-figure or widget fragment in the html-artifact runtime as a self-contained page.
 
 The runtime (<style id="viz-css"> and <script id="viz-js">) is copied from assets/template.html,
 its only source. Without --page the output suits T3's html_render: no background or padding of its
@@ -10,6 +10,7 @@ repository OUT is written into (see favicon.py).
 Usage: render.py FRAGMENT OUT [--title TITLE] [--page]
 """
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -27,11 +28,24 @@ class VizRoot(HTMLParser):
     def __init__(self):
         super().__init__()
         self.found = False
+        self.json, self.in_json = [], False
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
-        if tag == "div" and "viz" in (attrs.get("class") or "").split() and attrs.get("id"):
+        classes = (attrs.get("class") or "").split()
+        if tag == "div" and ("viz" in classes or "widget" in classes) and attrs.get("id"):
             self.found = True
+        self.in_json = tag == "script" and attrs.get("type") == "application/json"
+        if self.in_json:
+            self.json.append("")
+
+    def handle_endtag(self, tag):
+        if tag == "script":
+            self.in_json = False
+
+    def handle_data(self, data):
+        if self.in_json:
+            self.json[-1] += data
 
 
 def block(template: str, tag: str, ident: str) -> str:
@@ -55,7 +69,13 @@ def main() -> int:
     root = VizRoot()
     root.feed(fragment)
     if not root.found:
-        sys.exit('render.py: FRAGMENT needs a root <div class="viz" id="...">')
+        sys.exit('render.py: FRAGMENT needs a root <div class="viz" id="..."> or <div class="widget" id="...">')
+    # An inline render skips check.py, so a JSON block cut short (a "</script>" inside a cell) stops here.
+    for block_text in root.json:
+        try:
+            json.loads(block_text)
+        except json.JSONDecodeError as e:
+            sys.exit(f"render.py: a <script type=\"application/json\"> block is not valid JSON ({e}); escape \"<\" as \\u003c")
 
     template = TEMPLATE.read_text(encoding="utf-8")
     title = args.title or args.fragment.stem.replace("-", " ").capitalize()

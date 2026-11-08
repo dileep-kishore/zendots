@@ -22,9 +22,13 @@ shows its point, or none when a sentence says it faster.
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
 
+When the reader filters or thresholds real rows and should watch counts, a
+chart and a table follow, use a row widget
+([interactive.md](interactive.md#row-widgets)).
+
 Beyond figures, [components.md](components.md) covers tile deltas and
 sparklines, status ledgers, evidence disclosures, diff views, steppers,
-duration lanes and decision forms, with a guide to when each helps.
+duration lanes and the list of open decisions, with a guide to when each helps.
 
 ## Figure and table markup
 

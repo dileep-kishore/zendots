@@ -130,10 +130,75 @@ the runtime's behaviour:
 - Numbers come from the source or a stated model. A simulation names its
   model in the caption or a neighbouring table.
 
+## Row widgets
+
+When the reader filters or thresholds real rows and should watch counts, a
+chart and a table follow, declare a widget instead of writing a script. A
+model whose output responds to an input (the Amdahl fragment above) needs
+arithmetic, which a widget refuses; keep `viz.lineChart` or D3 for it.
+
+Embed a data file through `scripts/rows.py`, never by converting cells by
+hand. It applies the BERIL Workbench reader's rules: `""`, `NA`, `NaN`,
+`nan`, `null` and `None` become `null`, numeric text becomes a number, and
+a leading-zero id (`007`) or an integer past 2^53 stays a string.
+
+```bash
+python3 <skill-dir>/scripts/rows.py run.csv --columns genus,coverage,site > rows.json
+```
+
+Its output escapes `<` as `\u003c`, so a cell holding `</script>` cannot end
+the block early. When you assemble the block in a script, serialize it the
+same way: `json.dumps(block).replace("<", "\\u003c")`.
+
+```html
+<div class="widget" id="cov"><script type="application/json">
+{"state": {"min": 5, "site": null},
+ "rows": {"genera": [{"genus": "Bacillus", "coverage": 9.5, "site": "A"}]},
+ "where": {"pass": [{"field": "coverage", "op": ">=", "value": "$min"},
+                    {"field": "site", "op": "==", "value": "$site"}]},
+ "view": [
+  {"Row": [{"Slider": {"label": "Minimum coverage", "min": 0, "max": 20, "step": 0.5, "value": "$min"}},
+           {"Select": {"label": "Site", "options": [null, "A", "B"], "value": "$site"}}]},
+  {"Row": [{"Stat": {"label": "Genera passing", "rows": "genera", "op": "count", "where": "pass"}},
+           {"Stat": {"label": "Median coverage", "rows": "genera", "op": "median", "field": "coverage", "where": "pass"}}]},
+  {"Chart": {"rows": "genera", "where": "pass", "params": {"cutoff": "$min"}, "spec": {"layer": [
+    {"mark": "bar", "encoding": {"x": {"field": "coverage", "bin": true, "type": "quantitative"}, "y": {"aggregate": "count"}}},
+    {"mark": "rule", "encoding": {"x": {"datum": {"expr": "cutoff"}, "type": "quantitative"}}}]}}},
+  {"Table": {"rows": "genera", "where": "pass", "columns": ["genus", "coverage"], "sort": {"field": "coverage", "desc": true}}},
+  {"Sources": ["runs/r12/genus_coverage.csv (run r12)"]}]}
+</script></div>
+```
+
+| Part | Meaning |
+|---|---|
+| `state` | Every variable, by bare name. Any value that reads one is the whole string `"$name"` |
+| `rows` | Named datasets, each a list of objects from `rows.py` |
+| `where` | Named filter sets. A component's `where` is a set name, one `{field, op, value}`, or a list (all must hold). `op` is `>=` `>` `<=` `<` `==` `!=` `contains`. A row missing the field fails; a `null` or `""` value skips the condition, so a Select's `null` means "All" |
+| `Row` | Its components side by side |
+| `Slider` | `label`, `min`, `max`, `step`, `value: "$name"` |
+| `Select` | `label`, `options` (strings, numbers, `null`, or `{value, label}`), `value: "$name"` |
+| `Stat` | `label`, `rows`, `op`, optional `field` and `where`. `count` reads "7 of 12" against all rows; `missing` counts rows lacking `field`; `mean` `median` `min` `max` `sum` skip missing cells, show "—" when none remain, and add "n = N" |
+| `Table` | `rows`, optional `columns`, `where`, `sort: {field, desc}`, `limit` (default 50). Headers re-sort; missing values stay last |
+| `Chart` | `rows`, `spec` (Vega-Lite, drawing the passing rows as dataset `rows`), optional `where`, `params` (`{"cutoff": "$min"}` sets a spec param the marks read with `{"expr": "cutoff"}`) |
+| `Sources` | A list of strings: each file by path and the run that wrote it |
+
+There are no expressions: no arithmetic, functions or string templates. A
+chart cannot load anything: `check.py` refuses a `url`, `data` or
+`datasets` key and an image mark anywhere in its spec, and the runtime's
+loader refuses every request. A widget that fails a check shows its errors
+and its JSON instead of a partial view, and `check.py` reports the same
+errors. Nothing in a widget sends anything back to the agent; the reader
+explores, and asks in chat.
+
+A BERIL Workbench chat widget does not paste in: its positional
+`Slider("Minimum coverage", 0, 20, 0.5, $min)` becomes the named
+`{"Slider": {"label": ..., "value": "$min"}}`, `$min = 5` becomes
+`"state": {"min": 5}`, and `Query(...)` becomes rows embedded by `rows.py`.
+
 ## Inline in a T3 thread
 
 When the reader should see the visual in the conversation rather than a file,
-write the fragment alone and wrap it:
+write the fragment alone (a `div.viz` figure or a `div.widget`) and wrap it:
 
 ```bash
 python3 <skill-dir>/scripts/render.py fragment.html inline.html --title "Short name"
@@ -154,7 +219,8 @@ px, about 736 px, and a desktop width, in both themes, and confirm:
 2. Every control changes the visual and its stats; the legend toggles
    series; hover shows one row per visible series; Home, arrow keys and
    Escape work on a focused chart, and step through the marks of a custom
-   chart.
+   chart. For a widget, set each control to an edge value and read the
+   Stat, Table and chart text against the rows by hand.
 3. Nothing overflows or clips. This snippet lists clipped chart text:
 
 ```js

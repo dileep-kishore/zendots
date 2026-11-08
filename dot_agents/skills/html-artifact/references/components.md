@@ -15,9 +15,10 @@ when a sentence does. Most pages need two or three of these, not all.
 | How the thing that was built works, step by step | Stepper over an inline SVG or HTML diagram | One crowded diagram, or several near-identical ones |
 | When the work happened, what ran in parallel, where it waited | Duration lanes, from measured times | `.timeline`, which lists events without durations |
 | A short sequence of dated events | `.timeline` | Lanes, when durations do not matter |
-| What the reader must decide next | Decision form | A list of questions in prose |
+| What the reader must decide next | Numbered open decisions | Questions buried in prose |
 | One verdict, caution, or risk | `.callout` | Bold text in a paragraph |
 | How a result responds to an input | Interactive figure, per [interactive.md](interactive.md) | A table of scenarios |
+| How counts, a chart and a table change as the reader filters real rows | Row widget, per [interactive.md](interactive.md#row-widgets) | A hand-written figure script, or one table per cutoff |
 
 A plan that is still open reads better as a table of decisions and a flow
 diagram; these components lean toward pages that report finished work. The
@@ -129,24 +130,23 @@ Times are ISO strings or plain numbers (then set `"unit"`). `"wait": true`
 draws a hatched waiting span. Each lane takes the next chart colour; hover,
 or focus the timeline and use the arrow keys, for a span's times.
 
-## Decision form
+## Open decisions
 
-For the decisions that wait on the reader, typically the last section. Each
-question is a `fieldset` with a `legend` and radio options; mark the
-recommended one with `data-rec`. The runtime adds a one-line answer and a
-"Copy as prompt" button, so the reader pastes their choices back to the
-agent.
+The decisions that wait on the reader, typically the last section, as a
+numbered list. Each item states the question, the recommended answer with its
+reason, and the alternative. The reply that delivers the page repeats the same
+numbered questions, so the reader answers in chat, as briefly as "go with the
+recommendations" or at length for one item.
 
 ```html
-<form class="decide" data-prompt="Decisions on the interactive-figure work">
-  <fieldset><legend>Keep the new skill version?</legend>
-    <label><input type="radio" name="keep" value="keep and sync" checked data-rec>Keep and sync</label>
-    <label><input type="radio" name="keep" value="revert">Revert</label>
-  </fieldset>
-  <textarea name="note" rows="2" aria-label="Anything else" placeholder="Anything else"></textarea>
-</form>
+<ol>
+  <li><b>Keep the new skill version?</b> Recommended: keep and sync, because
+    the comparison passed every criterion. Otherwise: revert.</li>
+  <li><b>Run the held-out task now?</b> Recommended: yes, it takes ten
+    minutes. Otherwise: wait for the next edit.</li>
+</ol>
 ```
 
-One question per decision, two to four options each, the recommendation
-checked by default. A decision with no real alternative is a statement, not
-a question.
+One question per decision, two to four options each. A decision with no real
+alternative is a statement, not a question. Nothing on the page sends
+anything: the page is read, and the answer goes in chat.
