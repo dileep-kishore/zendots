@@ -28,8 +28,9 @@ family that wrote the change and gives each reviewer's launch route.
   authentication, authorization, persistent data or migrations, money, or
   concurrency; for a design review; and when the user asks for a dual, total,
   pair, or deep review.
-- **Tier 3**, the council: three finders, adding Grok 4.7. Only when the user
-  asks for a council.
+- **Tier 3**, the council: three finders, with Gemini 4 Carbon in the Gemini
+  seat, falling back to Argon, and adding Grok 4.7. Only when the user asks
+  for a council.
 
 Shape is separate from tier. Each finder reviews the whole scope by default.
 **Deep** review instead gives each finder one lens from
