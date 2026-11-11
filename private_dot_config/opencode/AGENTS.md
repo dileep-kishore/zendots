@@ -15,8 +15,9 @@
 - Questions, reviews, diagnoses, and plans: inspect and report without
   changing code; the workflow's own artifacts (plans, briefs, task lists) are
   fine. Change, build, and fix requests: make in-scope edits and run local
-  checks without asking. Make routine decisions yourself; ask only when
-  different readings of the request lead to materially different work.
+  checks without asking. Make routine decisions yourself; ask when different
+  readings of the request lead to materially different work, or when a
+  decision is major as defined below.
 - When a step doesn't need my input, keep going. Put status notes in the same
   message as your next action; don't end a turn by announcing the next step,
   offering to continue, or listing decisions that don't block the work. Stop
@@ -35,7 +36,22 @@
   typically 3 to 6 and fewer when appropriate, one at a time, each with a
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
-  without questions, record your assumptions and continue.
+  without questions, decide the routine choices, record them as assumptions,
+  and still ask each major decision as the next bullet says.
+- A decision is major when two sound options would change what a person
+  sees, what is stored or deleted, who can do something, a public interface
+  or config key, a dependency, a done check or tolerance, or a scientific
+  method or claim, and my request did not already choose. A choice within
+  approved behavior and an existing project convention is routine. "Do
+  everything yourself", "no questions", and a hands-off run hand you every
+  routine choice and no major one. Ask each major decision through the
+  question tool as multiple choice, with your recommendation marked and a
+  one-line reason. Keep doing the work that does not depend on the answer,
+  and build nothing on the open choice. Without a question tool, finish
+  that work, then open your final message with the question. For major
+  decisions this overrides the offer to skip questions in Superpowers
+  `brainstorming` and "Rulings, not stalls" in `executing-plans` and
+  `subagent-driven-development`.
 - I read the feature summary page, not specs or plans; write it in
   `html-artifact`'s feature-page format. For a project-size spec, the
   interviewing session writes `<spec>-intent.md` beside it as I answer: my
@@ -45,8 +61,9 @@
   the command that shows it: a known answer, a reference comparison, a
   property, a run on real inputs (for an app, from empty state in the client
   I use), or degenerate input. Before planning, run `independent-review` on
-  the spec as a design review. Plans and builds may change the spec when
-  they hit problems; log each change in one line. Never edit my quoted
+  the spec as a design review. Plans and builds may make routine changes to
+  the spec when they hit problems; log each in one line. A major change
+  asks first. Never edit my quoted
   words; correcting a done check or excluding something I asked for keeps
   the original and the evidence. Run the done checks before the final review
   and rerun affected ones after its fixes. Before cleanup, refresh the

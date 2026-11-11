@@ -10,7 +10,8 @@ Synthesize a spec from the conversation and the codebase. Do not interview
 the user; the discussion already happened. Ask only about a decision that is
 still open and would change the spec, one question at a time, with a
 recommended answer. If the user said to proceed without questions, choose the
-recommended answer and record it as an assumption.
+recommended answer for each routine decision and record it as an assumption.
+A major decision, as the global instructions define it, is still asked.
 
 ## 1. Ground it in the repo
 

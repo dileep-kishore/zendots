@@ -32,8 +32,10 @@ instead of asking.
   reason. Include enough context to answer without scrolling back.
 - Ask the next question only when its prerequisites are settled.
 - Stop when nothing consequential remains, not when every branch is visited.
-- If the user says to proceed without questions, record the assumptions you
-  would have asked about and continue within the authorized scope.
+- If the user says to proceed without questions, record the assumptions
+  you would have asked about for routine decisions and continue within
+  the authorized scope. A major decision, as the global instructions
+  define it, is still asked.
 
 While interviewing, challenge terms that conflict with the glossary, and surface
 contradictions between what the user says and what the code does.
