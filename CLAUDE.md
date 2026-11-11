@@ -40,7 +40,9 @@ The repository follows chezmoi's naming conventions where files/directories are 
 
 - **`dot_agents/skills/`** → Agent skills, shared by every harness (`~/.agents/skills/`)
 
-- **`dot_pixi/`** → Pixi package manager manifests
+- **`dot_pixi/`** → Pixi config, plus the pixi global manifest copied from
+  NERSC by `manifests/sync_manifest.sh`. Chezmoi deploys the manifest only at
+  NERSC; the other hosts get CLI tools from Homebrew or Paru.
 
 ## Personal artifacts
 

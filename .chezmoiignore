@@ -67,6 +67,12 @@ Library
 .zprofile
 {{- end }}
 
+# The pixi global manifest is a copy of NERSC's, fetched by sync_manifest.sh;
+# no other host runs pixi global. Same NERSC check as dot_zshrc.tmpl.
+{{- if ne .chezmoi.homeDir "/global/homes/d/dkishore" }}
+.pixi/manifests
+{{- end }}
+
 # misc
 tests/
 .config/sesh/sesh.toml

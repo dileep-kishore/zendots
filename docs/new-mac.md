@@ -155,6 +155,16 @@ On the new Mac:
    `agent-update` with
    `launchctl kickstart "gui/$(id -u)/com.dkishore.agent-update"` and read
    `~/.local/state/agent-update.log`.
+
+   The Brewfile installs rig, which installs R. Add R in user mode, which
+   needs no sudo and puts `R` and `Rscript` in `~/.local/bin`:
+
+   ```bash
+   rig add release --user --without-path
+   ```
+
+   `--without-path` stops rig from appending to the chezmoi-managed shell
+   startup files; `~/.local/bin` is already on PATH.
 6. On tsuki, run `ssh macbook true` once and accept the host key, so
    `work-sync`'s non-interactive SSH can reach the new Mac.
 7. Leave the Mac plugged in and awake overnight while Syncthing copies the
