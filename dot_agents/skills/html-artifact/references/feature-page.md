@@ -18,15 +18,15 @@ way. Headings stay claims about this feature, per [writing.md](writing.md).
 | # | `id` and `data-toc` | Content | Visual |
 |---|---|---|---|
 | 0 | header | Title is the feature's name. Meta line: `date · Design \| In build \| Built · spec path`. Lead: what it does, for whom, and why now, in three sentences | `.tiles`: stage, done checks passing (`n of m`), open decisions, spec changes since approval |
-| 1 | `how` "How it works" | The architecture, or for science and algorithm work the data and algorithm flow. Two or three sentences only | A graph-spec diagram ([diagrams.md](diagrams.md)), required, the first figure on the page |
-| 2 | `decisions` "Key decisions" | The choices that shape the build: decision, chosen option, the alternative rejected, why, and who chose it | Table; `who` is a tag: `you` (blue), `agent default` (peach), `review` (mauve). Undiscussed agent defaults come first. At most 8 rows; the rest go in an evidence disclosure |
-| 3 | `done` "Done checks" | The spec's done checks: check, kind (known answer, reference, property, real-data run, degenerate input, or app run from empty state), the command, status, evidence | Table with `.status` dots: `planned`, `pass` (good), `fail` (bad); evidence names the revision checked |
-| 4 | `risks` "Risks and review" | The design review's verdict in one line, then the two or three risks that matter, each with its mitigation | One `.callout`; full review findings in an evidence disclosure |
-| 5 | `not-doing` "Not doing" | What is out of scope, and why when it is not obvious | `.not-doing` list |
-| 6 | `decide` "Waiting on you" | Only what needs the user's call, each with its recommendation; the delivering reply repeats the same numbers | Numbered open decisions ([components.md](components.md#open-decisions)), or one sentence: "Nothing waits on you." |
+| 1 | `decide` "Waiting on you" | Only what needs the user's call, each with its recommendation; the delivering reply repeats the same numbers | Numbered open decisions ([components.md](components.md#open-decisions)), or one sentence: "Nothing waits on you." |
+| 2 | `how` "How it works" | The architecture, or for science and algorithm work the data and algorithm flow. Two or three sentences only | A graph-spec diagram ([diagrams.md](diagrams.md)), required, the first figure on the page |
+| 3 | `decisions` "Key decisions" | The choices that shape the build: decision, chosen option, the alternative rejected, why, and who chose it | Table; `who` is a tag: `you` (blue), `agent default` (peach), `review` (mauve). Undiscussed agent defaults come first. At most 8 rows; the rest go in an evidence disclosure |
+| 4 | `done` "Done checks" | The spec's done checks: check, kind (known answer, reference, property, real-data run, degenerate input, or app run from empty state), the command, status, evidence | Table with `.status` dots: `planned`, `pass` (good), `fail` (bad); evidence names the revision checked |
+| 5 | `risks` "Risks and review" | The design review's verdict in one line, then the two or three risks that matter, each with its mitigation | One `.callout`; full review findings in an evidence disclosure |
+| 6 | `not-doing` "Not doing" | What is out of scope, and why when it is not obvious | `.not-doing` list |
 
 After the build, add section 7. It sits between Done checks and Risks and
-review, beside the results it explains, so the open decisions stay last:
+review, beside the results it explains:
 
 | # | `id` and `data-toc` | Content | Visual |
 |---|---|---|---|
