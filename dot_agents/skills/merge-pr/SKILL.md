@@ -107,21 +107,23 @@ gate that was visible up front.
 
 5. **Tested against the current base.** GitHub reports `BEHIND` only when
    branch protection requires up-to-date branches, so `CLEAN` can sit on CI
-   that never saw newer base commits. Find base commits the head lacks that
-   touch this PR's files. `<remote>` is the remote whose URL is the PR's base
+   that never saw newer base commits. The head must contain the current base.
+   `<remote>` is the remote whose URL is the PR's base
    repository (`gh pr view <number> --json url`): usually `origin`, but often
    `upstream` in a clone of a fork.
 
    ```bash
-   git fetch <remote> <base> "refs/pull/<number>/head" && head=<headRefOid>
-   comm -12 <(git diff --name-only "$(git merge-base "$head" <remote>/<base>)" <remote>/<base> | sort) \
-            <(gh pr diff <number> --name-only | sort)
+   git fetch <remote> <base> "refs/pull/<number>/head" && { git merge-base --is-ancestor <remote>/<base> <headRefOid>; echo "ancestor exit $?"; }
    ```
 
-   Any output fails the gate until the branch includes those commits: run
-   `gh pr update-branch <number>`, which merges the base without a force-push,
-   re-read `headRefOid` with `gh pr view`, and rerun gates 1 to 5 on that
-   head.
+   `ancestor exit 0` passes. No `ancestor exit` line means the fetch failed,
+   which fails the gate with its error. `ancestor exit 1` fails the gate until
+   the branch includes the base: run `gh pr update-branch <number>`, which
+   merges the base without a force-push, re-read `headRefOid` with
+   `gh pr view`, and rerun gates 1 to 5 on that head. Any other exit status
+   fails the gate with the error. After three updates of one PR in one run,
+   stop and report that the base keeps moving. When the PR has no checks, the
+   report says that no check ran against the current base.
 
 ## 3. Merge, bottom-up
 
@@ -134,8 +136,11 @@ gh pr merge <number> --merge --match-head-commit <headRefOid>
 gh pr view <number> --json state,mergeCommit -q '.state+" "+.mergeCommit.oid'
 ```
 
-Immediately before each merge, re-run gate 2, and gate 1 too if a review
-arrived since the last check. A reviewer can open a thread during the CI wait
+Immediately before each merge, re-run gate 2, the gate 5 command, and gate 1
+too if a review arrived since the last check. When the gate 5 command no
+longer prints `ancestor exit 0`, go back to gate 5. A base commit that lands
+after this check is caught only by branch protection that requires up-to-date
+branches, or by a merge queue. A reviewer can open a thread during the CI wait
 or while earlier stack PRs merge, and `--match-head-commit` only refuses the
 merge when someone pushed after the gates passed. Do not pass
 `--delete-branch`; step 4 deletes branches safely. Never pass `--admin` or
@@ -153,11 +158,10 @@ gh pr edit <child> --base <default-branch>
 
 If the repository deleted the parent branch on merge, GitHub retargets the
 child itself; check `baseRefName` rather than assuming. Retargeting keeps the
-head SHA, and many workflows do not re-run on a base change, so the green
-checks may come from runs against the old base. Wait a few minutes for new
-runs to register. If none do, run `gh pr update-branch <child>` so CI runs on
-a head that contains the new base, re-read the child's `headRefOid`, and rerun
-gates 1 to 5 on it. Never merge a child on CI from its old base.
+head SHA, and the child's head never contains the commit its parent's merge
+wrote to the base, so gate 5 fails on it. Run `gh pr update-branch <child>` at
+once, re-read the child's `headRefOid`, and rerun gates 1 to 5 on it. Never
+merge a child on CI from its old base.
 
 ## 4. Clean up each merged branch
 
