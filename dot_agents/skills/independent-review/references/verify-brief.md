@@ -56,9 +56,28 @@ Intent: {INTENT}
    - **Unintended:** the intent does not ask for this behaviour.
    - **Rule-scoped:** a standards finding quotes a rule that applies to this
      file, and no explicit suppression covers the line.
+   - For a redundant-test finding, judge each listed test by one question: does
+     a retained test fail on every failure this test would catch? Name an input
+     or mutation the listed test catches and the retained test misses to refute
+     the finding for that test. CONFIRMED lists the tests that survive this
+     check; a test that is new in the change and asserts only on a mock is
+     confirmed without it.
 3. Where it is cheap and safe, show it: run the relevant existing test, or a
    small scratch script that exercises the path. A reproduction outranks any
    amount of reading.
+
+## Fix check
+
+When the task message says "fix check", the finding was CONFIRMED earlier
+and the author changed code to fix it. The scope diff runs from the
+finding's recorded base to the pinned current state, which for a
+working-change review includes the uncommitted and untracked changes. The
+task message also gives the fix diff, or the command that prints it. Answer
+two questions, each with its own output block. First, does the original
+failure still occur in the pinned current state? Use the gates above;
+REFUTED must cite the fix's file:line. Second, does the fix diff introduce a
+defect? Read every hunk of the fix diff and report each defect in a block
+titled `New in fix:`, judged by the same gates. Report nothing else.
 
 ## Verdicts
 

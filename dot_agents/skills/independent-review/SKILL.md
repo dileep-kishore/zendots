@@ -196,7 +196,8 @@ context with [references/verify-brief.md](references/verify-brief.md):
   private temporary directory, not other findings, other reports, or your
   opinion.
 - A verifier that fails or misses the deadline leaves its finding UNVERIFIED,
-  never refuted.
+  never refuted. Rerun the verifier once for an UNVERIFIED P0 to P2 finding
+  before triage.
 
 ### Findings ledger
 
@@ -258,6 +259,12 @@ describes. Write it only after the user approves.
 A review request does not authorize fixes, commits, or pushes. If fixes were
 already requested, fix CONFIRMED findings and settle each PLAUSIBLE one by
 fixing it or recording why not; otherwise present the findings for decision.
+A P0 to P2 finding that stays UNVERIFIED stays `open`, and the report names
+it. When the fix for a CONFIRMED finding touches more than one file, send
+it to a fresh verifier as a fix check
+([references/verify-brief.md](references/verify-brief.md)). After each fix,
+update the finding's ledger row: `fixed` with the fix's file:line and the
+check or verdict that proves it, or still `open`.
 
 Fixing is a second decision, and reviewers pull toward scope creep. Make the
 smallest change that resolves the verified failure within the stated intent,

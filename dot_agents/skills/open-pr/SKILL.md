@@ -130,8 +130,13 @@ Body, in order:
    it does and the one decision the reviewer needs. The diff shows the detail;
    the paragraph says what it achieves.
 3. **Verification** — one line per command that ran: the command and its
-   result. When `independent-review` ran on this change in the session, add
-   its score line.
+   result. When `independent-review` ran on this change, add its
+   `Independent review,` score line, and name each P0 to P2 finding its
+   ledger leaves `open`. When the global instructions require a review of
+   the change and none ran, run `independent-review` before opening the PR.
+   When the user said to skip the review, write "Independent review: skipped
+   at the owner's request." A change that needs only a self-check gets no
+   review line.
 
 Then, only when real, one sentence each: what was left out and why, a risk the
 diff does not show, a related issue, and how to undo the change when

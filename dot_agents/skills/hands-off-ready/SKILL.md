@@ -25,8 +25,9 @@ merging, so tier 2 is not forced.
 ## Stop at the gate
 
 Replace hands-off-merge's merge and report steps. Fetch the base and check the
-live PR's head, checks, reviews, and mergeability against hands-off-merge's
-gate, then unwatch and report one verdict:
+live PR's head, checks, reviews, and mergeability, the review ledger, and the
+`REVIEW.md` Human review paths against hands-off-merge's gate, then unwatch
+and report one verdict:
 
 - **Ready to merge:** the gate passes; the PR stays open and unmerged.
 - **Waiting on human approval:** only a required human review remains.

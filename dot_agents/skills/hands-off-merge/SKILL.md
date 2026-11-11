@@ -67,7 +67,14 @@ Outside T3 every wait is bounded, so check the clock after each one.
    - `merge-pr`'s gates pass: review bots finished, no unresolved threads or
      unanswered findings, CI green with every required check, mergeable, and
      tested against the current base;
-   - no human review requests changes.
+   - no human review requests changes;
+   - the `independent-review` ledger has no `open` P0 to P2 finding that is
+     CONFIRMED or UNVERIFIED;
+   - the change touches no path under a `REVIEW.md` "Human review" heading.
+
+   When one of these two fails and a fix cannot clear it, the run becomes
+   `hands-off-ready`: leave the PR open, never merge, and name the finding or
+   the paths as the blocker in the question.
 7. **Merge** with `merge-pr`, through branch protection as configured.
 8. **Report**, leading with the PR link and the merge commit, then the proof,
    the score line, and each decision you made for the user, under the
@@ -75,15 +82,16 @@ Outside T3 every wait is bounded, so check the clock after each one.
 
 ## Asking
 
-Ask only when the run cannot continue alone: the change cannot be proven
+Ask when a major decision, as the global instructions define it, comes up,
+or when the run cannot continue alone: the change cannot be proven
 and needs the user's environment, the gate cannot pass and you cannot fix
 it, the next step is outside what the phrase authorizes, the goal is
 ambiguous in a way that changes the result, another PR makes this one
 obsolete, or a limit was reached. Put the PR link, the blocker, and the
 options with your recommendation first into the question. Unwatch first.
 Without a question tool, leave the PR open and unmerged and open the final
-message with the question. Decide everything else yourself and list those
-decisions in the report.
+message with the question. Decide every routine choice yourself and list
+those decisions in the report.
 
 Locally maintained. Adapted from tstack's
 [full-send](https://github.com/t3dotgg/tstack/blob/main/skills/full-send/SKILL.md).

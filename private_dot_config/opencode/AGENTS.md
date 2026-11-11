@@ -15,8 +15,9 @@
 - Questions, reviews, diagnoses, and plans: inspect and report without
   changing code; the workflow's own artifacts (plans, briefs, task lists) are
   fine. Change, build, and fix requests: make in-scope edits and run local
-  checks without asking. Make routine decisions yourself; ask only when
-  different readings of the request lead to materially different work.
+  checks without asking. Make routine decisions yourself; ask when different
+  readings of the request lead to materially different work, or when a
+  decision is major as defined below.
 - When a step doesn't need my input, keep going. Put status notes in the same
   message as your next action; don't end a turn by announcing the next step,
   offering to continue, or listing decisions that don't block the work. Stop
@@ -35,7 +36,22 @@
   typically 3 to 6 and fewer when appropriate, one at a time, each with a
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
-  without questions, record your assumptions and continue.
+  without questions, decide the routine choices, record them as assumptions,
+  and still ask each major decision as the next bullet says.
+- A decision is major when two sound options would change what a person
+  sees, what is stored or deleted, who can do something, a public interface
+  or config key, a dependency, a done check or tolerance, or a scientific
+  method or claim, and my request did not already choose. A choice within
+  approved behavior and an existing project convention is routine. "Do
+  everything yourself", "no questions", and a hands-off run hand you every
+  routine choice and no major one. Ask each major decision through the
+  question tool as multiple choice, with your recommendation marked and a
+  one-line reason. Keep doing the work that does not depend on the answer,
+  and build nothing on the open choice. Without a question tool, finish
+  that work, then open your final message with the question. For major
+  decisions this overrides the offer to skip questions in Superpowers
+  `brainstorming` and "Rulings, not stalls" in `executing-plans` and
+  `subagent-driven-development`.
 - I read the feature summary page, not specs or plans; write it in
   `html-artifact`'s feature-page format. For a project-size spec, the
   interviewing session writes `<spec>-intent.md` beside it as I answer: my
@@ -45,8 +61,9 @@
   the command that shows it: a known answer, a reference comparison, a
   property, a run on real inputs (for an app, from empty state in the client
   I use), or degenerate input. Before planning, run `independent-review` on
-  the spec as a design review. Plans and builds may change the spec when
-  they hit problems; log each change in one line. Never edit my quoted
+  the spec as a design review. Plans and builds may make routine changes to
+  the spec when they hit problems; log each in one line. A major change
+  asks first. Never edit my quoted
   words; correcting a done check or excluding something I asked for keeps
   the original and the evidence. Run the done checks before the final review
   and rerun affected ones after its fixes. Before cleanup, refresh the
@@ -64,20 +81,35 @@
   what a few tool calls finish. Give each a bounded task, the files it may
   edit, and the evidence to return; check that evidence before accepting it.
   One agent drives any shared app session.
-- Tests are lasting maintenance: add one when it protects behavior or a likely
-  regression, test-first when that clarifies a bug fix, and a smoke check for
-  reversible, low-impact changes. Honor repository requirements and reuse the
-  project's verification recipes. `verify-this` settles a disputed claim;
+- Tests are lasting maintenance. Before adding one, name the failure it
+  would catch and the existing check that misses it, in the plan step or
+  your report. When no such failure exists, or an existing check already
+  catches it, add none. Extend an existing test at the highest useful seam
+  before writing a new one. Add no test per function, per task, or per
+  refactor, and none only because code had none. A plan task without a new
+  test names the existing check that covers it. Use test-first when it
+  clarifies a bug fix, and a smoke check for reversible, low-impact
+  changes. A verification command is not a test file. This overrides the
+  per-function checklist and the rule against production code without a
+  failing test in Superpowers `test-driven-development`, and the test step
+  in every task of `writing-plans` and `executing-plans`. Honor repository
+  requirements, which outrank every skill, and reuse the project's
+  verification recipes. `verify-this` settles a disputed claim;
   suggest `create-verification-skill` for a recurring manual check,
   `maintain-verification-skill` when a recipe drifts, and `correct` when I
   correct the same kind of mistake a second time.
-- After substantial work passes its check, run one `independent-review` of
-  the whole working change, untracked files included, at the reviewer tier
-  that skill picks. Fix each finding its verifier confirms, fix or explain each
-  plausible one, then rerun affected checks. A second review needs a
-  concrete new concern; this replaces other skills' review rounds. When
-  behavior, APIs, or setup changed, update the docs in the same change with
-  `doc-updater`. Trivial changes need only a self-check.
+- After a change that is not trivial passes its check, run one
+  `independent-review` of the whole working change, untracked files included,
+  at the reviewer tier that skill picks. Fix each finding its verifier
+  confirms, fix or explain each plausible one, then rerun affected checks. A
+  second review needs a concrete new concern; this replaces other skills'
+  review rounds, including Superpowers `requesting-code-review` and the task
+  and final reviewers in `subagent-driven-development` and `executing-plans`.
+  When behavior, APIs, or setup changed, update the docs in the same change
+  with `doc-updater`. A change is trivial when it edits only comments,
+  documentation, or formatting and changes no behavior. Trivial changes need
+  only a self-check, and so does a reversible personal setting whose effect I
+  see directly, such as a keybinding, a color, or an alias.
 - In research answers, mark what you couldn't confirm and say where you looked.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. The first and last lines stand alone: what
