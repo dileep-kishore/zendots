@@ -98,13 +98,18 @@
   suggest `create-verification-skill` for a recurring manual check,
   `maintain-verification-skill` when a recipe drifts, and `correct` when I
   correct the same kind of mistake a second time.
-- After substantial work passes its check, run one `independent-review` of
-  the whole working change, untracked files included, at the reviewer tier
-  that skill picks. Fix each finding its verifier confirms, fix or explain each
-  plausible one, then rerun affected checks. A second review needs a
-  concrete new concern; this replaces other skills' review rounds. When
-  behavior, APIs, or setup changed, update the docs in the same change with
-  `doc-updater`. Trivial changes need only a self-check.
+- After a change that is not trivial passes its check, run one
+  `independent-review` of the whole working change, untracked files included,
+  at the reviewer tier that skill picks. Fix each finding its verifier
+  confirms, fix or explain each plausible one, then rerun affected checks. A
+  second review needs a concrete new concern; this replaces other skills'
+  review rounds, including Superpowers `requesting-code-review` and the task
+  and final reviewers in `subagent-driven-development` and `executing-plans`.
+  When behavior, APIs, or setup changed, update the docs in the same change
+  with `doc-updater`. A change is trivial when it edits only comments,
+  documentation, or formatting and changes no behavior. Trivial changes need
+  only a self-check, and so does a reversible personal setting whose effect I
+  see directly, such as a keybinding, a color, or an alias.
 - In research answers, mark what you couldn't confirm and say where you looked.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. The first and last lines stand alone: what
