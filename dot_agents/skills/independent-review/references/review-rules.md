@@ -88,6 +88,8 @@ second draft.
 
 Human review paths change no finding. They tell the report to name each of
 those paths the change touches, so the user knows which diffs to read.
+A hands-off merge that touches one stops for the user before merging, as
+`hands-off-merge` step 6 says.
 
 A precedent must state when it does *not* apply. Without that boundary it
 suppresses the real bug that looks like the dismissed one. Never write a

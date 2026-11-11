@@ -67,7 +67,14 @@ Outside T3 every wait is bounded, so check the clock after each one.
    - `merge-pr`'s gates pass: review bots finished, no unresolved threads or
      unanswered findings, CI green with every required check, mergeable, and
      tested against the current base;
-   - no human review requests changes.
+   - no human review requests changes;
+   - the `independent-review` ledger has no `open` P0 to P2 finding that is
+     CONFIRMED or UNVERIFIED;
+   - the change touches no path under a `REVIEW.md` "Human review" heading.
+
+   When one of these two fails and a fix cannot clear it, the run becomes
+   `hands-off-ready`: leave the PR open, never merge, and name the finding or
+   the paths as the blocker in the question.
 7. **Merge** with `merge-pr`, through branch protection as configured.
 8. **Report**, leading with the PR link and the merge commit, then the proof,
    the score line, and each decision you made for the user, under the
