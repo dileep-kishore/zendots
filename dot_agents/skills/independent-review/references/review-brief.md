@@ -115,7 +115,15 @@ something is not a finding; find out yourself.
    finding. So is a test or done check that would still pass with the
    behaviour wrong, such as an expected value copied from the code's own
    output, an assertion on a mock, or a command that selects zero tests,
-   when it is the only evidence for a requirement.
+   when it is the only evidence for a requirement. In a change review, also
+   report each new test that catches no failure another retained test or check
+   misses: it repeats an assertion on the same kind of input, or it asserts
+   only on a mock. A shared code path, or coverage through a caller, is a
+   reason to look and never the ground by itself. Report them together as one
+   P3 finding that lists, for each test, its `file:line` and the retained test
+   that catches the same failures. The fix is deleting them. A test stays when
+   its plan step or the report names a failure the other tests miss, or when
+   you can name one.
 6. Standards: violations of the project standards above. A rule-based finding
    quotes the rule and must be one the rule actually scopes to this file.
 7. Security: only issues you can trace from an entry point an attacker

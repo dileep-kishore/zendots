@@ -81,10 +81,20 @@
   what a few tool calls finish. Give each a bounded task, the files it may
   edit, and the evidence to return; check that evidence before accepting it.
   One agent drives any shared app session.
-- Tests are lasting maintenance: add one when it protects behavior or a likely
-  regression, test-first when that clarifies a bug fix, and a smoke check for
-  reversible, low-impact changes. Honor repository requirements and reuse the
-  project's verification recipes. `verify-this` settles a disputed claim;
+- Tests are lasting maintenance. Before adding one, name the failure it
+  would catch and the existing check that misses it, in the plan step or
+  your report. When no such failure exists, or an existing check already
+  catches it, add none. Extend an existing test at the highest useful seam
+  before writing a new one. Add no test per function, per task, or per
+  refactor, and none only because code had none. A plan task without a new
+  test names the existing check that covers it. Use test-first when it
+  clarifies a bug fix, and a smoke check for reversible, low-impact
+  changes. A verification command is not a test file. This overrides the
+  per-function checklist and the rule against production code without a
+  failing test in Superpowers `test-driven-development`, and the test step
+  in every task of `writing-plans` and `executing-plans`. Honor repository
+  requirements, which outrank every skill, and reuse the project's
+  verification recipes. `verify-this` settles a disputed claim;
   suggest `create-verification-skill` for a recurring manual check,
   `maintain-verification-skill` when a recipe drifts, and `correct` when I
   correct the same kind of mistake a second time.

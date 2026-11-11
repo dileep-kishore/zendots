@@ -56,6 +56,12 @@ Intent: {INTENT}
    - **Unintended:** the intent does not ask for this behaviour.
    - **Rule-scoped:** a standards finding quotes a rule that applies to this
      file, and no explicit suppression covers the line.
+   - For a redundant-test finding, judge each listed test by one question: does
+     a retained test fail on every failure this test would catch? Name an input
+     or mutation the listed test catches and the retained test misses to refute
+     the finding for that test. CONFIRMED lists the tests that survive this
+     check; a test that is new in the change and asserts only on a mock is
+     confirmed without it.
 3. Where it is cheap and safe, show it: run the relevant existing test, or a
    small scratch script that exercises the path. A reproduction outranks any
    amount of reading.
