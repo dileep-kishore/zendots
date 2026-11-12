@@ -32,6 +32,21 @@ Intent: {INTENT}
 
 {FINDING}
 
+## Grounding
+
+Citations in the finding that the coordinator could not find, with the
+command and its output (`None` when every citation was found):
+
+{GROUNDING}
+
+When the coordinator lists citations it could not find, take them as facts
+about the report, not as a verdict. A wrong path, line, or quote does not
+refute the finding: look for the code or text the finding describes and
+judge that. If no such code or text exists in the pinned state, REFUTED cites
+the searches you ran and their empty output in place of a file:line. Your
+own citations are checked the same way, and a refuting file:line that does
+not exist voids the verdict.
+
 ## Process
 
 1. Restate the claim in your own words: the trigger, the faulty step, and the

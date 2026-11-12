@@ -17,7 +17,7 @@ the spec's own stated goals and mark that lens partial under coverage.
 
 ## Reviewers
 
-Use tier 2's two finders from [reviewers.md](reviewers.md), each covering
+Use tier 2's finders from [reviewers.md](reviewers.md), each covering
 every lens below, with verifiers chosen by that file's verifier rule. Two
 cross-model reviewers find partly different errors, so the pair beats two
 reviewers from one vendor. For deep review, split the lenses across them as
