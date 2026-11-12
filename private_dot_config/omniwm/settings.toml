@@ -187,7 +187,7 @@ backgroundEffect = "standardBlur"
 enabled = true
 heightPercent = 60.0
 monitorMode = "focusedWindow"
-opacity = 0.8
+opacity = 0.9
 position = "top"
 provider = "ghostty"
 widthPercent = 80.0
@@ -468,6 +468,27 @@ axSubrole = "AXStandardWindow"
 bundleId = "com.apple.Notes"
 id = "7471DB0A-065E-4985-BDC2-609F331793DC"
 layout = "float"
+
+[[appRules]]
+assignToWorkspace = "1"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "net.imput.helium"
+id = "BE9A782F-534A-4EC5-B38F-01239BC85B97"
+
+[[appRules]]
+assignToWorkspace = "2"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.electron.wispr-flow"
+id = "15BD8ED3-6742-4ED3-9E06-89D0F09011AD"
+
+[[appRules]]
+assignToWorkspace = "3"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
+bundleId = "com.anthropic.claudefordesktop"
+id = "8A5FE7B4-27F0-4789-8A7C-7B8BCF8DEB99"
 
 [[hotkeys]]
 binding = "Unassigned"

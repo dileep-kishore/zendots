@@ -102,7 +102,7 @@ which is the bar's thickness on a side edge. It limits the lanes to `omniwm`,
 the file keeps the full-width top layout for switching back.
 
 Quake Terminal is enabled with Ghostty as its provider, and Hyper+Return toggles
-it. It slides in from the top at 80% width and 60% height, with 0.8 opacity and
+it. It slides in from the top at 80% width and 60% height, with 0.9 opacity and
 a 25-point standard blur. It reads `~/.config/ghostty/config` through libghostty,
 which ships no themes, so the repo keeps a copy of Ghostty's built-in
 `Catppuccin Mocha` in `~/.config/ghostty/themes/`
@@ -114,10 +114,15 @@ that to 100% on the MacBook's built-in display only. OmniWM matches the entry
 by display UUID (`37D8832A-…`), so external monitors keep 50% and the macmini
 ignores the entry. `omniwmctl query displays` prints each display's UUID.
 
-Twelve app rules set initial workspace placement for standard windows, including
-Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.
-The complete assignments are in the file's `[[appRules]]` entries, alongside
-app-specific minimum window sizes. Separate rules make Zoom and Granola's
+Fifteen app rules set initial workspace placement for standard windows, including
+Chrome and Helium to 1, T3 Code and Orca to 2, Claude to 3, Notion to 6, Slack
+to 7, and Zotero to 8. The complete assignments are in the file's
+`[[appRules]]` entries, alongside app-specific minimum window sizes. Rules
+match bundle IDs, which can differ from the app name: ChatGPT.app is
+`com.openai.codex` and Grok Bot.app is `com.anysphere.sand`. Read an app's ID
+with `defaults read /Applications/<App>.app/Contents/Info CFBundleIdentifier`.
+To move an already-open window to its rule's workspace, run
+`omniwmctl rule apply --pid <pid>`. Separate rules make Zoom and Granola's
 standard windows float by default.
 
 Chrome popups, such as Google sign-in windows, open tiled; press Hyper+V to
