@@ -201,8 +201,22 @@ position = "top"
 widthPercent = 100.0
 
 [routing]
-arrangements = []
-mode = "macOS"
+mode = "custom"
+
+[[routing.arrangements]]
+id = "2D70DCDE-060E-46E8-A8EC-42BAB8563DE6"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 0
+monitorDisplayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
+monitorName = "ASUS VG289"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 1
+monitorDisplayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+monitorName = "Built-in Retina Display"
 
 [scratchpads]
 
@@ -609,6 +623,14 @@ id = "moveToWorkspace.8"
 
 [[hotkeys]]
 binding = "Unassigned"
+id = "switchWorkspace.9"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.9"
+
+[[hotkeys]]
+binding = "Unassigned"
 id = "switchWorkspaceSlot.1"
 
 [[hotkeys]]
@@ -802,6 +824,10 @@ id = "moveColumnToWorkspace.7"
 [[hotkeys]]
 binding = "Unassigned"
 id = "moveColumnToWorkspace.8"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.9"
 
 [[hotkeys]]
 binding = "Hyper+Left Arrow"
@@ -1317,7 +1343,11 @@ layoutType = "niri"
 name = "2"
 
 [workspaces.monitorAssignment]
-type = "main"
+type = "specificDisplay"
+
+[workspaces.monitorAssignment.output]
+displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
+name = "ASUS VG289"
 
 [[workspaces]]
 id = "BEB842B5-E894-4791-9FD1-397C3CDD3538"
@@ -1325,7 +1355,11 @@ layoutType = "niri"
 name = "3"
 
 [workspaces.monitorAssignment]
-type = "main"
+type = "specificDisplay"
+
+[workspaces.monitorAssignment.output]
+displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
+name = "ASUS VG289"
 
 [[workspaces]]
 id = "248AA883-2261-4D45-943C-79C0E46A232B"
@@ -1374,3 +1408,15 @@ name = "9"
 
 [workspaces.monitorAssignment]
 type = "main"
+
+[[workspaces]]
+id = "096B8183-47C1-4D2A-BA7B-E2295006BD6D"
+layoutType = "default"
+name = "10"
+
+[workspaces.monitorAssignment]
+type = "specificDisplay"
+
+[workspaces.monitorAssignment.output]
+displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
+name = "ASUS VG289"

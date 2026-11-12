@@ -70,9 +70,11 @@ Control+Option+Command+Space. On the Go60, press Right Command+Space.
 OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
 keeping Hyper+Space free for Raycast.
 
-The config uses Niri scrolling, nine workspaces on the main monitor, 25/50/75/100%
-column widths (50% by default), and a 6-point gap with no outer gaps. Borders
-are enabled at 2 points, with a mauve base color, an enabled gradient, and an
+The config uses Niri scrolling and ten workspaces. Workspaces 2, 3, and 10 are
+pinned to the ASUS VG289 when it is connected, and the rest use the main
+monitor. It sets 25/50/75/100% column widths (50% by default), and a 6-point
+gap with no outer gaps. Borders are enabled at 2 points, with a mauve base
+color, an enabled gradient, and an
 8-point glow at 60% opacity. A lone column stays centered at its configured
 width. Focus does not follow the mouse; keyboard focus still moves the pointer
 to the focused window. The workspace bar runs down the left screen edge, 32
