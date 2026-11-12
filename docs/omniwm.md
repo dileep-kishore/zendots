@@ -72,9 +72,9 @@ keeping Hyper+Space free for Raycast.
 
 The config uses Niri scrolling and ten workspaces. Workspaces 2, 3, and 10 are
 pinned to the ASUS VG289 when it is connected, and the rest use the main
-monitor. It sets 25/50/75/100% column widths (50% by default), and a 6-point
-gap with no outer gaps. Borders are enabled at 2 points, with a mauve base
-color, an enabled gradient, and an
+monitor. It sets 25/50/75/100% column widths (50% by default, 100% on the
+MacBook's built-in display), and a 6-point gap with no outer gaps. Borders are
+enabled at 2 points, with a mauve base color, an enabled gradient, and an
 8-point glow at 60% opacity. A lone column stays centered at its configured
 width. Focus does not follow the mouse; keyboard focus still moves the pointer
 to the focused window. The workspace bar runs down the left screen edge, 32
@@ -108,6 +108,11 @@ which ships no themes, so the repo keeps a copy of Ghostty's built-in
 `Catppuccin Mocha` in `~/.config/ghostty/themes/`
 ([OmniWM #272](https://github.com/OmniNull/OmniWM/issues/272)). OmniWM fullscreen (`toggleFullscreen`) is Unassigned; Hyper+Period reaches
 a 100% column width instead.
+
+New Niri columns open at 50% width. A `[[monitorNiriOverrides]]` entry raises
+that to 100% on the MacBook's built-in display only. OmniWM matches the entry
+by display UUID (`37D8832A-…`), so external monitors keep 50% and the macmini
+ignores the entry. `omniwmctl query displays` prints each display's UUID.
 
 Twelve app rules set initial workspace placement for standard windows, including
 Chrome to 1, T3 Code and Orca to 2, Notion to 6, Slack to 7, and Zotero to 8.

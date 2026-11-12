@@ -1329,6 +1329,12 @@ id = "toggleShellWidget.system-stats"
 binding = "Unassigned"
 id = "toggleShellWidget.workspaces"
 
+[[monitorNiriOverrides]]
+defaultContainerPrimarySpan = 1.0
+id = "F314D4EC-41EE-4B38-993B-0ABA072F9D87"
+monitorDisplayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+monitorName = "Built-in Retina Display"
+
 [[workspaces]]
 id = "AD36F001-C57E-41A5-AC1D-DF5249D007F0"
 layoutType = "niri"
