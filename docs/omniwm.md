@@ -120,6 +120,12 @@ The complete assignments are in the file's `[[appRules]]` entries, alongside
 app-specific minimum window sizes. Separate rules make Zoom and Granola's
 standard windows float by default.
 
+Chrome popups, such as Google sign-in windows, open tiled; press Hyper+V to
+float one. A title rule would also re-run when a normal window's tab reaches a
+sign-in page and float that whole window, because OmniWM 0.8.0 re-evaluates
+title matchers on every title change. A manual float stays when the title
+changes.
+
 ## Maintaining the config
 
 Edit `private_dot_config/omniwm/settings.toml` or
