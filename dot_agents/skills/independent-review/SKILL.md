@@ -22,8 +22,10 @@ family that wrote the change and gives each reviewer's launch route.
 
 - **Tier 1**, the default: one finder, GPT-6.1 Sol when Claude wrote the
   change.
-- **Tier 2**: two finders, adding Gemini 4 Argon, or Grok 4.7 when Argon
-  misses its deadline. Move up to it without asking
+- **Tier 2**: two cross-family finders, adding Gemini 4 Argon, or Grok 4.7
+  when Argon misses its deadline, plus Claude Sonnet 5.5 when Claude wrote the
+  change.
+  Move up to it without asking
   when the change is large (roughly 1,000+ changed lines) or touches
   authentication, authorization, persistent data or migrations, money, or
   concurrency; for a design review; and when the user asks for a dual, total,
@@ -136,7 +138,9 @@ reviewer's report.
 Launch each finder by the route
 [references/reviewers.md](references/reviewers.md) gives for the current host:
 
-- **T3 Code:** `delegate_task` with the roster's target, one task per finder.
+- **T3 Code:** `delegate_task` with the roster's target, one task per finder,
+  except Gemini finders: launch those with the `agy` CLI and its context
+  bundle, as the roster's Gemini section says.
 - **Native subagents:** for a seat in the coordinator's own family. Start with
   no inherited conversation, supplying only the brief and checkout. Use
   read-only permissions when supported. Reviewers should perform their own
@@ -178,16 +182,31 @@ is authorized, or explicitly hand them off. Preserve reports for inspection.
 Wait for every finder before verification. If one fails, label the review
 partial and name the lens or reviewer whose coverage is missing.
 
+## Ground citations
+
+Before merging anything, check every path, line range, and quote each
+finder report cites, as [references/grounding.md](references/grounding.md)
+describes. A report with 2 or more ungrounded citations is quarantined: its
+findings still go to verification, its coverage and score do not count, and
+its seat relaunches by the roster's fallback at once. A grounding miss never
+refutes a finding.
+
 ## Verify findings
 
 You wrote or own the change, so do not judge findings yourself. First merge
 duplicates by underlying failure: two findings on one line with different
 failures stay separate, and one failure reported from two places is one
-finding that keeps both attributions. Then verify each finding in a fresh
-context with [references/verify-brief.md](references/verify-brief.md):
+finding that keeps both attributions and each source's grounding result. A
+failure raised by both Sol and Sonnet is verified per source first, as the
+roster's verifier rule says.
+Then verify each finding in a fresh context with
+[references/verify-brief.md](references/verify-brief.md):
 
 - One verifier per P0–P2 finding, in parallel; P3 findings share one verifier,
-  which receives that batch and no other findings.
+  which receives that batch and no other findings. A finder report's
+  findings whose citations are all ungrounded also share one verifier.
+- Fill the verify brief's `{GROUNDING}` with each grounding miss for its
+  finding, with the command and its output, or `None`.
 - Launch verifiers like finders, with no inherited conversation. Pick each
   one by the roster's verifier rule: never from the finding reviewer's family,
   and never a finder-only model.
@@ -198,6 +217,9 @@ context with [references/verify-brief.md](references/verify-brief.md):
 - A verifier that fails or misses the deadline leaves its finding UNVERIFIED,
   never refuted. Rerun the verifier once for an UNVERIFIED P0 to P2 finding
   before triage.
+- Check each REFUTED verdict's refuting citation by the same rules. An
+  ungrounded one makes the verdict UNVERIFIED; rerun that verifier once,
+  whatever the severity.
 
 ### Findings ledger
 
@@ -208,8 +230,9 @@ session. One row per finding: ID, location, title, verdict, state, the
 evidence for that state, the base of the comparison it was found in, and the
 HEAD it was last checked at. CONFIRMED,
 PLAUSIBLE, and UNVERIFIED findings start `open`. REFUTED ones start
-`dismissed` with the refuting file:line, and a finding the user dismisses
-records the user's reason.
+`dismissed` with the refuting file:line, or `dismissed (ungrounded)` when
+the only failing gate was a missing citation, and a finding the user
+dismisses records the user's reason.
 
 Never give the ledger to finders: they review unseeded. Reconcile it after
 they finish, while merging duplicates:
@@ -227,7 +250,9 @@ they finish, while merging duplicates:
   verified once, keeping its ID.
 - A new finding with the same failure as a dismissed one is not raised again
   unless the new code makes it worse. List it with REFUTED findings as
-  previously dismissed, with the reason.
+  previously dismissed, with the reason. A `dismissed (ungrounded)` finding
+  suppresses nothing: a new grounded finding of that failure is verified as
+  new.
 
 Update the ledger after triage.
 
@@ -235,7 +260,10 @@ Update the ledger after triage.
 
 Read every report and verdict in full. Overrule a verdict only with code
 evidence and say so. Agreement between finders raises rank, not certainty; a
-finding from one finder may be the most serious.
+finding from one finder may be the most serious. Apply the verification
+trigger in [references/grounding.md](references/grounding.md), then take
+coverage, Requirements marks, and scores only from reports that are not
+quarantined.
 
 Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
 UNVERIFIED ones labeled with the step left unproven, most severe first. Give
@@ -244,7 +272,8 @@ reproduction, or both), repro, smallest fix, and finder and verifier
 attribution. On a repeat review, list ledger findings carried
 forward or newly fixed after them. List REFUTED findings one line each with
 the refuting file:line. Then coverage: the tier and shape, each seat's
-reviewer and route, any seat that fell back, the concern map, lenses run or skipped, what no one
+reviewer and route, any seat that fell back or was quarantined and why, the
+ungrounded citations per report, the concern map, lenses run or skipped, what no one
 could verify, whether the approved `REVIEW.md` override applied, and each
 Human review path the change touches or the audit includes. Link the unchanged raw reports; show them verbatim if
 requested. Do not impose a finding quota or manufacture findings for balance.
