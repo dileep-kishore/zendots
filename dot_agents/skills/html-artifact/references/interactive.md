@@ -221,11 +221,7 @@ px, about 736 px, and a desktop width, in both themes, and confirm:
    Escape work on a focused chart, and step through the marks of a custom
    chart. For a widget, set each control to an edge value and read the
    Stat, Table and chart text against the rows by hand.
-3. Nothing overflows or clips. This snippet lists clipped chart text:
-
-```js
-[...document.querySelectorAll('.viz-chart svg text')].filter(t => {
-  const r = t.getBoundingClientRect(), f = (t.closest('figure') || t.closest('.viz')).getBoundingClientRect();
-  return r.width && (r.left < f.left || r.right > f.right);
-}).map(t => t.textContent)
-```
+3. Nothing overflows or clips. `bun <skill-dir>/scripts/audit.ts <page>`
+   lists errors, figures that drew nothing, clipped text and page overflow at
+   390 and 1280 px in both themes, and exits 0 only when all four passes are
+   clean.
