@@ -1,0 +1,74 @@
+<style id="story-css">
+.scrolly{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:0 2rem;align-items:start}
+.scrolly>:not(.step-captions,.step-nav,figcaption){grid-column:2;grid-row:1;position:sticky;top:12vh}
+.scrolly .step-captions{grid-column:1;grid-row:1;margin:0;padding:25vh 0 35vh 1.2em}
+.scrolly .step-captions li{display:list-item;min-height:50vh}
+.scrolly .step-captions:has(.on) li:not(.on){opacity:.4}
+.scrolly .step-nav{display:none}.scrolly figcaption{grid-column:1/-1}
+mark.ref{background:var(--accent-soft);color:inherit;border-radius:3px;cursor:help}
+[data-ref]{transition:opacity .2s}.ref-dim{opacity:.25}
+@media (prefers-reduced-motion:reduce){.stepper [data-step],[data-ref]{transition:none}}
+@media print{.scrolly{display:block}.scrolly .step-captions{padding:0 0 0 1.2em}.scrolly .step-captions li{min-height:0;opacity:1}.ref-dim{opacity:1}}
+</style>
+<script id="story-js">
+(function () {
+var print = matchMedia('print'), on = function (t, e, f) { t.addEventListener(e, f); };
+function sig(v, k, x) { try { v.signal(k, x).runAsync(); } catch (e) { /* the chart does not declare this param */ } }
+function scroll(fig) {
+var caps = [].slice.call(fig.querySelectorAll('.step-captions>li')), io = null;
+function go(k) { fig.stepTo(k); caps.forEach(function (li, i) { li.classList.toggle('on', i === k - 1); }); }
+// A frame that grows to fit never scrolls, so the sticky layout needs a page that does.
+function set() {
+var ok = innerWidth >= 720 && !!window.IntersectionObserver && !print.matches && document.documentElement.scrollHeight > innerHeight + 1;
+fig.classList.toggle('scrolly', ok);
+if (ok && !io) {
+io = new IntersectionObserver(function (es) { es.forEach(function (e) {
+var i = caps.indexOf(e.target);
+if (e.isIntersecting) go(i + 1); else if (!i && e.boundingClientRect.top > innerHeight * .45) go(0);
+}); }, { rootMargin: '-40% 0px -55% 0px' });
+caps.forEach(function (li) { io.observe(li); });
+} else if (!ok && io) { io.disconnect(); io = null; go(0); }
+}
+set(); on(window, 'resize', set); on(print, 'change', set);
+}
+function link(m) {
+var name = m.dataset.ref, row = '"ref":' + JSON.stringify(name), lit = false;
+function light(x) {
+lit = x;
+document.querySelectorAll('figure').forEach(function (f) {
+var all = [].slice.call(f.querySelectorAll('[data-ref]:not(mark)'));
+if (all.some(function (el) { return el.dataset.ref === name; })) all.forEach(function (el) { el.classList.toggle('ref-dim', x && el.dataset.ref !== name); });
+});
+// Only charts whose rows name the phrase change.
+document.querySelectorAll('.vega').forEach(function (v) {
+if (v.vegaView && JSON.stringify(JSON.parse(v.querySelector('script').textContent)).indexOf(row) >= 0) sig(v.vegaView, 'ref', x ? name : '');
+});
+}
+m.tabIndex = 0;
+['mouseenter', 'focus'].forEach(function (e) { on(m, e, function () { light(true); }); });
+['mouseleave', 'blur'].forEach(function (e) { on(m, e, function () { light(false); }); });
+on(m, 'pointerup', function (e) { if (e.pointerType !== 'mouse') light(!lit); });
+on(m, 'keydown', function (e) { if (e.key === 'Escape') light(false); });
+on(print, 'change', function () { if (print.matches) light(false); });
+}
+function init() {
+document.querySelectorAll('figure.stepper').forEach(function (fig) {
+var vega = fig.querySelector('.vega'), cur = 0, scr = fig.classList.contains('scroll');
+if (!scr && !vega) return;
+if (!fig.stepTo) {
+var p = fig.appendChild(document.createElement('p')); p.className = 'viz-error';
+return p.textContent = "This page's runtime predates stories; copy viz-js from the template";
+}
+if (vega) {
+var apply = function () { if (vega.vegaView) sig(vega.vegaView, 'step', print.matches ? 0 : cur); };
+on(fig, 'stepchange', function (e) { cur = e.detail.step; apply(); });
+on(vega, 'vegaready', apply); on(print, 'change', apply);
+}
+if (scr) scroll(fig);
+});
+document.querySelectorAll('mark.ref').forEach(link);
+}
+// Runs after viz-js wires the steppers.
+if (document.readyState == 'loading') on(document, 'DOMContentLoaded', function () { setTimeout(init); }); else setTimeout(init);
+})();
+</script>

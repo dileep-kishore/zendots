@@ -292,6 +292,85 @@ def check_widget(spec, errors: list, warns: list) -> None:
         for i, n in enumerate(view):
             node(n, f"view[{i}]")
 
+TILE = re.compile(r'<div class="tile"[^>]*>((?:\s*<div class="[^"]*">.*?</div>|\s*<svg\b.*?</svg>)*)\s*</div>', re.S)
+NUM = re.compile(r"^[+\u2212-]?\d[\d,]*(?:\.\d+)?$")
+DELTA = re.compile(r"^([+\u2212-]?\d[\d,]*(?:\.\d+)?)\s+from\s+(\d[\d,]*(?:\.\d+)?)$")
+
+
+def text_of(fragment: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", fragment)).strip()
+
+
+def number(s: str) -> float:
+    return float(s.replace(",", "").replace("\u2212", "-"))
+
+
+def section(html: str, sid: str):
+    """Return the HTML from <h2 id=sid> to the next h2, or None when the page has no such section."""
+    m = re.search(rf'<h2\b[^>]*\bid="{re.escape(sid)}"', html)
+    if not m:
+        return None
+    rest = html[m.end():]
+    end = re.search(r"<h2\b|</main>", rest)
+    return rest[: end.start()] if end else rest
+
+
+def check_tiles(html: str, errors: list) -> None:
+    """Tile deltas must be arithmetic; on a feature page, count tiles must match the sections they count."""
+    done, decide, changes = section(html, "done"), section(html, "decide"), section(html, "changes")
+    feature = done is not None and decide is not None
+    for m in TILE.finditer(html):
+        part = lambda c: (lambda f: text_of(f.group(1)) if f else None)(re.search(rf'<div class="{c}\b[^"]*">(.*?)</div>', m.group(1), re.S))
+        n, k, d = part("n") or "", part("k") or "", part("d")
+        if d and NUM.match(n) and DELTA.match(d):
+            delta, base = (number(g) for g in DELTA.match(d).groups())
+            places = len(n.split(".")[1]) if "." in n else 0
+            if abs(round(number(n) - base, places) - delta) > 0.5 * 10 ** -places + 1e-9:
+                errors.append(f'tile "{k}": {n} is not {d} (expected {round(number(n) - base, places):g} from {d.split("from")[1].strip()})')
+        if not feature:
+            continue
+        if "done checks" in k and re.fullmatch(r"(\d+) of (\d+)", n):
+            got = tuple(int(g) for g in re.fullmatch(r"(\d+) of (\d+)", n).groups())
+            statuses = re.findall(r'class="status\b([^"]*)"', done)
+            want = (sum("good" in s.split() for s in statuses), len(statuses))
+            if got != want:
+                errors.append(f'tile "{k}": shows {n}, #done has {want[0]} of {want[1]} passing')
+        elif "decisions" in k and n.isdigit():
+            ol = re.search(r"<ol\b.*?</ol>", decide, re.S)
+            want = len(re.findall(r"<li\b", ol.group(0))) if ol else 0
+            if int(n) != want:
+                errors.append(f'tile "{k}": shows {n}, #decide lists {want}')
+        elif "changes" in k and n.isdigit() and changes is not None:
+            ledger = re.search(r'<ul class="ledger".*?</ul>', changes, re.S)
+            want = len(re.findall(r"<li\b", ledger.group(0))) if ledger else 0
+            if int(n) != want:
+                errors.append(f'tile "{k}": shows {n}, #changes lists {want}')
+
+
+def check_story(html: str, errors: list, warns: list) -> None:
+    """Story features need the opt-in story block and a viz-js new enough to have its hooks."""
+    figures = [set(c.split()) for c in re.findall(r'<figure\b[^>]*\bclass="([^"]*)"', html)]
+    chart_stepper = any(
+        re.search(r'class="vega\b', body)
+        for body in re.findall(r'<figure\b[^>]*\bclass="[^"]*\bstepper\b[^"]*"[^>]*>(.*?)</figure>', html, re.S)
+    )
+    phrases = re.findall(r'<mark\b[^>]*\bclass="[^"]*\bref\b[^"]*"[^>]*\bdata-ref="([^"]*)"', html)
+    phrases += re.findall(r'<mark\b[^>]*\bdata-ref="([^"]*)"[^>]*\bclass="[^"]*\bref\b', html)
+    used = any({"stepper", "scroll"} <= f for f in figures) or chart_stepper or bool(phrases)
+    block = 'id="story-css"' in html and 'id="story-js"' in html
+    if used and not block:
+        errors.append("story feature without the story block; paste story-css and story-js from assets/story.html after viz-js")
+    elif used and "stepchange" not in "".join(re.findall(r'<script id="viz-js">(.*?)</script>', html, re.S)):
+        errors.append("story block with a viz-js older than its hooks; copy viz-css and viz-js from the template")
+    if block and not used:
+        warns.append("story block present but no story feature uses it; remove it from a plain page")
+    targets = set(re.findall(r'<(?!mark\b)[a-z][\w-]*\b[^>]*\bdata-ref="([^"]*)"', html))
+    for spec in re.findall(r'<div class="vega[^"]*"[^>]*>\s*<script type="application/json">(.*?)</script>', html, re.S):
+        targets.update(re.findall(r'"ref"\s*:\s*"([^"]*)"', spec))
+    for name in sorted(set(phrases) - targets):
+        warns.append(f'linked phrase names "{name}", which no figure carries in data-ref or in a Vega row\'s ref field')
+
+
 def reject_constant(name):
     """NaN and Infinity are Python JSON extensions; the browser's JSON.parse refuses them."""
     raise ValueError(f"{name} is not valid JSON")
@@ -380,6 +459,9 @@ def check(path: Path) -> int:
                     span["start"], span["end"]
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             errors.append(f"lanes data needs lanes[].name and spans[].start/end: {e!r}")
+
+    check_tiles(html, errors)
+    check_story(html, errors, warns)
 
     if "<!-- SLOT:" in html:
         errors.append("unfilled SLOT comment remains")

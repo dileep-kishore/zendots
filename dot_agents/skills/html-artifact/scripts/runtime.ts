@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const source = join(import.meta.dir, 'diagram');
-const files = ['package.json', 'bun.lock', 'layout.ts', 'browser.ts', 'export.ts'];
+const files = ['package.json', 'bun.lock', 'layout.ts', 'browser.ts', 'export.ts', 'audit.js', 'audit-run.ts'];
 const cache = join(process.env.XDG_CACHE_HOME || join(homedir(), '.cache'), 'html-artifact', 'diagram');
 // The same pinned faces the template's @font-face rules load, so measured widths match the page.
 const FONTS = {

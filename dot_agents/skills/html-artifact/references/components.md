@@ -36,7 +36,17 @@ a real series of five or more points; a two-point trend is a delta.
 ```
 
 `good` or `bad` on `.d` colours the delta by meaning, not by sign. Always
-write the comparison point ("from 47.1", "vs last week").
+write the comparison point ("from 47.1", "vs last week"). `.d` holds only the
+delta and its comparison point; `check.py` checks the arithmetic of a
+`<delta> from <base>` delta.
+
+On a results page, the tiles' window and source go in one
+`<p class="meta">` line directly under the `.tiles` block ("Last 30 nightly
+runs · runs/bench.csv"). When tiles differ, each tile's `.k` ends with its
+own after a middle dot ("minutes per run · bench.csv"). Stage and count tiles
+on feature pages need neither. A derived number (a share, a change, a total)
+gets a short derivation in an evidence disclosure: its inputs and their
+source, the selection rule, and the formula, such as `(31 − 9) / 31 = 71%`.
 
 ## Status ledger
 
@@ -112,7 +122,9 @@ explains.
 When durations, overlap, or waiting are the point: parallel agents, a build
 pipeline, a long run. Use only measured times (timestamps from git, logs or
 session records, or measured durations laid end to end), never estimates;
-when you have only an order of events, use `.timeline`.
+when you have only an order of events, use `.timeline`. A span given as
+date-only strings (`"2026-11-10"`) shows its dates; timestamps show the
+reader's local clock.
 
 ```html
 <figure>
