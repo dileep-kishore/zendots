@@ -1,0 +1,5 @@
+{{- /* Short machine name used to tag agent memory. */ -}}
+{{- if eq .chezmoi.hostname "Dileeps-Mac-mini" -}}macmini
+{{- else if eq .chezmoi.hostname "DKishore-M81" -}}macbook
+{{- else -}}{{ .chezmoi.hostname | lower }}
+{{- end -}}

@@ -1,0 +1,14 @@
+#!/bin/sh
+# Reloads the Hindsight server LaunchAgent when its plist changes. Only macmini
+# runs the server; .chezmoiignore drops this script on every other host.
+# {{ include "private_Library/LaunchAgents/com.dkishore.hindsight-api.plist.tmpl" | sha256sum }}
+set -eu
+dir="$HOME/.hindsight-server"
+if [ ! -r "$dir/.env" ]; then
+  echo "hindsight-server: $dir/.env is missing; create it with HINDSIGHT_API_TENANT_API_KEY before loading the server." >&2
+  exit 0
+fi
+mkdir -p "$dir/logs"
+plist="$HOME/Library/LaunchAgents/com.dkishore.hindsight-api.plist"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"

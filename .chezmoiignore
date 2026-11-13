@@ -67,6 +67,25 @@ Library
 .zprofile
 {{- end }}
 
+# The Hindsight memory server runs on macmini only; other hosts are clients.
+{{- if ne .chezmoi.hostname "Dileeps-Mac-mini" }}
+Library/LaunchAgents/com.dkishore.hindsight-api.plist
+.chezmoiscripts/55_hindsight-server.sh
+{{- end }}
+
+# Hindsight's staged runtime, logs and companion skill copies are written by
+# its client, not chezmoi; keep `chezmoi add ~/.agents` from vendoring them.
+.hindsight/coding-agents
+.hindsight/coding-agents-logs
+.hindsight/state
+.agents/skills/hindsight-coding-agent
+.claude/skills/hindsight-coding-agent
+# NERSC is not a Hindsight client.
+{{- if eq .chezmoi.homeDir "/global/homes/d/dkishore" }}
+.hindsight
+.chezmoiscripts/60_hindsight-client.sh
+{{- end }}
+
 # The pixi global manifest is a copy of NERSC's, fetched by sync_manifest.sh;
 # no other host runs pixi global. Same NERSC check as dot_zshrc.tmpl.
 {{- if ne .chezmoi.homeDir "/global/homes/d/dkishore" }}

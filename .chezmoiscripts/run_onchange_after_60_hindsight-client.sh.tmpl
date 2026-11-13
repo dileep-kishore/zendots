@@ -1,0 +1,33 @@
+#!/bin/sh
+# Stages the Hindsight coding-agents runtime, its companion skill and Claude
+# Code's MCP entry. The hooks, Codex MCP and OpenCode plugin entries come from
+# the modify scripts, so the package's `install` command never runs (it would
+# also rewrite chezmoi-managed files and default to Hindsight Cloud).
+# Bump to rerun: 1
+set -u
+runtime="$HOME/.hindsight/coding-agents"
+node_bin={{ or (lookPath "node") "node" | quote }}
+
+if command -v npx >/dev/null 2>&1; then
+  npx -y @vectorize-io/hindsight-coding-agents@latest update || echo "hindsight-client: runtime update failed" >&2
+else
+  echo "hindsight-client: npx not on PATH; skipped staging the runtime" >&2
+fi
+
+# One copy in the shared skill store; Claude Code gets a link, Codex and
+# OpenCode read the store directly. .chezmoiignore keeps it out of zendots.
+skill="$HOME/.agents/skills/hindsight-coding-agent"
+if [ -d "$runtime/skill" ] && [ ! -e "$skill" ]; then
+  mkdir -p "$HOME/.agents/skills"
+  cp -R "$runtime/skill" "$skill"
+fi
+[ -x "$HOME/.local/bin/link-agent-skills.sh" ] && "$HOME/.local/bin/link-agent-skills.sh"
+
+if command -v claude >/dev/null 2>&1 && [ -f "$runtime/dist/mcp-server.js" ]; then
+  claude mcp remove --scope user hindsight >/dev/null 2>&1 || true
+  claude mcp add --scope user hindsight --env HINDSIGHT_MCP_HARNESS=claude-code -- \
+    "$node_bin" "$runtime/dist/mcp-server.js" >/dev/null
+else
+  echo "hindsight-client: claude or the runtime is missing; skipped the Claude MCP entry" >&2
+fi
+exit 0
