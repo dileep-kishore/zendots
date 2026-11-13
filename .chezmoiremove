@@ -66,3 +66,12 @@
 .pi/agent/skills/orca-independent-review
 .config/opencode/plugins/orca-opencode-status-tui
 .config/opencode/plugins/orca-opencode-status.js
+
+# Retired: unused; the global spec rule covers writing a spec from the
+# conversation, and the interview rule covers grilling.
+.agents/skills/grill-with-docs
+.claude/skills/grill-with-docs
+.pi/agent/skills/grill-with-docs
+.agents/skills/to-spec
+.claude/skills/to-spec
+.pi/agent/skills/to-spec

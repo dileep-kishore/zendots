@@ -37,10 +37,12 @@
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
   without questions, decide the routine choices, record them as assumptions,
-  and still ask each major decision as the next bullet says. Skip the spec,
-  intent file, design review, and Superpowers `brainstorming` for an obvious
-  change to one or two files when no major decision is open, and say that
-  you skipped them.
+  and still ask each major decision as the next bullet says. When I ask to
+  turn the conversation into a spec, write it from what was said, sized to
+  the change and saved where the project keeps specs, without another
+  interview. Skip the spec, intent file, design review, and Superpowers
+  `brainstorming` for an obvious change to one or two files when no major
+  decision is open, and say that you skipped them.
 - A decision is major when two sound options would change what a person
   sees, what is stored or deleted, who can do something, a public interface
   or config key, a dependency, a done check or tolerance, or a scientific
