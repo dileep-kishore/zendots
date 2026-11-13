@@ -89,20 +89,23 @@ preset's active tools and reported when the mode is selected interactively.
 
 ## Subagents
 
-`pi-subagents@0.42.0` is configured with:
+`pi-subagents@0.88.0` is configured with:
 
 - asynchronous top-level runs;
 - up to eight concurrent children;
 - FleetView below the editor;
 - artifacts stored with session data;
 - child-to-parent intercom;
-- dynamic `workflowScript` orchestration rather than saved chains.
+- dynamic `workflow` script orchestration rather than saved chains;
+- `toolActivation: "eager"`, so the active mode alone decides whether
+  `subagent` and `bg_wait` are available. The default `auto` would add a
+  `subagents_enable` loader that brings them back in `investigate` mode.
 
 ### Custom agents
 
 | Agent | Role | Context and model selection |
 | --- | --- | --- |
-| `scout` | Fast read-only reconnaissance | Fresh; GPT-5.3 Codex Spark, low thinking; fallback models declared in its agent file |
+| `scout` | Fast read-only reconnaissance | Fresh; GPT-5.3 Codex Spark, low thinking; no fallback model, since pi-subagents 0.88 removed `fallbackModels` |
 | `planner` | Evidence-backed implementation planning | Forked; no model override, high thinking |
 | `worker` | Sole-writer implementation | Forked; no model override, high thinking |
 | `reviewer` | Adversarial diff or plan review | Fresh; no model override, high thinking |
@@ -110,8 +113,11 @@ preset's active tools and reported when the mode is selected interactively.
 
 Only `scout` pins a model in the local agent definitions. The others use the
 runtime-selected model rather than fixed GPT-5.6/GPT-5.5 assignments. All five
-inherit project context but disable skill inheritance; `worker` may not launch
-subagents.
+inherit project context and set `inheritSkills: false`, but only the fresh
+agents (`scout`, `reviewer`, `verifier`) start without the parent's skills.
+The forked `planner` and `worker` keep the parent's system prompt, skills
+included, because pi-subagents ignores `inheritSkills` for forks.
+`worker` may not launch subagents.
 
 Built-in `oracle`, `researcher`, `context-builder`, and `delegate` agents are also available.
 
@@ -144,7 +150,7 @@ Monitor and control them with:
 
 ## Workflow orchestration
 
-The local workflow prompts use `pi-subagents` dynamic `workflowScript`
+The local workflow prompts use `pi-subagents` dynamic `workflow` script
 orchestration rather than checked-in chains. Audit work uses distinct
 read-only lanes; implementation uses one writer per working directory, then
 focused validation and fresh-context review for non-trivial changes.

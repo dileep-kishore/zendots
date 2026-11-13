@@ -6,5 +6,6 @@
   "toolDescriptionMode": "full",
   "fleetView": true,
   "fleetViewPlacement": "belowEditor",
-  "asyncWidget": false
+  "asyncWidget": false,
+  "toolActivation": "eager"
 }

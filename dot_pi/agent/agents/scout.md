@@ -2,7 +2,6 @@
 name: scout
 description: Fast read-only reconnaissance that returns compact, evidence-backed context for another agent
 model: openai-codex/gpt-5.3-codex-spark
-fallbackModels: openai-codex/gpt-5.4-mini, openai-codex/gpt-5.5
 thinking: low
 tools: read, grep, find, ls, bash, contact_supervisor
 systemPromptMode: replace
