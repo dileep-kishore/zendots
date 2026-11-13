@@ -182,8 +182,11 @@
 ## Host safety
 
 - Bound fix-and-verify loops, writer loops, and stress jobs by iterations,
-  runtime, and output size. After repeated failure for the same reason, change
-  approach or report the blocker with evidence.
+  runtime, and output size. When two fixes that rest on the same assumption
+  fail the same check, write the assumption down and run an observation that
+  would come out differently if it were false, before any third fix. If the
+  observation refutes it, look for the cause the failures share; if it holds
+  and you are still stuck, report the blocker with evidence.
 - On long runs, keep the task list in a file so it survives context
   compaction, plus a `show-me-your-work` decision log for long or unattended
   runs. Scheduled jobs and automatic wake-ups need an explicit request.
