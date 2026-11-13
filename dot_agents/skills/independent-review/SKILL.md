@@ -98,7 +98,14 @@ covers only the commits since the previously pinned HEAD, unless the user
 asks for a full review. Working-change targets always get a full review:
 their fixes are usually uncommitted, so a commit range from an unchanged HEAD
 would be empty. A force-push, a changed base, or changed review rules break
-the commit range, so they get a full review too. Every repeat review
+the commit range, so they get a full review too, with one exception: after a
+rebase with no conflict edits, when
+`git diff <old-base> <old-head> | git patch-id --stable` matches the same
+command on the new base and head, and `git diff <old-base> <new-base>`
+touches no reviewed file and no caller of a symbol the change adds, alters,
+or deletes, the earlier review still covers the patch. Say so, carry the
+ledger forward, and review only commits added since. When either check is in
+doubt, review in full. Every repeat review
 reconciles the findings ledger, as described under Verify findings.
 
 For committed branch/PR reviews, check for pre-existing dirty files even when
@@ -265,8 +272,15 @@ trigger in [references/grounding.md](references/grounding.md), then take
 coverage, Requirements marks, and scores only from reports that are not
 quarantined.
 
-Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
-UNVERIFIED ones labeled with the step left unproven, most severe first. Give
+For a change review, name the fact or facts the change is safe because of,
+such as "this call only drops cache entries that are already dead". For each,
+give the `verify-this` evidence level it reached and the check behind it,
+running a cheap check yourself when one exists, or mark it unproven. An
+unproven safety fact is a coverage gap and refutes no finding.
+
+Present a one-line verdict, then the safety facts, then CONFIRMED findings,
+then PLAUSIBLE and UNVERIFIED ones labeled with the step left unproven, most
+severe first. Give
 each its location, trigger, evidence and its method (source trace, executed
 reproduction, or both), repro, smallest fix, and finder and verifier
 attribution. On a repeat review, list ledger findings carried
@@ -283,7 +297,10 @@ End with the score line and append the calibration rows, both as
 When a refuted or user-dismissed finding's reason, or a confirmed finding's
 mistake, has come up before in this repository, propose a precedent or a
 source fix as [references/review-rules.md](references/review-rules.md)
-describes. Write it only after the user approves.
+describes. A source fix stops the next agent repeating the mistake: prefer
+removing the wrong path, then a type, then a lint or CI check, then a test,
+and fall back to a written rule only with the reason. Write it only after
+the user approves.
 
 A review request does not authorize fixes, commits, or pushes. If fixes were
 already requested, fix CONFIRMED findings and settle each PLAUSIBLE one by

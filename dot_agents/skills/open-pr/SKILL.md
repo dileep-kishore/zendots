@@ -42,7 +42,9 @@ finishing step does), wins over the default above. Use it for every
 `gh pr create --base`.
 
 On the default branch or a detached HEAD, branch before committing:
-`git switch -c <type>/<name>`.
+`git switch -c <type>/<name>`. A T3 Code worktree (under `~/.t3/worktrees`)
+keeps the branch T3 created; if HEAD is detached there, stop and report it
+instead, because T3 does not notice a new branch.
 
 Steps 2–5 plan and draft; step 6 checks for the few reasons to stop, and
 step 7 carries the plan out.
@@ -213,6 +215,9 @@ declined.
 ## 8. Hand over to review
 
 Unless the user asked only to open the PR, continue with `babysit-pr` from its
-step 1, passing that push time as `--since`. It waits for the review bots this
+step 1, passing that push time as `--since`. When this run will still stack
+another PR on this one, report the URL and build the next PR instead: fixes
+to a lower PR restart checks on every PR above it. Once the top of the stack
+is open, babysit each PR from the bottom up. It waits for the review bots this
 push triggered, and stops about three minutes after the push when none
 appear.

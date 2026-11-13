@@ -114,13 +114,17 @@ author agent making it again. Propose one only when both hold:
    thread or `fix:` commit (search `gh` and `git log`), or three or more
    instances of the pattern already exist in the code. One occurrence never
    qualifies.
-2. A written rule would have prevented it: the cause is something the author
-   could not see in the code, such as a repository convention, a replaced
-   helper, or an unstated constraint. Logic slips, typos and misread
-   conditions get fixed and nothing is recorded.
+2. Something outside the author's view would have prevented it: the cause
+   is a repository convention, a replaced helper, an unstated constraint, or
+   a shape that makes the wrong code look right. Logic slips, typos and
+   misread conditions get fixed and nothing is recorded.
 
-Choose the cheapest place that enforces it: a lint rule, then a `CLAUDE.md`
-line, then a `REVIEW.md` Focus line. Cite the earlier occurrence.
+Propose the highest fix that works, in this order: a structural change that
+removes the wrong path (one owner for the state, the old helper deleted),
+then a type that cannot hold the bad value, then a lint or CI check whose
+error names the fix, then a test, then a `CLAUDE.md` line, then a
+`REVIEW.md` Focus line. Say why each higher one does not fit, and cite the
+earlier occurrence.
 
 ## Writing a proposal
 

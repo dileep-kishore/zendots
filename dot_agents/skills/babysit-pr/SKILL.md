@@ -295,9 +295,20 @@ they never appear or the watch times out, report CI as unverified rather than
 passed.
 
 A check that fails because of this round's commit belongs to this round: read
-the failing log, fix it, push, and wait again. Report a failure that predates
-the round or is plainly infrastructure (a runner outage, a flaky job that
-passes on rerun) instead of patching around it.
+the failing log, fix it, push, and wait again. Classify any other failure
+before rerunning anything:
+
+- A suspected flake or runner outage gets one rerun
+  (`gh run rerun <run-id> --failed`). The same failure twice is not a flake:
+  read the log as a real failure.
+- A failure in code the PR never touched points at a stale base. Refresh the
+  base first, then check: `git fetch origin <base>` and
+  `git merge-base --is-ancestor origin/<base> <head-sha>`. When the base has
+  moved past the branch, report that the branch needs updating rather than
+  rerunning; when the fetch fails, report the base as unchecked.
+
+Report a failure that predates the round or is plainly infrastructure
+instead of patching around it.
 
 ## 7. Report, or go another round
 

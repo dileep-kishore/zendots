@@ -37,12 +37,21 @@
   marked recommendation and a one-line reason. Self-review the spec or plan,
   then present only its key decisions for approval. If I say to proceed
   without questions, decide the routine choices, record them as assumptions,
-  and still ask each major decision as the next bullet says.
+  and still ask each major decision as the next bullet says. When I ask to
+  turn the conversation into a spec, write it from what was said, sized to
+  the change and saved where the project keeps specs, without another
+  interview. Skip the spec, intent file, design review, and Superpowers
+  `brainstorming` for an obvious change to one or two files when no major
+  decision is open, and say that you skipped them.
 - A decision is major when two sound options would change what a person
   sees, what is stored or deleted, who can do something, a public interface
   or config key, a dependency, a done check or tolerance, or a scientific
   method or claim, and my request did not already choose. A choice within
-  approved behavior and an existing project convention is routine. "Do
+  approved behavior and an existing project convention is routine. A fact
+  that a short run can show, such as how a library or flag behaves, how long
+  a step takes, or what a command prints, is not a question for me: probe it
+  in a scratch directory within 20 minutes, delete the probe, and cite what
+  it showed. The probe informs a decision and never makes a major one. "Do
   everything yourself", "no questions", and a hands-off run hand you every
   routine choice and no major one. Ask each major decision through the
   question tool as multiple choice, with your recommendation marked and a
@@ -182,8 +191,11 @@
 ## Host safety
 
 - Bound fix-and-verify loops, writer loops, and stress jobs by iterations,
-  runtime, and output size. After repeated failure for the same reason, change
-  approach or report the blocker with evidence.
+  runtime, and output size. When two fixes that rest on the same assumption
+  fail the same check, write the assumption down and run an observation that
+  would come out differently if it were false, before any third fix. If the
+  observation refutes it, look for the cause the failures share; if it holds
+  and you are still stuck, report the blocker with evidence.
 - On long runs, keep the task list in a file so it survives context
   compaction, plus a `show-me-your-work` decision log for long or unattended
   runs. Scheduled jobs and automatic wake-ups need an explicit request.

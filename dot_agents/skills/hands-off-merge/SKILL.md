@@ -1,6 +1,7 @@
 ---
 name: hands-off-merge
 description: Use only when the user explicitly asks for a hands-off merge ("hands-off merge this", "/hands-off-merge"), an unattended run that takes the current change to a merged pull request. Not when the phrase is only being discussed.
+disable-model-invocation: true
 ---
 
 # Hands-off merge

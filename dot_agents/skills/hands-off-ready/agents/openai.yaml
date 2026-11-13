@@ -1,0 +1,5 @@
+interface:
+  display_name: "Hands-off ready"
+  short_description: "Take the current change to a merge-ready PR unattended"
+policy:
+  allow_implicit_invocation: false

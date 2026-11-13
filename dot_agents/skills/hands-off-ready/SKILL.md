@@ -1,6 +1,7 @@
 ---
 name: hands-off-ready
 description: Use only when the user explicitly asks for hands-off ready ("hands-off ready", "/hands-off-ready"), an unattended run that takes the current change to a pull request ready for the user to merge. Not when the phrase is only being discussed.
+disable-model-invocation: true
 ---
 
 # Hands-off ready
