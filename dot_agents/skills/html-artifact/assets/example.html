@@ -729,7 +729,9 @@ figure.diff { gap: 10px; }
           mark.style.left = (a - t0) / range * 100 + '%'; mark.style.width = (b - a) / range * 100 + '%';
           if (s.wait) mark.className = 'wait'; else mark.style.setProperty('--c', s.color || 'var(--chart-' + (li % 6 + 1) + ')');
           mark.textContent = s.label || '';
-          mark.setAttribute('data-tooltip', lane.name + ': ' + (s.label ? s.label + ', ' : '') + clock(a, b - a < 1.2e5) + '–' + clock(b, b - a < 1.2e5) + ' (' + length(b - a) + ')');
+          // Date-only spans parse as UTC midnight; show their dates, not a shifted clock.
+          var day = /^\d{4}-\d{2}-\d{2}$/, when = day.test(s.start) && day.test(s.end) ? s.start + ' – ' + s.end : clock(a, b - a < 1.2e5) + '–' + clock(b, b - a < 1.2e5);
+          mark.setAttribute('data-tooltip', lane.name + ': ' + (s.label ? s.label + ', ' : '') + when + ' (' + length(b - a) + ')');
           track.appendChild(mark);
         });
         el.append(name, track);
@@ -1119,11 +1121,17 @@ figure.diff { gap: 10px; }
     loadVega().then(function () {
       function render() {
         figs.forEach(function (el) {
-          var spec = JSON.parse(el.querySelector('script[type="application/json"]').textContent);
-          var view = el.querySelector('.vega-view');
+          var view = el.querySelector('.vega-view'), msg = el.querySelector(':scope > .viz-error');
           if (!view) { view = document.createElement('div'); view.className = 'vega-view'; el.appendChild(view); }
-          window.vegaEmbed(view, spec, { config: vegaConfig(), renderer: 'svg',
-            actions: { export: true, source: false, compiled: false, editor: false } });
+          // One bad spec shows its own message; the figures after it still draw.
+          function broke(e) { view.hidden = true; msg = msg || el.appendChild(Object.assign(document.createElement('p'), { className: 'viz-error' })); msg.textContent = 'This chart failed to draw: ' + e.message; }
+          try {
+            window.vegaEmbed(view, JSON.parse(el.querySelector('script[type="application/json"]').textContent), { config: vegaConfig(), renderer: 'svg',
+              actions: { export: true, source: false, compiled: false, editor: false } }).then(function (res) {
+              view.hidden = false; if (msg) msg.remove();
+              el.vegaView = res.view; el.dispatchEvent(new CustomEvent('vegaready', { bubbles: true }));
+            }).catch(broke);
+          } catch (e) { broke(e); }
         });
       }
       render();
