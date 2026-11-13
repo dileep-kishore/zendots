@@ -297,7 +297,10 @@ End with the score line and append the calibration rows, both as
 When a refuted or user-dismissed finding's reason, or a confirmed finding's
 mistake, has come up before in this repository, propose a precedent or a
 source fix as [references/review-rules.md](references/review-rules.md)
-describes. Write it only after the user approves.
+describes. A source fix stops the next agent repeating the mistake: prefer
+removing the wrong path, then a type, then a lint or CI check, then a test,
+and fall back to a written rule only with the reason. Write it only after
+the user approves.
 
 A review request does not authorize fixes, commits, or pushes. If fixes were
 already requested, fix CONFIRMED findings and settle each PLAUSIBLE one by
