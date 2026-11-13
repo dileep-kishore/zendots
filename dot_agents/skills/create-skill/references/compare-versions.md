@@ -25,17 +25,25 @@ Write the cases and criteria to a scratch file before any run.
 
 ## 2. Run both versions
 
-Save the old version from Git, then run each task once per version:
+Save the old version from Git, then run each task once per version. A
+candidate that can tell which version it has is no longer blind, so the
+copies get random neutral names and the map stays outside both:
 
 ```bash
 dir=$(mktemp -d)
-mkdir -p "$dir/old" "$dir/new"
-git -C ~/zendots archive HEAD dot_agents/skills/<name> | tar -x -C "$dir/old"
-cp -R ~/.agents/skills/<name>/. "$dir/new"
+read -r old new < <(printf 's1 s2\ns2 s1\n' | sed -n "$((RANDOM % 2 + 1))p")
+echo "old=$old new=$new" > "$dir.map"
+mkdir -p "$dir/s1" "$dir/s2"
+git -C ~/zendots archive HEAD:dot_agents/skills/<name> | tar -x -C "$dir/$old"
+cp -R ~/.agents/skills/<name>/. "$dir/$new"
+# chezmoi source names (executable_log.sh) and modes would give the old copy away.
+find "$dir/$old" -depth -name 'executable_*' -exec sh -c \
+  'f="${1%/*}/${1##*/executable_}"; mv "$1" "$f" && chmod +x "$f"' _ {} \;
 ```
 
 Each run is a fresh subagent with no conversation history, given only the
-task, its inputs, and the path to one version's `SKILL.md` to follow. Use
+task, its inputs, and the path to one version's `SKILL.md` to follow. Word
+the task as a user would; never mention versions, a comparison, or a test. Use
 the same model, prompt, and inputs for both versions. Runs that could edit
 files work in their own scratch copy. Keep each run's answer, its tool
 transcript or command log, and its scratch copy's `git status` and diff as
