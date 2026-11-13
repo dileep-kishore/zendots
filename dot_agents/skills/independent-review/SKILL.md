@@ -98,7 +98,14 @@ covers only the commits since the previously pinned HEAD, unless the user
 asks for a full review. Working-change targets always get a full review:
 their fixes are usually uncommitted, so a commit range from an unchanged HEAD
 would be empty. A force-push, a changed base, or changed review rules break
-the commit range, so they get a full review too. Every repeat review
+the commit range, so they get a full review too, with one exception: after a
+rebase with no conflict edits, when
+`git diff <old-base> <old-head> | git patch-id --stable` matches the same
+command on the new base and head, and `git diff <old-base> <new-base>`
+touches no reviewed file and no caller of a symbol the change adds, alters,
+or deletes, the earlier review still covers the patch. Say so, carry the
+ledger forward, and review only commits added since. When either check is in
+doubt, review in full. Every repeat review
 reconciles the findings ledger, as described under Verify findings.
 
 For committed branch/PR reviews, check for pre-existing dirty files even when
