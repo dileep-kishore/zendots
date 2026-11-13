@@ -1,0 +1,112 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# ///
+# chezmoi modify script for ~/.hindsight/coding-agent.json, the Hindsight
+# coding-agents client config. Enforces every key below over the live file and
+# keeps the live apiToken, which is a secret written by hand on each machine.
+# A semantic no-op emits stdin byte-for-byte.
+import copy
+import json
+import sys
+
+{{- $host := includeTemplate "host-alias" . }}
+{{- $os := "macOS" }}{{ if eq .chezmoi.os "linux" }}{{ $os = "CachyOS Linux" }}{{ end }}
+{{- $url := includeTemplate "hindsight-api-url" . }}
+
+HOST = {{ $host | quote }}
+OS_LABEL = {{ $os | quote }}
+API_URL = {{ $url | quote }}
+
+MANAGED = {
+    # Without these two keys the client falls back to Hindsight Cloud.
+    "serverMode": "self-hosted",
+    "apiUrl": API_URL,
+    "bankIdTemplate": "coding-agent::{gitProject}",
+    "autoUpdate": True,
+    "autoInject": "recall",
+    "recallOptions": {
+        "types": ["observation", "world", "experience"],
+        "tags": [f"host:{HOST}"],
+        "tags_match": "any",
+        "budget": "low",
+        "max_tokens": 2000,
+    },
+    "codebaseSurvey": False,
+    "gitIngest": "message",
+    "retainSessions": True,
+    "retainExtractionMode": "concise",
+    "observationScopes": "shared",
+    "retainTags": [f"host:{HOST}"],
+    "retainMetadata": {"host": HOST, "repo": "{gitProject}"},
+    "retainContext": (
+        f"Conversation between the user and you (the coding agent), recorded on the machine {HOST} "
+        f"({OS_LABEL}) in repository " + "{gitProject}. User turns are the user's words and decisions; "
+        "assistant turns are yours. When an assistant turn says something is fixed, passes or works, "
+        "record it as the agent's claim ('the agent reported X fixed'), not as an established fact, "
+        "unless later command output or a user turn confirms it. Prioritise failures and their fixes: "
+        "for each error, failed command or abandoned approach, record the exact symptom or error text, "
+        "the root cause, the fix that worked, and what was tried and did not work. When a fact depends "
+        "on this machine's environment (paths, installed tools and versions, OS, services, hardware), "
+        f"begin it with 'On {HOST}:'. Facts about the repository's code and decisions apply on every "
+        "machine and need no prefix."
+    ),
+    "toolGuideExtra": (
+        f"This session runs on {HOST} ({OS_LABEL}). Memory is shared by macmini, macbook and tsuki. "
+        "A memory that begins 'On <machine>:' describes that machine only: do not apply another "
+        "machine's paths, versions or services here without checking. Memory records the past: "
+        "verify any memory against the current files before acting on it, and when they disagree, "
+        "the files win."
+    ),
+    "pageTriggerType": "cron",
+    "pageTriggerCron": "H H * * *",
+    "pages": {
+        "Component map": False,
+        "Core concepts": False,
+        "Initiatives and enhancements": False,
+    },
+    "customPages": {
+        "Failures and fixes": {
+            "source_query": (
+                "What failures has this project hit: errors, broken builds or tests, failed commands, "
+                "wrong approaches? For each, give the symptom, the root cause, the fix that worked, and "
+                "any approach that was tried and failed. Name the machine when the failure depended on "
+                "one machine's environment. Prefer the latest fix when several were tried."
+            )
+        }
+    },
+    # Codex's own memory writer runs sessions inside ~/.codex/memories, a git
+    # repo named "memories"; without this every one of them is retained too.
+    "banks": {"coding-agent::memories": {"disabled": True}},
+    "defaultBankConfig": {
+        "enable_observations": True,
+        "enable_auto_consolidation": True,
+        "mental_model_min_refresh_interval_seconds": 21600,
+    },
+}
+
+
+def die(msg):
+    print("modify coding-agent.json: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+raw = sys.stdin.read()
+try:
+    doc = json.loads(raw) if raw.strip() else {}
+except json.JSONDecodeError as exc:
+    die("cannot parse stdin: " + str(exc))
+if not isinstance(doc, dict):
+    die("root is not a mapping")
+
+before = copy.deepcopy(doc)
+# Overrides here could point a harness, path or bank at another server.
+for section in ("harnesses", "paths", "banks"):
+    doc.pop(section, None)
+doc.update(copy.deepcopy(MANAGED))
+if doc.get("serverMode") != "self-hosted" or "vectorize" in str(doc.get("apiUrl", "")):
+    die("refusing a non-self-hosted endpoint")
+if doc == before:
+    sys.stdout.write(raw)
+else:
+    sys.stdout.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")

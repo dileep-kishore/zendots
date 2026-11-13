@@ -1,0 +1,2 @@
+{{- /* "true" on hosts that run the Hindsight client; NERSC does not. */ -}}
+{{- ne .chezmoi.homeDir "/global/homes/d/dkishore" -}}

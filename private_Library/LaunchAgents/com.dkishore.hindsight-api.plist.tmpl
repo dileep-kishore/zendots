@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Hindsight memory server for every agent on every machine: bound to
+     loopback and published on the tailnet by `tailscale serve`. The tenant
+     API key lives in ~/.hindsight-server/.env, which the server loads from
+     its working directory. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.dkishore.hindsight-api</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/uvx</string>
+    <string>hindsight-api@latest</string>
+    <string>--host</string>
+    <string>127.0.0.1</string>
+    <string>--port</string>
+    <string>8888</string>
+    <string>--no-access-log</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>{{ .chezmoi.homeDir }}/.hindsight-server</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:{{ .chezmoi.homeDir }}/.local/bin:/usr/bin:/bin</string>
+    <key>HINDSIGHT_API_DATABASE_URL</key>
+    <string>pg0://hindsight</string>
+    <key>HINDSIGHT_API_LLM_PROVIDER</key>
+    <string>claude-code</string>
+    <key>HINDSIGHT_API_LLM_MODEL</key>
+    <string>claude-haiku-4-5</string>
+    <!-- The `hindsight` providers would send text to Vectorize's inference API. -->
+    <key>HINDSIGHT_API_EMBEDDINGS_PROVIDER</key>
+    <string>local</string>
+    <key>HINDSIGHT_API_RERANKER_PROVIDER</key>
+    <string>local</string>
+    <key>HINDSIGHT_API_DECISION_MODEL_PROVIDER</key>
+    <string>none</string>
+    <key>HINDSIGHT_API_OTEL_TRACES_ENABLED</key>
+    <string>false</string>
+    <key>HINDSIGHT_API_TENANT_EXTENSION</key>
+    <string>hindsight_api.extensions.builtin.tenant:ApiKeyTenantExtension</string>
+    <key>HINDSIGHT_API_LOG_LEVEL</key>
+    <string>warning</string>
+    <!-- launchd does not inherit the shell's opt-outs, and the spawned Claude
+         CLI loads no settings files. -->
+    <key>DISABLE_TELEMETRY</key>
+    <string>1</string>
+    <key>DISABLE_ERROR_REPORTING</key>
+    <string>1</string>
+    <key>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</key>
+    <string>1</string>
+    <!-- Otherwise the CLI loads every claude.ai connector of the logged-in
+         account, about 245k tokens of tool definitions per call. -->
+    <key>ENABLE_CLAUDEAI_MCP_SERVERS</key>
+    <string>false</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+  <key>StandardOutPath</key>
+  <string>{{ .chezmoi.homeDir }}/.hindsight-server/logs/api.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>{{ .chezmoi.homeDir }}/.hindsight-server/logs/api.err.log</string>
+</dict>
+</plist>

@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+"""Send failed shell commands to the Hindsight memory server.
+
+Hindsight's own hooks drop command output before extraction, so a failure is
+otherwise remembered only when someone describes it in words. Usage, as an
+agent hook reading the event JSON on stdin:
+
+    hindsight-failure-hook claude   # PostToolUseFailure, one failure per call
+    hindsight-failure-hook codex    # Stop: scans the session log for new failures
+
+Reads apiUrl, apiToken and retainTags from ~/.hindsight/coding-agent.json and
+writes into the same per-repository bank as Hindsight. Never prints to stdout
+and always exits 0, so it cannot block or steer an agent.
+"""
+
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+HOME = Path.home()
+CONFIG = HOME / ".hindsight" / "coding-agent.json"
+STATE = HOME / ".hindsight" / "state" / "failure-hook"
+LOG = HOME / ".hindsight" / "coding-agents-logs" / "failure-hook.log"
+MAX_ERROR = 1500
+MAX_COMMAND = 500
+TIMEOUT = 3
+
+# Exit status 1 from these means "no match" or "false", not a failure, but only
+# when the whole command is that one program: in `[ -f x ] && pytest` the 1 is pytest's.
+QUIET_COMMANDS = ("grep", "rg", "test", "[", "diff", "cmp", "pgrep", "which", "command")
+SHELL_OPERATORS = re.compile(r"&&|\|\||[|;]|\$\(|`")
+SECRET_PATTERNS = [
+    r"sk-[A-Za-z0-9_-]{16,}",
+    r"gh[pousr]_[A-Za-z0-9]{20,}",
+    r"xox[abpr]-[A-Za-z0-9-]{10,}",
+    r"AKIA[0-9A-Z]{16}",
+    r"(?i:authorization)\s*:\s*(?i:basic|bearer|token)\s+\S+",
+    r"(?i:bearer)\s+[A-Za-z0-9._~+/=-]{16,}",
+    r"(?<=://)[^/\s:@]+:[^/\s@]+(?=@)",
+    r"(?<=\s-u\s)\S+:\S+",
+    r"(?<=--user\s)\S+:\S+",
+    r"""(?i:--?(?:password|passwd|pass|token|secret|api[_-]?key))[=\s]+(?:"[^"]*"|'[^']*'|\S+)""",
+    r"""(?i:[A-Z0-9_]*(?:password|passwd|secret|token|api[_-]?key|access[_-]?key)[A-Z0-9_]*)"?\s*[=:]\s*(?:"[^"]*"|'[^']*'|[^\s,}]+)""",
+]
+SECRET = re.compile("|".join(f"(?:{p})" for p in SECRET_PATTERNS))
+
+
+def log(msg):
+    try:
+        LOG.parent.mkdir(parents=True, exist_ok=True)
+        with LOG.open("a") as fh:
+            fh.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} {msg}\n")
+    except OSError:
+        pass
+
+
+def mask(text):
+    return SECRET.sub("[redacted]", text)
+
+
+def repo_name(cwd):
+    """The name Hindsight uses for {gitProject}, so failures land in the session's bank.
+
+    Mirrors the client's resolveProjectRoot: the parent of a `.git` or dot-named
+    bare common dir, else the common dir itself, with no suffix stripped.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", cwd, "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            capture_output=True, text=True, timeout=2,
+        )
+        common = out.stdout.strip().rstrip("/")
+        if out.returncode == 0 and common:
+            base = os.path.basename(common)
+            root = os.path.dirname(common) if base == ".git" or base.startswith(".") else common
+            return os.path.basename(root)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return os.path.basename(os.path.normpath(cwd)) or "unknown"
+
+
+def is_noise(command, exit_code, error):
+    if exit_code in (130, 143):  # interrupted or terminated by the user
+        return True
+    if exit_code != 1:
+        return False
+    if not error.strip():
+        return True
+    words = command.strip().split()
+    if not words or SHELL_OPERATORS.search(command):
+        return False
+    return words[0] in QUIET_COMMANDS or words[:2] == ["git", "diff"]
+
+
+def retain(cfg, failure, harness):
+    host_tags = [t for t in cfg.get("retainTags", []) if isinstance(t, str)]
+    host = next((t.split(":", 1)[1] for t in host_tags if t.startswith("host:")), "unknown")
+    repo = repo_name(failure["cwd"])
+    error = mask(failure["error"].strip())[:MAX_ERROR]
+    command = mask(failure["command"].strip())[:MAX_COMMAND]
+    first_line = error.splitlines()[0] if error else ""
+    # Host is part of the identity: the same failure on two machines must not replace each other.
+    doc_id = "failure:" + hashlib.sha1(f"{host}\0{repo}\0{command}\0{first_line}".encode()).hexdigest()[:16]
+    content = (
+        f"On {host}: in repository {repo}, the shell command `{command}` "
+        f"failed with exit code {failure['exit_code']}.\nError output:\n{error or '(none)'}"
+    )
+    item = {
+        "content": content,
+        "context": (
+            f"Automatic record of a failed shell command from {harness} on {host}. "
+            "Record the command, the error and its likely cause. It is not a fix; "
+            "a later conversation may say what worked instead."
+        ),
+        "document_id": doc_id,
+        "tags": host_tags + ["source:failure-hook"],
+        "metadata": {"host": host, "repo": repo, "harness": harness, "exit_code": str(failure["exit_code"])},
+        "observation_scopes": [[]],
+    }
+    bank = urllib.parse.quote(f"coding-agent::{repo}", safe="")
+    url = cfg["apiUrl"].rstrip("/") + f"/v1/default/banks/{bank}/memories"
+    headers = {"Content-Type": "application/json"}
+    if cfg.get("apiToken"):
+        headers["Authorization"] = f"Bearer {cfg['apiToken']}"
+    req = urllib.request.Request(url, data=json.dumps({"items": [item], "async": True}).encode(), headers=headers)
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+        resp.read()
+    log(f"retained {doc_id} bank={repo} exit={failure['exit_code']}")
+
+
+def claude_failures(event):
+    if event.get("hook_event_name") != "PostToolUseFailure" or event.get("tool_name") != "Bash":
+        return []
+    if event.get("is_interrupt"):
+        return []
+    error = str(event.get("error") or "")
+    match = re.match(r"Exit code (\d+)", error)
+    exit_code = int(match.group(1)) if match else 1
+    if match:
+        error = error[match.end():].lstrip("\n")
+    command = str((event.get("tool_input") or {}).get("command") or "")
+    return [{"command": command, "exit_code": exit_code, "error": error, "cwd": event.get("cwd") or os.getcwd()}]
+
+
+def codex_state_file(event):
+    session = str(event.get("session_id") or "unknown")
+    return STATE / f"codex-{re.sub(r'[^A-Za-z0-9_-]', '_', session)}.json"
+
+
+def load_seen(state_file):
+    try:
+        return set(json.loads(state_file.read_text()))
+    except (OSError, ValueError):
+        return set()
+
+
+def save_seen(state_file, seen):
+    STATE.mkdir(parents=True, exist_ok=True)
+    tmp = state_file.with_suffix(".tmp")
+    tmp.write_text(json.dumps(sorted(seen)))
+    tmp.replace(state_file)
+
+
+def codex_failures(event, seen):
+    """Failed commands in the session log that are not yet in `seen`, each with its item id."""
+    path = event.get("transcript_path")
+    if not path or not os.path.exists(path):
+        return []
+    failures = []
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if '"CommandExecution"' not in line:
+                continue
+            try:
+                payload = json.loads(line).get("payload") or {}
+            except ValueError:
+                continue
+            item = payload.get("item") or {}
+            if payload.get("type") != "item_completed" or item.get("type") != "CommandExecution":
+                continue
+            item_id = str(item.get("id") or "")
+            exit_code = item.get("exit_code")
+            if item_id in seen or item.get("status") != "failed" and exit_code in (0, None):
+                continue
+            argv = item.get("command") or []
+            command = argv[-1] if isinstance(argv, list) and argv else str(argv)
+            cwd = str(item.get("cwd") or event.get("cwd") or os.getcwd())
+            if cwd.startswith("file://"):
+                cwd = urllib.parse.unquote(urllib.parse.urlparse(cwd).path)
+            failures.append({
+                "id": item_id,
+                "command": command,
+                "exit_code": exit_code if exit_code is not None else 1,
+                "error": str(item.get("aggregated_output") or ""),
+                "cwd": cwd,
+            })
+    return failures
+
+
+def main():
+    harness = sys.argv[1] if len(sys.argv) > 1 else ""
+    try:
+        event = json.loads(sys.stdin.read() or "{}")
+        cfg = json.loads(CONFIG.read_text())
+        if cfg.get("serverMode") != "self-hosted" or not cfg.get("apiUrl"):
+            return
+        if harness == "claude":
+            for failure in claude_failures(event):
+                if not is_noise(failure["command"], failure["exit_code"], failure["error"]):
+                    retain(cfg, failure, harness)
+        elif harness == "codex":
+            # An id is marked seen only once it is sent or deliberately skipped,
+            # so an unreachable server means a retry at the next Stop, not a loss.
+            state_file = codex_state_file(event)
+            seen = load_seen(state_file)
+            before = set(seen)
+            for failure in codex_failures(event, seen):
+                try:
+                    if not is_noise(failure["command"], failure["exit_code"], failure["error"]):
+                        retain(cfg, failure, harness)
+                    seen.add(failure["id"])
+                except Exception as exc:
+                    log(f"codex: {type(exc).__name__}: {exc}")
+            if seen != before:
+                save_seen(state_file, seen)
+    except Exception as exc:  # a hook must never fail the agent's turn
+        log(f"{harness}: {type(exc).__name__}: {exc}")
+
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)
