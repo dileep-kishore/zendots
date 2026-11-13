@@ -3,15 +3,18 @@
 # Code's MCP entry. The hooks, Codex MCP and OpenCode plugin entries come from
 # the modify scripts, so the package's `install` command never runs (it would
 # also rewrite chezmoi-managed files and default to Hindsight Cloud).
-# Bump to rerun: 1
+# A failed runtime update exits nonzero so chezmoi reruns this on the next apply.
+# Bump to rerun: 2
 set -u
 runtime="$HOME/.hindsight/coding-agents"
 node_bin={{ or (lookPath "node") "node" | quote }}
+status=0
 
 if command -v npx >/dev/null 2>&1; then
-  npx -y @vectorize-io/hindsight-coding-agents@latest update || echo "hindsight-client: runtime update failed" >&2
+  npx -y @vectorize-io/hindsight-coding-agents@latest update || { echo "hindsight-client: runtime update failed" >&2; status=1; }
 else
   echo "hindsight-client: npx not on PATH; skipped staging the runtime" >&2
+  status=1
 fi
 
 # One copy in the shared skill store; Claude Code gets a link, Codex and
@@ -25,9 +28,10 @@ fi
 
 if command -v claude >/dev/null 2>&1 && [ -f "$runtime/dist/mcp-server.js" ]; then
   claude mcp remove --scope user hindsight >/dev/null 2>&1 || true
-  claude mcp add --scope user hindsight --env HINDSIGHT_MCP_HARNESS=claude-code -- \
+  claude mcp add --scope user hindsight --env HINDSIGHT_MCP_HARNESS=claude-code \
+    --env HINDSIGHT_SERVER_MODE=self-hosted --env HINDSIGHT_API_URL={{ includeTemplate "hindsight-api-url" . | quote }} -- \
     "$node_bin" "$runtime/dist/mcp-server.js" >/dev/null
 else
   echo "hindsight-client: claude or the runtime is missing; skipped the Claude MCP entry" >&2
 fi
-exit 0
+exit "$status"

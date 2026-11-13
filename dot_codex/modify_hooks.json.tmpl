@@ -18,6 +18,10 @@ def die(msg):
 
 {{ template "hindsight-hooks.py" . }}
 
+HINDSIGHT_CLIENT = {{ if eq (includeTemplate "hindsight-client" .) "true" }}True{{ else }}False{{ end }}
+# The env pins the endpoint, so a missing config file cannot fall back to
+# Hindsight Cloud; the config file still wins when present.
+HINDSIGHT_ENV = "HINDSIGHT_SERVER_MODE=self-hosted HINDSIGHT_API_URL={{ includeTemplate "hindsight-api-url" . }}"
 NODE = {{ or (lookPath "node") "node" | quote }}
 HINDSIGHT_DIST = {{ joinPath .chezmoi.homeDir ".hindsight/coding-agents/dist" | quote }}
 FAILURE_HOOK = {{ joinPath .chezmoi.homeDir ".local/bin/hindsight-failure-hook" | quote }}
@@ -30,13 +34,13 @@ def _hindsight_entry(command, timeout):
 # Codex hook payloads carry no exit status, so the failure hook scans the
 # session log at Stop instead of reacting per command.
 HINDSIGHT_HOOKS = {
-    "SessionStart": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-sessionstart-hook.js"', 30)],
-    "UserPromptSubmit": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-hook.js"', 30)],
+    "SessionStart": [_hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/codex-sessionstart-hook.js"', 30)],
+    "UserPromptSubmit": [_hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/codex-hook.js"', 30)],
     "Stop": [
-        _hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-stop-hook.js"', 60),
+        _hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/codex-stop-hook.js"', 60),
         _hindsight_entry(f'"{FAILURE_HOOK}" codex', 30),
     ],
-}
+} if HINDSIGHT_CLIENT else {}
 
 raw = sys.stdin.read()
 try:

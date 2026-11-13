@@ -12,8 +12,7 @@ import sys
 
 {{- $host := includeTemplate "host-alias" . }}
 {{- $os := "macOS" }}{{ if eq .chezmoi.os "linux" }}{{ $os = "CachyOS Linux" }}{{ end }}
-{{- $url := "https://dileeps-mac-mini.tail870d70.ts.net" }}
-{{- if eq $host "macmini" }}{{ $url = "http://127.0.0.1:8888" }}{{ end }}
+{{- $url := includeTemplate "hindsight-api-url" . }}
 
 HOST = {{ $host | quote }}
 OS_LABEL = {{ $os | quote }}

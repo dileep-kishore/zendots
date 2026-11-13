@@ -1,0 +1,4 @@
+{{- /* Where this host's agents reach the Hindsight server. */ -}}
+{{- if eq (includeTemplate "host-alias" .) "macmini" -}}http://127.0.0.1:8888
+{{- else -}}https://dileeps-mac-mini.tail870d70.ts.net
+{{- end -}}

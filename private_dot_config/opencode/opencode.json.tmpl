@@ -74,8 +74,8 @@
 	},
 	"plugins": [
 		"@mohak34/opencode-notifier@1.1.2",
-		"git+https://github.com/obra/superpowers.git#22f0b463e7a5e579904dd6211a520321035526f7",
-		{{ joinPath .chezmoi.homeDir ".hindsight/coding-agents" | quote }}
+		"git+https://github.com/obra/superpowers.git#22f0b463e7a5e579904dd6211a520321035526f7"{{ if eq (includeTemplate "hindsight-client" .) "true" }},
+		{{ joinPath .chezmoi.homeDir ".hindsight/coding-agents" | quote }}{{ end }}
 	],
 	"permissions": [
 		{ "action": "edit", "resource": "*", "effect": "allow" },

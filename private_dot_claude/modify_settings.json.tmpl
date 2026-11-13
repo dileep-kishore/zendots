@@ -41,6 +41,10 @@ def enforce(node, desired, path=""):
 
 {{ template "hindsight-hooks.py" . }}
 
+HINDSIGHT_CLIENT = {{ if eq (includeTemplate "hindsight-client" .) "true" }}True{{ else }}False{{ end }}
+# The env pins the endpoint, so a missing config file cannot fall back to
+# Hindsight Cloud; the config file still wins when present.
+HINDSIGHT_ENV = "HINDSIGHT_SERVER_MODE=self-hosted HINDSIGHT_API_URL={{ includeTemplate "hindsight-api-url" . }}"
 NODE = {{ or (lookPath "node") "node" | quote }}
 HINDSIGHT_DIST = {{ joinPath .chezmoi.homeDir ".hindsight/coding-agents/dist" | quote }}
 FAILURE_HOOK = {{ joinPath .chezmoi.homeDir ".local/bin/hindsight-failure-hook" | quote }}
@@ -52,11 +56,11 @@ def _hindsight_entry(command, timeout, matcher=None):
 
 
 HINDSIGHT_HOOKS = {
-    "SessionStart": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-sessionstart-hook.js"', 30)],
-    "UserPromptSubmit": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-hook.js"', 30)],
-    "Stop": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-stop-hook.js"', 60)],
+    "SessionStart": [_hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/claude-sessionstart-hook.js"', 30)],
+    "UserPromptSubmit": [_hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/claude-hook.js"', 30)],
+    "Stop": [_hindsight_entry(f'{HINDSIGHT_ENV} "{NODE}" "{HINDSIGHT_DIST}/claude-stop-hook.js"', 60)],
     "PostToolUseFailure": [_hindsight_entry(f'"{FAILURE_HOOK}" claude', 10, "^Bash$")],
-}
+} if HINDSIGHT_CLIENT else {}
 
 CAPSULE_COMMAND = (
     'capsule="$HOME/.agents/hooks/compact-capsule.sh"; '

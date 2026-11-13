@@ -58,7 +58,10 @@ tool definitions to every call, and every call failed as too long.
 
 The client config sets `"serverMode": "self-hosted"` and an explicit `apiUrl`.
 Without those two keys the client falls back to Hindsight Cloud. The modify
-script refuses to write any other `serverMode` or a Vectorize URL.
+script refuses to write any other `serverMode` or a Vectorize URL. Every
+Hindsight hook command and MCP entry also sets `HINDSIGHT_SERVER_MODE=self-hosted`
+and `HINDSIGHT_API_URL`, so a missing config file cannot fall back to the cloud
+either. The config file still wins when it exists.
 
 ## Where the secrets live
 
@@ -137,20 +140,28 @@ template it per host, because its keys are absolute paths.
 Hindsight drops command output before extraction, so a failure is otherwise
 remembered only when someone describes it. `~/.local/bin/hindsight-failure-hook`
 sends each failed shell command to the same per-repository bank. Each record
-holds the command, its exit code and up to 1,500 characters of error output.
-It is tagged with the machine's `host:` tag and `source:failure-hook`.
+starts with `On <machine>:` and holds the command (up to 500 characters), its
+exit code and up to 1,500 characters of error output. It is tagged with the
+machine's `host:` tag and `source:failure-hook`.
 
 Claude Code runs the hook on each Bash failure through `PostToolUseFailure`.
 Codex hook payloads carry no exit status, so Codex runs it at `Stop`. It then
-scans the session log for failed commands it has not sent yet. It tracks the
-ones it has sent in `~/.hindsight/state/failure-hook/`.
+scans the session log for failed commands it has not sent yet. It records a
+command in `~/.hindsight/state/failure-hook/` only after the server accepts it,
+so a failure found while the server is unreachable is sent at the next `Stop`.
 
-The hook masks likely secrets before sending: `sk-` and GitHub tokens, Slack
-tokens, bearer tokens, and `password=`, `secret=`, `token=` or `api_key=`
-values. It skips exit 1 when the command printed no error or is a search or
-test command such as `grep`, `rg`, `test`, `diff` or `git diff`. It skips exit
-130 and 143, which mean the user interrupted the command. A repeated failure
-with the same command and first error line replaces the earlier record.
+The hook masks likely secrets before sending: `sk-`, GitHub, Slack and AWS
+keys, `Authorization` and bearer values, `user:password` in URLs and `curl -u`,
+`--password`-style flags, and `password`, `secret`, `token`, `api_key` or
+`access_key` assignments, quoted or not. The masking is pattern-based, so an
+unusual secret format can still get through.
+
+It skips exit 1 when the command printed no error, or when the whole command is
+a single search or test such as `grep`, `rg`, `test`, `diff` or `git diff`. A
+chained command such as `[ -f x ] && pytest` is recorded. It skips exit 130 and
+143, which mean the user interrupted the command. A repeated failure with the
+same command and first error line on the same machine replaces the earlier
+record; the same failure on another machine is kept separately.
 
 The hook never prints to stdout and always exits 0, so it cannot block an
 agent. It logs each record it sends, and each error, to
@@ -176,7 +187,8 @@ put Homebrew on the path first: `PATH=/opt/homebrew/bin:$PATH chezmoi ...`.
    (umask 077; printf 'HINDSIGHT_API_TENANT_API_KEY=%s\n' "$(openssl rand -hex 32)" > ~/.hindsight-server/.env)
    ```
 
-   The server script refuses to load the agent while this file is missing.
+   The server script fails while this file is missing, so the next apply
+   retries it.
 2. Apply the plist, then its script, in two applies. In one combined apply the
    script ran first, and `launchctl` failed with error 5 because the plist was
    not there yet:
@@ -205,15 +217,17 @@ put Homebrew on the path first: `PATH=/opt/homebrew/bin:$PATH chezmoi ...`.
    missing parent directory for the file target:
 
    ```bash
-   chezmoi diff -r ~/.hindsight ~/.chezmoiscripts/60_hindsight-client.sh
+   chezmoi diff -r ~/.hindsight ~/.chezmoiscripts/60_hindsight-client.sh | sed -E 's/("apiToken": ")[^"]*/\1[redacted]/'
    chezmoi apply ~/.hindsight ~/.chezmoiscripts/60_hindsight-client.sh
    ```
 
-   The script stages the runtime with
+   Once the token is written, a diff of `~/.hindsight` can show it, so keep the
+   `sed` on every diff of that path. The script stages the runtime with
    `npx -y @vectorize-io/hindsight-coding-agents@latest update`, seeds the
-   skill, and adds Claude Code's MCP entry. It skips each step whose tool is
-   missing and prints a message. To rerun it after installing a missing tool,
-   raise the `Bump to rerun` number in
+   skill, and adds Claude Code's MCP entry. When `npx` is missing or the update
+   fails, the script fails, so the next apply retries it. A missing `claude`
+   only skips the MCP entry; to rerun after installing it, raise the
+   `Bump to rerun` number in
    `.chezmoiscripts/run_onchange_after_60_hindsight-client.sh.tmpl`.
 2. Write the token with the command in [Where the secrets live](#where-the-secrets-live).
 3. Apply the harness wiring:
@@ -251,6 +265,11 @@ tsuki reaches the server through the tailnet URL, so it must be on the
 tailnet. The key copy needs an SSH route to macmini. If tsuki's SSH config has
 no `macmini` host, replace `ssh macmini` with the tailnet name. Trust Codex's
 hooks on tsuki as in step 4.
+
+NERSC is not a client. On the home `/global/homes/d/dkishore`, chezmoi ignores
+`~/.hindsight` and the client script, and the Claude and Codex hooks, the Codex
+MCP entry and the OpenCode plugin render without any Hindsight entry. The
+templates share that test through `.chezmoitemplates/hindsight-client`.
 
 ## Checking that it works
 
@@ -307,7 +326,9 @@ saved.
    `private_dot_config/opencode/opencode.json.tmpl`, the files listed under
    [Source files](#source-files), and the Hindsight lines in
    `.chezmoiignore`. List the plist and `~/.local/bin/hindsight-failure-hook`
-   in `.chezmoiremove`, then apply those paths on each host.
+   in `.chezmoiremove`, then apply those paths and
+   `~/.config/opencode/opencode.json` on each host, so OpenCode stops loading
+   the plugin before step 5 deletes it.
 4. Remove the MCP entries on each host. The Codex modify script keeps keys
    that its fragment omits, so removing the block from the source does not
    remove the live entry:
