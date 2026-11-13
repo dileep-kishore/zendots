@@ -35,6 +35,15 @@ this order, as one paragraph:
    2026-08-07 to 2026-09-05.").
 3. **Takeaway**: the one thing the reader should notice.
 
+Define a metric and its denominator where it first appears ("p95: the
+95th-percentile run over 30 nights"). A difference or lift states its
+interval and whether the interval crosses zero when the data has one; never
+invent an interval. A caveat that changes how a figure reads goes in that
+figure's caption, and a source left out is named there with the reason.
+Numbers made up to illustrate, or produced by a model rather than measured,
+carry a visible "Sample" or "Model" in their caption or tile, with how they
+were made.
+
 Never invent a number, date, source, or sample size to complete a caption.
 When it is not in the material, write a visible placeholder such as
 `[n = ?]` or `[source?]` and say so in the reply; the reader can fill it,
@@ -55,8 +64,8 @@ A comparison closes with the choice and one reason. A plan carries a
   with fixed core sections; follow [feature-page.md](feature-page.md).
 - **Plan:** lead, decisions table, flow diagram, timeline, not doing.
 - **Workflow:** lead, flowchart, per-stage table, failure modes.
-- **Results:** lead, tiles, one chart per question, full table,
-  findings, next.
+- **Results:** lead stating the finding with its one number, tiles, one
+  chart per question, full table, findings, next.
 - **Comparison:** lead, criteria table, one chart if the criteria are numeric,
   recommendation.
 - **Work summary** (what was done): lead stating what is now true, tiles with

@@ -786,6 +786,7 @@ figure.diff { gap: 10px; }
       background: 'transparent', font: text,
       mark: { color: cat[0] },
       point: { filled: true, size: 60 },
+      text: { color: ink2 },
       axis: Object.assign({ labelColor: ink3, gridColor: line, domainColor: ink2, tickColor: ink2 }, t),
       axisX: { labelAngle: 0 },
       axisDiscrete: { labelOverlap: false },
@@ -1230,6 +1231,7 @@ figure.diff { gap: 10px; }
   <div class="tile"><div class="n">66%</div><div class="k">share of the run</div></div>
   <div class="tile"><div class="n good">9</div><div class="k">minutes after batching</div><div class="d good">−22 from 31</div></div>
 </div>
+<p class="meta">Last 30 nightly runs, 2026-08-07 to 2026-09-05 · runs/nightly.csv; batching from the 2026-09-04 dry run</p>
 <figure>
   <div class="vega"><script type="application/json">
   {"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
@@ -1239,14 +1241,49 @@ figure.diff { gap: 10px; }
      {"stage": "Parse", "stat": "p50", "minutes": 3.2}, {"stage": "Parse", "stat": "p95", "minutes": 3.9},
      {"stage": "Embed", "stat": "p50", "minutes": 31.0}, {"stage": "Embed", "stat": "p95", "minutes": 44.7},
      {"stage": "Publish", "stat": "p50", "minutes": 4.8}, {"stage": "Publish", "stat": "p95", "minutes": 6.0}]},
-   "mark": {"type": "bar", "tooltip": true},
    "encoding": {
      "x": {"field": "stage", "type": "nominal", "title": null, "sort": null},
      "xOffset": {"field": "stat"},
      "y": {"field": "minutes", "type": "quantitative", "title": "Minutes"},
-     "color": {"field": "stat", "type": "nominal", "title": "Statistic"}}}
+     "color": {"field": "stat", "type": "nominal", "title": "Statistic"}},
+   "layer": [
+     {"mark": {"type": "bar", "tooltip": true}},
+     {"transform": [{"filter": "datum.stage == 'Embed' && datum.stat == 'p95'"}], "mark": {"type": "text", "dy": -6},
+      "encoding": {"text": {"field": "minutes", "format": ".1f"}}}]}
   </script></div>
-  <figcaption><b>Minutes per stage, median and 95th percentile.</b> Bars show the p50 (blue) and p95 (peach) wall-clock minutes of each stage across 30 consecutive nightly runs, 2026-08-07 to 2026-09-05; hover for exact values. Embed's p95 gap comes from three nights when the model endpoint throttled, while the other stages barely vary.</figcaption>
+  <figcaption><b>Minutes per stage, median and 95th percentile.</b> Bars show the p50 (blue) and p95 (peach) wall-clock minutes of each stage across 30 consecutive nightly runs, 2026-08-07 to 2026-09-05; Embed's p95 bar carries its value, and its p50 is the 31-minute tile above. Embed's p95 gap comes from three nights when the model endpoint throttled, while the other stages barely vary.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+  {"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+   "width": 180, "height": 180,
+   "data": {"sequence": {"start": 0, "stop": 100, "as": "i"}},
+   "transform": [{"calculate": "datum.i % 10", "as": "col"}, {"calculate": "floor(datum.i / 10)", "as": "row"}],
+   "mark": {"type": "circle", "size": 120},
+   "encoding": {"x": {"field": "col", "type": "ordinal", "axis": null},
+                "y": {"field": "row", "type": "ordinal", "axis": null},
+                "color": {"condition": {"test": "datum.i < 66", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}}}
+  </script></div>
+  <figcaption><b>Embedding's share of the nightly run.</b> Each dot is one percent of the 47-minute p50 run over the last 30 nights; the 66 lit dots are embedding. Two thirds of every run waits on the model.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+  {"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+   "width": "container", "height": 120,
+   "data": {"values": [{"run": "Before", "min": 31}, {"run": "After", "min": 9}]},
+   "encoding": {"y": {"field": "run", "type": "nominal", "sort": null, "title": null}},
+   "layer": [
+    {"mark": {"type": "bar", "tooltip": true},
+     "encoding": {"x": {"field": "min", "type": "quantitative", "title": "Embed minutes, p50"},
+                  "color": {"condition": {"test": "datum.run == 'After'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}}},
+    {"data": {"values": [{"run": "After", "from": 9, "to": 31}]},
+     "mark": {"type": "rule", "strokeDash": [4, 3]},
+     "encoding": {"x": {"field": "from", "type": "quantitative"}, "x2": {"field": "to"}}},
+    {"data": {"values": [{"run": "After", "mid": 20, "label": "31 to 9 min, −22"}]},
+     "mark": {"type": "text", "dy": -10},
+     "encoding": {"x": {"field": "mid", "type": "quantitative"}, "text": {"field": "label"}}}]}
+  </script></div>
+  <figcaption><b>Embed minutes before and after batching.</b> Bars are the p50 embed stage over the last 30 nights (Before) and in the 2026-09-04 batching dry run (After); the dashed bracket spans the gap. Batching would cut the stage by 22 minutes, one dry run so far.</figcaption>
 </figure>
 
 <h2 id="per-stage-numbers">Per-stage numbers</h2>
@@ -1321,9 +1358,9 @@ figure.diff { gap: 10px; }
      {"tokens": 2200, "ms": 350, "source": "pdf"}, {"tokens": 380, "ms": 70, "source": "web"}, {"tokens": 1100, "ms": 190, "source": "pdf"}]},
    "mark": {"type": "point", "tooltip": true},
    "encoding": {
-     "x": {"field": "tokens", "type": "quantitative", "scale": {"type": "log"}, "title": "Record length (tokens, log)"},
+     "x": {"field": "tokens", "type": "quantitative", "scale": {"type": "log"}, "title": "Tokens (log)"},
      "y": {"field": "ms", "type": "quantitative", "title": "Latency per record (ms)"},
-     "color": {"field": "source", "type": "nominal", "title": "Source"}}}
+     "color": {"field": "source", "type": "nominal", "title": "Source", "legend": {"orient": "bottom"}}}}
   </script></div>
   <figcaption><b>Per-record latency against record length.</b> Points are single embed calls sampled from one night, coloured by source type; x is logarithmic. Latency is close to linear in tokens, so PDFs dominate the stage.</figcaption>
 </figure>

@@ -16,6 +16,10 @@ shows its point, or none when a sentence says it faster.
 | Which exact values do several series take at a point the reader picks? | `viz.lineChart` interactive figure |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
 | What are the two to four headline numbers? | `.tiles` |
+| What share of a whole? | 10 by 10 dot grid (recipe below), or a tile when the share is the only number |
+| How big is a total, and what makes it up? | One big number in a tile, its parts beside it |
+| How do a few values compare? | Horizontal bars from zero, each labelled with its value |
+| How big is the gap between two values? | Two bars and a labelled bracket over the gap (recipe below) |
 | What mechanism do none of those express? | Stepper over inline SVG ([components.md](components.md)) |
 | What exactly does the reader run or paste? | `<pre><code class="language-...">` |
 
@@ -115,26 +119,69 @@ flowchart LR
   {"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
    "width": "container", "height": 260,
    "data": {"values": [{"model": "A", "f1": 0.81}, {"model": "B", "f1": 0.74}]},
-   "mark": {"type": "bar", "tooltip": true},
    "encoding": {"x": {"field": "model", "type": "nominal", "title": null},
-                "y": {"field": "f1", "type": "quantitative", "title": "F1"}}}
+                "y": {"field": "f1", "type": "quantitative", "title": "F1"}},
+   "layer": [{"mark": {"type": "bar", "tooltip": true}},
+             {"mark": {"type": "text", "dy": -6}, "encoding": {"text": {"field": "f1", "format": ".2f"}}}]}
   </script></div>
-  <figcaption><b>F1 by model on the held-out set.</b> Bars are macro F1 over 2,000 held-out documents; hover for values. Model A leads by seven points.</figcaption>
+  <figcaption><b>F1 by model on the held-out set.</b> Bars are macro F1 over 2,000 held-out documents, each labelled with its value. Model A leads by seven points.</figcaption>
 </figure>
 ```
 
 - One y axis, never two.
 - Colour follows the entity: the same field maps to the same colour on every
   chart in the page. The template supplies the palette; specs carry no colours
-  unless an entity demands one.
+  unless an entity demands one, or the figure focuses on one subject: then
+  every mark is `var(--muted-foreground)` and the subject `var(--accent)`. To
+  focus, fade the rest rather than add a colour.
 - Legend for two or more series, direct labels for up to four, never a number
   on every point.
-- `tooltip: true` on marks. Log scales only with a labelled axis.
+- Print the one to four values the takeaway rests on, as end labels, a text
+  layer filtered to those marks, or a stat beside the chart. A screenshot, a
+  printout and a phone have no hover; `tooltip: true` on marks adds detail.
+- Lines go point to point: no `interpolate` smoothing on measured data, which
+  draws values the data lacks. Log scales only with a labelled axis.
+- Date-only values (`2026-11-10`) parse as UTC midnight: give their temporal
+  field `"timeUnit": "utcyearmonthdate"`, or readers west of UTC see the day
+  before.
 - Altair: `chart.to_json()` drops in unchanged; delete any `"config"` Altair
   added so the page theme applies. Facets, log scales, shape legends and
   layered error bands are themed; give facets at least 240px each or set
   `labelAngle: -30` on the x axis, since the theme never drops category
   labels.
+
+### Share and gap recipes
+
+A share as a dot grid, 66 of 100 lit:
+
+```json
+{"width": 180, "height": 180,
+ "data": {"sequence": {"start": 0, "stop": 100, "as": "i"}},
+ "transform": [{"calculate": "datum.i % 10", "as": "col"}, {"calculate": "floor(datum.i / 10)", "as": "row"}],
+ "mark": {"type": "circle", "size": 120},
+ "encoding": {"x": {"field": "col", "type": "ordinal", "axis": null},
+              "y": {"field": "row", "type": "ordinal", "axis": null},
+              "color": {"condition": {"test": "datum.i < 66", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}}}
+```
+
+A gap: two bars, and a dashed bracket from the smaller value to the larger
+one, labelled with the difference:
+
+```json
+{"width": "container", "height": 120,
+ "data": {"values": [{"run": "Before", "min": 31}, {"run": "After", "min": 9}]},
+ "encoding": {"y": {"field": "run", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+  {"mark": {"type": "bar", "tooltip": true},
+   "encoding": {"x": {"field": "min", "type": "quantitative", "title": "Minutes"},
+                "color": {"condition": {"test": "datum.run == 'After'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}}},
+  {"data": {"values": [{"run": "After", "from": 9, "to": 31, "mid": 20, "label": "31 to 9 min, −22"}]},
+   "mark": {"type": "rule", "strokeDash": [4, 3]},
+   "encoding": {"x": {"field": "from", "type": "quantitative"}, "x2": {"field": "to"}}},
+  {"data": {"values": [{"run": "After", "mid": 20, "label": "31 to 9 min, −22"}]},
+   "mark": {"type": "text", "dy": -10},
+   "encoding": {"x": {"field": "mid", "type": "quantitative"}, "text": {"field": "label"}}}]}
+```
 
 ## Palette
 

@@ -90,15 +90,17 @@ for the current house style.
 
 ```bash
 python3 <skill-dir>/scripts/check.py <file>
+bun <skill-dir>/scripts/audit.ts <file>
 ```
 
-Fix every `ERROR`. Done when the checker prints `OK`. The checker reads the
-file and never renders it, so it cannot see a Mermaid block that fails to
-parse or a chart that comes out empty; re-read those specs yourself.
-Open the final page in T3's built-in browser when available and check both
-themes, labels, arrow bindings, and narrow-screen scrolling. Drive every
-interactive figure as `references/interactive.md` describes. If browser review
-is unavailable, report that limit rather than treating the checker as visual proof.
+Fix every `ERROR`. The checker reads the file and never renders it; the audit
+opens it in Playwright at 390 and 1280 px in both themes and lists errors,
+figures that drew nothing, clipped text and page overflow. Done when the
+checker prints `OK` and the audit exits 0. Then look at the page in T3's
+built-in browser when available, for what neither measures: labels, arrow
+bindings, both themes. Drive every interactive figure as
+`references/interactive.md` describes. If the audit could not run, say so in
+the delivery rather than treating the checker as visual proof.
 
 ## 7. Deliver
 
@@ -119,7 +121,8 @@ its required dependencies to an ignored folder in the main checkout; this
 does not put it on the main branch. Completed test screenshots, raw reports,
 and logs are disposable even when earlier messages linked them.
 
-Report the absolute HTML path. For a visual the user wants in the conversation, wrap
+Report the absolute HTML path, say what the page shows and what you
+assumed, and leave out any claim that it works. For a visual the user wants in the conversation, wrap
 the fragment with `scripts/render.py` and show it with T3's `html_render`, as
 `references/interactive.md` describes. Publish only
 when the user asks for a link and the harness has an artifact tool, following
