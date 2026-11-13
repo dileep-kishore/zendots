@@ -75,6 +75,9 @@ MANAGED = {
             )
         }
     },
+    # Codex's own memory writer runs sessions inside ~/.codex/memories, a git
+    # repo named "memories"; without this every one of them is retained too.
+    "banks": {"coding-agent::memories": {"disabled": True}},
     "defaultBankConfig": {
         "enable_observations": True,
         "enable_auto_consolidation": True,

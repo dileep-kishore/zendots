@@ -266,6 +266,10 @@ tailnet. The key copy needs an SSH route to macmini. If tsuki's SSH config has
 no `macmini` host, replace `ssh macmini` with the tailnet name. Trust Codex's
 hooks on tsuki as in step 4.
 
+Codex's own memory writer runs its sessions inside `~/.codex/memories`, which is
+a Git repository named `memories`. The managed config disables the
+`coding-agent::memories` bank so those internal sessions are not retained.
+
 NERSC is not a client. On the home `/global/homes/d/dkishore`, chezmoi ignores
 `~/.hindsight` and the client script, and the Claude and Codex hooks, the Codex
 MCP entry and the OpenCode plugin render without any Hindsight entry. The
