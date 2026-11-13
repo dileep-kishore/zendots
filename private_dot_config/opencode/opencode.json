@@ -73,8 +73,8 @@
 		}
 	},
 	"plugins": [
-		"@mohak34/opencode-notifier@0.8.0",
-		"git+https://github.com/obra/superpowers.git#8ca22dba9a94f28898bbce59f2537ff4d87c747d"
+		"@mohak34/opencode-notifier@1.1.2",
+		"git+https://github.com/obra/superpowers.git#22f0b463e7a5e579904dd6211a520321035526f7"
 	],
 	"permissions": [
 		{ "action": "edit", "resource": "*", "effect": "allow" },
