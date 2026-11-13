@@ -62,6 +62,8 @@ A comparison closes with the choice and one reason. A plan carries a
 
 - **Feature:** a feature's design and, later, its build results on one page,
   with fixed core sections; follow [feature-page.md](feature-page.md).
+- **Story:** one finding told in chapters beside one figure; follow
+  [story.md](story.md).
 - **Plan:** lead, decisions table, flow diagram, timeline, not doing.
 - **Workflow:** lead, flowchart, per-stage table, failure modes.
 - **Results:** lead stating the finding with its one number, tiles, one

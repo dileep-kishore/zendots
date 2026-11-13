@@ -24,7 +24,8 @@ The title names the subject. One lead paragraph. Each h2 is a TOC entry and a
 claim, not a topic. Pick the section shape for the ask from
 [references/writing.md](references/writing.md). A feature's summary page,
 before or after its build, uses the fixed sections in
-[references/feature-page.md](references/feature-page.md). Done when the outline fits the
+[references/feature-page.md](references/feature-page.md). To tell one finding as a story, read
+[references/story.md](references/story.md). Done when the outline fits the
 ask with no section you could cut.
 
 ## 3. Choose visuals first

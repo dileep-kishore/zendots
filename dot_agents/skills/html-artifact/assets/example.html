@@ -704,8 +704,9 @@ figure.diff { gap: 10px; }
         caps.forEach(function (li, i) { li.classList.toggle('off', cur > 0 && i !== cur - 1); });
         all.setAttribute('aria-pressed', String(cur === 0)); prev.disabled = cur <= 1; next.disabled = cur === n;
         status.textContent = cur ? 'Step ' + cur + ' of ' + n : 'All ' + n + ' steps';
+        fig.dispatchEvent(new CustomEvent('stepchange', { detail: { step: cur } }));
       }
-      show(0);
+      fig.stepTo = show; show(0);
     });
   }
 

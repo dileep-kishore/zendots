@@ -347,6 +347,30 @@ def check_tiles(html: str, errors: list) -> None:
                 errors.append(f'tile "{k}": shows {n}, #changes lists {want}')
 
 
+def check_story(html: str, errors: list, warns: list) -> None:
+    """Story features need the opt-in story block and a viz-js new enough to have its hooks."""
+    figures = [set(c.split()) for c in re.findall(r'<figure\b[^>]*\bclass="([^"]*)"', html)]
+    chart_stepper = any(
+        re.search(r'class="vega\b', body)
+        for body in re.findall(r'<figure\b[^>]*\bclass="[^"]*\bstepper\b[^"]*"[^>]*>(.*?)</figure>', html, re.S)
+    )
+    phrases = re.findall(r'<mark\b[^>]*\bclass="[^"]*\bref\b[^"]*"[^>]*\bdata-ref="([^"]*)"', html)
+    phrases += re.findall(r'<mark\b[^>]*\bdata-ref="([^"]*)"[^>]*\bclass="[^"]*\bref\b', html)
+    used = any({"stepper", "scroll"} <= f for f in figures) or chart_stepper or bool(phrases)
+    block = 'id="story-css"' in html and 'id="story-js"' in html
+    if used and not block:
+        errors.append("story feature without the story block; paste story-css and story-js from assets/story.html after viz-js")
+    elif used and "stepchange" not in "".join(re.findall(r'<script id="viz-js">(.*?)</script>', html, re.S)):
+        errors.append("story block with a viz-js older than its hooks; copy viz-css and viz-js from the template")
+    if block and not used:
+        warns.append("story block present but no story feature uses it; remove it from a plain page")
+    targets = set(re.findall(r'<(?!mark\b)[a-z][\w-]*\b[^>]*\bdata-ref="([^"]*)"', html))
+    for spec in re.findall(r'<div class="vega[^"]*"[^>]*>\s*<script type="application/json">(.*?)</script>', html, re.S):
+        targets.update(re.findall(r'"ref"\s*:\s*"([^"]*)"', spec))
+    for name in sorted(set(phrases) - targets):
+        warns.append(f'linked phrase names "{name}", which no figure carries in data-ref or in a Vega row\'s ref field')
+
+
 def reject_constant(name):
     """NaN and Infinity are Python JSON extensions; the browser's JSON.parse refuses them."""
     raise ValueError(f"{name} is not valid JSON")
@@ -437,6 +461,7 @@ def check(path: Path) -> int:
             errors.append(f"lanes data needs lanes[].name and spans[].start/end: {e!r}")
 
     check_tiles(html, errors)
+    check_story(html, errors, warns)
 
     if "<!-- SLOT:" in html:
         errors.append("unfilled SLOT comment remains")
