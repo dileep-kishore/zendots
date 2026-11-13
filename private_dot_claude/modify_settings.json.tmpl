@@ -5,8 +5,8 @@
 # chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
 # from .chezmoidata/claude_managed.json over the live file on stdin. Claude
 # Code rewrites this file at runtime; every key absent from the fragment passes
-# through untouched, except our guard and compaction hooks, the retired
-# Ponytail registrations, and Orca's hooks.
+# through untouched, except our guard, compaction and Hindsight memory hooks,
+# the retired Ponytail registrations, and Orca's hooks.
 # A semantic no-op emits stdin byte-for-byte.
 import base64
 import copy
@@ -38,6 +38,25 @@ def enforce(node, desired, path=""):
 
 
 {{ template "agent-command-guard.py" . }}
+
+{{ template "hindsight-hooks.py" . }}
+
+NODE = {{ or (lookPath "node") "node" | quote }}
+HINDSIGHT_DIST = {{ joinPath .chezmoi.homeDir ".hindsight/coding-agents/dist" | quote }}
+FAILURE_HOOK = {{ joinPath .chezmoi.homeDir ".local/bin/hindsight-failure-hook" | quote }}
+
+
+def _hindsight_entry(command, timeout, matcher=None):
+    entry = {"hooks": [{"type": "command", "command": command, "timeout": timeout}]}
+    return {"matcher": matcher, **entry} if matcher else entry
+
+
+HINDSIGHT_HOOKS = {
+    "SessionStart": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-sessionstart-hook.js"', 30)],
+    "UserPromptSubmit": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-hook.js"', 30)],
+    "Stop": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/claude-stop-hook.js"', 60)],
+    "PostToolUseFailure": [_hindsight_entry(f'"{FAILURE_HOOK}" claude', 10, "^Bash$")],
+}
 
 CAPSULE_COMMAND = (
     'capsule="$HOME/.agents/hooks/compact-capsule.sh"; '
@@ -103,6 +122,7 @@ for section, key in (
 drop_orca_hooks(doc)
 merge_command_guard(doc)
 merge_compact_capsule(doc)
+merge_hindsight_hooks(doc, HINDSIGHT_HOOKS)
 if doc == before:
     sys.stdout.write(raw)
     sys.exit(0)

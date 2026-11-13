@@ -17,6 +17,13 @@ from collections.abc import MutableMapping
 import tomlkit
 
 MANAGED = json.loads(base64.b64decode("{{ .codex_managed | toJson | b64enc }}"))
+# Hindsight memory tools. Built here, not in .chezmoidata, because the path
+# depends on the host's home directory and data files are not templates.
+MANAGED.setdefault("mcp_servers", {})["hindsight"] = {
+    "command": {{ or (lookPath "node") "node" | quote }},
+    "args": [{{ joinPath .chezmoi.homeDir ".hindsight/coding-agents/dist/mcp-server.js" | quote }}],
+    "env": {"HINDSIGHT_MCP_HARNESS": "codex"},
+}
 
 
 def die(msg):

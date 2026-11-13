@@ -2,7 +2,8 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-# Preserve live third-party registrations, drop Orca's, and add our command guard.
+# Preserve live third-party registrations, drop Orca's, and add our command
+# guard and Hindsight memory hooks.
 import copy
 import json
 import sys
@@ -15,6 +16,28 @@ def die(msg):
 
 {{ template "agent-command-guard.py" . }}
 
+{{ template "hindsight-hooks.py" . }}
+
+NODE = {{ or (lookPath "node") "node" | quote }}
+HINDSIGHT_DIST = {{ joinPath .chezmoi.homeDir ".hindsight/coding-agents/dist" | quote }}
+FAILURE_HOOK = {{ joinPath .chezmoi.homeDir ".local/bin/hindsight-failure-hook" | quote }}
+
+
+def _hindsight_entry(command, timeout):
+    return {"hooks": [{"type": "command", "command": command, "timeout": timeout}]}
+
+
+# Codex hook payloads carry no exit status, so the failure hook scans the
+# session log at Stop instead of reacting per command.
+HINDSIGHT_HOOKS = {
+    "SessionStart": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-sessionstart-hook.js"', 30)],
+    "UserPromptSubmit": [_hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-hook.js"', 30)],
+    "Stop": [
+        _hindsight_entry(f'"{NODE}" "{HINDSIGHT_DIST}/codex-stop-hook.js"', 60),
+        _hindsight_entry(f'"{FAILURE_HOOK}" codex', 30),
+    ],
+}
+
 raw = sys.stdin.read()
 try:
     doc = json.loads(raw) if raw.strip() else {}
@@ -25,6 +48,7 @@ if not isinstance(doc, dict):
 before = copy.deepcopy(doc)
 drop_orca_hooks(doc)
 merge_command_guard(doc)
+merge_hindsight_hooks(doc, HINDSIGHT_HOOKS)
 if doc == before:
     sys.stdout.write(raw)
 else:
