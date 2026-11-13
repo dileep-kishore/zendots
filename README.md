@@ -304,6 +304,7 @@ apply only after approval. Do not chain a pull with a broad apply.
 - [OmniWM setup and shortcuts](docs/omniwm.md)
 - [Noctalia v5 configuration and maintenance](docs/noctalia-v5.md)
 - [Pi workflows and session handoff](docs/pi-workflow.md)
+- [Hindsight agent memory: server, clients and troubleshooting](docs/hindsight-memory.md)
 - [Dated cross-host maintenance record](docs/maintenance/2026-10-20-agent-updates.md)
 - [Ponytail retirement and pending deployment](docs/maintenance/2026-10-20-ponytail-retirement.md)
 - [Repository agent guidance](CLAUDE.md) and [review rules](REVIEW.md)
