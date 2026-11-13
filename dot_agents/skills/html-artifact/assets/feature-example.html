@@ -262,7 +262,7 @@ button.theme { position: fixed; right: 16px; top: 16px; z-index: 3; font: 400 11
 .viz-chart svg { display: block; width: 100%; overflow: visible; touch-action: pan-y; }
 .viz-chart svg:focus-visible { outline-offset: 4px; }
 .viz-chart .grid line { stroke: var(--viz-grid); }
-.viz-chart .axis text, .viz-chart .axis-title, .viz-chart .ref text { fill: var(--muted-foreground); font: 12px var(--font-sans); font-variant-numeric: tabular-nums; }
+.viz-chart .axis text, .viz-chart .axis-title, .viz-chart .ref text, .viz-chart .end-label { fill: var(--muted-foreground); font: 12px var(--font-sans); font-variant-numeric: tabular-nums; }
 .viz-chart .axis .domain, .viz-chart .axis line { stroke: var(--border); }
 .viz-chart .axis.y .domain { display: none; }
 .viz-chart .ref line { stroke: var(--muted-foreground); stroke-dasharray: 2 4; }
@@ -437,7 +437,7 @@ figure.diff { gap: 10px; }
     var xTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'x').attr('text-anchor', 'middle');
     var yTitle = svg.append('text').attr('class', 'axis-title').attr('data-axis', 'y').attr('text-anchor', 'middle');
     var clipId = 'viz-clip-' + (++clipSeq), clip = svg.append('clipPath').attr('id', clipId).append('rect');
-    var gLines = svg.append('g').attr('clip-path', 'url(#' + clipId + ')');
+    var gLines = svg.append('g').attr('clip-path', 'url(#' + clipId + ')'), gEnd = svg.append('g');
     var guide = svg.append('line').attr('class', 'guide').attr('visibility', 'hidden');
     var gDots = svg.append('g').attr('class', 'dots').attr('visibility', 'hidden').attr('clip-path', 'url(#' + clipId + ')');
     var tip = host.append('div').attr('class', 'viz-tip').attr('aria-hidden', 'true');
@@ -462,9 +462,16 @@ figure.diff { gap: 10px; }
       W = el.clientWidth;
       if (!W) { lastW = 0; return; }  // hidden: let the observer redraw at any width once shown
       var H = cur.height, narrow = W < 480, xs = cur.x.values;
+      // Screenshots have no hover, so print each last value.
+      var vis = cur.series.filter(function (s) { return !hidden.has(s.name); }), fy = cur.y.format || d3.format('~g');
+      var shown = cur.endLabels === false || vis.length > 4 ? [] : vis, last = function (s) { return s.values[s.values.length - 1]; };
+      var ends = gEnd.selectAll('text').data(shown, function (s) { return s.name; }).join('text').attr('class', 'end-label').style('fill', 'var(--foreground)')
+        .text(function (s) { return (shown.length > 1 ? s.name + ' ' : '') + fy(last(s)); });
+      var lw = d3.max(ends.nodes(), function (n) { return n.getComputedTextLength(); }) || 0;
+      if (lw > W / 4) { ends = ends.remove().filter(function () {}); lw = 0; }  // at most a quarter of the width
+      M.r = 18 + (lw && lw + 6);
       x = (cur.x.scale === 'log' ? d3.scaleLog().base(cur.x.base || 10) : d3.scaleLinear())
         .domain([xs[0], xs[xs.length - 1]]).range([M.l, W - M.r]);
-      var vis = cur.series.filter(function (s) { return !hidden.has(s.name); });
       var ext = d3.extent([].concat.apply([], vis.map(function (s) { return s.values; })));
       var lo = ext[0] === undefined ? 0 : ext[0], hi = ext[0] === undefined ? 1 : ext[1];
       var span = hi - lo || Math.abs(hi) || 1;
@@ -481,7 +488,7 @@ figure.diff { gap: 10px; }
       var tx = x.ticks(nx);
       if (cur.x.scale === 'log') tx = tx.filter(function (t) { var e = Math.log(t) / Math.log(cur.x.base || 10); return Math.abs(e - Math.round(e)) < 1e-9; });
       if (tx.length > nx) { var k = Math.ceil(tx.length / nx); tx = tx.filter(function (_, i) { return i % k === 0; }); }
-      var fx = cur.x.format || d3.format('~g'), fy = cur.y.format || d3.format('~g');
+      var fx = cur.x.format || d3.format('~g');
       // Static draws set attributes at once: transitions wait for animation frames, which hidden tabs and headless capture never run.
       var t = animate && !reduced.matches ? svg.transition().duration(450).ease(d3.easeCubicOut) : null;
       function T(sel) {
@@ -509,6 +516,10 @@ figure.diff { gap: 10px; }
         .attr('d', function (s) { return line(s.values); })
         .style('opacity', function (s) { return hidden.has(s.name) ? 0 : 1; });
 
+      var ly = shown.map(function (s) { return y(last(s)) + 4; }), o = d3.range(ly.length).sort(function (a, b) { return ly[a] - ly[b]; });
+      o.forEach(function (i, k) { if (k) ly[i] = Math.max(ly[i], ly[o[k - 1]] + 16); });
+      var up = Math.max(0, ly[o[o.length - 1]] - H + M.b - 4) || 0;  // keep a bottom pile inside the plot
+      ends.attr('x', W - M.r + 6).attr('y', function (_, i) { return ly[i] - up; });
       var yd = y.domain(), xd = x.domain();
       var refs = cur.refs.filter(function (r) { return r.y != null ? r.y >= yd[0] && r.y <= yd[1] : r.x >= xd[0] && r.x <= xd[1]; });
       gRef.selectAll('g').data(refs, function (r) { return r.label; })
@@ -729,7 +740,7 @@ figure.diff { gap: 10px; }
           mark.style.left = (a - t0) / range * 100 + '%'; mark.style.width = (b - a) / range * 100 + '%';
           if (s.wait) mark.className = 'wait'; else mark.style.setProperty('--c', s.color || 'var(--chart-' + (li % 6 + 1) + ')');
           mark.textContent = s.label || '';
-          // Date-only spans parse as UTC midnight; show their dates, not a shifted clock.
+          // Date-only spans are UTC midnight; show the dates.
           var day = /^\d{4}-\d{2}-\d{2}$/, when = day.test(s.start) && day.test(s.end) ? s.start + ' – ' + s.end : clock(a, b - a < 1.2e5) + '–' + clock(b, b - a < 1.2e5);
           mark.setAttribute('data-tooltip', lane.name + ': ' + (s.label ? s.label + ', ' : '') + when + ' (' + length(b - a) + ')');
           track.appendChild(mark);
@@ -1123,7 +1134,7 @@ figure.diff { gap: 10px; }
         figs.forEach(function (el) {
           var view = el.querySelector('.vega-view'), msg = el.querySelector(':scope > .viz-error');
           if (!view) { view = document.createElement('div'); view.className = 'vega-view'; el.appendChild(view); }
-          // One bad spec shows its own message; the figures after it still draw.
+          // A bad spec fails alone; later figures still draw.
           function broke(e) { view.hidden = true; msg = msg || el.appendChild(Object.assign(document.createElement('p'), { className: 'viz-error' })); msg.textContent = 'This chart failed to draw: ' + e.message; }
           try {
             window.vegaEmbed(view, JSON.parse(el.querySelector('script[type="application/json"]').textContent), { config: vegaConfig(), renderer: 'svg',

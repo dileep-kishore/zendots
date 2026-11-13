@@ -86,9 +86,13 @@ The caption's legend sentence says what to drag or hover.
 snaps to samples, for counts); `y.label`, `y.format`, `y.min`, `y.max`,
 `y.zero`; `series` (`name`, `values` the same length as `x.values`, optional
 `dash`, `color`); `refs` (`{ y | x, label }` dotted reference lines);
-`tipFormat`; `height` (default 300); `label` (the accessible name). Without
-`snap` the hover reads values at the exact cursor x, so `x.format` must round
-(`d3.format('.1f')`), or the tooltip prints every digit. It draws
+`tipFormat`; `height` (default 300); `label` (the accessible name);
+`endLabels` (default true: up to four visible series print their last
+value at the line's end, so a screenshot keeps it; `false` turns them off).
+Without `snap` the hover reads values between samples by interpolation, so
+measured data sets `x.snap: true`, and only a model curve named in the
+caption, such as the Amdahl example, reads continuously; its `x.format` must
+round (`d3.format('.1f')`), or the tooltip prints every digit. It draws
 axes, gridlines and titles, a legend that toggles series, one hover guide
 with a marker and tooltip row per visible series at the cursor, touch
 pinning, arrow-key stepping with a live announcement, and 450 ms transitions
@@ -109,7 +113,9 @@ the runtime's behaviour:
   live; never resolve a colour to hex. Keep one colour per entity across the
   page's figures.
 - Use the `grid`, `axis x`, `axis y` and `axis-title` classes so axes match.
-  Reserve 64px for y labels; at widths under 480px use four ticks.
+  Size the left margin from the widest y tick label as drawn
+  (`getComputedTextLength()`), at least 64px; at widths under 480px use
+  four ticks.
 - Animate a redraw with `svg.transition().duration(450)` only when an input
   changed, and skip it under `prefers-reduced-motion`. Static draws set
   attributes directly: transitions wait for animation frames, which hidden
@@ -123,6 +129,8 @@ the runtime's behaviour:
 ## Composition
 
 - The first render is the most useful state; the inputs explore from there.
+- A takeaway beside an interactive figure holds for every state its controls
+  allow, or says it describes the first state.
 - Controls change the point the section makes. No search, filters, or reset
   buttons nobody asked for, and no stats that do not move with the inputs.
 - Every visible label fits at 320px. Axis titles stay under about 30
