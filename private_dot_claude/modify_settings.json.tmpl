@@ -5,8 +5,8 @@
 # chezmoi modify script for ~/.claude/settings.json: enforce the managed keys
 # from .chezmoidata/claude_managed.json over the live file on stdin. Claude
 # Code rewrites this file at runtime; every key absent from the fragment passes
-# through untouched, except our guard hook, the retired Ponytail registrations,
-# and Orca's hooks.
+# through untouched, except our guard and compaction hooks, the retired
+# Ponytail registrations, and Orca's hooks.
 # A semantic no-op emits stdin byte-for-byte.
 import base64
 import copy
@@ -39,6 +39,46 @@ def enforce(node, desired, path=""):
 
 {{ template "agent-command-guard.py" . }}
 
+CAPSULE_COMMAND = (
+    'capsule="$HOME/.agents/hooks/compact-capsule.sh"; '
+    '[ -r "$capsule" ] && exec /bin/bash "$capsule"; exit 0'
+)
+
+
+def merge_compact_capsule(doc):
+    # Merged, not enforced: a list in the managed fragment would replace other
+    # tools' SessionStart hooks.
+    hooks = doc.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        die("hooks is not a mapping")
+    entries = hooks.setdefault("SessionStart", [])
+    if not isinstance(entries, list):
+        die("hooks.SessionStart is not an array")
+    desired = {
+        "matcher": "compact",
+        "hooks": [{"type": "command", "command": CAPSULE_COMMAND, "timeout": 10}],
+    }
+    uses = sum(
+        1 for e in entries if isinstance(e, dict) and isinstance(e.get("hooks"), list)
+        for h in e["hooks"] if isinstance(h, dict) and h.get("command") == CAPSULE_COMMAND
+    )
+    # Left in place when correct, so another tool appending after it causes no churn.
+    if uses == 1 and desired in entries:
+        return
+    # Drop only the capsule command, keeping any other hook that shares its entry.
+    remaining = []
+    for entry in entries:
+        inner = entry.get("hooks") if isinstance(entry, dict) else None
+        if not isinstance(inner, list):
+            remaining.append(entry)
+            continue
+        kept = [h for h in inner if not (isinstance(h, dict) and h.get("command") == CAPSULE_COMMAND)]
+        if len(kept) == len(inner):
+            remaining.append(entry)
+        elif kept:
+            remaining.append({**entry, "hooks": kept})
+    hooks["SessionStart"] = [*remaining, desired]
+
 raw = sys.stdin.read()
 if raw.strip():
     try:
@@ -62,6 +102,7 @@ for section, key in (
         entries.pop(key, None)
 drop_orca_hooks(doc)
 merge_command_guard(doc)
+merge_compact_capsule(doc)
 if doc == before:
     sys.stdout.write(raw)
     sys.exit(0)
