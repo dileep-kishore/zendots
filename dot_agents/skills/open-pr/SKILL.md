@@ -213,6 +213,9 @@ declined.
 ## 8. Hand over to review
 
 Unless the user asked only to open the PR, continue with `babysit-pr` from its
-step 1, passing that push time as `--since`. It waits for the review bots this
+step 1, passing that push time as `--since`. When this run will still stack
+another PR on this one, report the URL and build the next PR instead: fixes
+to a lower PR restart checks on every PR above it. Once the top of the stack
+is open, babysit each PR from the bottom up. It waits for the review bots this
 push triggered, and stops about three minutes after the push when none
 appear.
