@@ -265,8 +265,15 @@ trigger in [references/grounding.md](references/grounding.md), then take
 coverage, Requirements marks, and scores only from reports that are not
 quarantined.
 
-Present a one-line verdict, then CONFIRMED findings, then PLAUSIBLE and
-UNVERIFIED ones labeled with the step left unproven, most severe first. Give
+For a change review, name the fact or facts the change is safe because of,
+such as "this call only drops cache entries that are already dead". For each,
+give the `verify-this` evidence level it reached and the check behind it,
+running a cheap check yourself when one exists, or mark it unproven. An
+unproven safety fact is a coverage gap and refutes no finding.
+
+Present a one-line verdict, then the safety facts, then CONFIRMED findings,
+then PLAUSIBLE and UNVERIFIED ones labeled with the step left unproven, most
+severe first. Give
 each its location, trigger, evidence and its method (source trace, executed
 reproduction, or both), repro, smallest fix, and finder and verifier
 attribution. On a repeat review, list ledger findings carried
