@@ -57,6 +57,10 @@ if not isinstance(doc, MutableMapping):
 
 before = copy.deepcopy(doc)
 enforce(doc, MANAGED)
+# Serena refuses to start without `projects`, and only writes it when it creates
+# the file itself, which never happens once chezmoi has created it first.
+if "projects" not in doc:
+    doc["projects"] = []
 if doc == before:
     sys.stdout.write(raw)
     sys.exit(0)
