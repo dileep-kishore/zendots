@@ -85,6 +85,8 @@
 		{ "action": "skill", "resource": "correct", "effect": "ask" },
 		{ "action": "skill", "resource": "create-skill", "effect": "ask" },
 		{ "action": "skill", "resource": "create-verification-skill", "effect": "ask" },
+		{ "action": "skill", "resource": "hands-off-merge", "effect": "ask" },
+		{ "action": "skill", "resource": "hands-off-ready", "effect": "ask" },
 		{ "action": "skill", "resource": "humanizer", "effect": "ask" },
 		{ "action": "skill", "resource": "maintain-verification-skill", "effect": "ask" },
 		{ "action": "playwright_*", "resource": "*", "effect": "deny" },
