@@ -7,7 +7,7 @@ strings, because they are identifiers or would lose digits as JSON numbers.
 
 The output escapes "<" as \\u003c, so it can be pasted into a <script type="application/json"> block as is.
 
-Usage: rows.py FILE [--columns a,b,c] [--limit N]
+Usage: rows.py FILE [--columns a,b,c] [--limit N] [--source-line LABEL]
 """
 import argparse
 import csv
@@ -76,8 +76,10 @@ def main() -> int:
     ap.add_argument("file", type=Path)
     ap.add_argument("--columns", help="comma-separated fields to keep, in this order")
     ap.add_argument("--limit", type=int, help="keep the first N rows")
+    ap.add_argument("--source-line", metavar="LABEL", help="print a Sources entry on stderr, naming the run or revision")
     args = ap.parse_args()
     rows = read(args.file)
+    total = len(rows)
     if args.columns:
         keep = [c.strip() for c in args.columns.split(",") if c.strip()]
         absent = [c for c in keep if rows and not any(c in r for r in rows)]
@@ -88,7 +90,11 @@ def main() -> int:
         rows = rows[: args.limit]
     # "<" escaped so a cell holding "</script>" cannot end the <script> block the rows are pasted into.
     sys.stdout.write(json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False).replace("<", "\\u003c"))
-    sys.stderr.write(f"rows.py: {len(rows)} rows\n")
+    if args.source_line:
+        columns = ", ".join(keep if args.columns else dict.fromkeys(k for r in rows for k in r)) or "none"
+        sys.stderr.write(f"{args.file} ({args.source_line}): {len(rows)} of {total} rows, columns {columns}\n")
+    else:
+        sys.stderr.write(f"rows.py: {len(rows)} rows\n")
     return 0
 
 

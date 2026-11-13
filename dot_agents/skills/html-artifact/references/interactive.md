@@ -151,10 +151,12 @@ hand. It applies the BERIL Workbench reader's rules: `""`, `NA`, `NaN`,
 a leading-zero id (`007`) or an integer past 2^53 stays a string.
 
 ```bash
-python3 <skill-dir>/scripts/rows.py run.csv --columns genus,coverage,site > rows.json
+python3 <skill-dir>/scripts/rows.py run.csv --columns genus,coverage,site --source-line "run r12" > rows.json
 ```
 
-Its output escapes `<` as `\u003c`, so a cell holding `</script>` cannot end
+`--source-line` prints the widget's Sources entry on standard error, such as
+`run.csv (run r12): 142 of 150 rows, columns genus, coverage, site`. A widget
+over real data carries that entry in its `Sources` list. Its output escapes `<` as `\u003c`, so a cell holding `</script>` cannot end
 the block early. When you assemble the block in a script, serialize it the
 same way: `json.dumps(block).replace("<", "\\u003c")`.
 
