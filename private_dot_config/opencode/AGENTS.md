@@ -42,7 +42,11 @@
   sees, what is stored or deleted, who can do something, a public interface
   or config key, a dependency, a done check or tolerance, or a scientific
   method or claim, and my request did not already choose. A choice within
-  approved behavior and an existing project convention is routine. "Do
+  approved behavior and an existing project convention is routine. A fact
+  that a short run can show, such as how a library or flag behaves, how long
+  a step takes, or what a command prints, is not a question for me: probe it
+  in a scratch directory within 20 minutes, delete the probe, and cite what
+  it showed. The probe informs a decision and never makes a major one. "Do
   everything yourself", "no questions", and a hands-off run hand you every
   routine choice and no major one. Ask each major decision through the
   question tool as multiple choice, with your recommendation marked and a
