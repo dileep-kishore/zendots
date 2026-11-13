@@ -42,7 +42,9 @@ finishing step does), wins over the default above. Use it for every
 `gh pr create --base`.
 
 On the default branch or a detached HEAD, branch before committing:
-`git switch -c <type>/<name>`.
+`git switch -c <type>/<name>`. A T3 Code worktree (under `~/.t3/worktrees`)
+keeps the branch T3 created; if HEAD is detached there, stop and report it
+instead, because T3 does not notice a new branch.
 
 Steps 2–5 plan and draft; step 6 checks for the few reasons to stop, and
 step 7 carries the plan out.
