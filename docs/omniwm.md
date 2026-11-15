@@ -101,6 +101,12 @@ which is the bar's thickness on a side edge. It limits the lanes to `omniwm`,
 `workspaces`, and `scratchpads`, and uses the Catppuccin palette. A comment in
 the file keeps the full-width top layout for switching back.
 
+The profile sets `barFill = "surface"` and `backgroundOpacity = 1.0` for an
+opaque Catppuccin background, so bright wallpaper does not show through the
+workspace bar. These keys belong under `[profiles.default.workspaceBar]` in
+`shell/shell.toml`. Changing opacity alone tints the native material instead
+of selecting the palette's solid surface color.
+
 Quake Terminal is enabled with Ghostty as its provider, and Hyper+Return toggles
 it. It slides in from the top at 80% width and 60% height, with 0.9 opacity and
 a 25-point standard blur. It reads `~/.config/ghostty/config` through libghostty,

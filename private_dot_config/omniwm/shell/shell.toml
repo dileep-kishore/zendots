@@ -11,6 +11,8 @@ theme = "catppuccin"
 trailing = []
 
 [profiles.default.workspaceBar]
+backgroundOpacity = 1.0
+barFill = "surface"
 fullWidth = false
 height = 32.0
 notchMode = "off"
