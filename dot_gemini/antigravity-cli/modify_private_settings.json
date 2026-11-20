@@ -1,0 +1,12 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* agy writes this file itself (trusted workspaces, the GCP project), so
+       only the default model is managed. Neon replaced Carbon on 19 Nov 2026;
+       the LBL enterprise project rejects Neon's XHigh level with HTTP 400. */ -}}
+{{- $orig := default "{}" .chezmoi.stdin | fromJson -}}
+{{- $merged := default "{}" .chezmoi.stdin | fromJson
+  | setValueAtPath "model" "Gemini 4 Neon (High)" -}}
+{{- if eq (toJson $orig) (toJson $merged) -}}
+{{- .chezmoi.stdin -}}
+{{- else -}}
+{{- toPrettyJson $merged -}}
+{{- end -}}
