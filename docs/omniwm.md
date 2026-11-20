@@ -70,9 +70,13 @@ Control+Option+Command+Space. On the Go60, press Right Command+Space.
 OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
 keeping Hyper+Space free for Raycast.
 
-The config uses Niri scrolling and ten workspaces. Workspaces 2, 3, and 10 are
-pinned to the ASUS VG289 when it is connected, and the rest use the main
-monitor. It sets 25/50/75/100% column widths (50% by default, 100% on the
+The config uses Niri scrolling and ten workspaces. Workspaces 2, 3, and 10 use
+OmniWM's Secondary monitor role, and the rest use Main. `[monitors.ranking]`
+lists the MPG491CX, then the built-in display, so with the MPG491CX the three
+workspaces sit on the built-in display. The ASUS VG289 is unranked and follows
+the built-in display, so with the ASUS they move to the ASUS. A pin to one
+display would send them to Main whenever that display is disconnected, and
+OmniWM applies these assignments on every launch. It sets 25/50/75/100% column widths (50% by default, 100% on the
 MacBook's built-in display), and a 6-point gap with no outer gaps. Borders are
 enabled at 2 points, with a mauve base color, an enabled gradient, and an
 8-point glow at 60% opacity. A lone column stays centered at its configured

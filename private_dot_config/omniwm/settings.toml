@@ -1395,11 +1395,7 @@ layoutType = "niri"
 name = "2"
 
 [workspaces.monitorAssignment]
-type = "specificDisplay"
-
-[workspaces.monitorAssignment.output]
-displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
-name = "ASUS VG289"
+type = "secondary"
 
 [[workspaces]]
 id = "BEB842B5-E894-4791-9FD1-397C3CDD3538"
@@ -1407,11 +1403,7 @@ layoutType = "niri"
 name = "3"
 
 [workspaces.monitorAssignment]
-type = "specificDisplay"
-
-[workspaces.monitorAssignment.output]
-displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
-name = "ASUS VG289"
+type = "secondary"
 
 [[workspaces]]
 id = "248AA883-2261-4D45-943C-79C0E46A232B"
@@ -1467,8 +1459,4 @@ layoutType = "default"
 name = "10"
 
 [workspaces.monitorAssignment]
-type = "specificDisplay"
-
-[workspaces.monitorAssignment.output]
-displayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
-name = "ASUS VG289"
+type = "secondary"
