@@ -20,7 +20,7 @@ Finders fill the seats of a tier from the ranked roster in
 [references/reviewers.md](references/reviewers.md), which skips the model
 family that wrote the change and gives each reviewer's launch route.
 
-- **Tier 1**, the default: one finder, GPT-6.1 Sol when Claude wrote the
+- **Tier 1**, the default: one finder, GPT-6.2 Sol when Claude wrote the
   change.
 - **Tier 2**: two cross-family finders, adding Gemini 4 Argon, or Grok 4.7
   when Argon misses its deadline, plus Claude Sonnet 5.5 when Claude wrote the
@@ -30,7 +30,7 @@ family that wrote the change and gives each reviewer's launch route.
   authentication, authorization, persistent data or migrations, money, or
   concurrency; for a design review; and when the user asks for a dual, total,
   pair, or deep review.
-- **Tier 3**, the council: three finders, with Gemini 4 Carbon in the Gemini
+- **Tier 3**, the council: three finders, with Gemini 4 Neon in the Gemini
   seat, falling back to Argon, and adding Grok 4.7. Only when the user asks
   for a council.
 
