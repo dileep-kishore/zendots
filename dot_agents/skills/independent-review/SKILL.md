@@ -148,8 +148,8 @@ Launch each finder by the route
 [references/reviewers.md](references/reviewers.md) gives for the current host:
 
 - **T3 Code:** `delegate_task` with the roster's target, one task per finder,
-  except Gemini finders: launch those with the `agy` CLI and its context
-  bundle, as the roster's Gemini section says.
+  Gemini finders included. Gemini finders always get the context bundle,
+  and fall back to the `agy` CLI as the roster's Gemini section says.
 - **Native subagents:** for a seat in the coordinator's own family. Start with
   no inherited conversation, supplying only the brief and checkout. Use
   read-only permissions when supported. Reviewers should perform their own

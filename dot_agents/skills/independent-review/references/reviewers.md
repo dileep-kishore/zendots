@@ -8,13 +8,14 @@ write the change. Model IDs age: take the newest flagship of each family from
 when one is replaced. Gemini 4 Neon replaced Carbon in the council seat on
 19 November 2026, after the PR #97 replay below, and Carbon left the roster.
 Argon keeps the tier 2 seat until Neon has about five calibration rows. Use
-Neon at high: the LBL enterprise Gemini project rejects `xhigh` with HTTP 400.
+Neon at high: the LBL enterprise Gemini project rejects `xhigh` with HTTP 400
+through `agy`, though T3 lists it.
 
 | Rank | Reviewer | Family | Seats |
 |---|---|---|---|
 | 1 | GPT-6.2 Sol, high effort | OpenAI | tiers 1-3, verifier |
-| 2 | Gemini 4 Argon, high thinking, through `agy` | Google | tier 2; Neon's fallback in tier 3 |
-| 2 | Gemini 4 Neon, high thinking, through `agy` | Google | tier 3 |
+| 2 | Gemini 4 Argon, high thinking, through Antigravity | Google | tier 2; Neon's fallback in tier 3 |
+| 2 | Gemini 4 Neon, high thinking, through Antigravity | Google | tier 3 |
 | 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3; Argon's fallback in tier 2 |
 | - | Claude Opus 5.5, high effort | Anthropic | rank 1 when Claude did not write the change; verifier |
 | - | Claude Sonnet 5.5, high effort | Anthropic | extra tier 2 seat when Claude wrote the change |
@@ -54,32 +55,51 @@ verifiers until the calibration log shows they settle findings reliably.
 
 ## Gemini finders
 
-Launch Gemini finders with the `agy` CLI, even inside T3. T3's
-`delegate_task` runs them through its bundled Antigravity server (1.4.5,
-older than the CLI's 1.5.6), and that route fails often: 12 of 76 T3 Gemini
-runs hit `502 "The model is currently unreachable"`, each costing 5.1
-minutes, and T3 stops a task after 15 silent minutes. No direct `agy` run has
-hit it; on 12 November 2026 the same Carbon brief finished in 9.3 minutes
-through `agy` and failed through T3 at the same time. Use `delegate_task` for
-a Gemini seat only when `agy` is not installed. When T3's bundled server
-(`~/.t3/tools/antigravity-acp/*/versions/*/.install-complete.json`) moves
-past 1.4.5, run one Neon brief through both routes at once again, and move
-Gemini back to `delegate_task` if the T3 run finishes without a 502.
+Inside T3, launch Gemini finders with `delegate_task` like the other
+finders. Use the `agy` CLI outside T3, or when `orchestrator_capabilities`
+marks Antigravity unable to run child tasks or lacks the model. The default
+listing shows at most eight models per provider, so call it with
+`search: "gemini-4"` before deciding a model is missing. When T3 lacks a
+model that `agy models` lists, launch it through `agy` and tell the user
+that **Refresh provider status** in T3's provider settings would add it.
+
+T3's bundled Antigravity server was 1.4.5 until 20 November 2026, and that
+route failed often: 12 of 76 T3 Gemini runs hit `502 "The model is currently
+unreachable"`, each costing 5.1 minutes, while no direct `agy` run hit it.
+T3 then installed runtime 1.5.13
+(`~/.t3/tools/antigravity-acp/*/versions/*/.install-complete.json`). The
+same day, Neon high ran the PR #97 replay brief through T3 on both hosts
+with no 502: 11.1 minutes and 13 findings on the macbook, 9.0 minutes and 11
+findings on the macmini. The same brief through `agy` took 10.7 minutes on
+the macbook and 9.0 on the macmini. Two clean runs are thin against a 16%
+failure rate: when a T3 Gemini
+run hits a 502, say so in the report's coverage with the run's elapsed time,
+and propose moving Gemini back to `agy` for the user's approval.
 
 Every Gemini finder gets the bundle and rules in the
 [reading budget](reading-budget.md), and a deadline from launch: 20 minutes
 for Argon and Neon. Most of their time is a few long thinking turns
-that print nothing, so judge progress by the event stream, not by silence.
-Fall back at once when the stream shows an `ERROR` step or "unreachable",
-when the result's `response` is empty, or when it lists `denied_actions`.
+that print nothing, so through `agy` judge progress by the event stream, not
+by silence. Fall back at once when a T3 task fails or its report lacks the
+completion token, or, through `agy`, when the stream shows an `ERROR` step
+or "unreachable", when the result's `response` is empty, or when it lists
+`denied_actions`.
 
-In tier 2, at Argon's deadline, stop its process and
+Only `agy` enforces the deadline, through `--print-timeout`. An async T3
+task wakes the coordinator only when it ends, and T3 ends an Antigravity
+task after 15 minutes without activity, not at a wall-clock limit. Through
+T3, treat a Gemini task that ends without a report as having missed its
+deadline. When another finder's completion wakes the coordinator after a
+Gemini task's 20 minutes have passed, cancel that task with `task_cancel` and
+fall back as below.
+
+In tier 2, at Argon's deadline, stop it and
 launch Grok 4.7 high fast with the same brief, minus the reading budget, into
 that seat. Do the same at once when Argon is unavailable or its launch fails.
 Grok gets its own 20-minute deadline; if it misses that too, label the seat
 partial.
 
-In tier 3, at Neon's deadline, stop its process and launch Argon with the same
+In tier 3, at Neon's deadline, stop it and launch Argon with the same
 brief and a reading budget rendered for Argon's own deadline, into that seat. Do the same at once when
 Neon is unavailable or its launch fails. Argon gets its own 20-minute
 deadline; Grok already holds a seat, so if Argon misses too, that seat stays
@@ -145,9 +165,11 @@ citations existed; its 10 other findings were not verified.
 
 ## Launch routes
 
-Use T3's `delegate_task` inside T3 Code, except for Gemini finders, which use
-`agy` as [Gemini finders](#gemini-finders) says; otherwise the CLI. Call
-`orchestrator_capabilities` once before the first `delegate_task`. Start one
+Use T3's `delegate_task` inside T3 Code, and the CLI otherwise. Gemini
+finders fall back to `agy` inside T3 as [Gemini finders](#gemini-finders)
+says. Call `orchestrator_capabilities` once before the first
+`delegate_task`, with `search: "gemini-4"` when a Gemini seat is in the
+tier. Start one
 `delegate_task` per finder or verifier with `role: "review"`,
 `mode: "async"`, and the brief as `task`; keep each `taskId`. Completion
 wakes the coordinator, so do not poll. The child's final message is its
@@ -156,8 +178,8 @@ report: save it unchanged to the report path.
 | Reviewer | T3 `target` | CLI |
 |---|---|---|
 | Sol | `providerInstanceId: "codex"`, `model: "gpt-6.2-sol"`, `options: {reasoningEffort: "high"}` | `codex exec -C <checkout> -s read-only -m gpt-6.2-sol -c model_reasoning_effort=high --ephemeral -o <report> "<prompt>"` |
-| Argon | only without `agy`: `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thinking_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
-| Neon | only without `agy`: `providerInstanceId: "antigravity"`, `model: "gemini-4-neon"`, `options: {thinking_level: "high"}` | `agy --mode plan --model gemini-4-neon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
+| Argon | `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
+| Neon | `providerInstanceId: "antigravity"`, `model: "gemini-4-neon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-neon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
 | Claude Sonnet | `providerInstanceId: "claudeAgent"`, `model: "claude-sonnet-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-sonnet-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
 | Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}`; as Argon's fallback, `fastMode: true` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout; as Argon's fallback, `--model grok-4.7-high-fast` |
 | Claude Opus | `providerInstanceId: "claudeAgent"`, `model: "claude-opus-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-opus-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
@@ -177,9 +199,8 @@ without a report; the completion token decides. For `agy`, the report is the
 `--print-timeout` is the Gemini deadline.
 
 T3 lists a new Antigravity model only after a session starts or the user
-presses **Refresh provider status** in its provider settings. When
-`orchestrator_capabilities` lacks Neon but `agy models` lists it, ask the
-user to refresh, or launch it through the CLI.
+presses **Refresh provider status** in its provider settings. Until then,
+the model goes through `agy`, as [Gemini finders](#gemini-finders) says.
 
 ## Score line
 
