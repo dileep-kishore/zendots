@@ -131,6 +131,8 @@ artifacts; record hashes, or redact, for files that hold credentials.
 ## Brief and launch finders
 
 Create a private temporary directory outside the checkout with `mktemp -d`.
+Finders and verifiers never delete their scratch files, so remove this
+directory yourself once the review and its repeat reviews are done.
 Fill [references/review-brief.md](references/review-brief.md) with the intent,
 pinned scope, standards, and a per-finder report path and completion token.
 `{LENS}` is the finder's lens for deep review; otherwise "Full review: cover

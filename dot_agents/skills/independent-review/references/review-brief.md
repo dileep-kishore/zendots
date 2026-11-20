@@ -10,6 +10,9 @@ and report what holds up; do not stay quiet to look precise.
 
 - Read-only. Do not edit, write, stage, commit, checkout, or push anything in
   this checkout. The only file you create is the report at the path below.
+- Never run `rm`, including in a `trap` or cleanup step. Leave probe files
+  in the scratch directory; the coordinator removes it. Codex stops for the
+  user's approval on every `rm -f`-style command, even in full-access mode.
 - Do the whole review yourself. Do not spawn subagents or ask another model for
   a second opinion; if the diff is large, review it in passes and say so.
 - Review the target against the stated intent. Flag a flawed assumption when
