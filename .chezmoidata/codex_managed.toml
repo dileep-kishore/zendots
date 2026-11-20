@@ -1,4 +1,7 @@
 [codex_managed]
+model = "gpt-6.2-sol"
+review_model = "gpt-6.2-sol"
+model_reasoning_effort = "high"
 service_tier = "default"
 
 [codex_managed.agents]
@@ -46,7 +49,7 @@ memories = true
 generate_memories = true
 use_memories = true
 extract_model = "gpt-6-luna"
-consolidation_model = "gpt-6.1-sol"
+consolidation_model = "gpt-6.2-sol"
 
 [codex_managed.desktop]
 appearanceTheme = "system"
