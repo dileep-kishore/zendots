@@ -57,7 +57,7 @@ followsMouse = false
 followsMouseOnlyFullyVisible = false
 followsWindowToMonitor = false
 lockModifier = "off"
-moveCrossesMonitorAtEdge = false
+moveCrossesMonitorAtEdge = true
 moveMouseToFocusedWindow = true
 raiseOnMouseFocus = false
 
@@ -126,6 +126,16 @@ entries = []
 shell = "system"
 shellExecutable = ""
 terminal = "terminal"
+
+[monitors]
+
+[[monitors.ranking]]
+displayUUID = "4B5E430D-CC2C-4087-B4E6-D142D01AA149"
+name = "MPG491CX OLED"
+
+[[monitors.ranking]]
+displayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+name = "Built-in Retina Display"
 
 [mouseWarp]
 constrainToArrangement = false
@@ -201,7 +211,7 @@ position = "top"
 widthPercent = 100.0
 
 [routing]
-mode = "custom"
+mode = "macOS"
 
 [[routing.arrangements]]
 id = "2D70DCDE-060E-46E8-A8EC-42BAB8563DE6"
@@ -211,6 +221,21 @@ gridColumn = 0
 gridRow = 0
 monitorDisplayUUID = "DE1787A3-3471-40C5-B4DF-DDCB707A3C84"
 monitorName = "ASUS VG289"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 1
+monitorDisplayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+monitorName = "Built-in Retina Display"
+
+[[routing.arrangements]]
+id = "3C4E1C0F-411D-4405-8F97-B80CF549D624"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 0
+monitorDisplayUUID = "4B5E430D-CC2C-4087-B4E6-D142D01AA149"
+monitorName = "MPG491CX OLED"
 
 [[routing.arrangements.monitors]]
 gridColumn = 0
