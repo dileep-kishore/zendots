@@ -40,7 +40,7 @@ independent of this macOS configuration.
 | J / K | Focus down / up; switch to next / previous workspace at the edge |
 | Arrow keys | Move in that direction |
 | Tab | Toggle between current and last-used workspace |
-| Space | Raycast, configured separately in Raycast |
+| Space | Tinycast launcher |
 | P | OmniWM command palette |
 | Return | Toggle the Quake Terminal (Ghostty) |
 | O | Overview |
@@ -65,10 +65,16 @@ last until the window closes or OmniWM quits. To jump to a marked window, type
 its name in the Hyper+P palette, where marks sort first, or run
 `omniwmctl window mark focus <name>`.
 
-Reserve Hyper+Space for Raycast by setting its hotkey to
-Control+Option+Command+Space. On the Go60, press Right Command+Space.
-OmniWM's `openCommandPalette` uses Hyper+P, or Right Command+P on the Go60,
-keeping Hyper+Space free for Raycast.
+Tinycast's launcher hotkey is Control+Option+Command+Space, set as
+`launcherShortcut` in the managed `~/.config/tinycast/settings.json`. On the
+Go60, press Right Command+Space. OmniWM's `openCommandPalette` uses Hyper+P,
+or Right Command+P on the Go60, keeping Hyper+Space free for Tinycast.
+Tinycast reads the file only after you turn on Settings > Backup > Sync
+settings file and choose Import, which is off on a fresh install. While sync
+is on, Tinycast rewrites the file when you change a setting in its GUI. Run
+`chezmoi re-add ~/.config/tinycast/settings.json` afterwards and read
+`git diff` before committing, because the repository is public and the AI
+system prompt and file-search folders are free text.
 
 The config uses Niri scrolling and ten workspaces. Workspaces 2, 3, and 10 use
 OmniWM's Secondary monitor role, and the rest use Main. `[monitors.ranking]`
@@ -97,8 +103,8 @@ in `~/.config/omniwm/shell/default/` makes the bar full width at 32 points.
 OmniWM manages that folder and overwrites it on update. A style's values take
 precedence over the `[workspaceBar]` keys in `settings.toml`. A full-width bar
 that is not `belowMenuBar` sets the macOS "Automatically hide and show the menu
-bar" setting to Always. Third-party menu bar icons, such as BetterDisplay,
-Raycast, and Tailscale, are then reachable only through OmniWM's Hidden Bar.
+bar" setting to Always. Third-party menu bar icons, such as BetterDisplay and
+Tailscale, are then reachable only through OmniWM's Hidden Bar.
 `shell/shell.toml` overrides the Default profile to keep the native menu bar
 visible. It sets `position = "left"`, `fullWidth = false`, and `height = 32.0`,
 which is the bar's thickness on a side edge. It limits the lanes to `omniwm`,

@@ -22,7 +22,7 @@ package lists, encrypted secrets, and apply hooks before using it on another hos
 | Editor | Neovim + lazy.nvim, Snacks pickers, sidekick.nvim, avante.nvim, Copilot |
 | Sessions | tmux + TPM, sesh, tmuxp; Zellij config also included |
 | Files and Git | Yazi, Lazygit, delta |
-| macOS desktop | OmniWM; Karabiner/Raycast hotkeys configured separately — [guide](docs/omniwm.md) |
+| macOS desktop | OmniWM, Tinycast; Karabiner hotkeys configured separately — [guide](docs/omniwm.md) |
 | Linux desktop | Niri + Noctalia v5 — [guide](docs/noctalia-v5.md) |
 | Coding agents | Claude Code, Codex, OpenCode V2, Pi, omp; Orca and T3 Code integrations |
 | Shell AI | aichat command generation with `Alt-e` |

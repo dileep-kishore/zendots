@@ -180,13 +180,18 @@ such as `core.ignorecase`, which Syncthing does not carry.
 macOS does not let scripts grant privacy permissions, so these stay manual.
 
 - Grant Accessibility and Input Monitoring to OmniWM, Karabiner-Elements,
-  Raycast, AltTab, BetterDisplay, and Wispr Flow when each asks. Give OmniWM
-  Screen Recording for Overview. Approve Karabiner's driver under System
-  Settings > General > Login Items & Extensions.
+  AltTab, BetterDisplay, and Wispr Flow when each asks. Grant Tinycast what
+  its Settings > Permissions lists. Give OmniWM Screen Recording for
+  Overview. Approve Karabiner's driver under System Settings > General >
+  Login Items & Extensions.
 - Confirm Stage Manager is off and "Displays have separate Spaces" is on, then
   log out and back in.
-- Import Raycast settings from a `.rayconfig` exported on macmini
-  (Settings > Advanced), or turn on Cloud Sync. Set its hotkey to Hyper+Space.
+- Chezmoi has already placed `~/.config/tinycast/settings.json`. In
+  Tinycast, turn on Settings > Backup > Sync settings file and choose Import
+  when it asks. That file holds no snippets, quicklinks, or notes. To bring
+  them over, export a backup from Settings > Backup on macmini with only
+  Snippets, Notes, and Settings & Shortcuts checked, then import it here. The
+  launcher's Export Backup command also copies clipboard history.
 - Enter the BetterDisplay license; its license files are not copied.
 - Sign in to Chrome, Slack, Notion, Notion Calendar, Morgen, Superlist,
   Linear, Granola, Zoom, Spotify, ProtonVPN, ChatGPT, Claude, Grammarly,

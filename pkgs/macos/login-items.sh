@@ -18,7 +18,7 @@ apps=(
     "OmniWM"
     "CodexBar"
     "Wispr Flow"
-    "Raycast"
+    "Tinycast"
     "BetterDisplay"
     "Granola"
     "Vorssaint"
@@ -48,5 +48,18 @@ on run argv
 end run
 APPLESCRIPT
         echo "add  $app: $path"
+    fi
+done
+
+# Tinycast replaced Raycast; Raycast stays installed as a fallback.
+retired=("Raycast")
+for app in "${retired[@]}"; do
+    if [[ ", $existing, " == *", $app, "* ]]; then
+        osascript - "$app" <<'APPLESCRIPT' >/dev/null
+on run argv
+    tell application "System Events" to delete login item (item 1 of argv)
+end run
+APPLESCRIPT
+        echo "drop $app: retired"
     fi
 done
