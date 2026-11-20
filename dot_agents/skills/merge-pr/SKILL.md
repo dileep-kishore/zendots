@@ -102,12 +102,14 @@ gate that was visible up front.
 
 4. **Mergeable.** `mergeStateStatus` must be `CLEAN` or `HAS_HOOKS`.
    `UNKNOWN` means GitHub is still computing it: re-query for up to a minute.
-   `DIRTY` (conflicts), `BEHIND`, `BLOCKED`, `UNSTABLE`, and `DRAFT` fail the
-   gate with that status named.
+   `BEHIND` means branch protection requires the head to contain the base:
+   take gate 5's update path. `DIRTY` (conflicts), `BLOCKED`, `UNSTABLE`, and
+   `DRAFT` fail the gate with that status named.
 
 5. **Tested against the current base.** GitHub reports `BEHIND` only when
    branch protection requires up-to-date branches, so `CLEAN` can sit on CI
-   that never saw newer base commits. The head must contain the current base.
+   that never saw newer base commits. The head must contain the current base,
+   except for a stacked child that passes step 3's parent-merge proof.
    `<remote>` is the remote whose URL is the PR's base
    repository (`gh pr view <number> --json url`): usually `origin`, but often
    `upstream` in a clone of a fork.
@@ -117,13 +119,14 @@ gate that was visible up front.
    ```
 
    `ancestor exit 0` passes. No `ancestor exit` line means the fetch failed,
-   which fails the gate with its error. `ancestor exit 1` fails the gate until
-   the branch includes the base: run `gh pr update-branch <number>`, which
-   merges the base without a force-push, re-read `headRefOid` with
-   `gh pr view`, and rerun gates 1 to 5 on that head. Any other exit status
-   fails the gate with the error. After three updates of one PR in one run,
-   stop and report that the base keeps moving. When the PR has no checks, the
-   report says that no check ran against the current base.
+   which fails the gate with its error. `ancestor exit 1`, or gate 4's
+   `BEHIND`, fails the gate until the branch includes the base. This is the
+   update path: run `gh pr update-branch <number>`, which merges the base
+   without a force-push, re-read `headRefOid` with `gh pr view`, and rerun
+   gates 1 to 5 on that head. Any other exit status fails the gate with the
+   error. After three updates of one PR in one run, stop and report that the
+   base keeps moving. When the PR has no checks, the report says that no
+   check ran against the current base.
 
 ## 3. Merge, bottom-up
 
@@ -136,9 +139,10 @@ gh pr merge <number> --merge --match-head-commit <headRefOid>
 gh pr view <number> --json state,mergeCommit -q '.state+" "+.mergeCommit.oid'
 ```
 
-Immediately before each merge, re-run gate 2, the gate 5 command, and gate 1
-too if a review arrived since the last check. When the gate 5 command no
-longer prints `ancestor exit 0`, go back to gate 5. A base commit that lands
+Immediately before each merge, re-run gates 2 and 4, the gate 5 command (or
+the parent-merge proof for a child that passed by it), and gate 1 too if a
+review arrived since the last check. When gate 4 or 5 no longer passes, go
+back to gate 5. A base commit that lands
 after this check is caught only by branch protection that requires up-to-date
 branches, or by a merge queue. A reviewer can open a thread during the CI wait
 or while earlier stack PRs merge, and `--match-head-commit` only refuses the
@@ -158,10 +162,30 @@ gh pr edit <child> --base <default-branch>
 
 If the repository deleted the parent branch on merge, GitHub retargets the
 child itself; check `baseRefName` rather than assuming. Retargeting keeps the
-head SHA, and the child's head never contains the commit its parent's merge
-wrote to the base, so gate 5 fails on it. Run `gh pr update-branch <child>` at
-once, re-read the child's `headRefOid`, and rerun gates 1 to 5 on it. Never
-merge a child on CI from its old base.
+head SHA, so gate 3 reads the CI result it already passed instead of waiting
+for a new run. The child's head lacks the commit its parent's merge wrote to
+the base, so gate 5 prints `ancestor exit 1`. When the parent merged with
+`--merge` in this run, the parent-merge proof can pass gate 5 instead.
+`<parentHeadOid>` is the SHA passed to the parent's `--match-head-commit`,
+and `<parentMergeOid>` is its `mergeCommit.oid`:
+
+```bash
+gh api "repos/<owner>/<repo>/branches/<base>" --jq .commit.sha
+git fetch <remote> <base> "refs/pull/<child>/head"
+git merge-base --is-ancestor <parentHeadOid> <childHeadOid>; echo "parent-in-child exit $?"
+git rev-parse "<parentMergeOid>^{tree}" "<parentHeadOid>^{tree}"
+```
+
+The proof passes when the first command prints `<parentMergeOid>`, so
+nothing else reached the base, `parent-in-child exit 0` follows, and the two
+tree hashes are equal. The base then holds exactly the parent's files, and
+the child already contains the parent, so merging the child lands exactly
+the child's own files, the ones its CI tested. The proof reads GitHub's
+branch tip and stored commits, so a stale remote-tracking ref or a local
+merge driver cannot fake it. Merge the child on its unchanged head; do not
+run `gh pr update-branch` on it, because the new head SHA restarts CI on the
+same files. When any part fails, or gate 4 reports `BEHIND`, take gate 5's
+update path and wait for CI on the new head.
 
 ## 4. Clean up each merged branch
 
