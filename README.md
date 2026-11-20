@@ -211,7 +211,7 @@ project-size spec.
 
 OpenCode's server configuration is `~/.config/opencode/opencode.json`; terminal
 settings are in `cli.json`, and custom agents in `agents/`. The configured
-default is `plan` with `openai/gpt-6.1-sol` and high reasoning. The CLI theme is
+default is `plan` with `openai/gpt-6.2-sol` and high reasoning. The CLI theme is
 Catppuccin dark. Its template includes Orca's status plugin only when the local
 entrypoint exists; preview/apply `cli.json` again after installing Orca.
 
