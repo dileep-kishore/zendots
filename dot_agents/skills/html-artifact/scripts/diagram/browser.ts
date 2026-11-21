@@ -4,7 +4,7 @@ import { KINDS } from './kinds';
 import { placeNotes } from './notes';
 import { bounds, esc, iconSvg, ICON_GAP, ICON_SIZE, itemSvg, legendRows, legendSvg, shift, stroke, tint, type Role, type SItem } from './scene';
 
-declare global { interface Window { renderDiagram: (g: Graph, o: Opts) => Promise<{ svg: string; W: number; H: number; violations: Violation[]; strict: boolean }> } }
+declare global { interface Window { renderDiagram: (g: Graph, o: Opts) => Promise<{ svg: string; W: number; H: number; violations: Violation[]; strict: boolean; items: SItem[] }> } }
 
 // Measured with the template's own faces, served by diagram-export.ts under these names.
 const MEASURE = {
@@ -21,9 +21,11 @@ const LINE = { title: 19, titleMono: 18, detail: 16, edge: 15, group: 14, legend
 // Fallback faces run wider than SN Pro and iA Writer; the slack keeps text inside its box.
 const SLACK = 1.06;
 
-function markers(id: string, open: boolean) {
-  const arrow = `<marker id="${id}-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3)"/></marker>`;
-  const hollow = `<marker id="${id}-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/></marker>`;
+// The graph kind keeps its original grey marker; newer kinds colour each head like its line where context-stroke works.
+function markers(id: string, open: boolean, matchStroke = false) {
+  const fill = matchStroke ? 'fill:var(--ink-3);fill:context-stroke' : 'fill:var(--ink-3)';
+  const arrow = `<marker id="${id}-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="${fill}"/></marker>`;
+  const hollow = `<marker id="${id}-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9" style="fill:none;stroke:var(--ink-3);stroke:context-stroke;stroke-width:1.4"/></marker>`;
   return `<defs>${arrow}${open ? hollow : ''}</defs>`;
 }
 
@@ -54,8 +56,8 @@ window.renderDiagram = async (g, o) => {
     const H = Math.ceil(b.y1 - b.y0 + 2 * pad + legendH);
     const violations = checkScene({ W, H, items });
     const open = items.some(it => it.t === 'path' && it.marker === 'open');
-    const out = [...header(W, H), markers(id, open), ...items.map(it => itemSvg(it, id)), ...legendSvg(rows, H - legendH, DRAW.legend), '</svg>'];
-    return { svg: out.join('\n'), W, H, violations, strict: true };
+    const out = [...header(W, H), markers(id, open, true), ...items.map(it => itemSvg(it, id)), ...legendSvg(rows, H - legendH, DRAW.legend), '</svg>'];
+    return { svg: out.join('\n'), W, H, violations, strict: true, items };
   }
 
   // The graph kind below keeps its original drawing code, so specs without notes or icons render byte-for-byte as before.
@@ -170,5 +172,5 @@ window.renderDiagram = async (g, o) => {
     }
   });
   out.push('</svg>');
-  return { svg: out.join('\n'), W, H, violations: checkScene({ W, H, items: geom }), strict: false };
+  return { svg: out.join('\n'), W, H, violations: checkScene({ W, H, items: geom }), strict: false, items: geom };
 };

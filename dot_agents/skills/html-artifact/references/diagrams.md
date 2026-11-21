@@ -134,6 +134,39 @@ change `direction`, or split the figure. Text is measured with SN Pro and iA
 Writer Mono plus 6% slack, so an offline reader with neither face still sees
 labels inside their boxes. Check the result in both themes after pasting it.
 
+## Sequence (`"kind": "sequence"`)
+
+For who calls whom, in what order, and what comes back: a request path, an
+auth handshake, a retry. Actors sit in a row; time runs down.
+
+```json
+{"id": "refresh", "kind": "sequence", "alt": "...",
+ "actors": [{"id": "web", "title": "Browser", "icon": "laptop"}, {"id": "api", "title": "API"},
+            {"id": "auth", "title": "Auth service", "icon": "key"}],
+ "messages": [
+   {"from": "web", "to": "api", "label": "GET /orders"},
+   {"from": "api", "to": "web", "label": "401", "type": "return"},
+   {"from": "web", "to": "auth", "label": "POST /refresh"},
+   {"id": "token", "from": "auth", "to": "web", "label": "new token", "type": "return", "tone": "accent"}],
+ "frames": [{"op": "opt", "guard": "token expired", "start": 1, "end": 3}]}
+```
+
+- `actors[]`: `id`, `title`, optional `detail`, `icon`, `tone`, drawn like
+  graph nodes.
+- `messages[]`: `from`, `to`, `label`, optional `id` (a note target), `tone`
+  and `type`: `call` (solid, filled head; the default), `return` (dashed,
+  filled head) or `async` (dashed, open head). `from` equal to `to` draws a
+  self-message loop.
+- `frames[]`: `op` (`opt`, `alt`, `loop`), `guard`, and `start` and `end`,
+  0-based inclusive message indexes. An `alt` also takes `else`, the index of
+  the first message after the divider (`start < else <= end`), and an
+  optional `elseGuard`. Frames nest one level; partly overlapping frames, a
+  third level, or an inner frame across an `else` divider are errors.
+- Each label sits above its arrow beside the source lifeline, so a message
+  that skips an actor never writes over the skipped lifeline. Columns widen
+  to fit labels, self-loops and frame guards. Activation bars are not drawn.
+- Budget: 6 actors and 16 messages; above that, split the exchange.
+
 ## Layer stack (`"kind": "layers"`)
 
 For a real hierarchy: a tech stack, abstraction levels, enforcement points, a
