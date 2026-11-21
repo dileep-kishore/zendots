@@ -7,20 +7,26 @@ write the change. Model IDs age: take the newest flagship of each family from
 `orchestrator_capabilities` or the CLI's model list, and update this table
 when one is replaced. Gemini 4 Neon replaced Carbon in the council seat on
 19 November 2026, after the PR #97 replay below, and Carbon left the roster.
-Argon keeps the tier 2 seat until Neon has about five calibration rows. Use
-Neon at high: the LBL enterprise Gemini project rejects `xhigh` with HTTP 400
-through `agy`, though T3 lists it.
+On 20 November 2026 the user moved Neon ahead of Argon into the tier 2 seat.
+Neon reviews about as well as Claude Opus, and sometimes better. Its
+Antigravity allocation is smaller than the Claude and OpenAI allocations, so
+it ranks below them. Argon stays only as Neon's tier 3 fallback. Use Neon at
+high: the LBL enterprise Gemini project rejects `xhigh` with HTTP 400 through
+`agy`, though T3 lists it.
 
 | Rank | Reviewer | Family | Seats |
 |---|---|---|---|
-| 1 | GPT-6.2 Sol, high effort | OpenAI | tiers 1-3, verifier |
-| 2 | Gemini 4 Argon, high thinking, through Antigravity | Google | tier 2; Neon's fallback in tier 3 |
-| 2 | Gemini 4 Neon, high thinking, through Antigravity | Google | tier 3 |
-| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3; Argon's fallback in tier 2 |
-| - | Claude Opus 5.5, high effort | Anthropic | rank 1 when Claude did not write the change; verifier |
+| 1 | GPT-6.2 Sol, high effort | OpenAI | tiers 1-3 when Codex did not write the change; verifier |
+| 1 | Claude Opus 5.5, high effort | Anthropic | tiers 1-3 when Codex wrote the change; verifier |
+| 2 | Gemini 4 Neon, high thinking, through Antigravity | Google | tiers 2-3 |
+| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3; Neon's fallback in tier 2 |
+| - | Gemini 4 Argon, high thinking, through Antigravity | Google | Neon's fallback in tier 3 |
 | - | Claude Sonnet 5.5, high effort | Anthropic | extra tier 2 seat when Claude wrote the change |
 
-When Codex wrote the change, Claude Opus takes rank 1 and Sol drops out.
+Rank 1 goes to the frontier model from the other family than the one that
+wrote the change: Sol when Claude wrote it, Claude Opus when Codex wrote it.
+When neither wrote it, Sol takes rank 1 and Claude Opus serves only as a
+verifier.
 
 Sonnet shares the author's family when Claude wrote the change, so it adds a
 seat and never fills a cross-family one. The user chose it for tier 2 on 12
@@ -32,11 +38,10 @@ findings; its calibration rows decide whether it keeps the seat.
 - **Tier 1:** the first eligible reviewer.
 - **Tier 2:** the first two eligible reviewers, plus Claude Sonnet when
   Claude wrote the change.
-- **Tier 3 (council):** the first three eligible reviewers, with Neon in
-  the Gemini seat and Grok included.
+- **Tier 3 (council):** the first three eligible reviewers.
 
 A seat whose reviewer is unavailable goes to the next eligible reviewer.
-Grok fills a tier 2 seat only as Argon's fallback, and Argon fills a tier 3
+Grok fills a tier 2 seat only as Neon's fallback, and Argon fills a tier 3
 seat only as Neon's fallback, under Gemini finders below. With no eligible substitute, leave the seat empty and label the
 review partial. Say which seat moved or stayed empty, and why.
 
@@ -93,9 +98,9 @@ deadline. When another finder's completion wakes the coordinator after a
 Gemini task's 20 minutes have passed, cancel that task with `task_cancel` and
 fall back as below.
 
-In tier 2, at Argon's deadline, stop it and
+In tier 2, at Neon's deadline, stop it and
 launch Grok 4.7 high fast with the same brief, minus the reading budget, into
-that seat. Do the same at once when Argon is unavailable or its launch fails.
+that seat. Do the same at once when Neon is unavailable or its launch fails.
 Grok gets its own 20-minute deadline; if it misses that too, label the seat
 partial.
 
@@ -118,7 +123,7 @@ fallback named here (Sol, Grok, or Claude Opus in its own seat) stays
 partial.
 
 A November 2026 bake-off on one 46-line diff with five known defects set
-this order: Sol found 5 of 5 in 38 seconds, Argon 5 of 5 in about 2
+the first order: Sol found 5 of 5 in 38 seconds, Argon 5 of 5 in about 2
 minutes, and Grok high fast 4 of 5 in about 3 minutes, with severity
 inflated to P0. One small diff cannot separate Sol from Argon; the
 calibration log decides from here.
@@ -181,7 +186,7 @@ report: save it unchanged to the report path.
 | Argon | `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
 | Neon | `providerInstanceId: "antigravity"`, `model: "gemini-4-neon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-neon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
 | Claude Sonnet | `providerInstanceId: "claudeAgent"`, `model: "claude-sonnet-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-sonnet-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
-| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}`; as Argon's fallback, `fastMode: true` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout; as Argon's fallback, `--model grok-4.7-high-fast` |
+| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}`; as Neon's tier 2 fallback, `fastMode: true` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout; as Neon's tier 2 fallback, `--model grok-4.7-high-fast` |
 | Claude Opus | `providerInstanceId: "claudeAgent"`, `model: "claude-opus-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-opus-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
 
 `<prompt>` is one short line: read the brief at its absolute path and follow
@@ -208,7 +213,7 @@ Every finder ends its verdict with a score out of 10. The final report and
 the PR's Verification section carry one line per review:
 
 ```text
-Independent review, tier 2 deep: GPT-6.2 Sol 7/10, Gemini 4 Argon 8/10; 2 confirmed and fixed, 1 refuted.
+Independent review, tier 2 deep: GPT-6.2 Sol 7/10, Gemini 4 Neon 8/10; 2 confirmed and fixed, 1 refuted.
 ```
 
 A repeat review appends its scores (`Sol 7 -> 9/10`). A reviewer that gave
@@ -236,7 +241,4 @@ means unknown; never fill old rows with `0`.
 `model` names the model that ran, not the seat it filled. Strip tabs and
 newlines from cells. When a reviewer has about ten rows, report its
 confirmed and unique rates and its median minutes, and propose a roster change
-if they support one. Neon is the exception: after about five council rows,
-compare it with Argon's rows and propose whether it should take the tier 2
-seat;
-the user approves changes to this file.
+if they support one; the user approves changes to this file.
