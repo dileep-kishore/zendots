@@ -204,8 +204,8 @@ verifiers. Performance findings must connect a concrete consequence to expected
 load supported by repository evidence, including tests or code bounds, with
 assumptions stated. A design review checks a spec before planning against the
 user's recorded words and its done checks, with a Claude and a Codex finder and
-gates that need no code yet; the global `AGENTS.md` runs one for every
-project-size spec.
+gates that need no code yet; the `plan-feature` skill runs one for every spec
+it writes.
 
 ### OpenCode V2 and Pi
 
@@ -215,10 +215,13 @@ default is `plan` with `openai/gpt-6.2-sol` and high reasoning. The CLI theme is
 Catppuccin dark. Its template includes Orca's status plugin only when the local
 entrypoint exists; preview/apply `cli.json` again after installing Orca.
 
-Notifier uses a pinned package version. Superpowers is pinned to a
-full Git commit and registers its own skills. Update that pin in `opencode.json`,
-not a separate checkout. `sync_skill_collections.sh` only removes known legacy
-Superpowers symlinks and leaves the old checkout alone. Refer to the
+Notifier uses a pinned package version. Superpowers was retired on
+2026-11-21. After applying that change on a host, run
+`~/.local/bin/link-agent-skills.sh` and
+`~/.config/opencode/sync_skill_collections.sh` there. The second removes only
+the known legacy Superpowers symlinks and leaves the old checkout alone. Codex
+holds Superpowers as an account-level plugin, so also run
+`codex plugin remove superpowers@openai-curated-remote` on each host. Refer to the
 [OpenCode V2 guides](https://opencode.ai/v2/docs/) for configuration fields.
 
 Pi's persistent modes, custom agents, package configuration, and session handoff

@@ -28,104 +28,87 @@
 - A request that names an outcome authorizes its routine steps: asking for a
   PR covers committing, pushing, and opening it; asking to address review
   covers fixes, pushes, and thread replies. Skip skill checkpoints that ask me
-  to approve such steps and report what you did instead. When Superpowers'
-  finishing menu would ask, open a PR with `open-pr` if I asked to ship;
-  otherwise keep the branch as it is and say so.
-- Spec and planning workflows, Superpowers included: interview me first with
-  multiple-choice questions on the unresolved consequential decisions,
-  typically 3 to 6 and fewer when appropriate, one at a time, each with a
-  marked recommendation and a one-line reason. Self-review the spec or plan,
-  then present only its key decisions for approval. If I say to proceed
-  without questions, decide the routine choices, record them as assumptions,
-  and still ask each major decision as the next bullet says. When I ask to
-  turn the conversation into a spec, write it from what was said, sized to
-  the change and saved where the project keeps specs, without another
-  interview. Skip the spec, intent file, design review, and Superpowers
-  `brainstorming` for an obvious change to one or two files when no major
-  decision is open, and say that you skipped them.
-- A decision is major when two sound options would change what a person
-  sees, what is stored or deleted, who can do something, a public interface
-  or config key, a dependency, a done check or tolerance, or a scientific
-  method or claim, and my request did not already choose. A choice within
-  approved behavior and an existing project convention is routine. A fact
-  that a short run can show, such as how a library or flag behaves, how long
-  a step takes, or what a command prints, is not a question for me: probe it
-  in a scratch directory within 20 minutes, delete the probe, and cite what
-  it showed. The probe informs a decision and never makes a major one. "Do
-  everything yourself", "no questions", and a hands-off run hand you every
-  routine choice and no major one. Ask each major decision through the
-  question tool as multiple choice, with your recommendation marked and a
-  one-line reason. Keep doing the work that does not depend on the answer,
-  and build nothing on the open choice. Without a question tool, finish
-  that work, then open your final message with the question. For major
-  decisions this overrides the offer to skip questions in Superpowers
-  `brainstorming` and "Rulings, not stalls" in `executing-plans` and
-  `subagent-driven-development`.
+  to approve such steps and report what you did instead. When work on a branch
+  is finished, open a PR with `open-pr` if I asked to ship; otherwise keep the
+  branch as it is and say so.
+- A request to build, brainstorm, or design a feature that spans several files
+  and leaves major decisions open starts with `plan-feature`: interview me
+  before presenting a finished design or plan, and write no code until I
+  approve the spec. When I ask to turn the conversation into a spec, write it
+  from what was said, without another interview. Skip the spec for an obvious
+  change to one or two files when no major decision is open, and say that you
+  skipped it. Every session that builds from a spec follows its build rules,
+  runs its done checks before the final review, and refreshes the summary page
+  before cleanup.
+- A decision is major when two sound options would change what a person sees,
+  what is stored or deleted, who can do something, a public interface or
+  config key, a dependency, a done check or tolerance, or a scientific method
+  or claim, and my request did not already choose. A choice within approved
+  behavior and an existing project convention is routine. A fact that a short
+  run can show, such as how a library or flag behaves, how long a step takes,
+  or what a command prints, is not a question for me: probe it in a scratch
+  directory within 20 minutes, delete the probe, and cite what it showed. The
+  probe informs a decision and never makes a major one. "Do everything
+  yourself", "no questions", and a hands-off run hand you every routine choice
+  and no major one.
+- I steer at the start and then leave the work to run. Before work starts,
+  ask every major decision you can foresee in one round, as multiple choice
+  with your recommendation first and labeled, plus a one-line reason: in one
+  question-tool call when the tool holds them all, otherwise as one numbered
+  list that ends your message. Until I answer, limit the work to reading,
+  probing, and changes that stay identical under every option. When a new
+  major decision comes up after I approve the start, finish the work that does
+  not depend on it, then ask it the same way and stop; the work that depends
+  on it waits for my answer.
 - I read the feature summary page, not specs or plans; write it in
-  `html-artifact`'s feature-page format. For a project-size spec, the
-  interviewing session writes `<spec>-intent.md` beside it as I answer: my
-  messages verbatim, each beside the question and options it answers, each
-  consequential default I never discussed, and an amendment log. The spec
-  gets 3 to 6 done checks that fit the work, each an observable result with
-  the command that shows it: a known answer, a reference comparison, a
-  property, a run on real inputs (for an app, from empty state in the client
-  I use), or degenerate input. Before planning, run `independent-review` on
-  the spec as a design review. Plans and builds may make routine changes to
-  the spec when they hit problems; log each in one line. A major change
-  asks first. Never edit my quoted
-  words; correcting a done check or excluding something I asked for keeps
-  the original and the evidence. Run the done checks before the final review
-  and rerun affected ones after its fixes. Before cleanup, refresh the
-  summary page with the undiscussed defaults, each done check's result and
-  revision, and changes to my requests or a done check.
+  `html-artifact`'s feature-page format.
 - Keep changes focused and complexity proportionate. Before fixing a bug,
   trace the failing path and search for callers of the operation causing it,
   including affected sibling paths. Before deleting or renaming code, config,
   or files, search for string and dynamic references too. Include required
-  tests, fixtures, config, and exports when behavior changes. Preserve required
-  validation, error handling, and compatibility during moves or simplification.
-  Preserve unrelated and in-progress work in the checkout.
-- Delegate to subagents when work splits into large independent parts
-  (audits, migrations, broad research) or would flood your context, not for
-  what a few tool calls finish. Give each a bounded task, the files it may
-  edit, and the evidence to return; check that evidence before accepting it.
-  One agent drives any shared app session.
-- Tests are lasting maintenance. Before adding one, name the failure it
-  would catch and the existing check that misses it, in the plan step or
-  your report. When no such failure exists, or an existing check already
-  catches it, add none. Extend an existing test at the highest useful seam
-  before writing a new one. Add no test per function, per task, or per
-  refactor, and none only because code had none. A plan task without a new
-  test names the existing check that covers it. Use test-first when it
-  clarifies a bug fix, and a smoke check for reversible, low-impact
-  changes. A verification command is not a test file. This overrides the
-  per-function checklist and the rule against production code without a
-  failing test in Superpowers `test-driven-development`, and the test step
-  in every task of `writing-plans` and `executing-plans`. Honor repository
-  requirements, which outrank every skill, and reuse the project's
-  verification recipes. `verify-this` settles a disputed claim;
-  suggest `create-verification-skill` for a recurring manual check,
-  `maintain-verification-skill` when a recipe drifts, and `correct` when I
-  correct the same kind of mistake a second time.
+  tests, fixtures, config, and exports when behavior changes. Preserve
+  required validation, error handling, and compatibility during moves or
+  simplification. Before a refactor whose existing tests would miss a change
+  in output, save the old outputs, compare the new ones, and delete the probe
+  before committing. Land a change too wide for one green PR as expand,
+  migrate callers, contract. Preserve unrelated and in-progress work in the
+  checkout.
+- Delegate to subagents when work splits into large independent parts (audits,
+  migrations, broad research) or would flood your context, not for what a few
+  tool calls finish. Give each a bounded task, the files it may edit, and the
+  evidence to return; check that evidence before accepting it. One agent
+  drives any shared app session.
+- Tests are lasting maintenance. Before adding one, name the failure it would
+  catch and the existing check that misses it, in the plan step or your
+  report. When no such failure exists, or an existing check already catches
+  it, add none. Extend an existing test at the highest useful seam before
+  writing a new one. Add no test per function, per task, or per refactor, and
+  none only because code had none. A plan task without a new test names the
+  existing check that covers it. Use test-first when it clarifies a bug fix,
+  and a smoke check for reversible, low-impact changes. A verification command
+  is not a test file. Honor repository requirements, which outrank every
+  skill, and reuse the project's verification recipes. `verify-this` settles a
+  disputed claim; suggest `create-verification-skill` for a recurring manual
+  check, `maintain-verification-skill` when a recipe drifts, and `correct`
+  when I correct the same kind of mistake a second time.
 - After a change that is not trivial passes its check, run one
   `independent-review` of the whole working change, untracked files included,
   at the reviewer tier that skill picks. Fix each finding its verifier
   confirms, fix or explain each plausible one, then rerun affected checks. A
   second review needs a concrete new concern; this replaces other skills'
-  review rounds, including Superpowers `requesting-code-review` and the task
-  and final reviewers in `subagent-driven-development` and `executing-plans`.
-  When behavior, APIs, or setup changed, update the docs in the same change
-  with `doc-updater`. A change is trivial when it edits only comments,
-  documentation, or formatting and changes no behavior. Trivial changes need
-  only a self-check, and so does a reversible personal setting whose effect I
-  see directly, such as a keybinding, a color, or an alias.
-- In research answers, mark what you couldn't confirm and say where you looked.
+  review rounds. When behavior, APIs, or setup changed, update the docs in the
+  same change with `doc-updater`. A change is trivial when it edits only
+  comments, documentation, or formatting and changes no behavior. Trivial
+  changes need only a self-check, and so does a reversible personal setting
+  whose effect I see directly, such as a keybinding, a color, or an alias.
+- In research answers, mark what you couldn't confirm and say where you
+  looked.
 - Lead with the outcome and explain the important decisions for someone who
   has not followed the session. The first and last lines stand alone: what
   happened, and what is waiting on me. End a long or multi-step run with three
   headings: Blocked on me, Changed, Found. Order lists by importance.
-- Assume I return without the scrollback. Name the project, branch, and PR
-  in status reports, and make each question self-contained: its background,
+- Assume I return without the scrollback. Name the project, branch, and PR in
+  status reports, and make each question self-contained: its background,
   options, and your recommendation, with no "the earlier fix" or "option B".
 - Write prose a reader can act on: name the mechanism, number, or instruction
   instead of how something feels, and cut a sentence that would fit unchanged
@@ -135,9 +118,9 @@
   ("drift-safe pass", "north star").
 - Use a list only for parallel items, written as sentences rather than bold
   labels with colons. Separate clauses with periods, commas, or colons, never
-  em dashes. State a point directly rather than against one nobody raised
-  ("X, not Y", "not just X"). These writing rules cover prose you write:
-  replies and new text in documents, commits, and PRs. Leave existing prose,
+  em dashes. State a point directly rather than against one nobody raised ("X,
+  not Y", "not just X"). These writing rules cover prose you write: replies
+  and new text in documents, commits, and PRs. Leave existing prose,
   quotations, code, identifiers, and exact strings as they are unless I ask
   you to edit them, and follow a file's established conventions where they
   differ.
@@ -147,9 +130,9 @@
 - Don't add skill-branded comments such as `ponytail:`.
 - Code comments carry what the code cannot show: a reason, constraint, edge
   case, or trap, in one line, two only when the second is a new fact. No
-  banners, step narration, restated lines or signatures, end-of-block
-  markers, emoji, or TODOs that name no task. `clean-comments` removes these
-  from existing code.
+  banners, step narration, restated lines or signatures, end-of-block markers,
+  emoji, or TODOs that name no task. `clean-comments` removes these from
+  existing code.
 - Use `check-web-ui` when you build, test, or review a web UI.
 
 ## Tools and preferences
@@ -195,10 +178,14 @@
   fail the same check, write the assumption down and run an observation that
   would come out differently if it were false, before any third fix. If the
   observation refutes it, look for the cause the failures share; if it holds
-  and you are still stuck, report the blocker with evidence.
+  and you are still stuck, report the blocker with evidence. When evidence
+  refutes a debugging hypothesis, revert the edits it led to.
 - On long runs, keep the task list in a file so it survives context
-  compaction, plus a `show-me-your-work` decision log for long or unattended
-  runs. Scheduled jobs and automatic wake-ups need an explicit request.
+  compaction, and for a multi-task build record each finished task's check
+  and commit, if any, there and check it against `git log` and the working
+  diff after compaction, plus a
+  `show-me-your-work` decision log for long or unattended runs. Scheduled jobs
+  and automatic wake-ups need an explicit request.
 - Work is not done while a command or subagent you started is still running.
   Then stop the dev servers and browser sessions you started, keeping evidence
   and my own sessions. Before deleting a background job's output, kill its

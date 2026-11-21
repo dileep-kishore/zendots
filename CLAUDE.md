@@ -136,11 +136,16 @@ chezmoi with a source entry and a removal for the same path.
   The store is visible to Claude Code through those symlinks, so adding a skill
   an enabled plugin already provides puts two copies in one session. Compare
   against `~/.claude/plugins` and `enabledPlugins` in `~/.claude/settings.json`.
-- OpenCode V2 loads Superpowers from a pinned Git package in `opencode.json`;
-  its plugin registers the skills and bootstrap. Do not add its skills to
-  `~/.agents/skills` or link its plugin separately, which would duplicate them.
-  `~/.config/opencode/sync_skill_collections.sh` now removes only the legacy
-  helper's known symlinks and leaves the old unmanaged checkout untouched.
+- Superpowers was retired on 2026-11-21 from Claude Code, Codex, and OpenCode;
+  the global AGENTS.md and the `plan-feature` skill carry its interview, spec,
+  and plan rules. Specs and plans still default to the ignored
+  `docs/superpowers/` folder. On each host, after the scoped apply, run
+  `~/.local/bin/link-agent-skills.sh` so Claude Code finds `plan-feature`, and
+  `~/.config/opencode/sync_skill_collections.sh` once; the second removes only
+  the old helper's known symlinks and leaves the old unmanaged checkout
+  untouched. Codex
+  holds Superpowers as an account-level plugin, which chezmoi cannot remove:
+  run `codex plugin remove superpowers@openai-curated-remote` on each host.
 - **A plugin skill wanted in another harness is linked, not copied.**
   `~/.config/opencode/skills/frontend-design` and
   `~/.codex/skills/frontend-design` are chezmoi-managed relative symlinks into

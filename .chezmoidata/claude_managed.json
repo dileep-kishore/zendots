@@ -31,7 +31,7 @@
       "pyright-lsp@claude-plugins-official": true,
       "code-simplifier@claude-plugins-official": true,
       "ralph-loop@claude-plugins-official": false,
-      "superpowers@claude-plugins-official": true,
+      "superpowers@claude-plugins-official": false,
       "productivity@knowledge-work-plugins": false,
       "bio-research@knowledge-work-plugins": false,
       "claude-md-management@claude-plugins-official": true,
