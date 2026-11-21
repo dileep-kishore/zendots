@@ -1701,7 +1701,7 @@ figure.diff { gap: 10px; }
    {"calculate": "datum.step === 'End' ? 0 : datum.to - datum.delta", "as": "from"},
    {"calculate": "datum.step === 'Start' ? 0 : datum.from", "as": "from"},
    {"calculate": "datum.step === 'Start' || datum.step === 'End' ? 'total' : datum.delta > 0 ? 'up' : 'down'", "as": "kind"},
-   {"calculate": "datum.kind === 'total' ? format(datum.to, 'd') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), 'd')", "as": "label"},
+   {"calculate": "datum.kind === 'total' ? format(datum.to, ',') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), ',')", "as": "label"},
    {"calculate": "max(datum.from, datum.to)", "as": "top"}],
  "encoding": {"x": {"field": "step", "type": "nominal", "sort": null, "title": null}},
  "layer": [
@@ -1784,7 +1784,7 @@ figure.diff { gap: 10px; }
    {"week": "W3", "team": "Atlas", "pts": 27}, {"week": "W3", "team": "Birch", "pts": 35}, {"week": "W3", "team": "Cove", "pts": 30}, {"week": "W3", "team": "Dune", "pts": 21}]},
  "transform": [{"window": [{"op": "row_number", "as": "rank"}], "sort": [{"field": "pts", "order": "descending"}, {"field": "team"}], "groupby": ["week"]}],
  "encoding": {"x": {"field": "week", "type": "ordinal", "title": null, "scale": {"padding": 0.3}},
-              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "scale": {"domain": [1, 2, 3, 4]}},
+              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "sort": "ascending"},
               "detail": {"field": "team"},
               "color": {"condition": {"test": "datum.team == 'Cove'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
  "layer": [

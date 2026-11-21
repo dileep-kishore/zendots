@@ -44,14 +44,15 @@ works step by step, when work ran, or what the reader must decide, use the
 components in [references/components.md](references/components.md); it is a
 guide, not a checklist.
 
-Diagrams are written as a short JSON spec and laid out by the bundled
-command in [references/diagrams.md](references/diagrams.md); never place
-coordinates by hand. Besides the `graph` kind for parts and flows, it draws
-a `sequence` of calls between actors, a `swimlane` of who does what, a
-`layers` stack, and a `quadrant` of options on two axes, each with optional
-callouts and icons. Its output is inline SVG on the page's own tokens, and it
-refuses a drawing whose labels collide. A schedule goes in `.timeline` or
-duration lanes, and a step-by-step mechanism in a stepper over inline SVG
+Diagrams are written as a short JSON spec and laid out by the bundled command
+in [references/diagrams.md](references/diagrams.md); never place coordinates
+by hand. Besides the `graph` kind for parts and flows, it draws a `sequence`
+of calls between actors, a `swimlane` of who does what, a `layers` stack, and
+a `quadrant` of options on two axes, each with optional callouts and, except
+the quadrant, icons. Its output is inline SVG on the page's own tokens. It
+refuses a new-kind drawing whose labels collide, and warns for a graph. A
+schedule goes in `.timeline` or duration lanes, and a step-by-step mechanism
+in a stepper over inline SVG
 ([references/components.md](references/components.md)). Before keeping a
 figure, apply the remove test in `references/visuals.md`. For a huge diagram
 you may offer hand-drawn Mermaid, and use it only when the user explicitly

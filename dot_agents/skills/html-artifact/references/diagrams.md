@@ -69,7 +69,8 @@ update them in a temporary workspace and copy back the manifest and
 
 ## Callouts and icons
 
-Both work on every kind.
+Callouts work on every kind; icons on graph nodes, sequence actors, swimlane
+steps and layers, not on quadrant items.
 
 - `notes`: at most two callouts, each `{"target": "<id>", "text": "..."}`.
   A callout carries the one remark the reader should take from the drawing,
@@ -245,5 +246,5 @@ reach against frequency. Positions come from the data, never from layout.
   in a column inside the quadrant, each joined to its dot by a hairline
   leader. The plot grows from 480 units up to 780 when labels need room, and
   the command stops and names the items when they still do not fit.
-- Budget: about 9 items; it warns above 12. A note works best on an item
-  near the left or right edge.
+- Budget: about 9 items; it warns above 12. A note goes on whichever side of
+  its item is free of the item's own label and of other items.

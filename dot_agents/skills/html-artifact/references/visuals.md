@@ -224,7 +224,8 @@ data. Change the data and labels, keep the transforms.
 
 A **waterfall** bridges a start total to an end total through signed steps.
 The running total comes from a window sum, so the end bar always equals the
-start plus the steps; give the last row `"delta": 0`. The transforms name
+start plus the steps; give the last row `"delta": 0`. Labels print the values
+as given, decimals included, with thousands separators. The transforms name
 the first and last rows `Start` and `End`; rename them there too. Totals are muted,
 rises green, falls red, and every bar prints its value.
 
@@ -242,7 +243,7 @@ rises green, falls red, and every bar prints its value.
    {"calculate": "datum.step === 'End' ? 0 : datum.to - datum.delta", "as": "from"},
    {"calculate": "datum.step === 'Start' ? 0 : datum.from", "as": "from"},
    {"calculate": "datum.step === 'Start' || datum.step === 'End' ? 'total' : datum.delta > 0 ? 'up' : 'down'", "as": "kind"},
-   {"calculate": "datum.kind === 'total' ? format(datum.to, 'd') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), 'd')", "as": "label"},
+   {"calculate": "datum.kind === 'total' ? format(datum.to, ',') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), ',')", "as": "label"},
    {"calculate": "max(datum.from, datum.to)", "as": "top"}],
  "encoding": {"x": {"field": "step", "type": "nominal", "sort": null, "title": null}},
  "layer": [
@@ -319,8 +320,8 @@ fewer than about eight points per group, plot the points instead.
 
 A **bump chart** shows rank movement across three or more snapshots. Ranks
 come from a `row_number` window sorted by value with ties broken by name, so
-equal scores never share a rank. Rank 1 is at the top; the end labels carry
-the last value.
+equal scores never share a rank. Rank 1 is at the top and the axis takes as many
+ranks as there are entities; the end labels carry the last value.
 
 ```json
 {"width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 220,
@@ -330,7 +331,7 @@ the last value.
    {"week": "W3", "team": "Atlas", "pts": 27}, {"week": "W3", "team": "Birch", "pts": 35}, {"week": "W3", "team": "Cove", "pts": 30}, {"week": "W3", "team": "Dune", "pts": 21}]},
  "transform": [{"window": [{"op": "row_number", "as": "rank"}], "sort": [{"field": "pts", "order": "descending"}, {"field": "team"}], "groupby": ["week"]}],
  "encoding": {"x": {"field": "week", "type": "ordinal", "title": null, "scale": {"padding": 0.3}},
-              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "scale": {"domain": [1, 2, 3, 4]}},
+              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "sort": "ascending"},
               "detail": {"field": "team"},
               "color": {"condition": {"test": "datum.team == 'Cove'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
  "layer": [
