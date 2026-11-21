@@ -7,7 +7,7 @@ SUPERPOWERS_DIR="${OPENCODE_CONFIG_DIR}/superpowers"
 PLUGIN_LINK="${OPENCODE_CONFIG_DIR}/plugins/superpowers.js"
 SKILLS_LINK="${OPENCODE_CONFIG_DIR}/skills/superpowers"
 
-# Superpowers is now loaded once from the pinned package in opencode.json.
+# Superpowers was retired on 2026-11-21.
 # Retire only links created by the old helper, never their targets or real files.
 for link in "${PLUGIN_LINK}" "${SKILLS_LINK}"; do
   if [[ ! -e "${link}" && ! -L "${link}" ]]; then
@@ -39,4 +39,4 @@ for link in "${PLUGIN_LINK}" "${SKILLS_LINK}"; do
   fi
 done
 
-echo "Superpowers is managed by the pinned V2 package; the local checkout is untouched."
+echo "Superpowers is retired; the old local checkout is untouched."

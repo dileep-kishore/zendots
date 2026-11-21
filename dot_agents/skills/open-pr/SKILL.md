@@ -36,8 +36,8 @@ Read the body again just before `gh pr edit`; if it changed since the
 survey, merge those edits too.
 
 `base` is the branch this work forked from, not always the default: an open
-PR's base, or the base a calling workflow already settled (Superpowers'
-finishing step does), wins over the default above. Use it for every
+PR's base, or the base a calling workflow already settled, wins over the
+default above. Use it for every
 `origin/$base`, the survey's `git log` included, and pass it to
 `gh pr create --base`.
 
