@@ -84,8 +84,9 @@ User-chosen Mermaid goes in `<pre class="mermaid">`, a Vega-Lite spec in
 `<div class="viz" id="...">` fragment or a row widget's
 `<div class="widget" id="...">` before its `<figcaption>`. A diff view
 is the output of `scripts/diff.py`, pasted as it stands. `assets/example.html`
-is a component catalogue, not a model for length. It includes a graph-spec
-diagram and a hand-drawn Mermaid example explicitly labelled as opt-in.
+is a component catalogue, not a model for length. It includes a graph
+diagram, one figure of each other diagram kind, the chart recipes, and a
+hand-drawn Mermaid example explicitly labelled as opt-in.
 
 To update an existing page, edit its `<main>` in place and leave its copied
 CSS and script alone; regenerate from the template only when the user asks

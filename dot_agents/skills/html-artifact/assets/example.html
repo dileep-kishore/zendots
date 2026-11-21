@@ -1453,6 +1453,348 @@ figure.diff { gap: 10px; }
   <li><b>What happens to records over 8,000 tokens?</b> Recommended: skip and log them. Otherwise: split them into chunks.</li>
 </ol>
 
+<h2 id="diagram-kinds" data-toc="Diagram kinds">Four more diagram kinds come from the same command</h2>
+<p>Each figure below is a JSON spec in <code>scripts/diagram/examples/</code>, laid out by <code>diagram.ts</code>; the subjects are stand-ins.</p>
+<figure>
+<div class="diagram" style="overflow-x:auto" tabindex="0" role="group" aria-label="Scrollable diagram">
+<svg viewBox="0 0 901 601" role="img" aria-labelledby="token-refresh-t token-refresh-d" style="width:100%;height:auto;max-width:901px;min-width:600px">
+<title id="token-refresh-t">Token refresh on an API call</title><desc id="token-refresh-d">The browser calls the API with an access token and the API verifies it. If the token is valid the API reads the orders from the database; if it has expired the API asks the auth service, which reads the refresh grant from the database and returns a new token. The API answers the browser and sends an audit event to the auth service without waiting.</desc>
+<defs><marker id="token-refresh-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3);fill:context-stroke"/></marker><marker id="token-refresh-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9" style="fill:none;stroke:var(--ink-3);stroke:context-stroke;stroke-width:1.4"/></marker></defs>
+<path d="M81,79 L81,545" style="fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 4"/>
+<path d="M242,79 L242,545" style="fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 4"/>
+<path d="M414,79 L414,545" style="fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 4"/>
+<path d="M595,79 L595,545" style="fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 4"/>
+<path d="M418.5,191 L605,191 Q609,191 609,195 L609,457 Q609,461 605,461 L232,461 Q228,461 228,457 L228,195 Q228,191 232,191 L418.5,191" style="fill:none;stroke:var(--line-strong);stroke-width:1"/>
+<path d="M228,303 L609,303" style="fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:4 3"/>
+<path d="M81,122 L242,122" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M242,155 L266,155 Q272,155 272,161 L272,167 Q272,173 266,173 L243,173" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M242,254 L595,254" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M595,287 L242,287" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<path d="M242,348 L414,348" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M414,381 L595,381" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M595,414 L414,414" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<path d="M414,447 L242,447" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<path d="M242,490 L81,490" marker-end="url(#token-refresh-arrow)" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4"/>
+<path d="M242,523 L414,523" marker-end="url(#token-refresh-open)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<rect x="228" y="191" width="39.7" height="18" rx="2" style="fill:var(--surface);stroke:var(--line-strong);stroke-width:1"/>
+<text x="236" y="204" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">ALT</text>
+<rect x="233" y="213" width="105.2" height="15" style="fill:var(--surface)"/>
+<text x="236" y="223" style="font:400 12px var(--font-mono);fill:var(--ink-3)">[token valid]</text>
+<rect x="233" y="309" width="120.5" height="15" style="fill:var(--surface)"/>
+<text x="236" y="319" style="font:400 12px var(--font-mono);fill:var(--ink-3)">[token expired]</text>
+<rect x="86" y="103" width="151" height="15" style="fill:var(--surface)"/>
+<text x="89" y="113" style="font:400 12px var(--font-mono);fill:var(--ink-2)">GET /orders + token</text>
+<rect x="247" y="136" width="128.1" height="15" style="fill:var(--surface)"/>
+<text x="250" y="146" style="font:400 12px var(--font-mono);fill:var(--ink-2)">verify signature</text>
+<rect x="247" y="235" width="105.2" height="15" style="fill:var(--surface)"/>
+<text x="250" y="245" style="font:400 12px var(--font-mono);fill:var(--ink-2)">SELECT orders</text>
+<rect x="553.5" y="268" width="36.5" height="15" style="fill:var(--surface)"/>
+<text x="587" y="278" text-anchor="end" style="font:400 12px var(--font-mono);fill:var(--ink-2)">rows</text>
+<rect x="247" y="329" width="105.2" height="15" style="fill:var(--surface)"/>
+<text x="250" y="339" style="font:400 12px var(--font-mono);fill:var(--ink-2)">POST /refresh</text>
+<rect x="419" y="362" width="143.4" height="15" style="fill:var(--surface)"/>
+<text x="422" y="372" style="font:400 12px var(--font-mono);fill:var(--ink-2)">read refresh grant</text>
+<rect x="545.8" y="395" width="44.2" height="15" style="fill:var(--surface)"/>
+<text x="587" y="405" text-anchor="end" style="font:400 12px var(--font-mono);fill:var(--ink-2)">grant</text>
+<rect x="334.3" y="428" width="74.7" height="15" style="fill:var(--surface)"/>
+<text x="406" y="438" text-anchor="end" style="font:400 12px var(--font-mono);fill:var(--ink-2)">new token</text>
+<rect x="108.9" y="471" width="128.1" height="15" style="fill:var(--surface)"/>
+<text x="234" y="481" text-anchor="end" style="font:400 12px var(--font-mono);fill:var(--ink)">200 + Set-Cookie</text>
+<rect x="247" y="504" width="90" height="15" style="fill:var(--surface)"/>
+<text x="250" y="514" style="font:400 12px var(--font-mono);fill:var(--ink-2)">audit event</text>
+<rect x="16" y="16" width="130" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(38.1 38) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 19l18 0" /> <path d="M5 7a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8" /></g>
+<text x="64.1" y="52" style="font:600 15px var(--font-display);fill:var(--ink)">Browser</text>
+<rect x="182" y="16" width="120" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(216.2 29) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M7 4a2 2 0 0 0 -2 2v3a2 3 0 0 1 -2 3a2 3 0 0 1 2 3v3a2 2 0 0 0 2 2" /> <path d="M17 4a2 2 0 0 1 2 2v3a2 3 0 0 0 2 3a2 3 0 0 0 -2 3v3a2 2 0 0 1 -2 2" /></g>
+<text x="242.2" y="43" style="font:600 15px var(--font-display);fill:var(--ink)">API</text>
+<text x="242" y="62" text-anchor="middle" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">gateway</text>
+<rect x="334" y="16" width="160" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(356 38) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /> <path d="M15 9h.01" /></g>
+<text x="382" y="52" style="font:600 15px var(--font-display);fill:var(--ink)">Auth service</text>
+<rect x="526" y="16" width="138" height="63" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(548.4 38) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" /> <path d="M4 6v6a8 3 0 0 0 16 0v-6" /> <path d="M4 12v6a8 3 0 0 0 16 0v-6" /></g>
+<text x="574.4" y="52" style="font:600 15px var(--font-display);fill:var(--ink)">Database</text>
+<path d="M668,47.5 L680,47.5" style="fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3"/>
+<text x="686" y="43.5" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">Refresh grants rotate on</text>
+<text x="686" y="61.5" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">every use</text>
+<rect x="16.0" y="573" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:3 2"/>
+<text x="41.0" y="583.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">return or async (open head)</text>
+</svg>
+</div>
+  <figcaption><b>Token refresh, as a sequence.</b> Actors across the top, time down the page; dashed arrows are returns and the open head is fire-and-forget. The ALT frame splits the valid-token path from the refresh path, and the accent marks the response the browser keeps.</figcaption>
+</figure>
+<figure>
+<div class="diagram" style="overflow-x:auto" tabindex="0" role="group" aria-label="Scrollable diagram">
+<svg viewBox="0 0 1078 501" role="img" aria-labelledby="release-handoff-t release-handoff-d" style="width:100%;height:auto;max-width:1078px;min-width:600px">
+<title id="release-handoff-t">From pull request to release</title><desc id="release-handoff-d">An engineer opens a pull request; CI runs lint and unit tests while a reviewer is assigned. Review either sends the change back to the engineer or approves it, which starts the release build and release notes before the release manager publishes.</desc>
+<defs><marker id="release-handoff-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3);fill:context-stroke"/></marker></defs>
+<rect x="16" y="16" width="1045.4" height="87" style="fill:var(--surface-2);fill-opacity:.4"/>
+<rect x="16" y="103" width="1045.4" height="144" style="fill:var(--surface)"/>
+<rect x="16" y="247" width="1045.4" height="87" style="fill:var(--surface-2);fill-opacity:.4"/>
+<rect x="16" y="334" width="1045.4" height="87" style="fill:var(--surface)"/>
+<path d="M16,16 L1061.4,16" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M16,103 L1061.4,103" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M16,247 L1061.4,247" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M16,334 L1061.4,334" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M16,421 L1061.4,421" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<text x="32" y="63.5" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">ENGINEER</text>
+<text x="32" y="179" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">CI</text>
+<text x="32" y="294.5" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">REVIEWER</text>
+<text x="32" y="381.5" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">RELEASE MANAGER</text>
+<path d="M329.4,48.8 L357.4,48.8 Q363.4,48.8 363.4,54.8 L363.4,140.5 Q363.4,146.5 369.4,146.5 L386.9,146.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M329.4,59.5 L347.4,59.5 Q353.4,59.5 353.4,65.5 L353.4,197.5 Q353.4,203.5 359.4,203.5 L377.4,203.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M329.4,70.3 L337.4,70.3 Q343.4,70.3 343.4,76.3 L343.4,284.5 Q343.4,290.5 349.4,290.5 L386.9,290.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M506.9,146.5 L540.4,146.5 Q546.4,146.5 546.4,152.5 L546.4,273.8 Q546.4,279.8 552.4,279.8 L560.4,279.8" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M516.4,203.5 L530.4,203.5 Q536.4,203.5 536.4,209.5 L536.4,284.5 Q536.4,290.5 542.4,290.5 L560.4,290.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M506.9,301.3 L560.4,301.3" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M683.4,301.3 L697.4,301.3 Q703.4,301.3 703.4,307.3 L703.4,439 Q703.4,445 697.4,445 L186.4,445 Q180.4,445 180.4,439 L180.4,65.5 Q180.4,59.5 186.4,59.5 L194.4,59.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:5 4"/>
+<path d="M683.4,279.8 L697.4,279.8 Q703.4,279.8 703.4,273.8 L703.4,181 Q703.4,175 709.4,175 L742.9,175" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M683.4,290.5 L707.4,290.5 Q713.4,290.5 713.4,296.5 L713.4,371.5 Q713.4,377.5 719.4,377.5 L727.4,377.5" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M862.9,175 L902.4,175 Q908.4,175 908.4,181 L908.4,364.3 Q908.4,370.3 914.4,370.3 L922.4,370.3" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<path d="M878.4,384.7 L922.4,384.7" marker-end="url(#release-handoff-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<rect x="194.4" y="38" width="135" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(216.6 50) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 18a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M5 6a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 6a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M7 8l0 8" /> <path d="M9 18h6a2 2 0 0 0 2 -2v-5" /> <path d="M14 14l3 -3l3 3" /></g>
+<text x="242.6" y="64" style="font:600 15px var(--font-display);fill:var(--ink)">Open PR</text>
+<rect x="386.9" y="125" width="120" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(420.3 137) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 7l5 5l-5 5" /> <path d="M12 19l7 0" /></g>
+<text x="446.3" y="151" style="font:600 15px var(--font-display);fill:var(--ink)">Lint</text>
+<rect x="377.4" y="182" width="139" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(399.5 194) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 18a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M5 6a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M7 8l0 8" /> <path d="M7 8a4 4 0 0 0 4 4h4" /></g>
+<text x="425.5" y="208" style="font:600 15px var(--font-display);fill:var(--ink)">Unit tests</text>
+<rect x="386.9" y="269" width="120" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(409.6 281) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" /> <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></g>
+<text x="435.6" y="295" style="font:600 15px var(--font-display);fill:var(--ink)">Assign</text>
+<rect x="560.4" y="269" width="123" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(582.7 281) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /> <path d="M21 21l-6 -6" /></g>
+<text x="608.7" y="295" style="font:600 15px var(--font-display);fill:var(--ink)">Review</text>
+<rect x="742.9" y="153.5" width="120" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(771.3 165.5) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /> <path d="M12 12l8 -4.5" /> <path d="M12 12l0 9" /> <path d="M12 12l-8 -4.5" /> <path d="M16 5.25l-8 4.5" /></g>
+<text x="797.3" y="179.5" style="font:600 15px var(--font-display);fill:var(--ink)">Build</text>
+<rect x="727.4" y="356" width="151" height="43" rx="6" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4"/>
+<g transform="translate(749.7 368) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /> <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2" /></g>
+<text x="775.7" y="382" style="font:600 15px var(--font-display);fill:var(--ink)">Draft notes</text>
+<rect x="922.4" y="356" width="123" height="43" rx="6" style="fill:var(--ground);stroke:var(--accent);stroke-width:2"/>
+<rect x="922.4" y="356" width="123" height="43" rx="6" style="fill:var(--accent-soft)"/>
+<g transform="translate(944.8 368) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6.657 18c-2.572 0 -4.657 -2.007 -4.657 -4.483c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-11.878" /></g>
+<text x="970.8" y="382" style="font:600 15px var(--font-display);fill:var(--ink)">Publish</text>
+<rect x="367.4" y="54.8" width="36.5" height="15" style="fill:var(--surface)"/>
+<rect x="367.4" y="54.8" width="36.5" height="15" style="fill:var(--surface-2);fill-opacity:.4"/>
+<text x="370.4" y="64.8" style="font:400 12px var(--font-mono);fill:var(--ink-3)">push</text>
+<rect x="185.4" y="428" width="135.7" height="15" style="fill:var(--surface)"/>
+<text x="188.4" y="438" style="font:400 12px var(--font-mono);fill:var(--ink-3)">changes requested</text>
+<rect x="632.4" y="181" width="67.1" height="15" style="fill:var(--surface)"/>
+<text x="635.4" y="191" style="font:400 12px var(--font-mono);fill:var(--ink-3)">approved</text>
+<rect x="912.4" y="181" width="67.1" height="15" style="fill:var(--surface)"/>
+<text x="915.4" y="191" style="font:400 12px var(--font-mono);fill:var(--ink-3)">artifact</text>
+<rect x="16.0" y="473" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:3 2"/>
+<text x="41.0" y="483.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">requests changes</text>
+<rect x="185.1" y="473" width="18" height="12" rx="3" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4"/>
+<text x="210.1" y="483.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">the release gate</text>
+</svg>
+</div>
+  <figcaption><b>A change shipping, as a swimlane.</b> One lane per owner and one column per step in order; arrows that cross lanes are handoffs. The dashed path below the lanes is review sending work back, and the accent is the release gate.</figcaption>
+</figure>
+<figure>
+<div class="diagram" style="overflow-x:auto" tabindex="0" role="group" aria-label="Scrollable diagram">
+<svg viewBox="0 0 1028 372" role="img" aria-labelledby="render-stack-t render-stack-d" style="width:100%;height:auto;max-width:1028px;min-width:600px">
+<title id="render-stack-t">What a diagram passes through</title><desc id="render-stack-d">Five layers from the page down to the fonts: the page, the template runtime, the diagram fragment, the browser, and the fonts. The diagram fragment is the layer this skill generates.</desc>
+<defs><marker id="render-stack-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3);fill:context-stroke"/></marker></defs>
+<rect x="130.9" y="16" width="640" height="300" rx="6" style="fill:var(--ground)"/>
+<rect x="133.9" y="139" width="634" height="54" rx="4" style="fill:var(--accent-soft)"/>
+<path d="M130.9,76 L770.9,76" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M130.9,136 L770.9,136" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M130.9,196 L770.9,196" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<path d="M130.9,256 L770.9,256" style="fill:none;stroke:var(--line);stroke-width:1"/>
+<rect x="130.9" y="16" width="640" height="300" rx="6" style="fill:none;stroke:var(--ink-3);stroke-width:1.4"/>
+<rect x="130.9" y="16" width="640" height="60" style="fill:none;stroke:none"/>
+<rect x="130.9" y="76" width="640" height="60" style="fill:none;stroke:none"/>
+<rect x="133.9" y="139" width="634" height="54" rx="4" style="fill:none;stroke:var(--accent);stroke-width:2"/>
+<rect x="133.9" y="199" width="634" height="54" rx="4" style="fill:none;stroke:var(--blue);stroke-width:1.4"/>
+<rect x="133.9" y="259" width="634" height="54" rx="4" style="fill:none;stroke:var(--blue);stroke-width:1.4"/>
+<path d="M59.4,151 L59.4,20" marker-end="url(#render-stack-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.2"/>
+<path d="M59.4,312 L59.4,181" style="fill:none;stroke:var(--ink-3);stroke-width:1.2"/>
+<text x="59.4" y="168" text-anchor="middle" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">abstraction</text>
+<text x="154.9" y="48" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">L5</text>
+<g transform="translate(194.6 36.5) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /> <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2" /></g>
+<text x="220.6" y="50.5" style="font:600 15px var(--font-display);fill:var(--ink)">Page</text>
+<text x="746.9" y="49" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">sections · captions · prose</text>
+<text x="154.9" y="108" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">L4</text>
+<text x="220.6" y="110.5" style="font:600 15px var(--font-display);fill:var(--ink)">Template runtime</text>
+<text x="746.9" y="109" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">tokens · theme · layout grid</text>
+<text x="154.9" y="168" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--accent)">L3</text>
+<text x="220.6" y="170.5" style="font:600 15px var(--font-display);fill:var(--ink)">Diagram fragment</text>
+<text x="746.9" y="169" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">inline SVG · var(--token) colours</text>
+<text x="154.9" y="228" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">L2</text>
+<g transform="translate(194.6 216.5) scale(0.75)" style="fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 19l18 0" /> <path d="M5 7a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8" /></g>
+<text x="220.6" y="230.5" style="font:600 15px var(--font-display);fill:var(--ink)">Browser</text>
+<text x="746.9" y="229" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">SVG renderer · font loading</text>
+<text x="154.9" y="288" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">L1</text>
+<text x="220.6" y="290.5" style="font:600 15px var(--font-display);fill:var(--ink)">Fonts</text>
+<text x="746.9" y="289" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-3)">SN Pro · iA Writer Mono</text>
+<path d="M771.9,166 L786.9,166" style="fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3"/>
+<text x="792.9" y="162" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">The only layer the diagram</text>
+<text x="792.9" y="180" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">command writes</text>
+<rect x="16.0" y="344" width="18" height="12" rx="3" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4"/>
+<text x="41.0" y="354.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">generated by the skill</text>
+<rect x="230.9" y="344" width="18" height="12" rx="3" style="fill:var(--ground);stroke:var(--blue);stroke-width:1.4"/>
+<text x="255.9" y="354.5" style="font:400 12px var(--font-mono);fill:var(--ink-3)">supplied by the host</text>
+</svg>
+</div>
+  <figcaption><b>What a diagram passes through, as a layer stack.</b> Bands run from the page down to the fonts; tags index them and the details name what each holds. The accent is the one layer the command writes.</figcaption>
+</figure>
+<figure>
+<div class="diagram" style="overflow-x:auto" tabindex="0" role="group" aria-label="Scrollable diagram">
+<svg viewBox="0 0 869 571" role="img" aria-labelledby="backlog-map-t backlog-map-d" style="width:100%;height:auto;max-width:869px;min-width:600px">
+<title id="backlog-map-t">Where the next quarter goes</title><desc id="backlog-map-d">Nine backlog items placed by effort and impact. Fixing the signup bug is the one quick win to start now; rewriting billing is costly and changes little.</desc>
+<defs><marker id="backlog-map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" style="fill:var(--ink-3);fill:context-stroke"/></marker></defs>
+<path d="M57.6,291 L553.6,291" marker-end="url(#backlog-map-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.2"/>
+<path d="M297.6,531 L297.6,35" marker-end="url(#backlog-map-arrow)" style="fill:none;stroke:var(--ink-3);stroke-width:1.2"/>
+<text x="47.6" y="295" text-anchor="end" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">EASY</text>
+<text x="563.6" y="295" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">HARD</text>
+<text x="297.6" y="25" text-anchor="middle" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">MAJOR</text>
+<text x="297.6" y="550" text-anchor="middle" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-2)">MINOR</text>
+<text x="57.6" y="62" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">QUICK WINS</text>
+<text x="537.6" y="62" text-anchor="end" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">BIG BETS</text>
+<text x="57.6" y="526" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">FILL-INS</text>
+<text x="537.6" y="526" text-anchor="end" style="font:500 11px var(--font-mono);letter-spacing:.08em;fill:var(--ink-3)">MONEY PITS</text>
+<circle cx="124.8" cy="118.2" r="6" style="fill:var(--accent);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="206.4" cy="190.2" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="153.6" cy="243" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="384" cy="127.8" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="460.8" cy="223.8" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="134.4" cy="377.4" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="235.2" cy="449.4" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="360" cy="358.2" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<circle cx="470.4" cy="435" r="5" style="fill:var(--ink-2);stroke:var(--ground);stroke-width:1.5"/>
+<text x="137.8" y="122.2" style="font:400 12.5px var(--font-mono);fill:var(--ink)">Fix signup bug</text>
+<text x="194.4" y="194.2" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Cache search</text>
+<text x="165.6" y="247" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Welcome email</text>
+<text x="396" y="131.8" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">SSO for teams</text>
+<text x="448.8" y="227.8" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Offline mode</text>
+<text x="146.4" y="381.4" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Dark mode</text>
+<text x="223.2" y="453.4" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Tidy settings</text>
+<text x="372" y="362.2" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Custom themes</text>
+<text x="458.4" y="439" text-anchor="end" style="font:400 12.5px var(--font-mono);fill:var(--ink-2)">Rewrite billing</text>
+<path d="M479.4,435 L611.2,435" style="fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3"/>
+<text x="617.2" y="431" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">Six weeks of work for a</text>
+<text x="617.2" y="449" style="font:italic 400 13px var(--font-text);fill:var(--ink-2)">change no customer asked for</text>
+</svg>
+</div>
+  <figcaption><b>A backlog by impact and effort, as a quadrant.</b> Each dot sits at its estimated impact (up) and effort (right); the corner labels name the quadrants. The accent is the item to do first.</figcaption>
+</figure>
+
+<h2 id="chart-recipes" data-toc="Chart recipes">Five chart recipes cover bridges, changes, spreads and ranks</h2>
+<figure>
+  <div class="vega"><script type="application/json">
+{"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+ "width": "container", "height": 260,
+ "data": {"values": [
+   {"step": "Start", "delta": 42},
+   {"step": "New hires", "delta": 9},
+   {"step": "Transfers in", "delta": 3},
+   {"step": "Attrition", "delta": -6},
+   {"step": "Contract ends", "delta": -4},
+   {"step": "End", "delta": 0}]},
+ "transform": [
+   {"window": [{"op": "sum", "field": "delta", "as": "to"}]},
+   {"calculate": "datum.step === 'End' ? 0 : datum.to - datum.delta", "as": "from"},
+   {"calculate": "datum.step === 'Start' ? 0 : datum.from", "as": "from"},
+   {"calculate": "datum.step === 'Start' || datum.step === 'End' ? 'total' : datum.delta > 0 ? 'up' : 'down'", "as": "kind"},
+   {"calculate": "datum.kind === 'total' ? format(datum.to, 'd') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), 'd')", "as": "label"},
+   {"calculate": "max(datum.from, datum.to)", "as": "top"}],
+ "encoding": {"x": {"field": "step", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "bar", "tooltip": true},
+    "encoding": {"y": {"field": "from", "type": "quantitative", "title": "Headcount"}, "y2": {"field": "to"},
+                 "color": {"field": "kind", "type": "nominal", "legend": null,
+                           "scale": {"domain": ["total", "up", "down"], "range": ["var(--muted-foreground)", "var(--green)", "var(--red)"]}}}},
+   {"mark": {"type": "text", "dy": -7},
+    "encoding": {"y": {"field": "top", "type": "quantitative"}, "text": {"field": "label"}}}]}
+  </script></div>
+  <figcaption><b>Headcount from 42 to 44, as a waterfall.</b> Grey bars are totals, green rises and red falls; the end bar is computed from the steps.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+{"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+ "width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 260,
+ "data": {"values": [
+   {"model": "Baseline", "split": "Validation", "f1": 0.71}, {"model": "Baseline", "split": "Held-out", "f1": 0.69},
+   {"model": "Fine-tuned", "split": "Validation", "f1": 0.84}, {"model": "Fine-tuned", "split": "Held-out", "f1": 0.73},
+   {"model": "Retrieval", "split": "Validation", "f1": 0.78}, {"model": "Retrieval", "split": "Held-out", "f1": 0.77}]},
+ "encoding": {"x": {"field": "split", "type": "nominal", "sort": ["Validation", "Held-out"], "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "f1", "type": "quantitative", "title": "F1", "scale": {"zero": false}},
+              "detail": {"field": "model"},
+              "color": {"condition": {"test": "datum.model == 'Fine-tuned'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.split == 'Held-out'"}, {"calculate": "datum.model + ' ' + format(datum.f1, '.2f')", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}},
+   {"transform": [{"filter": "datum.split == 'Validation'"}],
+    "mark": {"type": "text", "align": "right", "dx": -8}, "encoding": {"text": {"field": "f1", "format": ".2f"}}}]}
+  </script></div>
+  <figcaption><b>F1 on validation and held-out data, as a slopegraph.</b> Each line is one model; the fine-tuned model falls furthest, from 0.84 to 0.73.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+{"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+ "width": "container", "height": 180,
+ "data": {"values": [
+   {"stage": "Fetch", "run": "Before", "min": 12}, {"stage": "Fetch", "run": "After", "min": 11},
+   {"stage": "Parse", "run": "Before", "min": 21}, {"stage": "Parse", "run": "After", "min": 6},
+   {"stage": "Embed", "run": "Before", "min": 34}, {"stage": "Embed", "run": "After", "min": 29}]},
+ "encoding": {"y": {"field": "stage", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "rule", "color": "var(--muted-foreground)", "strokeWidth": 2},
+    "encoding": {"x": {"aggregate": "min", "field": "min", "type": "quantitative", "title": "Minutes per run"}, "x2": {"aggregate": "max", "field": "min"}}},
+   {"mark": {"type": "point", "filled": true, "size": 90, "tooltip": true},
+    "encoding": {"x": {"field": "min", "type": "quantitative"},
+                 "color": {"field": "run", "type": "nominal", "sort": ["Before", "After"], "title": null,
+                           "scale": {"domain": ["Before", "After"], "range": ["var(--muted-foreground)", "var(--accent)"]}}}},
+   {"transform": [{"filter": "datum.run == 'After'"}],
+    "mark": {"type": "text", "dy": -12}, "encoding": {"x": {"field": "min", "type": "quantitative"}, "text": {"field": "min"}}}]}
+  </script></div>
+  <figcaption><b>Minutes per stage before and after batching, as a dumbbell.</b> Grey is before, mauve after; parsing gained most, from 21 to 6 minutes.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+{"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+ "width": "container", "height": 200,
+ "data": {"values": [
+   {"node": "A100", "s": 41}, {"node": "A100", "s": 44}, {"node": "A100", "s": 45}, {"node": "A100", "s": 47}, {"node": "A100", "s": 52}, {"node": "A100", "s": 70},
+   {"node": "H100", "s": 22}, {"node": "H100", "s": 24}, {"node": "H100", "s": 25}, {"node": "H100", "s": 26}, {"node": "H100", "s": 29}, {"node": "H100", "s": 31}]},
+ "encoding": {"y": {"field": "node", "type": "nominal", "title": null}},
+ "layer": [
+   {"mark": {"type": "boxplot", "extent": 1.5, "size": 22, "color": "var(--blue)",
+             "median": {"color": "var(--ground)", "strokeWidth": 2}, "rule": {"color": "var(--muted-foreground)"},
+             "ticks": false, "outliers": {"color": "var(--red)"}},
+    "encoding": {"x": {"field": "s", "type": "quantitative", "title": "Seconds per step", "scale": {"zero": false}}}},
+   {"transform": [{"aggregate": [{"op": "median", "field": "s", "as": "med"}], "groupby": ["node"]}],
+    "mark": {"type": "text", "dy": -18}, "encoding": {"x": {"field": "med", "type": "quantitative"}, "text": {"field": "med", "format": ".1f"}}}]}
+  </script></div>
+  <figcaption><b>Seconds per training step on two GPU types, as box plots.</b> Boxes span the middle half of the steps, whiskers 1.5 times that span, and the red dot is an outlier; medians are printed.</figcaption>
+</figure>
+<figure>
+  <div class="vega"><script type="application/json">
+{"$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+ "width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 220,
+ "data": {"values": [
+   {"week": "W1", "team": "Atlas", "pts": 31}, {"week": "W1", "team": "Birch", "pts": 28}, {"week": "W1", "team": "Cove", "pts": 22}, {"week": "W1", "team": "Dune", "pts": 19},
+   {"week": "W2", "team": "Atlas", "pts": 29}, {"week": "W2", "team": "Birch", "pts": 33}, {"week": "W2", "team": "Cove", "pts": 24}, {"week": "W2", "team": "Dune", "pts": 24},
+   {"week": "W3", "team": "Atlas", "pts": 27}, {"week": "W3", "team": "Birch", "pts": 35}, {"week": "W3", "team": "Cove", "pts": 30}, {"week": "W3", "team": "Dune", "pts": 21}]},
+ "transform": [{"window": [{"op": "row_number", "as": "rank"}], "sort": [{"field": "pts", "order": "descending"}, {"field": "team"}], "groupby": ["week"]}],
+ "encoding": {"x": {"field": "week", "type": "ordinal", "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "scale": {"domain": [1, 2, 3, 4]}},
+              "detail": {"field": "team"},
+              "color": {"condition": {"test": "datum.team == 'Cove'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.week == 'W3'"}, {"calculate": "datum.team + ' ' + datum.pts", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}}]}
+  </script></div>
+  <figcaption><b>League rank over three weeks, as a bump chart.</b> Rank 1 is at the top; ties break by name. Cove climbs from third to second.</figcaption>
+</figure>
+
 <h2 id="opt-in-mermaid">Hand-drawn Mermaid is an optional alternative</h2>
 <p>Use this component only when the user explicitly chooses Mermaid.</p>
 <figure>
