@@ -44,12 +44,16 @@ works step by step, when work ran, or what the reader must decide, use the
 components in [references/components.md](references/components.md); it is a
 guide, not a checklist.
 
-Diagrams are written as a short graph spec and laid out by the bundled
+Diagrams are written as a short JSON spec and laid out by the bundled
 command in [references/diagrams.md](references/diagrams.md); never place
-coordinates by hand. Its output is inline SVG on the page's own tokens. A
-sequence goes in a numbered table, a schedule in `.timeline` or duration
-lanes, and a step-by-step mechanism in a stepper over inline SVG
-([references/components.md](references/components.md)). For a huge diagram
+coordinates by hand. Besides the `graph` kind for parts and flows, it draws
+a `sequence` of calls between actors, a `swimlane` of who does what, a
+`layers` stack, and a `quadrant` of options on two axes, each with optional
+callouts and icons. Its output is inline SVG on the page's own tokens, and it
+refuses a drawing whose labels collide. A schedule goes in `.timeline` or
+duration lanes, and a step-by-step mechanism in a stepper over inline SVG
+([references/components.md](references/components.md)). Before keeping a
+figure, apply the remove test in `references/visuals.md`. For a huge diagram
 you may offer hand-drawn Mermaid, and use it only when the user explicitly
 chooses it. The diagram command installs locked packages outside the skill
 and repository; do not reconstruct the setup or vendor dependencies.
@@ -131,5 +135,8 @@ the publishing note in `references/writing.md`.
 
 Locally maintained. Draws on Claude's artifact-design and dataviz guidance,
 [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer)
-for the navigation and Mermaid theming, and Theo Browne's html-communication
-skill for density.
+for the navigation and Mermaid theming, Theo Browne's html-communication
+skill for density, and
+[cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)
+for the diagram kinds, chart types, semantic patterns and remove test. Node
+icons are from [Tabler Icons](https://github.com/tabler/tabler-icons) (MIT).

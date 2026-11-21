@@ -5,13 +5,23 @@ shows its point, or none when a sentence says it faster.
 
 ## Which visual
 
-| The section answers | Use |
+Find the row whose question your reader is asking. When behaviour, state,
+enforcement or risk carries the point, check the patterns below first.
+
+| The reader asks | Use |
 |---|---|
-| How does the process or decision flow, or how do the parts connect? | Diagram from a graph spec ([diagrams.md](diagrams.md)) |
-| Who calls whom, in what order? | Numbered table of calls, or a graph spec with numbered edge labels |
+| How do the parts connect, or how does a decision branch? | Diagram spec, `graph` kind ([diagrams.md](diagrams.md)) |
+| Who calls whom, in what order, and what comes back? | Diagram spec, `sequence` kind; a numbered table only for a list of calls with no fixed set of actors |
+| Who does each step, and where does work change hands? | Diagram spec, `swimlane` kind |
+| What sits on what, and which layer is the bottleneck? | Diagram spec, `layers` kind |
+| Where does each option sit on two axes? | Diagram spec, `quadrant` kind |
+| Which states and transitions exist? | Diagram spec, `graph` kind |
 | When does each piece happen? | `.timeline` for a short list, duration lanes for measured times |
-| Which states and transitions exist? | Diagram from a graph spec |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
+| How does a start total become an end total? | Waterfall recipe |
+| How did each item change between two points? | Slopegraph recipe for up to six items; dumbbell recipe for before and after per category |
+| How is each group's value spread out? | Box plot recipe |
+| Who moved up or down the ranking? | Bump chart recipe |
 | How does the result respond to an input the reader can change? | Interactive figure, per [interactive.md](interactive.md) |
 | Which exact values do several series take at a point the reader picks? | `viz.lineChart` interactive figure |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
@@ -22,6 +32,30 @@ shows its point, or none when a sentence says it faster.
 | How big is the gap between two values? | Two bars and a labelled bracket over the gap (recipe below) |
 | What mechanism do none of those express? | Stepper over inline SVG ([components.md](components.md)) |
 | What exactly does the reader run or paste? | `<pre><code class="language-...">` |
+
+Before drawing, ask whether a three-column table or one sentence says the
+same; if so, use it. Then run the remove test on the figure: drop any node,
+arrow or label the reader would not miss, and merge two nodes that always
+travel together. Above the kind's budget, draw an overview and one figure per
+part.
+
+### When behaviour carries the point
+
+These patterns, adapted from diagram-design's semantic patterns, name what a
+figure must show when a mechanism matters more than its parts. Pick one per
+figure; a second may lend one element.
+
+| The reader must understand | Draw | It must show |
+|---|---|---|
+| Many arrivals competing for one limited service | `graph`, sources fanning into one accent node | Each source, the queue with its count and capacity (`8/hour`, `3 slots`), what is admitted and what waits or is dropped |
+| The same questions asked at every stage | Table with a row per stage and a column per question | Every cell filled or marked `—`, one output per stage |
+| A loose conversation becoming a durable record | `graph`: input, one transform, the record | A short source excerpt, the record's fields, which statement filled which field, the fields still unknown |
+| Why two decisions differ, and where they first part | Two `sequence` diagrams side by side, or a table of rules | Each rule's result for both cases (pass, fail, skipped, not reached), the first divergence as the accent |
+| Which routes cross a trust boundary and which are blocked | `graph` with one group per trust zone | The allowed paths solid, the blocked ones dashed and labelled, the boundary as a group |
+| Which controls apply where they are enforced | `layers`, one band per enforcement point | The controls in each band's detail, no control listed twice |
+| How defences reduce risk and what risk remains | `layers`, outermost defence on top | What each layer stops, and a callout on the risk that gets through |
+| How a system breaks into citable parts | `graph`, `direction: DOWN`, one group per level | Stable ids in titles (`B2.1`), each part's input and output in its detail, a link to the code in the caption |
+| How one thing moves through phases, waits, retries and ends | `graph` with a main row and side states, or `swimlane` when owners change | Every state, both terminal outcomes, every transition labelled, retries as dashed returns |
 
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
@@ -51,7 +85,7 @@ Write captions to the three-part shape in
 ```
 
 Mark the one value or node the reader must notice with `class="hot"` (cells,
-tile numbers) or `tone: "accent"` in a graph spec; never more than one
+tile numbers) or `tone: "accent"` in a diagram spec; never more than one
 per figure.
 
 ## Code
@@ -70,7 +104,7 @@ tag tight against the first character or the block gains a blank first line.
 
 ## Diagrams
 
-Write a graph spec and run the [diagram command](diagrams.md). Paste its
+Write a diagram spec (any kind) and run the [diagram command](diagrams.md). Paste its
 `.diagram.html` fragment, an inline SVG inside `<div class="diagram">`, before
 the figure's caption. The SVG reads the page's colour tokens and fonts, so it
 needs no light/dark pair. Keep the spec JSON beside the artifact.
@@ -341,7 +375,7 @@ Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
 ## Inline SVG
 
 These rules apply when incorporating an existing SVG asset. Author new
-diagrams as a graph spec by default; its generated SVG styles marks with
+diagrams as a diagram spec by default; its generated SVG styles marks with
 `style="...var(--token)..."`, which follows the theme and is allowed.
 
 ```html
