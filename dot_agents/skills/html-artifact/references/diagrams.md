@@ -167,6 +167,36 @@ auth handshake, a retry. Actors sit in a row; time runs down.
   to fit labels, self-loops and frame guards. Activation bars are not drawn.
 - Budget: 6 actors and 16 messages; above that, split the exchange.
 
+## Swimlane (`"kind": "swimlane"`)
+
+For who does each step and where work changes hands: a release process, an
+on-call escalation, a review loop. One lane per person, team or system.
+
+```json
+{"id": "ship", "kind": "swimlane", "alt": "...",
+ "lanes": [{"id": "eng", "label": "Engineer"}, {"id": "rev", "label": "Reviewer"}],
+ "steps": [{"id": "pr", "lane": "eng", "title": "Open PR", "icon": "git-branch"},
+           {"id": "review", "lane": "rev", "title": "Review", "icon": "search"},
+           {"id": "merge", "lane": "eng", "title": "Merge", "tone": "accent"}],
+ "edges": [{"from": "pr", "to": "review"}, {"from": "review", "to": "merge", "label": "approved"},
+           {"from": "review", "to": "pr", "label": "changes requested", "back": true}]}
+```
+
+- `lanes[]`: `id`, `label`, in reading order; a lane may be empty.
+- `steps[]`: `id`, `lane`, `title`, optional `detail`, `tone`, `icon`,
+  `style: "dashed"`.
+- `edges[]`: `from`, `to`, optional `label`, `style: "dashed"`, and
+  `back: true` for a step that sends work back. `[]` for none.
+- `direction`: `RIGHT` (the default; lanes are rows) or `DOWN` (lanes are
+  columns).
+- Columns follow the longest path through the forward edges. Edges marked
+  `back`, and any edge that closes a cycle (found walking `steps[]` in
+  order), are return paths: dashed, and routed through a channel beyond the
+  last lane (below for `RIGHT`, to the right for `DOWN`). Steps that share a
+  lane and a column stack inside the lane.
+- Budget: about 4 lanes and 8 steps; it warns above 5 lanes or 12 steps.
+  Past about five columns `RIGHT` passes 1100 units; switch to `DOWN`.
+
 ## Layer stack (`"kind": "layers"`)
 
 For a real hierarchy: a tech stack, abstraction levels, enforcement points, a
