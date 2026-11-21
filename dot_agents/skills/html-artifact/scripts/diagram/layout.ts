@@ -1,8 +1,8 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
 
-export interface GNode { id: string; group?: string; title: string; detail?: string; tone?: string; kind?: string; style?: string; mono?: boolean }
+export interface GNode { id: string; group?: string; title: string; detail?: string; tone?: string; kind?: string; style?: string; mono?: boolean; icon?: string }
 export interface GEdge { from: string; to: string; label?: string; style?: string; back?: boolean }
-export interface Graph { id: string; alt: string; title?: string; direction?: string; layout?: string; nodeGap?: number; layerGap?: number; legend?: [string, string][]; groups?: { id: string; label: string; tone?: string }[]; nodes: GNode[]; edges: GEdge[] }
+export interface Graph { id: string; alt: string; title?: string; kind?: string; notes?: { target: string; text: string }[]; direction?: string; layout?: string; nodeGap?: number; layerGap?: number; legend?: [string, string][]; groups?: { id: string; label: string; tone?: string }[]; nodes: GNode[]; edges: GEdge[] }
 export interface Opts { layout: string; dir?: string; layerGap?: string; nodeGap?: string; padY?: number; placement?: string }
 export type Box = { x: number; y: number; w: number; h: number };
 export type Measure = (text: string, role: 'title' | 'titleMono' | 'detail' | 'edge' | 'group') => { w: number; h: number };
@@ -17,7 +17,8 @@ export async function layoutGraph(g: Graph, o: Opts, m: Measure) {
     const t = m(n.title, n.mono ? 'titleMono' : 'title');
     const d = n.detail ? m(n.detail, 'detail') : undefined;
     const padX = n.kind === 'actor' ? 30 : 22;
-    const w = Math.max(150, Math.ceil(Math.max(t.w, d?.w || 0) + 2 * padX));
+    // An icon sits left of the title: 18 units plus an 8-unit gap, as scene.ts draws it.
+    const w = Math.max(150, Math.ceil(Math.max(t.w + (n.icon ? 26 : 0), d?.w || 0) + 2 * padX));
     const h = Math.ceil(padY + t.h + (d ? 4 + d.h : 0) + padY);
     sizes.set(n.id, { w, h, t, d });
   }

@@ -1,18 +1,23 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const source = join(import.meta.dir, 'diagram');
-const files = ['package.json', 'bun.lock', 'layout.ts', 'browser.ts', 'export.ts', 'audit.js', 'audit-run.ts'];
+// Every module the bundle can import, at any depth; example specs and installed packages stay out.
+const files = (readdirSync(source, { recursive: true }) as string[])
+  .filter(name => /\.(ts|js)$|^package\.json$|^bun\.lock$/.test(name) && !/^(examples|node_modules)\//.test(name))
+  .sort();
 const cache = join(process.env.XDG_CACHE_HOME || join(homedir(), '.cache'), 'html-artifact', 'diagram');
 // The same pinned faces the template's @font-face rules load, so measured widths match the page.
 const FONTS = {
   'display.ttf': 'https://cdn.jsdelivr.net/gh/supernotes/sn-pro@e025ac475535/fonts/variable/SNPro%5Bwght%5D.ttf',
   'mono.ttf': 'https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Mono/Variable/iAWriterMonoV.ttf',
 };
+// Kept apart from FONTS so adding it leaves the existing font cache, and offline exports of older specs, as they were.
+const NOTE_FONT = { 'note.ttf': 'https://cdn.jsdelivr.net/gh/iaolo/iA-Fonts@f32c04c3058a/iA%20Writer%20Duo/Variable/iAWriterDuoV-Italic.ttf' };
 
 export interface Runtime { dir: string; run: (args: string[], env?: Record<string, string>) => void }
 
@@ -44,7 +49,7 @@ export async function ensureRuntime(): Promise<Runtime> {
       if (!existsSync(ready)) {
         console.log(`Preparing shared diagram runtime: ${dir}`);
         mkdirSync(dir, { recursive: true });
-        for (const name of files) copyFileSync(join(source, name), join(dir, name));
+        for (const name of files) { mkdirSync(dirname(join(dir, name)), { recursive: true }); copyFileSync(join(source, name), join(dir, name)); }
         execFileSync(process.execPath, ['install', '--frozen-lockfile', '--ignore-scripts'], options);
         execFileSync(process.execPath, ['node_modules/playwright/cli.js', 'install', 'chromium', '--only-shell'], options);
         writeFileSync(ready, 'ready\n');
@@ -59,10 +64,10 @@ export async function ensureRuntime(): Promise<Runtime> {
 }
 
 /** Downloads the measuring fonts once into the cache and returns their directory. */
-export async function ensureFonts(): Promise<string> {
-  const dir = join(cache, 'fonts', createHash('sha256').update(JSON.stringify(FONTS)).digest('hex').slice(0, 16));
+export async function ensureFonts(set: Record<string, string> = FONTS): Promise<string> {
+  const dir = join(cache, 'fonts', createHash('sha256').update(JSON.stringify(set)).digest('hex').slice(0, 16));
   mkdirSync(dir, { recursive: true });
-  for (const [name, url] of Object.entries(FONTS)) {
+  for (const [name, url] of Object.entries(set)) {
     const path = join(dir, name);
     if (existsSync(path)) continue;
     const response = await fetch(url, { signal: AbortSignal.timeout(60_000) });
@@ -73,4 +78,9 @@ export async function ensureFonts(): Promise<string> {
     renameSync(part, path);
   }
   return dir;
+}
+
+/** The callout face, fetched only for a spec with notes; returns the font file's path. */
+export async function ensureNoteFont(): Promise<string> {
+  return join(await ensureFonts(NOTE_FONT), 'note.ttf');
 }

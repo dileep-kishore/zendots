@@ -13,7 +13,7 @@ Requires Bun 1.4.0 or newer. Run from the ignored artifact folder, beside the
 HTML:
 
 ```bash
-bun run ~/.agents/skills/html-artifact/scripts/diagram.ts arch.json arch
+bun run <skill-dir>/scripts/diagram.ts arch.json arch
 ```
 
 The first run downloads the locked packages, Chromium's headless shell and
@@ -64,6 +64,38 @@ update them in a temporary workspace and copy back the manifest and
   dash carries meaning; the caption should not have to decode colours.
 - Tones: `ink` (default), `blue`, `green`, `teal`, `peach`, `yellow`, `red`,
   and `accent` for the one node the reader must notice.
+
+## Callouts and icons
+
+Both work on every kind.
+
+- `notes`: at most two callouts, each `{"target": "<id>", "text": "..."}`.
+  A callout carries the one remark the reader should take from the drawing,
+  in the italic of figure captions, joined to its target by a dashed leader.
+  Keep it to about 80 characters; it wraps at 28 and may not pass three
+  lines. The command puts it on the right of the target, else the left, else
+  below, wherever a straight leader reaches the edge without crossing
+  anything, and stops with an error when no side is clear. Target a node on
+  the outside of the drawing. In a graph spec a node and its group may share
+  an id, but a note cannot target such an id.
+- `icon` on a node (or actor, step, layer): one of `user`, `users`, `robot`,
+  `laptop`, `server`, `container`, `cloud`, `internet`, `database`, `file`,
+  `log`, `queue`, `cache`, `search`, `api`, `lock`, `key`, `alert`,
+  `git-branch`, `terminal`, `pipeline`, `monitoring` (Tabler Icons, MIT,
+  licence in `scripts/diagram/ICONS-LICENSE`). An icon helps the reader tell
+  a person from a service from a store; put one on every node of a kind or
+  on none.
+
+## Layout self-check
+
+Before it writes a fragment, the command checks the laid-out drawing: no
+diagonal connector, no text over other text or over a box it does not belong
+to, no text across a line unless it sits on a backing (group headings,
+message labels), and nothing outside the viewBox. For the newer kinds a
+failure stops the export and lists each collision; change the spec (shorter
+labels, another direction, fewer items) and rerun. For graph specs the same
+findings print as `WARN` and the fragment is still written, so older specs
+render as before. `scripts/diagram/geometry.ts` holds the rules.
 
 ## Layout hints
 
