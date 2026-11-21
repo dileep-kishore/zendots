@@ -6,21 +6,23 @@ Ranked. A seat goes to the highest-ranked reviewer whose model family did not
 write the change. Model IDs age: take the newest flagship of each family from
 `orchestrator_capabilities` or the CLI's model list, and update this table
 when one is replaced. Gemini 4 Neon replaced Carbon in the council seat on
-19 November 2026, after the PR #97 replay below, and Carbon left the roster.
+19 November 2026, after the PR #97 replay below.
 On 20 November 2026 the user moved Neon ahead of Argon into the tier 2 seat.
 Neon reviews about as well as Claude Opus, and sometimes better. Its
 Antigravity allocation is smaller than the Claude and OpenAI allocations, so
-it ranks below them. Argon stays only as Neon's tier 3 fallback. Use Neon at
-high: the LBL enterprise Gemini project rejects `xhigh` with HTTP 400 through
-`agy`, though T3 lists it.
+it ranks below them. The same day the user gave Neon a 30-minute deadline
+and brought Carbon back as Neon's first fallback, with Argon after Carbon.
+Use Neon at high: the LBL enterprise Gemini project rejects `xhigh` with
+HTTP 400 through `agy`, though T3 lists it.
 
 | Rank | Reviewer | Family | Seats |
 |---|---|---|---|
 | 1 | GPT-6.2 Sol, high effort | OpenAI | tiers 1-3 when Codex did not write the change; verifier |
 | 1 | Claude Opus 5.5, high effort | Anthropic | tiers 1-3 when Codex wrote the change; verifier |
 | 2 | Gemini 4 Neon, high thinking, through Antigravity | Google | tiers 2-3 |
-| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3; Neon's fallback in tier 2 |
-| - | Gemini 4 Argon, high thinking, through Antigravity | Google | Neon's fallback in tier 3 |
+| 3 | Grok 4.7, high effort, through Cursor | xAI | tier 3 |
+| - | Gemini 4 Carbon, high thinking, through Antigravity | Google | Neon's fallback in tiers 2-3 |
+| - | Gemini 4 Argon, high thinking, through Antigravity | Google | Carbon's fallback in tiers 2-3 |
 | - | Claude Sonnet 5.5, high effort | Anthropic | extra tier 2 seat when Claude wrote the change |
 
 Rank 1 goes to the frontier model from the other family than the one that
@@ -41,8 +43,8 @@ findings; its calibration rows decide whether it keeps the seat.
 - **Tier 3 (council):** the first three eligible reviewers.
 
 A seat whose reviewer is unavailable goes to the next eligible reviewer.
-Grok fills a tier 2 seat only as Neon's fallback, and Argon fills a tier 3
-seat only as Neon's fallback, under Gemini finders below. With no eligible substitute, leave the seat empty and label the
+The Gemini seat is the exception: only Carbon and then Argon replace Neon,
+under Gemini finders below, and Grok never takes it. With no eligible substitute, leave the seat empty and label the
 review partial. Say which seat moved or stayed empty, and why.
 
 ## Verifiers
@@ -55,7 +57,7 @@ verify the two write-ups separately before merging, Sol's with Opus and
 Sonnet's with Sol, and give the merged finding the stronger verdict
 (CONFIRMED, then PLAUSIBLE, then UNVERIFIED, then REFUTED). When one write-up
 is CONFIRMED and the other REFUTED, the merged finding is PLAUSIBLE: report
-both verdicts, and settle it at triage only with code evidence. Never use Neon, Argon, or Grok as
+both verdicts, and settle it at triage only with code evidence. Never use Neon, Carbon, Argon, or Grok as
 verifiers until the calibration log shows they settle findings reliably.
 
 ## Gemini finders
@@ -82,8 +84,8 @@ run hits a 502, say so in the report's coverage with the run's elapsed time,
 and propose moving Gemini back to `agy` for the user's approval.
 
 Every Gemini finder gets the bundle and rules in the
-[reading budget](reading-budget.md), and a deadline from launch: 20 minutes
-for Argon and Neon. Most of their time is a few long thinking turns
+[reading budget](reading-budget.md), and a deadline from launch: 30 minutes
+for Neon and Carbon, 20 for Argon. Most of their time is a few long thinking turns
 that print nothing, so through `agy` judge progress by the event stream, not
 by silence. Fall back at once when a T3 task fails or its report lacks the
 completion token, or, through `agy`, when the stream shows an `ERROR` step
@@ -95,23 +97,19 @@ task wakes the coordinator only when it ends, and T3 ends an Antigravity
 task after 15 minutes without activity, not at a wall-clock limit. Through
 T3, treat a Gemini task that ends without a report as having missed its
 deadline. When another finder's completion wakes the coordinator after a
-Gemini task's 20 minutes have passed, cancel that task with `task_cancel` and
+Gemini task's deadline has passed, cancel that task with `task_cancel` and
 fall back as below.
 
-In tier 2, at Neon's deadline, stop it and
-launch Grok 4.7 high fast with the same brief, minus the reading budget, into
+In tiers 2 and 3, at Neon's deadline, stop it and launch Carbon with the
+same brief and a reading budget rendered for Carbon's own deadline, into
 that seat. Do the same at once when Neon is unavailable or its launch fails.
-Grok gets its own 20-minute deadline; if it misses that too, label the seat
-partial.
+At Carbon's deadline, or when Carbon is unavailable or fails to launch, stop
+it and launch Argon the same way. If Argon misses its deadline too, the seat
+stays empty and the review is partial. A seat that runs all three can take
+80 minutes.
 
-In tier 3, at Neon's deadline, stop it and launch Argon with the same
-brief and a reading budget rendered for Argon's own deadline, into that seat. Do the same at once when
-Neon is unavailable or its launch fails. Argon gets its own 20-minute
-deadline; Grok already holds a seat, so if Argon misses too, that seat stays
-empty and the review is partial.
-
-Report a seat as fallen back with the first reviewer's elapsed time, and keep
-that reviewer's calibration row with `findings` empty.
+Report a seat as fallen back with each replaced reviewer's elapsed time, and
+keep each replaced reviewer's calibration row with `findings` empty.
 
 A report quarantined on the grounding trigger
 ([grounding.md](grounding.md)) starts the same fallback at once, with the
@@ -184,9 +182,10 @@ report: save it unchanged to the report path.
 |---|---|---|
 | Sol | `providerInstanceId: "codex"`, `model: "gpt-6.2-sol"`, `options: {reasoningEffort: "high"}` | `codex exec -C <checkout> -s read-only -m gpt-6.2-sol -c model_reasoning_effort=high --ephemeral -o <report> "<prompt>"` |
 | Argon | `providerInstanceId: "antigravity"`, `model: "gemini-4-argon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-argon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
-| Neon | `providerInstanceId: "antigravity"`, `model: "gemini-4-neon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-neon-high --add-dir <private dir> --output-format stream-json --print-timeout 20m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
+| Neon | `providerInstanceId: "antigravity"`, `model: "gemini-4-neon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-neon-high --add-dir <private dir> --output-format stream-json --print-timeout 30m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
+| Carbon | `providerInstanceId: "antigravity"`, `model: "gemini-4-carbon"`, `options: {thought_level: "high"}` | `agy --mode plan --model gemini-4-carbon-high --add-dir <private dir> --output-format stream-json --print-timeout 30m -p "<prompt>" > <events.jsonl>`, run from the checkout in the background |
 | Claude Sonnet | `providerInstanceId: "claudeAgent"`, `model: "claude-sonnet-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-sonnet-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
-| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}`; as Neon's tier 2 fallback, `fastMode: true` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout; as Neon's tier 2 fallback, `--model grok-4.7-high-fast` |
+| Grok | `providerInstanceId: "cursor"`, `model: "grok-4.7"`, `options: {reasoning_effort: "high", fastMode: false}` | `cursor-agent -p --trust --mode plan --model grok-4.7-high --output-format text "<prompt>" > <report>`, run from the checkout |
 | Claude Opus | `providerInstanceId: "claudeAgent"`, `model: "claude-opus-5-5"`, `options: {effort: "high"}` | `env -u ANTHROPIC_API_KEY claude -p --model claude-opus-5-5 --effort high --permission-mode plan "<prompt>" > <report>` |
 
 `<prompt>` is one short line: read the brief at its absolute path and follow

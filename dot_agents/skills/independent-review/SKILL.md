@@ -22,17 +22,18 @@ family that wrote the change and gives each reviewer's launch route.
 
 - **Tier 1**, the default: one finder, GPT-6.2 Sol when Claude wrote the
   change and Claude Opus 5.5 when Codex wrote it.
-- **Tier 2**: two cross-family finders, adding Gemini 4 Neon, or Grok 4.7
-  when Neon misses its deadline, plus Claude Sonnet 5.5 when Claude wrote the
-  change.
+- **Tier 2**: two cross-family finders, adding Gemini 4 Neon, plus Claude
+  Sonnet 5.5 when Claude wrote the change. Gemini 4 Carbon takes Neon's seat
+  when Neon misses its deadline, and Gemini 4 Argon takes it when Carbon
+  misses too.
   Move up to it without asking
   when the change is large (roughly 1,000+ changed lines) or touches
   authentication, authorization, persistent data or migrations, money, or
   concurrency; for a design review; and when the user asks for a dual, total,
   pair, or deep review.
 - **Tier 3**, the council: three finders, adding Grok 4.7 to tier 2's
-  cross-family pair, with Gemini 4 Argon as Neon's fallback. Only when the
-  user asks for a council.
+  cross-family pair, with the same Neon, Carbon, Argon fallback order. Only
+  when the user asks for a council.
 
 Shape is separate from tier. Each finder reviews the whole scope by default.
 **Deep** review instead gives each finder one lens from
