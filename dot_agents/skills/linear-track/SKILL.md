@@ -63,7 +63,10 @@ all Done, as step 4 says.
 
 When the user approves a feature's summary page (`plan-feature` section 5),
 create one issue in the linked project, unless the session started from an
-existing issue: then use that one and add the `agent` label to it.
+existing issue: then use that one and add the `agent` label to it. The link
+names the repo's main project; a feature that plainly belongs to another
+project in the same area, such as a benchmark run made from a workbench repo,
+goes there instead. Ask in the question batch when it is not plain.
 
 - Title: the feature's name.
 - Description, written once: the goal in one sentence, the decisions the user
