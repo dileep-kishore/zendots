@@ -5,13 +5,23 @@ shows its point, or none when a sentence says it faster.
 
 ## Which visual
 
-| The section answers | Use |
+Find the row whose question your reader is asking. When behaviour, state,
+enforcement or risk carries the point, check the patterns below first.
+
+| The reader asks | Use |
 |---|---|
-| How does the process or decision flow, or how do the parts connect? | Diagram from a graph spec ([diagrams.md](diagrams.md)) |
-| Who calls whom, in what order? | Numbered table of calls, or a graph spec with numbered edge labels |
+| How do the parts connect, or how does a decision branch? | Diagram spec, `graph` kind ([diagrams.md](diagrams.md)) |
+| Who calls whom, in what order, and what comes back? | Diagram spec, `sequence` kind; a numbered table only for a list of calls with no fixed set of actors |
+| Who does each step, and where does work change hands? | Diagram spec, `swimlane` kind |
+| What sits on what, and which layer is the bottleneck? | Diagram spec, `layers` kind |
+| Where does each option sit on two axes? | Diagram spec, `quadrant` kind |
+| Which states and transitions exist? | Diagram spec, `graph` kind |
 | When does each piece happen? | `.timeline` for a short list, duration lanes for measured times |
-| Which states and transitions exist? | Diagram from a graph spec |
 | How does a number vary across categories, time, or two measures? | Vega-Lite bar, line, scatter; heatmap for a matrix |
+| How does a start total become an end total? | Waterfall recipe |
+| How did each item change between two points? | Slopegraph recipe for up to six items; dumbbell recipe for before and after per category |
+| How is each group's value spread out? | Box plot recipe |
+| Who moved up or down the ranking? | Bump chart recipe |
 | How does the result respond to an input the reader can change? | Interactive figure, per [interactive.md](interactive.md) |
 | Which exact values do several series take at a point the reader picks? | `viz.lineChart` interactive figure |
 | What are the exact values, or more than about seven classes? | Table in `.table-wrap` |
@@ -22,6 +32,30 @@ shows its point, or none when a sentence says it faster.
 | How big is the gap between two values? | Two bars and a labelled bracket over the gap (recipe below) |
 | What mechanism do none of those express? | Stepper over inline SVG ([components.md](components.md)) |
 | What exactly does the reader run or paste? | `<pre><code class="language-...">` |
+
+Before drawing, ask whether a three-column table or one sentence says the
+same; if so, use it. Then run the remove test on the figure: drop any node,
+arrow or label the reader would not miss, and merge two nodes that always
+travel together. Above the kind's budget, draw an overview and one figure per
+part.
+
+### When behaviour carries the point
+
+These patterns, adapted from diagram-design's semantic patterns, name what a
+figure must show when a mechanism matters more than its parts. Pick one per
+figure; a second may lend one element.
+
+| The reader must understand | Draw | It must show |
+|---|---|---|
+| Many arrivals competing for one limited service | `graph`, sources fanning into one accent node | Each source, the queue with its count and capacity (`8/hour`, `3 slots`), what is admitted and what waits or is dropped |
+| The same questions asked at every stage | Table with a row per stage and a column per question | Every cell filled or marked `—`, one output per stage |
+| A loose conversation becoming a durable record | `graph`: input, one transform, the record | A short source excerpt, the record's fields, which statement filled which field, the fields still unknown |
+| Why two decisions differ, and where they first part | Two `sequence` diagrams side by side, or a table of rules | Each rule's result for both cases (pass, fail, skipped, not reached), the first divergence as the accent |
+| Which routes cross a trust boundary and which are blocked | `graph` with one group per trust zone | The allowed paths solid, the blocked ones dashed and labelled, the boundary as a group |
+| Which controls apply where they are enforced | `layers`, one band per enforcement point | The controls in each band's detail, no control listed twice |
+| How defences reduce risk and what risk remains | `layers`, outermost defence on top | What each layer stops, and a callout on the risk that gets through |
+| How a system breaks into citable parts | `graph`, `direction: DOWN`, one group per level | Stable ids in titles (`B2.1`), each part's input and output in its detail, a link to the code in the caption |
+| How one thing moves through phases, waits, retries and ends | `graph` with a main row and side states, or `swimlane` when owners change | Every state, both terminal outcomes, every transition labelled, retries as dashed returns |
 
 Comparisons draw the difference, not one box per option. One value is a
 sentence or a tile, never a chart.
@@ -51,7 +85,7 @@ Write captions to the three-part shape in
 ```
 
 Mark the one value or node the reader must notice with `class="hot"` (cells,
-tile numbers) or `tone: "accent"` in a graph spec; never more than one
+tile numbers) or `tone: "accent"` in a diagram spec; never more than one
 per figure.
 
 ## Code
@@ -70,7 +104,7 @@ tag tight against the first character or the block gains a blank first line.
 
 ## Diagrams
 
-Write a graph spec and run the [diagram command](diagrams.md). Paste its
+Write a diagram spec (any kind) and run the [diagram command](diagrams.md). Paste its
 `.diagram.html` fragment, an inline SVG inside `<div class="diagram">`, before
 the figure's caption. The SVG reads the page's colour tokens and fonts, so it
 needs no light/dark pair. Keep the spec JSON beside the artifact.
@@ -183,6 +217,134 @@ one, labelled with the difference:
    "encoding": {"x": {"field": "mid", "type": "quantitative"}, "text": {"field": "label"}}}]}
 ```
 
+### Chart recipes
+
+Each was rendered in the template and its printed values compared with its
+data. Change the data and labels, keep the transforms.
+
+A **waterfall** bridges a start total to an end total through signed steps.
+The running total comes from a window sum, so the end bar always equals the
+start plus the steps; give the last row `"delta": 0`. Labels print the values
+as given, decimals included, with thousands separators. The transforms name
+the first and last rows `Start` and `End`; rename them there too. Totals are muted,
+rises green, falls red, and every bar prints its value.
+
+```json
+{"width": "container", "height": 260,
+ "data": {"values": [
+   {"step": "Start", "delta": 42},
+   {"step": "New hires", "delta": 9},
+   {"step": "Transfers in", "delta": 3},
+   {"step": "Attrition", "delta": -6},
+   {"step": "Contract ends", "delta": -4},
+   {"step": "End", "delta": 0}]},
+ "transform": [
+   {"window": [{"op": "sum", "field": "delta", "as": "to"}]},
+   {"calculate": "datum.step === 'End' ? 0 : datum.to - datum.delta", "as": "from"},
+   {"calculate": "datum.step === 'Start' ? 0 : datum.from", "as": "from"},
+   {"calculate": "datum.step === 'Start' || datum.step === 'End' ? 'total' : datum.delta > 0 ? 'up' : 'down'", "as": "kind"},
+   {"calculate": "datum.kind === 'total' ? format(datum.to, ',') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), ',')", "as": "label"},
+   {"calculate": "max(datum.from, datum.to)", "as": "top"}],
+ "encoding": {"x": {"field": "step", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "bar", "tooltip": true},
+    "encoding": {"y": {"field": "from", "type": "quantitative", "title": "Headcount"}, "y2": {"field": "to"},
+                 "color": {"field": "kind", "type": "nominal", "legend": null,
+                           "scale": {"domain": ["total", "up", "down"], "range": ["var(--muted-foreground)", "var(--green)", "var(--red)"]}}}},
+   {"mark": {"type": "text", "dy": -7},
+    "encoding": {"y": {"field": "top", "type": "quantitative"}, "text": {"field": "label"}}}]}
+```
+
+A **slopegraph** shows each entity's change between exactly two points. Print
+both values, name each line at its right end, and colour only the subject.
+Over about six lines, use a table. The right padding holds the end labels.
+
+```json
+{"width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 260,
+ "data": {"values": [
+   {"model": "Baseline", "split": "Validation", "f1": 0.71}, {"model": "Baseline", "split": "Held-out", "f1": 0.69},
+   {"model": "Fine-tuned", "split": "Validation", "f1": 0.84}, {"model": "Fine-tuned", "split": "Held-out", "f1": 0.73},
+   {"model": "Retrieval", "split": "Validation", "f1": 0.78}, {"model": "Retrieval", "split": "Held-out", "f1": 0.77}]},
+ "encoding": {"x": {"field": "split", "type": "nominal", "sort": ["Validation", "Held-out"], "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "f1", "type": "quantitative", "title": "F1", "scale": {"zero": false}},
+              "detail": {"field": "model"},
+              "color": {"condition": {"test": "datum.model == 'Fine-tuned'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.split == 'Held-out'"}, {"calculate": "datum.model + ' ' + format(datum.f1, '.2f')", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}},
+   {"transform": [{"filter": "datum.split == 'Validation'"}],
+    "mark": {"type": "text", "align": "right", "dx": -8}, "encoding": {"text": {"field": "f1", "format": ".2f"}}}]}
+```
+
+A **dumbbell** compares two values per category, such as before and after.
+The rule spans the two, the later value is the accent, and only the later
+values are printed.
+
+```json
+{"width": "container", "height": 180,
+ "data": {"values": [
+   {"stage": "Fetch", "run": "Before", "min": 12}, {"stage": "Fetch", "run": "After", "min": 11},
+   {"stage": "Parse", "run": "Before", "min": 21}, {"stage": "Parse", "run": "After", "min": 6},
+   {"stage": "Embed", "run": "Before", "min": 34}, {"stage": "Embed", "run": "After", "min": 29}]},
+ "encoding": {"y": {"field": "stage", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "rule", "color": "var(--muted-foreground)", "strokeWidth": 2},
+    "encoding": {"x": {"aggregate": "min", "field": "min", "type": "quantitative", "title": "Minutes per run"}, "x2": {"aggregate": "max", "field": "min"}}},
+   {"mark": {"type": "point", "filled": true, "size": 90, "tooltip": true},
+    "encoding": {"x": {"field": "min", "type": "quantitative"},
+                 "color": {"field": "run", "type": "nominal", "sort": ["Before", "After"], "title": null,
+                           "scale": {"domain": ["Before", "After"], "range": ["var(--muted-foreground)", "var(--accent)"]}}}},
+   {"transform": [{"filter": "datum.run == 'After'"}],
+    "mark": {"type": "text", "dy": -12}, "encoding": {"x": {"field": "min", "type": "quantitative"}, "text": {"field": "min"}}}]}
+```
+
+A **box plot** shows a distribution per group: median, quartiles, whiskers
+at 1.5 times the interquartile range, and outliers. Print the medians. With
+fewer than about eight points per group, plot the points instead.
+
+```json
+{"width": "container", "height": 200,
+ "data": {"values": [
+   {"node": "A100", "s": 41}, {"node": "A100", "s": 44}, {"node": "A100", "s": 45}, {"node": "A100", "s": 47}, {"node": "A100", "s": 52}, {"node": "A100", "s": 70},
+   {"node": "H100", "s": 22}, {"node": "H100", "s": 24}, {"node": "H100", "s": 25}, {"node": "H100", "s": 26}, {"node": "H100", "s": 29}, {"node": "H100", "s": 31}]},
+ "encoding": {"y": {"field": "node", "type": "nominal", "title": null}},
+ "layer": [
+   {"mark": {"type": "boxplot", "extent": 1.5, "size": 22, "color": "var(--blue)",
+             "median": {"color": "var(--ground)", "strokeWidth": 2}, "rule": {"color": "var(--muted-foreground)"},
+             "ticks": false, "outliers": {"color": "var(--red)"}},
+    "encoding": {"x": {"field": "s", "type": "quantitative", "title": "Seconds per step", "scale": {"zero": false}}}},
+   {"transform": [{"aggregate": [{"op": "median", "field": "s", "as": "med"}], "groupby": ["node"]}],
+    "mark": {"type": "text", "dy": -18}, "encoding": {"x": {"field": "med", "type": "quantitative"}, "text": {"field": "med", "format": ".1f"}}}]}
+```
+
+A **bump chart** shows rank movement across three or more snapshots. Ranks
+come from a `row_number` window sorted by value with ties broken by name, so
+equal scores never share a rank. Rank 1 is at the top and the axis takes as many
+ranks as there are entities; the end labels carry the last value.
+
+```json
+{"width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 220,
+ "data": {"values": [
+   {"week": "W1", "team": "Atlas", "pts": 31}, {"week": "W1", "team": "Birch", "pts": 28}, {"week": "W1", "team": "Cove", "pts": 22}, {"week": "W1", "team": "Dune", "pts": 19},
+   {"week": "W2", "team": "Atlas", "pts": 29}, {"week": "W2", "team": "Birch", "pts": 33}, {"week": "W2", "team": "Cove", "pts": 24}, {"week": "W2", "team": "Dune", "pts": 24},
+   {"week": "W3", "team": "Atlas", "pts": 27}, {"week": "W3", "team": "Birch", "pts": 35}, {"week": "W3", "team": "Cove", "pts": 30}, {"week": "W3", "team": "Dune", "pts": 21}]},
+ "transform": [{"window": [{"op": "row_number", "as": "rank"}], "sort": [{"field": "pts", "order": "descending"}, {"field": "team"}], "groupby": ["week"]}],
+ "encoding": {"x": {"field": "week", "type": "ordinal", "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "sort": "ascending"},
+              "detail": {"field": "team"},
+              "color": {"condition": {"test": "datum.team == 'Cove'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.week == 'W3'"}, {"calculate": "datum.team + ' ' + datum.pts", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}}]}
+```
+
+Recipe colours set the connector rules, box parts and medians explicitly,
+because the page theme colours only plain marks. They use `var(--...)` tokens,
+which the page resolves; a PNG or SVG saved from a chart's own export menu
+loses those colours, so capture the page instead.
+
 ## Palette
 
 Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
@@ -214,7 +376,7 @@ Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
 ## Inline SVG
 
 These rules apply when incorporating an existing SVG asset. Author new
-diagrams as a graph spec by default; its generated SVG styles marks with
+diagrams as a diagram spec by default; its generated SVG styles marks with
 `style="...var(--token)..."`, which follows the theme and is allowed.
 
 ```html

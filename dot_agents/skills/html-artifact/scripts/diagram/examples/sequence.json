@@ -1,0 +1,29 @@
+{
+  "id": "token-refresh",
+  "kind": "sequence",
+  "title": "Token refresh on an API call",
+  "alt": "The browser calls the API with an access token and the API verifies it. If the token is valid the API reads the orders from the database; if it has expired the API asks the auth service, which reads the refresh grant from the database and returns a new token. The API answers the browser and sends an audit event to the auth service without waiting.",
+  "actors": [
+    {"id": "browser", "title": "Browser", "icon": "laptop"},
+    {"id": "api", "title": "API", "detail": "gateway", "icon": "api"},
+    {"id": "auth", "title": "Auth service", "icon": "key"},
+    {"id": "db", "title": "Database", "icon": "database"}
+  ],
+  "messages": [
+    {"id": "call", "from": "browser", "to": "api", "label": "GET /orders + token"},
+    {"from": "api", "to": "api", "label": "verify signature"},
+    {"from": "api", "to": "db", "label": "SELECT orders"},
+    {"from": "db", "to": "api", "label": "rows", "type": "return"},
+    {"from": "api", "to": "auth", "label": "POST /refresh"},
+    {"from": "auth", "to": "db", "label": "read refresh grant"},
+    {"from": "db", "to": "auth", "label": "grant", "type": "return"},
+    {"from": "auth", "to": "api", "label": "new token", "type": "return"},
+    {"id": "answer", "from": "api", "to": "browser", "label": "200 + Set-Cookie", "type": "return", "tone": "accent"},
+    {"id": "audit", "from": "api", "to": "auth", "label": "audit event", "type": "async"}
+  ],
+  "frames": [
+    {"op": "alt", "guard": "token valid", "start": 2, "end": 7, "else": 4, "elseGuard": "token expired"}
+  ],
+  "legend": [["return or async (open head)", "dashed"]],
+  "notes": [{"target": "db", "text": "Refresh grants rotate on every use"}]
+}

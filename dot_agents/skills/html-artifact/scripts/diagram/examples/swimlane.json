@@ -1,0 +1,36 @@
+{
+  "id": "release-handoff",
+  "kind": "swimlane",
+  "title": "From pull request to release",
+  "alt": "An engineer opens a pull request; CI runs lint and unit tests while a reviewer is assigned. Review either sends the change back to the engineer or approves it, which starts the release build and release notes before the release manager publishes.",
+  "legend": [["requests changes", "dashed"], ["the release gate", "accent"]],
+  "lanes": [
+    {"id": "eng", "label": "Engineer"},
+    {"id": "ci", "label": "CI"},
+    {"id": "rev", "label": "Reviewer"},
+    {"id": "rm", "label": "Release manager"}
+  ],
+  "steps": [
+    {"id": "pr", "lane": "eng", "title": "Open PR", "icon": "git-branch"},
+    {"id": "lint", "lane": "ci", "title": "Lint", "icon": "terminal"},
+    {"id": "tests", "lane": "ci", "title": "Unit tests", "icon": "pipeline"},
+    {"id": "assign", "lane": "rev", "title": "Assign", "icon": "users"},
+    {"id": "review", "lane": "rev", "title": "Review", "icon": "search"},
+    {"id": "build", "lane": "ci", "title": "Build", "icon": "container"},
+    {"id": "notes", "lane": "rm", "title": "Draft notes", "icon": "file"},
+    {"id": "publish", "lane": "rm", "title": "Publish", "icon": "cloud", "tone": "accent"}
+  ],
+  "edges": [
+    {"from": "pr", "to": "lint", "label": "push"},
+    {"from": "pr", "to": "tests"},
+    {"from": "pr", "to": "assign"},
+    {"from": "lint", "to": "review"},
+    {"from": "tests", "to": "review"},
+    {"from": "assign", "to": "review"},
+    {"from": "review", "to": "pr", "label": "changes requested", "back": true},
+    {"from": "review", "to": "build", "label": "approved"},
+    {"from": "review", "to": "notes"},
+    {"from": "build", "to": "publish", "label": "artifact"},
+    {"from": "notes", "to": "publish"}
+  ]
+}

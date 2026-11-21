@@ -35,7 +35,15 @@
     if (hasError(fig) || hasError(host)) return;
     var drew;
     if (el.matches('.lanes')) drew = !!el.querySelector('.track i');
-    else {
+    else if (el.matches('.vega')) {
+      // vega-embed adds a sized export-menu icon, so only data marks (not axes or legends) count as drawn.
+      var marks = el.querySelector('svg.marks');
+      drew = !!marks && boxed(marks) && !!marks.querySelector('.role-mark > path, .role-mark > rect, .role-mark > text, .role-mark > line, .role-mark > image, .role-mark > g');
+    } else if (host.matches('.diagram')) {
+      var dsvg = host.querySelector('svg');
+      // Marker shapes inside <defs> are definitions, not drawing.
+      drew = !!dsvg && boxed(dsvg) && Array.prototype.some.call(dsvg.querySelectorAll('rect, path, circle'), function (m) { return !m.closest('defs'); });
+    } else {
       var svg = host.querySelector('svg');
       drew = !!svg && boxed(svg);
     }

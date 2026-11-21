@@ -1,0 +1,26 @@
+{
+  "id": "article-review",
+  "kind": "swimlane",
+  "direction": "DOWN",
+  "title": "Article review",
+  "alt": "An author drafts an article and an editor reviews it, sending it back for revision or passing it to the publisher, who schedules and then publishes it.",
+  "lanes": [
+    {"id": "author", "label": "Author"},
+    {"id": "editor", "label": "Editor"},
+    {"id": "pub", "label": "Publisher"}
+  ],
+  "steps": [
+    {"id": "draft", "lane": "author", "title": "Draft", "detail": "first full text"},
+    {"id": "edit", "lane": "editor", "title": "Edit", "detail": "structure · facts"},
+    {"id": "approve", "lane": "editor", "title": "Approve"},
+    {"id": "schedule", "lane": "pub", "title": "Schedule"},
+    {"id": "publish", "lane": "pub", "title": "Publish", "tone": "accent"}
+  ],
+  "edges": [
+    {"from": "draft", "to": "edit", "label": "submit"},
+    {"from": "edit", "to": "draft", "label": "revise", "back": true},
+    {"from": "edit", "to": "approve"},
+    {"from": "approve", "to": "schedule", "label": "ready"},
+    {"from": "schedule", "to": "publish"}
+  ]
+}
