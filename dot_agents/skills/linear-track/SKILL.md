@@ -80,6 +80,14 @@ goes there instead. Ask in the question batch when it is not plain.
   issue whose description you leave as the user wrote it, this comment also
   carries the answered decisions and the done checks.
 
+## Show the issue
+
+Whenever the session creates or takes an issue, link it to the thread with
+T3 Code's issue-link tool (`link_issue` with the issue's `linear.app` URL) when
+the harness offers it, so it shows beside the thread. In every message that
+names an issue, write it as a link, `[LBNL-123](https://linear.app/...)`, so
+the user can open it in one click.
+
 ## 4. Move it as the work moves
 
 | When | Status | Comment |
@@ -102,7 +110,7 @@ Check every issue this session created or touched: its status matches the
 work, and a finished one has its result comment. Cancel any issue created
 only for testing and remove it from its project, since the Linear tools cannot
 delete issues, then tell the user it can be deleted in the app. List each
-issue ID with its status in your report.
+issue as a link with its status in your report.
 
 ## Repo links
 
