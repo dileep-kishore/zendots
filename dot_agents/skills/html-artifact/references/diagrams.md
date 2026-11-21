@@ -1,7 +1,9 @@
 # Diagrams
 
-Describe the diagram as a short graph spec and let the bundled command lay it
-out. Never place coordinates by hand: the layout engine (ELK) sizes every box
+Describe the diagram as a short JSON spec and let the bundled command lay it
+out. A spec's `kind` picks the drawing: `graph` (the default, below) for parts
+and flows, and the kinds after Limits for call sequences, swimlanes, layer
+stacks and quadrants. Never place coordinates by hand: the layout engine (ELK) sizes every box
 from its measured text, routes arrows at right angles, and keeps labels off
 the strokes. The default output is one inline SVG drawn with the page's own
 fonts and colour tokens, so it follows the theme toggle and prints without an
@@ -131,3 +133,26 @@ takes a layer, or drops the arrows that cross between zones. Reorder nodes,
 change `direction`, or split the figure. Text is measured with SN Pro and iA
 Writer Mono plus 6% slack, so an offline reader with neither face still sees
 labels inside their boxes. Check the result in both themes after pasting it.
+
+## Layer stack (`"kind": "layers"`)
+
+For a real hierarchy: a tech stack, abstraction levels, enforcement points, a
+request path. When the parts are not stacked, use a graph or a swimlane.
+
+```json
+{"id": "stack", "kind": "layers", "alt": "...", "axis": "abstraction ↑",
+ "layers": [
+   {"id": "page", "tag": "L3", "title": "Page", "detail": "sections · prose", "icon": "file"},
+   {"id": "runtime", "tag": "L2", "title": "Template runtime", "detail": "tokens · theme", "tone": "accent"},
+   {"id": "fonts", "tag": "L1", "title": "Fonts", "detail": "SN Pro · iA Writer"}]}
+```
+
+- `layers[]`, top to bottom, 2 to 7 (fewer is an error, more warns). Each has
+  a `title`, and optionally an `id` (a note target), a short `tag` drawn far
+  left in mono, a `detail` drawn far right, a `tone`, and an `icon`.
+- `accent` marks the one focal layer with a wash; any other tone colours only
+  the band's outline, so the stack still reads as one hierarchy.
+- `axis`: an arrow in the left margin, such as `"abstraction ↑"` or
+  `"requests ↓"`; the trailing arrow sets its direction.
+- Every band has the same width and height; long titles and details wrap, and
+  all bands grow together.
