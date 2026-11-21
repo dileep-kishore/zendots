@@ -183,6 +183,133 @@ one, labelled with the difference:
    "encoding": {"x": {"field": "mid", "type": "quantitative"}, "text": {"field": "label"}}}]}
 ```
 
+### Chart recipes
+
+Each was rendered in the template and its printed values compared with its
+data. Change the data and labels, keep the transforms.
+
+A **waterfall** bridges a start total to an end total through signed steps.
+The running total comes from a window sum, so the end bar always equals the
+start plus the steps; give the last row `"delta": 0`. The transforms name
+the first and last rows `Start` and `End`; rename them there too. Totals are muted,
+rises green, falls red, and every bar prints its value.
+
+```json
+{"width": "container", "height": 260,
+ "data": {"values": [
+   {"step": "Start", "delta": 42},
+   {"step": "New hires", "delta": 9},
+   {"step": "Transfers in", "delta": 3},
+   {"step": "Attrition", "delta": -6},
+   {"step": "Contract ends", "delta": -4},
+   {"step": "End", "delta": 0}]},
+ "transform": [
+   {"window": [{"op": "sum", "field": "delta", "as": "to"}]},
+   {"calculate": "datum.step === 'End' ? 0 : datum.to - datum.delta", "as": "from"},
+   {"calculate": "datum.step === 'Start' ? 0 : datum.from", "as": "from"},
+   {"calculate": "datum.step === 'Start' || datum.step === 'End' ? 'total' : datum.delta > 0 ? 'up' : 'down'", "as": "kind"},
+   {"calculate": "datum.kind === 'total' ? format(datum.to, 'd') : (datum.delta > 0 ? '+' : '−') + format(abs(datum.delta), 'd')", "as": "label"},
+   {"calculate": "max(datum.from, datum.to)", "as": "top"}],
+ "encoding": {"x": {"field": "step", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "bar", "tooltip": true},
+    "encoding": {"y": {"field": "from", "type": "quantitative", "title": "Headcount"}, "y2": {"field": "to"},
+                 "color": {"field": "kind", "type": "nominal", "legend": null,
+                           "scale": {"domain": ["total", "up", "down"], "range": ["var(--muted-foreground)", "var(--green)", "var(--red)"]}}}},
+   {"mark": {"type": "text", "dy": -7},
+    "encoding": {"y": {"field": "top", "type": "quantitative"}, "text": {"field": "label"}}}]}
+```
+
+A **slopegraph** shows each entity's change between exactly two points. Print
+both values, name each line at its right end, and colour only the subject.
+Over about six lines, use a table. The right padding holds the end labels.
+
+```json
+{"width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 260,
+ "data": {"values": [
+   {"model": "Baseline", "split": "Validation", "f1": 0.71}, {"model": "Baseline", "split": "Held-out", "f1": 0.69},
+   {"model": "Fine-tuned", "split": "Validation", "f1": 0.84}, {"model": "Fine-tuned", "split": "Held-out", "f1": 0.73},
+   {"model": "Retrieval", "split": "Validation", "f1": 0.78}, {"model": "Retrieval", "split": "Held-out", "f1": 0.77}]},
+ "encoding": {"x": {"field": "split", "type": "nominal", "sort": ["Validation", "Held-out"], "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "f1", "type": "quantitative", "title": "F1", "scale": {"zero": false}},
+              "detail": {"field": "model"},
+              "color": {"condition": {"test": "datum.model == 'Fine-tuned'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.split == 'Held-out'"}, {"calculate": "datum.model + ' ' + format(datum.f1, '.2f')", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}},
+   {"transform": [{"filter": "datum.split == 'Validation'"}],
+    "mark": {"type": "text", "align": "right", "dx": -8}, "encoding": {"text": {"field": "f1", "format": ".2f"}}}]}
+```
+
+A **dumbbell** compares two values per category, such as before and after.
+The rule spans the two, the later value is the accent, and only the later
+values are printed.
+
+```json
+{"width": "container", "height": 180,
+ "data": {"values": [
+   {"stage": "Fetch", "run": "Before", "min": 12}, {"stage": "Fetch", "run": "After", "min": 11},
+   {"stage": "Parse", "run": "Before", "min": 21}, {"stage": "Parse", "run": "After", "min": 6},
+   {"stage": "Embed", "run": "Before", "min": 34}, {"stage": "Embed", "run": "After", "min": 29}]},
+ "encoding": {"y": {"field": "stage", "type": "nominal", "sort": null, "title": null}},
+ "layer": [
+   {"mark": {"type": "rule", "color": "var(--muted-foreground)", "strokeWidth": 2},
+    "encoding": {"x": {"aggregate": "min", "field": "min", "type": "quantitative", "title": "Minutes per run"}, "x2": {"aggregate": "max", "field": "min"}}},
+   {"mark": {"type": "point", "filled": true, "size": 90, "tooltip": true},
+    "encoding": {"x": {"field": "min", "type": "quantitative"},
+                 "color": {"field": "run", "type": "nominal", "sort": ["Before", "After"], "title": null,
+                           "scale": {"domain": ["Before", "After"], "range": ["var(--muted-foreground)", "var(--accent)"]}}}},
+   {"transform": [{"filter": "datum.run == 'After'"}],
+    "mark": {"type": "text", "dy": -12}, "encoding": {"x": {"field": "min", "type": "quantitative"}, "text": {"field": "min"}}}]}
+```
+
+A **box plot** shows a distribution per group: median, quartiles, whiskers
+at 1.5 times the interquartile range, and outliers. Print the medians. With
+fewer than about eight points per group, plot the points instead.
+
+```json
+{"width": "container", "height": 200,
+ "data": {"values": [
+   {"node": "A100", "s": 41}, {"node": "A100", "s": 44}, {"node": "A100", "s": 45}, {"node": "A100", "s": 47}, {"node": "A100", "s": 52}, {"node": "A100", "s": 70},
+   {"node": "H100", "s": 22}, {"node": "H100", "s": 24}, {"node": "H100", "s": 25}, {"node": "H100", "s": 26}, {"node": "H100", "s": 29}, {"node": "H100", "s": 31}]},
+ "encoding": {"y": {"field": "node", "type": "nominal", "title": null}},
+ "layer": [
+   {"mark": {"type": "boxplot", "extent": 1.5, "size": 22, "color": "var(--blue)",
+             "median": {"color": "var(--ground)", "strokeWidth": 2}, "rule": {"color": "var(--muted-foreground)"},
+             "ticks": false, "outliers": {"color": "var(--red)"}},
+    "encoding": {"x": {"field": "s", "type": "quantitative", "title": "Seconds per step", "scale": {"zero": false}}}},
+   {"transform": [{"aggregate": [{"op": "median", "field": "s", "as": "med"}], "groupby": ["node"]}],
+    "mark": {"type": "text", "dy": -18}, "encoding": {"x": {"field": "med", "type": "quantitative"}, "text": {"field": "med", "format": ".1f"}}}]}
+```
+
+A **bump chart** shows rank movement across three or more snapshots. Ranks
+come from a `row_number` window sorted by value with ties broken by name, so
+equal scores never share a rank. Rank 1 is at the top; the end labels carry
+the last value.
+
+```json
+{"width": "container", "padding": {"left": 5, "top": 10, "bottom": 5, "right": 110}, "height": 220,
+ "data": {"values": [
+   {"week": "W1", "team": "Atlas", "pts": 31}, {"week": "W1", "team": "Birch", "pts": 28}, {"week": "W1", "team": "Cove", "pts": 22}, {"week": "W1", "team": "Dune", "pts": 19},
+   {"week": "W2", "team": "Atlas", "pts": 29}, {"week": "W2", "team": "Birch", "pts": 33}, {"week": "W2", "team": "Cove", "pts": 24}, {"week": "W2", "team": "Dune", "pts": 24},
+   {"week": "W3", "team": "Atlas", "pts": 27}, {"week": "W3", "team": "Birch", "pts": 35}, {"week": "W3", "team": "Cove", "pts": 30}, {"week": "W3", "team": "Dune", "pts": 21}]},
+ "transform": [{"window": [{"op": "row_number", "as": "rank"}], "sort": [{"field": "pts", "order": "descending"}, {"field": "team"}], "groupby": ["week"]}],
+ "encoding": {"x": {"field": "week", "type": "ordinal", "title": null, "scale": {"padding": 0.3}},
+              "y": {"field": "rank", "type": "ordinal", "title": "Rank", "scale": {"domain": [1, 2, 3, 4]}},
+              "detail": {"field": "team"},
+              "color": {"condition": {"test": "datum.team == 'Cove'", "value": "var(--accent)"}, "value": "var(--muted-foreground)"}},
+ "layer": [
+   {"mark": {"type": "line", "point": true, "tooltip": true}},
+   {"transform": [{"filter": "datum.week == 'W3'"}, {"calculate": "datum.team + ' ' + datum.pts", "as": "end"}],
+    "mark": {"type": "text", "align": "left", "dx": 8}, "encoding": {"text": {"field": "end"}}}]}
+```
+
+Recipe colours set the connector rules, box parts and medians explicitly,
+because the page theme colours only plain marks. They use `var(--...)` tokens,
+which the page resolves; a PNG or SVG saved from a chart's own export menu
+loses those colours, so capture the page instead.
+
 ## Palette
 
 Catppuccin: Mocha in dark mode, Latte in light, supplied by the template.
