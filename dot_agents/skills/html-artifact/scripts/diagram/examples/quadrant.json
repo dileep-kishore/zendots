@@ -1,0 +1,20 @@
+{
+  "id": "backlog-map",
+  "kind": "quadrant",
+  "title": "Where the next quarter goes",
+  "alt": "Nine backlog items placed by effort and impact. Fixing the signup bug is the one quick win to start now; rewriting billing is costly and changes little.",
+  "axes": {"x": ["easy", "hard"], "y": ["minor", "major"]},
+  "quadrants": ["Quick wins", "Big bets", "Fill-ins", "Money pits"],
+  "items": [
+    {"id": "signup", "title": "Fix signup bug", "x": 0.14, "y": 0.86, "tone": "accent"},
+    {"id": "cache", "title": "Cache search", "x": 0.31, "y": 0.71},
+    {"id": "welcome", "title": "Welcome email", "x": 0.2, "y": 0.6},
+    {"id": "sso", "title": "SSO for teams", "x": 0.68, "y": 0.84},
+    {"id": "offline", "title": "Offline mode", "x": 0.84, "y": 0.64},
+    {"id": "dark", "title": "Dark mode", "x": 0.16, "y": 0.32},
+    {"id": "settings", "title": "Tidy settings", "x": 0.37, "y": 0.17},
+    {"id": "themes", "title": "Custom themes", "x": 0.63, "y": 0.36},
+    {"id": "billing", "title": "Rewrite billing", "x": 0.86, "y": 0.2}
+  ],
+  "notes": [{"target": "billing", "text": "Six weeks of work for a change no customer asked for"}]
+}

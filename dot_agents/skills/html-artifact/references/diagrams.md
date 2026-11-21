@@ -219,3 +219,31 @@ request path. When the parts are not stacked, use a graph or a swimlane.
   `"requests ↓"`; the trailing arrow sets its direction.
 - Every band has the same width and height; long titles and details wrap, and
   all bands grow together.
+
+## Quadrant (`"kind": "quadrant"`)
+
+For where each option sits on two measured axes: impact against effort,
+reach against frequency. Positions come from the data, never from layout.
+
+```json
+{"id": "backlog", "kind": "quadrant", "alt": "...",
+ "axes": {"x": ["easy", "hard"], "y": ["minor", "major"]},
+ "quadrants": ["quick wins", "big bets", "fill-ins", "money pits"],
+ "items": [{"id": "signup", "title": "Fix signup bug", "x": 0.2, "y": 0.85, "tone": "accent"},
+           {"id": "sso", "title": "SSO for teams", "x": 0.7, "y": 0.8}]}
+```
+
+- `axes`: one word for the low and the high end of each axis, drawn beyond
+  the axis tips; never a phrase, an arrow glyph, or "high/low".
+- `quadrants`: optional corner labels, top left, top right, bottom left,
+  bottom right.
+- `items[]`: `id`, a one-to-three-word `title`, `x` and `y` from 0 to 1 (0 is
+  left and bottom), optional `tone`; `accent` marks the one item to act on.
+  A value outside 0 to 1, exactly 0.5 (on an axis), or two items at one
+  point are errors.
+- Labels go right of their dot, else left; a crowded cluster stacks its labels
+  in a column inside the quadrant, each joined to its dot by a hairline
+  leader. The plot grows from 480 units up to 780 when labels need room, and
+  the command stops and names the items when they still do not fit.
+- Budget: about 9 items; it warns above 12. A note works best on an item
+  near the left or right edge.
