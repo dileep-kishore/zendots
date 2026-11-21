@@ -40,9 +40,11 @@ try {
   try {
     res = await page.evaluate(([g, o]) => (window as any).renderDiagram(g, o), [graph, opts] as const);
   } catch (error) {
-    // Layouts throw for specs they cannot draw (a note with no clear side); report the message, not a stack.
+    // Layouts mark the specs they cannot draw with [spec]; report those as a rejection, and anything else as a crash.
     const message = error instanceof Error ? error.message : String(error);
-    throw Object.assign(new Error(message.replace(/^(page\.)?evaluate: (Error: )?/, '').split('\n    at ')[0]), { spec: true });
+    const at = message.indexOf('[spec] ');
+    if (at < 0) throw error;
+    throw Object.assign(new Error(message.slice(at + 7).split('\n    at ')[0]), { spec: true });
   }
   const found = res.violations.map((v: { rule: string; what: string }) => `${v.rule}: ${v.what}`);
   if (res.strict && found.length) {

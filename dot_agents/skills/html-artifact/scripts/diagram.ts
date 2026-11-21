@@ -18,7 +18,7 @@ const KIND_NAMES = ['graph', ...Object.keys(KINDS)];
 const text = (v: unknown) => typeof v === 'string' && v.trim().length > 0;
 // A collection that is present but not an array is reported once and then skipped, never iterated.
 const list = (g: any, key: string, errors: string[]): any[] => {
-  if (g[key] === undefined) return [];
+  if (g[key] === undefined || g[key] === null) return [];
   if (Array.isArray(g[key])) return g[key];
   errors.push(`${key} must be an array`);
   return [];
@@ -68,6 +68,7 @@ function validate(g: any): { errors: string[]; warns: string[] } {
   const errors: string[] = [], warns: string[] = [];
   if (!text(g.id) || !/^[a-z][a-z0-9-]*$/.test(g.id)) errors.push('id must be a lowercase slug, unique on the page (it prefixes SVG ids)');
   if (!text(g.alt)) errors.push('alt must describe the diagram for screen readers');
+  if (g.title !== undefined && typeof g.title !== 'string') errors.push('title must be a string');
   const kind = g.kind ?? 'graph';
   if (!KIND_NAMES.includes(kind)) return { errors: [...errors, `kind must be one of ${KIND_NAMES.join(', ')}`], warns };
   if (kind === 'graph') errors.push(...validateGraph(g));
@@ -90,6 +91,7 @@ function validate(g: any): { errors: string[]; warns: string[] } {
     });
   }
   const iconHosts = kind === 'graph' ? (Array.isArray(g.nodes) ? g.nodes : []) : kind === 'sequence' ? (Array.isArray(g.actors) ? g.actors : []) : kind === 'swimlane' ? (Array.isArray(g.steps) ? g.steps : []) : kind === 'layers' ? (Array.isArray(g.layers) ? g.layers : []) : [];
+  if (kind === 'quadrant') for (const it of Array.isArray(g.items) ? g.items : []) if (it?.icon !== undefined) errors.push(`item ${it.id}: quadrant items take no icon`);
   for (const h of iconHosts) if (h?.icon !== undefined && !ICON_NAMES.includes(h.icon)) errors.push(`${h.id ?? h.title}: unknown icon ${JSON.stringify(h.icon)}; known icons: ${ICON_NAMES.join(', ')}`);
   return { errors, warns };
 }

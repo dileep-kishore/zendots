@@ -1,4 +1,4 @@
-import { LINE, stroke, text, textBox, type Measure, type Pt, type SItem, type SPath, type SText } from '../scene';
+import { LINE, stroke, text, textBox, type Measure, type Pt, type SItem, type SPath, type SText, specError } from '../scene';
 import { isText, TONES, type Kind } from './types';
 
 type Box = { x: number; y: number; w: number; h: number };
@@ -289,6 +289,6 @@ export const quadrant: Kind = {
       if (r.items) return r.items;
       fail = r.fail;
     }
-    throw new Error(`quadrant ${g.id}: no room for the labels of ${fail.join(', ')} even in a ${MAX}-unit plot; shorten those titles, spread the items, or drop some`);
+    throw specError(`quadrant ${g.id}: no room for the labels of ${fail.join(', ')} even in a ${MAX}-unit plot; shorten those titles, spread the items, or drop some`);
   },
 };

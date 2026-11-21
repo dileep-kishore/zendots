@@ -1,4 +1,4 @@
-import { ICON_SIZE, LINE, nodeBox, sizeNode, text, textBox, type Measure, type Pt, type SItem } from '../scene';
+import { ICON_SIZE, LINE, nodeBox, sizeNode, text, textBox, type Measure, type Pt, type SItem, specError } from '../scene';
 import { isText, TONES, type Kind } from './types';
 
 interface Lane { id: string; label: string }
@@ -20,6 +20,7 @@ function check(g: any): { errors: string[]; warns: string[] } {
   if (!Array.isArray(g.lanes) || !g.lanes.length) errors.push('lanes must be a nonempty array');
   else for (const l of g.lanes) {
     if (!isText(l?.id) || lanes.has(l.id)) errors.push(`lane id missing or duplicated: ${l?.id}`);
+    else if (l.id.includes('|')) errors.push(`lane ${l.id}: ids may not contain "|"`);
     if (!isText(l?.label)) errors.push(`lane ${l?.id} needs a label`);
     lanes.add(l?.id);
   }
@@ -335,7 +336,7 @@ function layout(g: any, m: Measure): SItem[] {
         }
       }
       if ((!best || best.score >= 10) && zoneable(i) && !zoned.has(i)) { need.push(i); return; }
-      if (!best) throw new Error(`edge ${e.from} -> ${e.to}: no clear place beside the arrow for its label "${e.label}"; shorten it`);
+      if (!best) throw specError(`edge ${e.from} -> ${e.to}: no clear place beside the arrow for its label "${e.label}"; shorten it`);
       const { box } = best;
       obst.push(box);
       const bk = { x: box.x - 3, y: box.y, w: box.w + 6, h: box.h };

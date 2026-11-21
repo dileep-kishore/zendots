@@ -136,8 +136,9 @@ export const sequence: Kind = {
     const rows: number[] = [];
     let y = boxH + 24;
     msgs.forEach((msg, k) => {
-      for (const f of frames.filter(f => f.start === k).sort((p, q) => p.depth - q.depth || p.i - q.i)) { y += 4; top.set(f, y); y += 44; }
+      // An alt's divider comes before any frame that opens on its else message: that frame lives in the else branch.
       for (const f of frames.filter(f => f.op === 'alt' && f.else === k)) { divider.set(f, y + 2); y += 28; }
+      for (const f of frames.filter(f => f.start === k).sort((p, q) => p.depth - q.depth || p.i - q.i)) { y += 4; top.set(f, y); y += 44; }
       rows.push(y);
       y += 19 + (msg.from === msg.to ? LOOP_H : 0) + 14;
       for (const f of frames.filter(f => f.end === k).sort((p, q) => q.depth - p.depth || q.i - p.i)) { bottom.set(f, y); y += 10; }

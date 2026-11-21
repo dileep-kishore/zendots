@@ -25,6 +25,8 @@ export const stroke = (t?: string) => t && t !== 'ink' ? `var(--${t})` : 'var(--
 export const tint = (t?: string) => t === 'accent' ? 'var(--accent-soft)' : t && SOFT.has(t) ? `var(--${t}-soft)` : 'var(--surface-2)';
 export const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const f = (v: number) => +v.toFixed(1);
+/** An error the spec's author can fix; export.ts reports these as a rejected layout and anything else as a crash. */
+export const specError = (message: string) => new Error(`[spec] ${message}`);
 
 /** The box a text item occupies: baseline y, measured width, line height. */
 export function textBox(t: SText) {
