@@ -78,6 +78,10 @@
   tool calls finish. Give each a bounded task, the files it may edit, and the
   evidence to return; check that evidence before accepting it. One agent
   drives any shared app session.
+- A subagent for research, exploration, or an audit runs on this session's
+  model unless I name another. Other model families fill the seats
+  `independent-review` assigns and the blind judges I ask for. When you hand
+  off work I asked you to judge, also do your own pass, or say why not.
 - Tests are lasting maintenance. Before adding one, name the failure it would
   catch and the existing check that misses it, in the plan step or your
   report. When no such failure exists, or an existing check already catches
