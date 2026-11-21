@@ -14,20 +14,22 @@ repo-link.sh: the repo-to-Linear-project link, stored as git config zendots.line
 
 Usage:
   repo-link.sh get   [--dir DIR]          print the project ID or "none"; exit 1 when unset
-  repo-link.sh set   VALUE [--dir DIR]    VALUE is a Linear project ID (P-LBNL-31) or "none"
+  repo-link.sh set   VALUE [--dir DIR]    VALUE is a Linear project ID (P-ABC-12) or "none"
   repo-link.sh unset [--dir DIR]          remove the link
-  repo-link.sh list  [--root DIR ...]     every repo under the synced roots, with its link
-  repo-link.sh scan  [--dir DIR] [--base REF] [--text FILE]
+  repo-link.sh list  [--root DIR]...      every repo under the synced roots, with its link
+  repo-link.sh scan  [--dir DIR] [--base REF] [--text FILE|-]
                                           find Linear issue IDs or links in the branch name,
-                                          the commits after REF, and FILE (a draft PR title
-                                          or body); exit 1 when any is found
+                                          the commits after REF (messages and added lines),
+                                          and FILE or stdin (a draft title, body or comment);
+                                          exit 1 when any is found, 2 when it cannot read one
 
 Examples:
   repo-link.sh get
-  repo-link.sh set P-PLA-33 --dir /Volumes/WorkSSD/Personal/bellwether
+  repo-link.sh set P-ABC-12 --dir /Volumes/WorkSSD/Personal/bellwether
   repo-link.sh set none
   repo-link.sh list
   repo-link.sh scan --base origin/main --text /tmp/pr-body.md
+  printf '%s\n' "$reply" | repo-link.sh scan --text -
 USAGE
 }
 
@@ -67,6 +69,10 @@ in_repo() {
   git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 || die "$dir is not a git repository"
 }
 
+if [[ -n "$value" && "$cmd" != "set" ]]; then
+  die "unexpected argument $value for $cmd (try --help)"
+fi
+
 case "$cmd" in
   get)
     in_repo
@@ -79,9 +85,9 @@ case "$cmd" in
     ;;
   set)
     in_repo
-    [[ -n "$value" ]] || die "set needs a value, for example: repo-link.sh set P-LBNL-31"
+    [[ -n "$value" ]] || die "set needs a value, for example: repo-link.sh set P-ABC-12"
     [[ "$value" == "none" || "$value" =~ ^P-[A-Z0-9]+-[0-9]+$ ]] \
-      || die "value must be a Linear project ID such as P-LBNL-31, or none"
+      || die "value must be a Linear project ID such as P-ABC-12, or none"
     current="$(git -C "$dir" config --local --get "$KEY" || true)"
     if [[ "$current" == "$value" ]]; then
       echo "already $KEY=$value"
@@ -116,27 +122,44 @@ case "$cmd" in
     ;;
   scan)
     in_repo
-    pattern="linear\.app/|\b(${TEAM_KEYS})-[0-9]+\b"
+    # Word boundaries treat "_" as a letter, so fix_ABC-12 would slip past \b.
+    pattern="linear\.app/|(^|[^A-Za-z0-9])(${TEAM_KEYS})-[0-9]+([^0-9]|$)"
     found=0
-    branch="$(git -C "$dir" branch --show-current)"
-    if printf '%s\n' "$branch" | grep -Eiq "$pattern"; then
-      echo "branch: $branch"; found=1
-    fi
+    check() {  # $1 label, $2 text; grep exit 1 means no match, anything higher is an error
+      local out rc
+      out="$(printf '%s\n' "$2" | grep -Ei "$pattern")" && rc=0 || rc=$?
+      [[ $rc -le 1 ]] || die "could not scan the $1 text"
+      [[ -z "$out" ]] && return 0
+      while IFS= read -r line; do echo "$1: $line"; done <<<"$out"
+      found=1
+    }
+    branch="$(git -C "$dir" branch --show-current)" || die "could not read the branch"
+    check branch "$branch"
     if [[ -n "$base" ]]; then
       git -C "$dir" rev-parse --verify -q "$base^{commit}" >/dev/null \
         || die "base $base does not resolve; fetch it or pass another ref"
-      while IFS= read -r line; do
-        echo "commit: $line"; found=1
-      done < <(git -C "$dir" log --format='%h %s%n%b' "$base"..HEAD | grep -Ei "$pattern" || true)
+      log="$(git -C "$dir" log --format='%h %s%n%b' "$base"..HEAD)" \
+        || die "could not read commits after $base"
+      diff="$(git -C "$dir" diff --unified=0 --no-color "$base"...HEAD)" \
+        || die "could not read the diff after $base"
+      paths="$(git -C "$dir" diff --name-only "$base"...HEAD)" \
+        || die "could not read the changed paths after $base"
+      check commit "$log"
+      check path "$paths"
+      # Drop only the "+++ b/<path>" headers; an added line may itself start with "++".
+      check added "$(printf '%s\n' "$diff" | sed -n -e '/^+++ [ab]\//d' -e '/^+++ \/dev\/null/d' -e '/^+/p')"
     fi
     if [[ -n "$textfile" ]]; then
-      [[ -f "$textfile" ]] || die "no such file $textfile"
-      while IFS= read -r line; do
-        echo "text: $line"; found=1
-      done < <(grep -Ei "$pattern" "$textfile" || true)
+      if [[ "$textfile" == "-" ]]; then
+        text="$(cat)" || die "could not read stdin"
+      else
+        [[ -f "$textfile" ]] || die "no such file $textfile"
+        text="$(cat -- "$textfile")" || die "could not read $textfile"
+      fi
+      check text "$text"
     fi
     if [[ $found -eq 1 ]]; then
-      echo "repo-link.sh: Linear references found; remove them before pushing" >&2
+      echo "repo-link.sh: Linear references found; remove them before publishing" >&2
       exit 1
     fi
     echo "no Linear references"

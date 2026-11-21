@@ -193,15 +193,15 @@ their first round; add one Solution sentence for it.
 
 Make the planned commits. If a hook rejects or rewrites one, fix it and
 commit again; do not skip hooks. Then fold with a scripted todo, since the
-harness cannot open the rebase editor. Before the push, in every repo, check
-that no Linear issue ID or link is in the branch name, the outgoing commits,
-or the draft title and body (written to a file); Linear is the user's private
-tracker. Exit 1 lists each reference: remove it, rewording commits or
-renaming the branch, before the first push.
+harness cannot open the rebase editor. Before the push, in every repo, scan
+the branch name, the outgoing commits and the lines they add, and the draft
+title and body (written to a file) for Linear issue IDs and links; Linear is
+the user's private tracker. Push only when the scan exits 0, as
+`linear-track`'s opening section says.
 
 ```bash
 GIT_SEQUENCE_EDITOR="sed -i.bak -e 's/^pick d4e5f6/fixup d4e5f6/'" git rebase -i "origin/$base"
-~/.agents/skills/linear-track/scripts/repo-link.sh scan --base "origin/$base" --text <draft file>
+~/.agents/skills/linear-track/scripts/repo-link.sh scan --base "origin/$base" --text <draft file> || exit 1
 date -u +%Y-%m-%dT%H:%M:%SZ   # note it: the push time for step 8
 git push -u origin HEAD
 gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: gh pr edit
@@ -211,8 +211,8 @@ gh pr create --base "$base" --title "<title>" --body "<body>"   # existing PR: g
 through REST instead:
 `gh api repos/<owner>/<repo>/pulls -f title=<title> -f head=<branch> -f base="$base" -F body=@<file>`.
 
-When the repo's Linear link (`linear-track` step 1) names a project, move the
-work's Linear issue to In Review with the PR link, as `linear-track` step 4
+When the work has a Linear issue (named in the request, or tracked in a
+linked repo), move it to In Review with the PR link, as `linear-track` step 4
 says.
 
 Report the URL, the commits and any fold made, the `pr-assets` commit when

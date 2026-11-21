@@ -189,9 +189,9 @@ update path and wait for CI on the new head.
 
 ## 4. Clean up each merged branch
 
-After confirming the merge, move each merged PR's Linear issue to Done with its
-result comment, and close its parent when every sub-issue is Done, as
-`linear-track` step 4 says, when the repo is linked. Then
+After confirming the merge, finish each merged PR's Linear issue, when the work
+has one, as `linear-track` step 4 says: its result comment, its summary, its
+parent when every sub-issue is Done, then the Done status. Then
 follow [artifact cleanup](references/artifact-cleanup.md) before invoking the
 branch cleanup helper. Preserve useful feature-summary
 HTML in the main checkout's ignored artifact folder, stop owned test jobs,

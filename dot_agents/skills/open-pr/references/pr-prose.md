@@ -11,7 +11,8 @@ writes. The global writing rules still hold; these add what review text needs.
 - Keep commit SHAs, file references, commands, and results exactly as they
   are. Never turn a rebuttal into agreement or invent a claim.
 - Before posting, read the whole text, quotes and attachments included, for
-  secrets, tokens, private paths, and personal details; remove them.
+  secrets, tokens, private paths, personal details, and Linear issue IDs or
+  links; remove them.
 - Preview the Markdown once so quotes, lists, and code render as intended.
 
 Apply `humanizer` only when the user asks for it.

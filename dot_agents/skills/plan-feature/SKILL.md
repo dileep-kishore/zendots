@@ -14,15 +14,18 @@ Size the work first. The paperwork grows with it:
 | Size | Before code | After the build |
 |---|---|---|
 | Small: an obvious change to one or two files, no major decision open | Nothing; say you skipped the spec | The usual check and review |
-| Feature: fits one session | Questions, `spec.md`, `spec-intent.md`, `summary.html` | Done checks, review against the spec, page refreshed |
-| Large: several sessions or PRs | The same, plus `plan.md`; a design review when section 3 calls it risky | The same, per PR |
+| Feature: fits one session | Questions, `spec.md`, `spec-intent.md`, `summary.html`; a design review when section 3 calls it risky | Done checks, review against the spec, page refreshed |
+| Large: several sessions or PRs | The same, plus `plan.md` | The same, per PR |
 
 Feature files go in `docs/drafts/<date>-<feature>/`, which the global gitignore
 covers, unless the project's instructions name another ignored folder. A
 feature already filed under `docs/superpowers/` may stay there. Before writing
-the first file, run `git check-ignore -q <folder>/spec.md`; when it fails, add
-that folder's top directory (`/docs/drafts/` by default) to the file
-`git rev-parse --git-path info/exclude` names.
+each file there, check that git ignores it and does not track it
+(`git check-ignore -q <path>`, `git ls-files --error-unmatch <path>` fails).
+When it is not ignored, add the folder's top directory (`/docs/drafts/` by
+default) to the file `git rev-parse --git-path info/exclude` names and check
+again; a path a tracked `.gitignore` unignores stays exposed, so write nothing
+there and ask where to put it.
 
 When the user asks to turn the conversation into a spec, skip the questions in
 section 2 and fill the intent file from the conversation, each decision beside
@@ -109,7 +112,8 @@ new test names the existing check that covers it.
 Write `summary.html` in `html-artifact`'s feature-page format: an overview, the
 key decisions with the undiscussed defaults first, one design diagram, the
 done checks, and what is out of scope, plus the plan's order when there is a
-plan. Present only the key decisions and link the page. Write no code until
+plan. Its approval item names where the work ends (a branch, a PR, or a
+merge) and whether that came from the user or the default. Present only the key decisions and link the page. Write no code until
 the user approves. When the request asked for the build, approval covers it
 through the end state the user chose in section 2. At the approval, create or
 adopt the Linear issue as `linear-track` step 3 says, unless the user chose to

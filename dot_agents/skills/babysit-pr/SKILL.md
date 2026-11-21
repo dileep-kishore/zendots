@@ -220,9 +220,13 @@ Read the live body with `gh pr view <number> --json body` right before
 editing, change only the affected sentences, keep what others added, and
 write it back with `gh pr edit <number> --body-file -`.
 
-Note the push time for step 7's wait, push, then capture the new head:
+Note the push time for step 7's wait, push, then capture the new head. Push
+only when the Linear privacy scan exits 0, and scan each reply the same way
+before posting it, as `linear-track`'s opening section says:
 
 ```bash
+base=$(gh pr view <number> --json baseRefName -q .baseRefName)
+~/.agents/skills/linear-track/scripts/repo-link.sh scan --base "origin/$base" || exit 1
 date -u +%Y-%m-%dT%H:%M:%SZ
 git push
 git rev-parse --short HEAD

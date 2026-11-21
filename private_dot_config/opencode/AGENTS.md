@@ -42,8 +42,10 @@
   before cleanup.
 - Linear is my private tracker; the teams behind my shared repos don't use
   it. In every repo, keep Linear issue IDs and links out of branches,
-  commits, PRs, and PR comments. When a request names a Linear issue, or the
-  repo's git config sets `zendots.linearProject`, follow `linear-track`.
+  commits, files, PRs, and PR comments, and run `linear-track`'s privacy scan
+  before each push, PR, or PR comment. When a request names a Linear issue,
+  or the repo's git config sets `zendots.linearProject`, follow
+  `linear-track`.
 - A decision is major when two sound options would change what a person sees,
   what is stored or deleted, who can do something, a public interface or
   config key, a dependency, a done check or tolerance, or a scientific method

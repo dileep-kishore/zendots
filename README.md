@@ -205,8 +205,8 @@ verifiers. Performance findings must connect a concrete consequence to expected
 load supported by repository evidence, including tests or code bounds, with
 assumptions stated. A design review checks a spec before planning against the
 user's recorded words and its done checks, with a Claude and a Codex finder and
-gates that need no code yet; the `plan-feature` skill runs one for every spec
-it writes.
+gates that need no code yet; the `plan-feature` skill runs one only for risky
+work (several PRs, stored data, auth, or a public interface).
 
 ### OpenCode V2 and Pi
 
