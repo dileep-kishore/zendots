@@ -73,7 +73,7 @@ creating them so merge cleanup can identify them.
 # Preview what a changed path would do (diff is not recursive without -r)
 chezmoi diff -r ~/.zshrc
 
-# Apply only the paths you changed, once the diff is approved
+# Apply only the paths you changed, after reviewing the diff
 chezmoi apply ~/.zshrc
 # `just apply` / `just diff` run the unscoped forms; see "Applying changes"
 
@@ -281,7 +281,7 @@ This repository is the **source** for dotfiles. The typical workflow is:
 
 1. **Modify files** in this repository (using `dot_` prefixes for dotfiles)
 2. **Run `chezmoi diff -r <destination paths>`** to preview what will change
-3. **Run `chezmoi apply <destination paths>`** once the diff is approved (see the agent rules below)
+3. **Run `chezmoi apply <destination paths>`** on every reachable host (see the agent rules below)
 
 Do not directly edit files in `~/.config/` or `~/` if they are managed by chezmoi - edit them in this repository instead.
 
@@ -299,8 +299,15 @@ new skill, then run `~/.local/bin/link-agent-skills.sh`.
 - **Never run a bare `chezmoi apply`.** Always scope it to the target paths you
   actually modified: `chezmoi apply ~/.config/niri/config.kdl ~/.config/mimeapps.list`.
   A bare apply sweeps in unrelated pending changes (e.g. `.agents/.skill-lock.json` churn).
-- **Ask for confirmation before applying.** Show the scoped `chezmoi diff -r <paths>`
-  first and wait for the user to approve. Do not apply as part of a larger action.
+- **Apply your scoped changes on every reachable host without asking.** Read
+  the scoped `chezmoi diff -r <paths>`, apply it, and include the diff in your
+  report. Then apply the same paths on the other reachable hosts over `ssh`
+  once Syncthing has delivered the source: the changed source files' `shasum`
+  matches and `chezmoi status <paths>` shows only the expected rows.
+- **Ask before applying only when the diff could break something.** That
+  covers discarding local edits in a destination file, deleting files, running
+  a `run_` script, changing shell startup, SSH, or login config, touching
+  secrets, or a diff on another host that differs from the one you reviewed.
 - Use the **destination** paths (`~/.config/...`), not the source names (`private_dot_config/...`).
 - **Always pass `-r` to `chezmoi diff`.** Unlike `chezmoi status`, `diff` is not
   recursive by default, so `chezmoi diff ~/.agents/skills/open-pr` prints nothing
@@ -329,8 +336,8 @@ When making changes to configurations, edit these files in the repository:
 - **Git**: `dot_gitconfig`, `dot_gitignore_global`
 - **Packages**: `pkgs/Brewfile`
 
-After editing managed configuration, show the scoped `chezmoi diff -r` and
-apply only the approved paths, as described under "Applying changes".
+After editing managed configuration, apply the changed paths on every
+reachable host, as described under "Applying changes".
 Repository-only docs are ignored by chezmoi and need no apply.
 
 ## Chezmoi File Name Translation

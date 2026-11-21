@@ -100,8 +100,9 @@ chezmoi apply ~/.zshrc ~/.shell_exports ~/.shell_aliases
 
 Repeat for each selected config. Never use an unscoped apply to pick up a small
 change. Apply hooks can also relink Claude skills and enable the agent-update
-scheduler; inspect `.chezmoiscripts/` before deployment. Agents must show the
-scoped diff and obtain approval before any apply.
+scheduler; inspect `.chezmoiscripts/` before deployment. Agents apply scoped
+diffs on every reachable host and ask first only when a diff could break
+something; `CLAUDE.md` lists those cases.
 
 After deploying the relevant tool configs:
 
@@ -170,7 +171,7 @@ Homebrew, and leaves out apps installed there that new Macs skip. Edit it by
 hand rather than with `just dump`, which would undo both.
 
 `just apply` / `just a` and `just diff` / `just d` are still **unscoped** wrappers.
-Use explicit `chezmoi diff -r <paths>` and approved `chezmoi apply <paths>` instead.
+Use explicit `chezmoi diff -r <paths>` and `chezmoi apply <paths>` instead.
 
 ### Shared agent skills
 
