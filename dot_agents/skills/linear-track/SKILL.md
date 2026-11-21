@@ -1,0 +1,109 @@
+---
+name: linear-track
+description: Use when work will create, update, or close a Linear issue for the user's private tracking, when a session starts in a repo whose git config sets zendots.linearProject, when a request names a Linear issue, when a PR opens or merges in such a repo, or when the user asks to link a repo to a Linear project. Not for team trackers such as GitHub issues.
+---
+
+# Track work in Linear, privately
+
+Linear is the user's private tracker. The teams behind their shared repos do
+not use it, so nothing about Linear goes into git or GitHub: no Linear issue
+ID or URL in a branch name, commit message, PR title, PR description, or PR
+comment, in any repo. Write to Linear only through the Linear tools. A Linear
+issue may link a GitHub issue or PR; nothing links back. Before any commit,
+push, PR, or PR comment, check what is about to go out:
+
+```bash
+~/.agents/skills/linear-track/scripts/repo-link.sh scan --base "origin/$base" --text <draft title and body>
+```
+
+It exits 1 and prints each Linear ID or link it finds in the branch name, the
+outgoing commits, and the draft text. Remove them before publishing.
+
+## 0. Read a named issue first
+
+When the request names a Linear issue, read it and its comments before
+planning (the issue lookup leaves comments out; list them separately). Later
+comments can change the scope. That issue is the tracking record for the
+work, even in a repo whose link is `none`.
+
+## 1. Find the repo's project
+
+```bash
+~/.agents/skills/linear-track/scripts/repo-link.sh get
+```
+
+It prints a Linear project ID, or `none` for a repo Linear does not track, and
+exits 1 when the repo has no link. With `none`, do nothing in Linear. With no
+link, ask which project in the first question batch, with the projects whose
+names match the repo as options and "not tracked" among them, then save the
+answer with `repo-link.sh set <project-id|none>`. The key lives in the repo's
+`.git/config`, so every worktree reads it and Syncthing carries it to the
+other machines.
+
+## 2. Sync merged PRs first
+
+At the start of any session in a linked repo, list the project's issues in In
+Progress or In Review with the `agent` label. Each one's comments hold its
+branch name, and its PR link once a PR exists. Find the PR from either:
+
+```bash
+gh pr view <url> --json state,mergedAt,body
+gh pr list --head <branch> --state all --json url,state,mergedAt,body
+```
+
+A PR found from the branch alone gets its PR link comment and moves to In
+Review first. Move a merged one to Done with the result comment from step 4,
+taking the done-check outcomes from the PR body's verification section. For a
+PR closed without merging, add one comment saying so, unless the issue already
+has that comment for this PR, and list the issue in your final report; leave
+its status for the user. Then close any parent issue whose sub-issues are now
+all Done, as step 4 says.
+
+## 3. Create the issue at the user's OK
+
+When the user approves a feature's summary page (`plan-feature` section 5),
+create one issue in the linked project, unless the session started from an
+existing issue: then use that one and add the `agent` label to it.
+
+- Title: the feature's name.
+- Description, written once: the goal in one sentence, the decisions the user
+  answered, the done checks, and the local folder that holds the spec. Later
+  changes go in comments; the description stays as approved.
+- Label `agent`. Create it in the team when it does not exist yet.
+- Work across several PRs: one sub-issue per PR in `plan.md`'s order, each
+  blocked by the one before it.
+- One comment: approved on <date>, where the work ends, and the approved
+  design in a few lines (the key decisions and how it works). For an existing
+  issue whose description you leave as the user wrote it, this comment also
+  carries the answered decisions and the done checks.
+
+## 4. Move it as the work moves
+
+| When | Status | Comment |
+|---|---|---|
+| The build starts | In Progress | the branch name |
+| A PR opens (`open-pr`) | In Review | the PR link |
+| The PR merges (`merge-pr`, or step 2) | Done | the result |
+| The work lands without a PR | Done | the result, with the commit |
+| The user drops the work | Canceled | the reason |
+| The last sub-issue of a parent is Done | Done, on the parent | the feature result |
+
+The result comment gives the PR or commit, each done check with its outcome,
+and the follow-ups from the final report. A parent's result lists its PRs and
+the feature's done checks. A follow-up becomes an issue only when the user
+says so; it gets the `agent` label.
+
+## 5. Before the session ends
+
+Check every issue this session created or touched: its status matches the
+work, and a finished one has its result comment. Cancel any issue created
+only for testing and remove it from its project, since the Linear tools cannot
+delete issues, then tell the user it can be deleted in the app. List each
+issue ID with its status in your report.
+
+## Repo links
+
+```bash
+~/.agents/skills/linear-track/scripts/repo-link.sh list   # every synced repo and its link
+~/.agents/skills/linear-track/scripts/repo-link.sh set P-PLA-33 --dir <repo>
+```

@@ -313,7 +313,8 @@ apply only after approval. Do not chain a pull with a broad apply.
 - [Ponytail retirement and pending deployment](docs/maintenance/2026-10-20-ponytail-retirement.md)
 - [Repository agent guidance](CLAUDE.md) and [review rules](REVIEW.md)
 
-`docs/drafts/`, `docs/plans/`, and `docs/superpowers/` hold ignored local artifacts.
+`docs/drafts/` (ignored by the global gitignore), `docs/plans/`, and the older
+`docs/superpowers/` hold ignored local artifacts.
 Keep personal feature-summary HTML and required diagrams/assets in a relevant
 feature folder under `docs/drafts/`, or an established ignored artifact location.
 Useful summaries and dependencies may be copied from a completed worktree to

@@ -111,10 +111,10 @@ the delivery rather than treating the checker as visual proof.
 
 ## 7. Deliver
 
-Use the project's established ignored artifact folder, such as
-`docs/superpowers/` or `docs/drafts/<feature>/`. Otherwise use
-`docs/drafts/<slug>/<slug>.html` and add `/docs/drafts/` to Git's local
-exclude file, located by `git rev-parse --git-path info/exclude`.
+Use the project's established ignored artifact folder, otherwise
+`docs/drafts/<slug>/<slug>.html`; the global gitignore covers `docs/drafts/`.
+When `git check-ignore` says a path there is not ignored, add `/docs/drafts/`
+to Git's local exclude file, located by `git rev-parse --git-path info/exclude`.
 Change tracked `.gitignore` rules only when the project or user requests it.
 Keep required local assets and diagram sources together in that folder;
 check each path with `git check-ignore <path>`. Personal artifacts stay out

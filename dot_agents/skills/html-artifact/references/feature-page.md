@@ -1,14 +1,15 @@
 # Feature page
 
 The one page the user reads for a feature, instead of its spec and plan. Write
-it once the spec has passed design review, before planning, and update the
-same page in place after the build. Its job is the design and architecture
-at a glance: what the feature is, how it works, what was decided and by whom,
-and how anyone will know it is done.
+it once the spec is settled, before the user's approval, and update the same
+page in place after the build. Its job is the design at a glance: what the
+feature is, how it works, what was decided and by whom, and how anyone will
+know it is done. It leaves out the details the spec holds.
 
-Put it at `docs/superpowers/<feature>/<feature>.html`, git-ignored, or in the
-project's established ignored artifact folder, with its diagram specs beside
-it. Link the spec and plan by path in the meta line; never copy them in.
+Put it at `docs/drafts/<date>-<feature>/summary.html`, which the global
+gitignore covers, or in the project's established ignored artifact folder,
+with its diagram specs beside it. Link the spec and plan by path in the meta
+line; never copy them in.
 
 ## Core sections, always in this order
 
@@ -22,15 +23,19 @@ way. Headings stay claims about this feature, per [writing.md](writing.md).
 | 2 | `how` "How it works" | The architecture, or for science and algorithm work the data and algorithm flow. Two or three sentences only | A graph-spec diagram ([diagrams.md](diagrams.md)), required, the first figure on the page |
 | 3 | `decisions` "Key decisions" | The choices that shape the build: decision, chosen option, the alternative rejected, why, and who chose it | Table; `who` is a tag: `you` (blue), `agent default` (peach), `review` (mauve). Undiscussed agent defaults come first. At most 8 rows; the rest go in an evidence disclosure |
 | 4 | `done` "Done checks" | The spec's done checks: check, kind (known answer, reference, property, real-data run, degenerate input, or app run from empty state), the command, status, evidence. Evidence keeps the observed answer in a few words ("12 of 12 rows match") beside the revision checked, so it survives cleanup of logs | Table with `.status` dots: `planned`, `pass` (good), `fail` (bad); evidence names the revision checked |
-| 5 | `risks` "Risks and review" | The design review's verdict in one line, then the two or three risks that matter, each with its mitigation | One `.callout`; full review findings in an evidence disclosure |
-| 6 | `not-doing` "Not doing" | What is out of scope, and why when it is not obvious | `.not-doing` list |
+| 5 | `not-doing` "Not doing" | What is out of scope, and why when it is not obvious | `.not-doing` list |
 
-After the build, add section 7. It sits between Done checks and Risks and
-review, beside the results it explains:
+Add `risks` "Risks and review" between Done checks and Not doing only when a
+design review ran or a real risk exists: the review's verdict in one line,
+then the two or three risks that matter, each with its mitigation, in one
+`.callout`, with full findings in an evidence disclosure.
+
+After the build, add What changed. It sits right after Done checks, beside the
+results it explains:
 
 | # | `id` and `data-toc` | Content | Visual |
 |---|---|---|---|
-| 7 | `changes` "What changed from the design" | Each spec amendment made during planning and the build, with its reason; corrections to a done check or to the user's requests first | Status ledger (`done`, `changed`, `dropped`, `deferred`) |
+| 6 | `changes` "What changed from the design" | Each spec amendment made during planning and the build, with its reason; corrections to a done check or to the user's requests first | Status ledger (`done`, `changed`, `dropped`, `deferred`) |
 
 ## Optional sections
 
@@ -42,7 +47,7 @@ measured times exist.
 
 ## Detail
 
-The core fits about three screens at 1400x900. Everything that supports a
+The core fits about two screens at 1400x900. Everything that supports a
 claim without being the claim (interfaces, file lists, full review findings,
 raw check output) goes in `details.evidence` blocks. Numbers go in tiles and
 tables, not prose. A section with nothing to say keeps its heading and one
@@ -52,9 +57,9 @@ sentence saying so; it is never padded.
 
 Edit `<main>` in place. Change the stage in the meta line and the tiles, fill
 each done check's status and evidence with the revision checked, add What
-changed, and refresh Risks and Waiting on you. Do this after the last review
-fixes and before any workspace cleanup deletes the ledger the amendments came
-from.
+changed, and refresh Waiting on you, and Risks when the page has it. Do this
+after the last review fixes and before any workspace cleanup deletes the
+ledger the amendments came from.
 
 [`assets/feature-example.html`](../assets/feature-example.html) is a complete
 page at the Built stage.

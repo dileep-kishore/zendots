@@ -47,8 +47,8 @@ The repository follows chezmoi's naming conventions where files/directories are 
 ## Personal artifacts
 
 Keep personal feature-summary HTML and its required diagrams and assets local
-and untracked in a relevant feature folder under `docs/drafts/`, or an
-established ignored location such as `docs/superpowers/`. Maintained project
+and untracked in a feature folder under `docs/drafts/`, which the global
+gitignore covers. Older work may stay in `docs/superpowers/`. Maintained project
 documentation, guides, and existing published documentation stay tracked.
 Product HTML under skills stays tracked.
 
@@ -138,8 +138,9 @@ chezmoi with a source entry and a removal for the same path.
   against `~/.claude/plugins` and `enabledPlugins` in `~/.claude/settings.json`.
 - Superpowers was retired on 2026-11-21 from Claude Code, Codex, and OpenCode;
   the global AGENTS.md and the `plan-feature` skill carry its interview, spec,
-  and plan rules. Specs and plans still default to the ignored
-  `docs/superpowers/` folder. On each host, after the scoped apply, run
+  and plan rules. Specs, plans and summary pages now go in
+  `docs/drafts/<date>-<feature>/`; older ones stay in `docs/superpowers/`.
+  On each host, after the scoped apply, run
   `~/.local/bin/link-agent-skills.sh` so Claude Code finds `plan-feature`, and
   `~/.config/opencode/sync_skill_collections.sh` once; the second removes only
   the old helper's known symlinks and leaves the old unmanaged checkout

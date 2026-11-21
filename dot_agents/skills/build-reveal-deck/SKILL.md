@@ -39,9 +39,9 @@ audience should remember.
 Put the deck where html-artifact pages go:
 
 - **In a git project:** use the project's established ignored artifact
-  folder, such as `docs/superpowers/<topic>/` or `docs/drafts/<slug>/`.
-  Otherwise use `docs/drafts/<slug>/` and add `/docs/drafts/` to the file
-  `git rev-parse --git-path info/exclude` prints. Change tracked `.gitignore`
+  folder, otherwise `docs/drafts/<slug>/`, which the global gitignore covers.
+  When `git check-ignore` says it is not ignored, add `/docs/drafts/` to the
+  file `git rev-parse --git-path info/exclude` prints. Change tracked `.gitignore`
   rules only when the project or user asks. Never commit a deck unless asked.
 - **When the user asks for the Presentations folder:** use a subfolder for
   this deck, `/Volumes/WorkSSD/Work/Presentations/<Topic>_<YYYY>_<Mon>/`.

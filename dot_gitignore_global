@@ -9,3 +9,8 @@
 
 # Serena per-project state and memories
 .serena/
+
+**/.claude/settings.local.json
+
+# Personal feature specs, plans and summary pages (plan-feature, html-artifact)
+docs/drafts/

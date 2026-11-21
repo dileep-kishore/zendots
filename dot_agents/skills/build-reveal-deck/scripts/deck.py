@@ -61,7 +61,7 @@ def guard_untracked(dest: Path, files: list[Path]) -> None:
     tracked = [str(f) for f in files if (dest / f).resolve() not in ignored]
     if tracked:
         fail(f"git would track {len(tracked)} file(s) in {dest}, e.g. {', '.join(tracked[:3])}. Use the project's "
-             "ignored artifact folder (docs/superpowers/ or docs/drafts/), add the whole folder to the file "
+             "ignored artifact folder (docs/drafts/), add the whole folder to the file "
              "`git rev-parse --git-path info/exclude` names, or pass --tracked to commit it")
 
 

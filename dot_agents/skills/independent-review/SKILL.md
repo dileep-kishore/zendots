@@ -71,6 +71,10 @@ approval-marker commit still matches the head.
 Record the absolute checkout path, HEAD, target, and relevant project standards.
 Respect explicit file or staged-only scopes rather than widening them.
 
+When the change was built from a spec (`plan-feature`), copy the spec's
+decisions and done checks into the intent as requirements, with the spec's
+path, so finders check the build against what the user approved.
+
 - **Working changes:** inspect staged and unstaged changes with `git diff HEAD`
   and untracked files with `git status --short --untracked-files=all`. Untracked
   files count even when the tracked diff is empty. For an unborn HEAD, inspect
