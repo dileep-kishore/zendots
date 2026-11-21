@@ -37,7 +37,8 @@ show, such as how a library or flag behaves or how long a step takes, is not a
 question: probe it in a scratch directory within 20 minutes, cite the result,
 and delete the probe. When a probe or a quick prototype could change your
 recommendation on a question, run it first and put its result in that
-question's options.
+question's options. In a repo linked to Linear, run `linear-track` step 2
+here: what related issues settle is read, not asked.
 
 ## 2. Ask once, up front
 
@@ -52,7 +53,9 @@ has two sound options here:
 - where the work ends, only when the global default (branch only, or a PR when
   the user asked to ship) does not fit;
 - taste calls the user wants to make, such as visual style or naming;
-- the Linear project, when the repo has no link yet (`linear-track` step 1).
+- the Linear project, when the repo has no link yet (`linear-track` step 1);
+- which Linear issue tracks the work, when the related-issue search or a
+  GitHub issue offers a choice (`linear-track` step 2).
 
 Ask them all in one round: one question-tool call when the tool holds them all,
 otherwise one numbered message, and stop. Each question is multiple choice with
@@ -108,8 +111,9 @@ key decisions with the undiscussed defaults first, one design diagram, the
 done checks, and what is out of scope, plus the plan's order when there is a
 plan. Present only the key decisions and link the page. Write no code until
 the user approves. When the request asked for the build, approval covers it
-through the end state the user chose in section 2. At the approval, create the
-Linear issue as `linear-track` step 3 says, when the repo is linked.
+through the end state the user chose in section 2. At the approval, create or
+adopt the Linear issue as `linear-track` step 3 says, unless the user chose to
+leave Linear out.
 
 ## 6. Build rules (copy into the spec)
 
@@ -121,8 +125,8 @@ Linear issue as `linear-track` step 3 says, when the repo is linked.
 - Run the done checks before the final review, and rerun the affected ones
   after its fixes. The final review takes the spec's decisions and done
   checks as its requirements.
-- Keep the Linear issue's status current with `linear-track` step 4, when the
-  repo is linked.
+- Keep the Linear issue's status and summary current with `linear-track`
+  step 4, when the work has an issue.
 - Put each decision a later maintainer needs in the PR description, or, when
   the work lands without a PR, in the commit message body or a tracked
   decision record. The spec folder is ignored and disposable after merge.
