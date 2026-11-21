@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -50,8 +50,13 @@ export async function ensureRuntime(): Promise<Runtime> {
         console.log(`Preparing shared diagram runtime: ${dir}`);
         mkdirSync(dir, { recursive: true });
         for (const name of files) { mkdirSync(dirname(join(dir, name)), { recursive: true }); copyFileSync(join(source, name), join(dir, name)); }
-        execFileSync(process.execPath, ['install', '--frozen-lockfile', '--ignore-scripts'], options);
-        execFileSync(process.execPath, ['node_modules/playwright/cli.js', 'install', 'chromium', '--only-shell'], options);
+        // An edit to the diagram sources must not need the network: reuse packages a ready runtime installed from the same lockfile.
+        const donor = readyRuntimeWithSameLock(dir);
+        if (donor) cpSync(join(donor, 'node_modules'), join(dir, 'node_modules'), { recursive: true, verbatimSymlinks: true });
+        else {
+          execFileSync(process.execPath, ['install', '--frozen-lockfile', '--ignore-scripts'], options);
+          execFileSync(process.execPath, ['node_modules/playwright/cli.js', 'install', 'chromium', '--only-shell'], options);
+        }
         writeFileSync(ready, 'ready\n');
       }
     } finally {
@@ -61,6 +66,16 @@ export async function ensureRuntime(): Promise<Runtime> {
   }
   console.log(`Using shared diagram runtime: ${dir}`);
   return { dir, run: (args, env = {}) => execFileSync(process.execPath, args, { ...options, env: { ...options.env, ...env } }) };
+}
+
+function readyRuntimeWithSameLock(dir: string): string | undefined {
+  const same = (a: string, b: string) => existsSync(a) && existsSync(b) && readFileSync(a).equals(readFileSync(b));
+  for (const name of readdirSync(cache)) {
+    const other = join(cache, name);
+    if (other === dir || !existsSync(join(other, '.ready')) || !existsSync(join(other, 'node_modules'))) continue;
+    if (same(join(other, 'package.json'), join(dir, 'package.json')) && same(join(other, 'bun.lock'), join(dir, 'bun.lock'))) return other;
+  }
+  return undefined;
 }
 
 /** Downloads the measuring fonts once into the cache and returns their directory. */
