@@ -9,3 +9,12 @@ fi
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 {{- end }}
+
+# Agent shells (T3, Codex) are login but non-interactive and skip .zshrc, so
+# load the API keys here too. Same rules as .shell_exports.
+if [ -f "$HOME/.config/secrets.env" ]; then
+    set -a
+    . "$HOME/.config/secrets.env"
+    set +a
+fi
+unset ANTHROPIC_API_KEY OPENAI_API_KEY
