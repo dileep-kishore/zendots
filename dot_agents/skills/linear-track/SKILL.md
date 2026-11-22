@@ -108,7 +108,7 @@ that skips `plan-feature` is adopted at build start.
 
 Work that skips `plan-feature` with no named issue gets one at build start
 in two cases: the user asks to track it in Linear, or the repo is linked to a
-project and the build touches more than two files or lands in several PRs.
+project and the build touches more than five files or lands in several PRs.
 The user's request overrides a `none` link; when the repo has no project,
 ask step 1's question before the build starts. When the related-issue search
 found an issue for this same work, adopt it; otherwise create one and list
