@@ -1,6 +1,6 @@
 ---
 name: linear-track
-description: Use when work will create, update, or close a Linear issue for the user's private tracking, when a session starts in a repo whose git config sets zendots.linearProject, when a request names a Linear issue, when a PR opens or merges in such a repo, when a GitHub issue is filed in such a repo, or when the user asks to link a repo to a Linear project. Not for team trackers such as GitHub issues.
+description: Use when work will create, update, or close a Linear issue for the user's private tracking, when a session starts in a repo whose git config sets zendots.linearProject, when a request names a Linear issue or asks to track work in Linear, when a PR opens or merges in such a repo, when a GitHub issue is filed in such a repo, or when the user asks to link a repo to a Linear project. Not for team trackers such as GitHub issues.
 ---
 
 # Track work in Linear, privately
@@ -104,17 +104,29 @@ At the user's OK on the summary page (`plan-feature` section 5), act on the
 tracking choice already made: adopt the issue named in the request or chosen
 in the batch; create nothing when the user chose to leave Linear out or the
 repo's link is `none`; otherwise create one issue. A named issue for work
-that skips `plan-feature` is adopted at build start. The link names the
-repo's main project; a feature that plainly belongs to another project in the
-same team, such as a benchmark run made from a workbench repo, goes there
-instead. Ask in the batch when it is not plain.
+that skips `plan-feature` is adopted at build start.
+
+Work that skips `plan-feature` with no named issue gets one at build start
+in two cases: the user asks to track it in Linear, or the repo is linked to a
+project and the build touches more than two files or lands in several PRs.
+The user's request overrides a `none` link; when the repo has no project,
+ask step 1's question before the build starts. When the related-issue search
+found an issue for this same work, adopt it; otherwise create one and list
+close matches under **Links**. Its summary takes the decisions from the
+request and the done checks from the check the session settled before
+editing.
+
+The link names the repo's main project; a feature that plainly belongs to
+another project in the same team, such as a benchmark run made from a
+workbench repo, goes there instead. Ask in the batch when it is not plain.
 
 - Title: the feature's name. Label `agent`, created in the team when missing.
 - Description: the summary block from the reference, written as it says.
 - Work across several PRs: one sub-issue per PR in `plan.md`'s order, each
   with the `agent` label, blocked by the one before it, with its own short
   summary.
-- One comment: approved on <date>, and where the work ends.
+- One comment: approved on <date>, or started on <date> without a spec and
+  why it is tracked, and where the work ends.
 
 ## Show the issue
 
