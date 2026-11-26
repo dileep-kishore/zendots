@@ -160,6 +160,16 @@
   and narrow), interfaces for object shapes, JSDoc on exported functions.
 - System and global installs: Paru or Homebrew, not pip, conda, apt, npm, or
   yarn, unless I ask. Inside a project, use its package manager.
+- For browser work in T3 Code, call `preview_status` first. When it returns
+  `available: false` with `tabId: null`, call `preview_open` without a
+  `tabId`. Pass `open: true` when the user wants to watch. For a local dev
+  server on the thread's host, pass
+  `target: {kind: "environment-port", port}`.
+- Run desktop capture and GUI tools from the logged-in macOS GUI session.
+  Before capturing on a headless Mac, check the console lock with
+  `ioreg -n Root -d1 | grep CGSSessionScreenIsLocked`, where no match means
+  unlocked. If the display is asleep, try `caffeinate -u -t 2` and recheck.
+  If a screen lock remains, stop and report it.
 
 ## Git
 
